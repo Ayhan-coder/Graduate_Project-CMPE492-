@@ -1,0 +1,528 @@
+\documentclass[conference]{IEEEtran}
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{microtype}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit,calc,shapes.geometric}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.17}
+\usepackage{url}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\begin{document}
+
+\title{A Two-Layer Evaluation of Speech-to-Text and\\
+LLM-Based Terminology Extraction Systems\\
+for Multilingual Education}
+
+\author{\IEEEauthorblockN{Cakil Yilmaz}
+\IEEEauthorblockA{\textit{Computer Engineering Dept.}\\
+\textit{Ko\c{c} University}\\
+Istanbul, Turkey\\
+dogacakilyilmaz2005@gmail.com}
+\and
+\IEEEauthorblockN{Berat Enes Dadak, Efe Batur Giritli, Yekta Said Can}
+\IEEEauthorblockA{\textit{R\&D Center}\\
+\textit{Tatilsepeti}\\
+Istanbul, Turkey\\
+\{berat.dadak, batur.giritli, yekta.can\}@tatilsepeti.com}
+}
+
+\maketitle
+
+\begin{abstract}
+Personalized instruction can improve learning outcomes, but it is hard to scale for spoken lecture and video content: the material must first be understood before it can be adapted to a learner. This paper reports a two-layer experimental evaluation of off-the-shelf automatic speech recognition (ASR) and large language model (LLM) components for making multilingual educational speech more accessible to beginner-level users. Rather than proposing a new architecture, we benchmark how these components behave on Turkish and English educational video. In the first layer, four ASR systems are compared on transcription accuracy (word and character error rates) and computational efficiency (latency, real-time factor). In the second layer, the most accurate transcripts are processed by two LLMs that extract domain-specific terminology and generate context-aware, CEFR-B1 explanations. Semantic outputs are scored with context-consistency and explanation-accuracy labels in both languages, and with a CEFR difficulty ratio and BLEU on English only. Whisper-based models produce substantially more reliable out-of-the-box transcripts than the English-oriented Wav2Vec~2.0 and SpeechBrain checkpoints used here. GPT-4.1 yields higher terminology coverage and explanation accuracy than GPT-4o-mini, at a modest latency cost. We formalize the evaluation protocol---a Turkish/English ASR split, a same-LLM cross-layer ablation, a two-annotator agreement procedure, and a dataset card---and pin a 2026 Hugging Face refresh (Whisper Large-v3 Turbo, Qwen3-ASR, and two open-weight LLMs) that officially covers Turkish and English. The language split, the ablation, the second-annotator $\kappa$, and the 2026 scores are not filled until the accompanying scripts have been run on the same seven videos. The completed pilot ran the LLMs on the best transcripts only.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Automatic speech recognition, terminology extraction, large language models, multilingual educational content, evaluation benchmark
+\end{IEEEkeywords}
+
+\section{Introduction}
+
+Educational content is increasingly delivered as audio and video. Lectures and instructional clips are typically prepared as if every listener shares a similar level of prior knowledge. That assumption limits comprehensibility for beginner-level users, especially in passages that carry domain-specific terminology~\cite{conde2016,xu2024}.
+
+One-to-one tutoring with mastery learning can raise average performance by roughly two standard deviations over conventional classroom instruction~\cite{bloom1984}, but human tutoring does not scale. Intelligent tutoring systems, adaptive hypermedia, and knowledge-tracing models approximate individualization at scale~\cite{brusilovsky2007,corbett1995,vanlehn2011}; large language models have more recently been used as a flexible substrate for instructional support and content generation~\cite{xu2024,vanzo2025}. Across these lines of work, a learning-support pipeline has three stages: (i)~understand the source content, (ii)~model the learner, and (iii)~adapt the delivery. For spoken lecture and video material the pipeline cannot start at (ii) or (iii). The content is locked in the audio signal, so the first stage must convert speech to text and then provide term-level semantic support. \emph{That first stage is the focus of this study.}
+
+Manual captioning and expert correction of lecture audio do not scale~\cite{southwell2022}. Transformer ASR trained on large multilingual collections, notably Whisper~\cite{radford2023}, is more robust under noise, accent, and domain shift; self-supervised encoders such as wav2vec~2.0~\cite{baevski2020} target low-resource labeled settings; toolkits such as SpeechBrain~\cite{ravanelli2021} make controlled comparison practical. Transcription alone is not enough. Beginners struggle with the domain terms---including multi-word terms---that lectures assume~\cite{conde2016,frantzi2000}, which motivates automatic terminology extraction and beginner-level explanation~\cite{tran2026}. In the literature, ASR quality and LLM-based semantic quality are usually reported separately. Studies that evaluate both layers on the same multilingual educational material, and that include a lower-resource language such as Turkish alongside English, remain scarce.
+
+This paper therefore asks three questions:
+
+\begin{itemize}
+\item \textbf{RQ1.} How do common off-the-shelf ASR systems compare on Turkish and English educational speech, both pooled and per language, in accuracy (WER, CER) and efficiency (latency, real-time factor)?
+\item \textbf{RQ2.} Given the most accurate transcripts, how do a high-capacity LLM and a lightweight LLM compare on terminology coverage, context consistency, explanation accuracy, and---for English---beginner suitability?
+\item \textbf{RQ3.} Which ASR+LLM pairings are preferable when the deployment constraint is accuracy versus when it is latency?
+\end{itemize}
+
+The completed pilot still reports pooled ASR numbers and runs both LLMs on the best transcripts. We do \emph{not} treat ASR$\to$LLM error propagation as a measured result. The accompanying repository defines the per-language table, the same-LLM ablation, and the two-annotator $\kappa$ procedure; those cells stay empty until the seven videos are re-scored.
+
+Our contributions are:
+
+\begin{itemize}
+\item A zero-shot comparison of ASR systems on multilingual (TR/EN) educational speech, reporting raw and normalized WER/CER together with latency and real-time factor, with a required Turkish/English split (Table~\ref{tab:asr-lang}). The completed pilot uses Whisper Medium/Large-v3, Wav2Vec~2.0, and SpeechBrain; the 2026 refresh adds Whisper Large-v3 Turbo, Qwen3-ASR (1.7B and 0.6B), and a Turkish-matched Whisper Turbo fine-tune.
+\item A comparison of GPT-4.1 and GPT-4o-mini on the same Whisper transcripts for terminology extraction and CEFR-B1 explanation generation, extended in the refresh by two public Hugging Face checkpoints (Qwen3-8B and Qwen2.5-3B-Instruct), plus a same-LLM ablation protocol on every ASR hypothesis (Table~\ref{tab:ablation}).
+\item A formal evaluation protocol (which metrics apply to which language; a two-annotator $\kappa$ procedure; a dataset card), decoding and hardware notes (Appendix~\ref{app:hw}), recommended pipeline pairings, and an evaluation kit that writes the pending tables from JSONL runs.
+\end{itemize}
+
+\section{Related Work}
+
+Video-based learning has made captions and transcripts a core accessibility feature. Automatic caption quality varies with domain terminology, speaker characteristics, and language or accent~\cite{kuhn2024}. Lecture-recording studies show that a single pooled error rate is not a sufficient report of ASR behavior~\cite{kuhn2024}, and ASR errors are known to propagate into downstream NLP tasks~\cite{southwell2022}. For Turkish, model choice is already known to matter~\cite{mercan2023}. Whisper remains a strong multilingual baseline~\cite{radford2023}; Large-v3 Turbo keeps the same $\approx$99-language coverage, including Turkish, with a pruned decoder~\cite{whisper-turbo}. Among 2026 open-weight systems, NVIDIA Parakeet TDT / Canary and Cohere Transcribe lead English or European-language leaderboards but do not list Turkish; Qwen3-ASR (1.7B and 0.6B) does, with official Turkish and English support~\cite{qwen3asr2026}. wav2vec~2.0 offers self-supervised representations under limited labels~\cite{baevski2020}; SpeechBrain provides a common experimental harness~\cite{ravanelli2021}. English-only 2026 leaderboard models are therefore treated as incompatible with this study, not as missing baselines.
+
+Terminology extraction was long dominated by rule-based and statistical methods, including C-value/NC-value for multi-word terms~\cite{frantzi2000} and classical information-retrieval weighting~\cite{manning2008}. Deep learning then became the default in specialized domains such as biomedicine~\cite{lossio2016}. LiTeWi combines unsupervised extractors with entity linking to build educational ontologies from textbooks~\cite{conde2016}. Recent surveys emphasize transformer-based and generative approaches to automatic term extraction~\cite{tran2026}. Almost all of this work assumes clean text.
+
+A separate literature targets the later stages of individualization---learner modeling and adapted delivery---including intelligent tutoring and adaptive hypermedia~\cite{brusilovsky2007,corbett1995,vanlehn2011} and, more recently, LLM tutors with carefully designed prompts~\cite{xu2024,vanzo2025}. Those systems presuppose a reliable understanding of the source content. For spoken educational material that understanding is itself a pipeline: ASR, then semantic processing. Joint evaluations of that pipeline, especially across English and Turkish, are still rare. This study targets that gap as a two-layer benchmark, not as a new adaptive tutor.
+
+\section{Method}
+
+\subsection{System Architecture}
+
+The system under evaluation has two stages (Fig.~\ref{fig:arch}). Audio is first transcribed by an ASR model. The resulting text is the only input to the second stage, in which an LLM extracts domain terms and writes a short beginner-level explanation for each term. The completed pilot evaluates the stages separately and runs the LLM layer on the most accurate transcripts only. The ablation protocol feeds \emph{every} ASR hypothesis to the \emph{same} LLM (GPT-4o-mini by default) so that term count and, once labeled, R1\%/D1\% can be plotted against ASR WER.
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[
+  font=\scriptsize\sffamily,
+  box/.style={draw, rounded corners=2pt, align=center, inner sep=3.5pt,
+              fill=black!4, minimum width=0.86\columnwidth},
+  arr/.style={-{Latex}, thick}
+]
+\node[box] (audio) {Educational audio (TR / EN, 16\,kHz mono)};
+\node[box, below=0.22cm of audio] (asr)
+  {ASR: Whisper Med./Large-v3/Turbo, Qwen3-ASR, TR-matched Turbo\\
+   {\itshape\tiny evaluated with WER, CER, latency, RTF}};
+\node[box, below=0.22cm of asr] (tr) {Transcript (pilot: best ASR;\ ablation: every ASR)};
+\node[box, below=0.22cm of tr] (llm)
+  {LLM: GPT-4.1 / GPT-4o-mini / Qwen3-8B / Qwen2.5-3B-Instruct\\
+   {\itshape\tiny terms + CEFR-B1 explanations; R1, D1; B1+ and BLEU on EN}};
+\node[box, below=0.22cm of llm] (out) {JSON array of $\{\texttt{term},\ \texttt{explanation}\}$};
+\draw[arr] (audio) -- (asr);
+\draw[arr] (asr) -- (tr);
+\draw[arr] (tr) -- (llm);
+\draw[arr] (llm) -- (out);
+\end{tikzpicture}
+\caption{Two-layer pipeline. Pilot semantic scores use the best ASR transcripts. The ablation protocol uses every ASR hypothesis with one fixed LLM.}
+\label{fig:arch}
+\end{figure}
+
+\subsection{Dataset}
+
+The evaluation set is seven educational videos (three Turkish, four English) totaling about 95 minutes of audio, summarized in Table~\ref{tab:data}. Topics were chosen from different domains but with comparable terminological load, so that domain is less likely to dominate the comparison. Audio was extracted from the videos, converted to 16\,kHz mono, and left otherwise unedited, preserving the original recording conditions.
+
+Reference transcripts were produced by manual correction of the audio and checked by a human annotator. We treat these references as the gold standard for WER/CER. The accompanying repository holds a dataset card (\texttt{experiments/data/DATASET\_CARD.md}) with the fields in Table~\ref{tab:data}, the 16\,kHz mono conversion, and the no-cleaning rule. Source platform, license, speaker count, accent, and prepared versus spontaneous speech are recorded there as unknown until the authors complete those fields; they are not invented in this draft.
+
+\begin{table}[t]
+\caption{Evaluation set (total $\approx$95\,min).}
+\label{tab:data}
+\centering
+\renewcommand{\arraystretch}{1.12}
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{@{}l p{2.55cm} c p{1.55cm} r@{}}
+\toprule
+\textbf{ID} & \textbf{Title} & \textbf{Lg.} & \textbf{Domain} & \textbf{Dur.} \\
+\midrule
+TR-1 & Project mgmt., Unit 7, Lecture 1 & TR & Proj.\ mgmt. & $\approx$12\,min \\
+TR-2 & Tourism training for tour guides & TR & Tourism & 12\,min \\
+TR-3 & Intro to data science (Python) & TR & Data science & $\approx$14\,min \\
+EN-1 & Introduction to agile methods & EN & Proj.\ mgmt. & $\approx$13\,min \\
+EN-2 & What is sustainable tourism? & EN & Tourism & $\approx$9\,min \\
+EN-3 & Generative AI in a nutshell & EN & AI & $\approx$18\,min \\
+EN-4 & Understanding thermal radiation & EN & Heat transfer & $\approx$17\,min \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Speech Recognition Layer}
+
+The completed pilot compared four off-the-shelf systems on the same audio, with default pretrained weights and no domain-specific fine-tuning: Whisper Medium and Large-v3~\cite{radford2023}, Wav2Vec~2.0 (\texttt{facebook/wav2vec2-large-xlsr-53})~\cite{baevski2020}, and SpeechBrain~\cite{ravanelli2021}. The Wav2Vec~2.0 and SpeechBrain checkpoints are primarily English-oriented; their Turkish numbers are a coverage result, not an architectural ranking.
+
+The 2026 refresh keeps that zero-shot rule and adds only checkpoints that officially cover both Turkish and English, plus one language-matched Turkish model used only on the TR subset (Table~\ref{tab:hf2026}). Hub IDs and commit SHAs were snapshotted on 28~August~2026. NVIDIA Parakeet TDT 0.6B~v3, Canary~1B~v2, Canary-Qwen~2.5B, and Cohere Transcribe 03-2026 were inspected and rejected because Turkish is not in their published language lists.
+
+\begin{table}[t]
+\caption{Hugging Face checkpoints selected for the 2026 refresh (28~Aug~2026). Pilot rows already have results in Section~\ref{sec:results}.}
+\label{tab:hf2026}
+\centering
+\renewcommand{\arraystretch}{1.12}
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}p{3.35cm} l l l@{}}
+\toprule
+\textbf{Hub ID} & \textbf{Role} & \textbf{Lang.} & \textbf{License} \\
+\midrule
+\texttt{openai/whisper-medium} & pilot baseline & tr+en & Apache-2.0 \\
+\texttt{openai/whisper-large-v3} & pilot multilingual & tr+en & Apache-2.0 \\
+\texttt{openai/whisper-large-v3-turbo} & 2026 speed & tr+en & MIT \\
+\texttt{Qwen/Qwen3-ASR-1.7B-hf} & 2026 multilingual & tr+en & Apache-2.0 \\
+\texttt{Qwen/Qwen3-ASR-0.6B-hf} & 2026 efficient & tr+en & Apache-2.0 \\
+\texttt{selimc/whisper-large-v3-turbo-turkish} & TR-matched & tr only & MIT \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Semantic Analysis Layer}
+
+The most accurate transcripts are passed to the semantic layer, with no local training or fine-tuning. The completed pilot uses two hosted models through the OpenAI API~\cite{openai2026}: GPT-4o-mini (low-latency baseline) and GPT-4.1 (higher-capacity reference). The 2026 refresh adds two public, ungated Hugging Face checkpoints so the semantic layer is no longer API-only: \texttt{Qwen/Qwen3-8B} (open-weight capacity) and \texttt{Qwen/Qwen2.5-3B-Instruct} (open-weight latency). Aya Expanse 8B lists Turkish but is gated and non-commercial, so it is not in the primary set.
+
+The instruction is held fixed across all runs. The model must (i)~extract domain-specific terms, including multi-word terms, as a JSON list, and (ii)~write one short CEFR-B1 explanation per term that uses only information consistent with the transcript. The full template is given in Appendix~\ref{app:prompt}. Temperature and other generation settings are left at API defaults and are not varied.
+
+\subsection{Evaluation Metrics}
+
+\subsubsection{ASR layer}
+We report word error rate (WER) and character error rate (CER) against the reference transcripts~\cite{jurafsky2026}. For a reference of $N$ words,
+\begin{equation}
+\mathrm{WER}=\frac{S+D+I}{N},
+\label{eq:wer}
+\end{equation}
+where $S$, $D$, and $I$ are substitutions, deletions, and insertions. CER is defined analogously over $N_c$ reference characters. Both metrics are computed on raw output and on a normalized form (lowercasing, punctuation removal, whitespace cleanup) so that formatting differences are not counted as content errors. CER is the more stable of the two under the morphological richness of Turkish.
+
+Efficiency is reported as wall-clock latency and as the real-time factor
+\begin{equation}
+\mathrm{RTF}=\frac{t_{\mathrm{proc}}}{t_{\mathrm{audio}}},
+\label{eq:rtf}
+\end{equation}
+so that $\mathrm{RTF}<1$ means faster-than-real-time processing.
+
+\subsubsection{Semantic layer}
+Outputs are scored against dictionary references: the Turkish Language Association (TDK) dictionary for Turkish~\cite{tdk2026} and the Oxford English Dictionary for English~\cite{oed2026}. Two binary labels are assigned by a domain-knowledgeable annotator. The completed pilot used a single annotator. The repository includes a two-annotator protocol and a Cohen's $\kappa$ script; $\kappa$ is reported only after a second annotator has labeled a subset independently (Appendix~\ref{app:iaa}):
+
+\begin{itemize}
+\item $R$: the extracted term is consistent with the transcript context ($R1$) or not ($R0$);
+\item $D$: the generated explanation is correct relative to the dictionary ($D1$) or not ($D0$).
+\end{itemize}
+
+From these counts we report
+\begin{equation}
+\mathrm{R1\%}=\frac{R1}{R1+R0},\qquad
+\mathrm{D1\%}=\frac{D1}{D1+D0}.
+\label{eq:rd}
+\end{equation}
+R1\% is a precision-like score over emitted terms; there is no gold term list, so recall is not reported. Term count is therefore presented alongside R1\%, not as a coverage claim by itself.
+
+For English only we also report a CEFR-based B1+ ratio and BLEU~\cite{papineni2002}. The B1+ ratio is the fraction of explanation tokens at CEFR level B1 or above,
+\begin{equation}
+\mathrm{B1^{+}\ ratio}=\frac{\lvert\{w:\mathrm{CEFR}(w)\ge\mathrm{B1}\}\rvert}{\lvert\{w\}\rvert},
+\label{eq:b1}
+\end{equation}
+so a \emph{lower} value is more beginner-friendly. These two metrics are English-only because there is no equally standardized CEFR word list for Turkish and because BLEU requires aligned reference definitions. Table~\ref{tab:protocol} states which metric applies to which language.
+
+\begin{table}[t]
+\caption{Evaluation protocol by language.}
+\label{tab:protocol}
+\centering
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Metric} & \textbf{TR} & \textbf{EN} \\
+\midrule
+Term--context consistency (R1/R0) & yes & yes \\
+Explanation accuracy (D1/D0) & yes & yes \\
+CEFR difficulty (B1+ ratio) & -- & yes \\
+BLEU vs.\ dictionary definition & -- & yes \\
+ASR WER / CER / latency / RTF & yes & yes \\
+LLM latency & yes & yes \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Experimental Setup and Reproducibility}
+
+Pilot checkpoints: Whisper \texttt{medium} / \texttt{large-v3}; Wav2Vec~2.0 \texttt{facebook/wav2vec2-large-xlsr-53}; SpeechBrain with default greedy/beam settings; GPT-4.1 and GPT-4o-mini via the OpenAI API~\cite{openai2026}. All pilot ASR runs were on CPU. The original draft did not record the CPU model or Whisper decoding flags; those scores are therefore configuration-sensitive (Appendix~\ref{app:hw}). Refresh checkpoints and pinned revisions are listed in Table~\ref{tab:hf2026} and in \texttt{experiments/models.json}. The refresh scripts force \texttt{task=transcribe}, set \texttt{language} from the clip when known, decode long-form audio in 30\,s chunks, and leave \texttt{condition\_on\_previous\_text} off by default. R/D labels in the pilot were assigned by a single annotator. Exact prompt wording is in Appendix~\ref{app:prompt}.
+
+\section{Experimental Results}
+\label{sec:results}
+
+This section reports the completed pilot. Tests were run on the Turkish and English material; Table~\ref{tab:asr} gives pooled ASR error rates. Table~\ref{tab:asr-lang} is the required language split: it is empty until \texttt{run\_asr.py} and \texttt{report.py} have been run on the seven-video manifest. The 2026 models in Table~\ref{tab:hf2026} share that protocol; their scores appear in Table~\ref{tab:asr-2026} only after the same run.
+
+\begin{table}[t]
+\caption{Average transcription accuracy. Lower is better.}
+\label{tab:asr}
+\centering
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Model} & \textbf{WER raw} & \textbf{CER raw} & \textbf{WER norm.} & \textbf{CER norm.} \\
+\midrule
+Whisper Medium & 0.058 & 0.021 & 0.021 & 0.015 \\
+Whisper Large-v3 & 0.132 & 0.113 & 0.129 & 0.112 \\
+Wav2Vec2$^{\dagger}$ & 1.017 & 0.848 & 0.548 & 0.196 \\
+SpeechBrain$^{\dagger}$ & 1.246 & 1.051 & 0.382 & 0.273 \\
+\bottomrule
+\multicolumn{5}{p{0.95\columnwidth}}{\footnotesize $^{\dagger}$Default, primarily English-oriented checkpoints. Turkish numbers reflect out-of-the-box multilingual coverage, not an architectural limit.}
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\caption{Normalized WER/CER by language (unweighted mean over clips). Cells are written by \texttt{report.py} from \texttt{run\_asr.py} JSONL. Pooled values in Table~\ref{tab:asr} are unchanged.}
+\label{tab:asr-lang}
+\centering
+\renewcommand{\arraystretch}{1.15}
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Model} & \textbf{TR WER} & \textbf{TR CER} & \textbf{EN WER} & \textbf{EN CER} \\
+\midrule
+Whisper Medium & --- & --- & --- & --- \\
+Whisper Large-v3 & --- & --- & --- & --- \\
+Wav2Vec2$^{\dagger}$ & --- & --- & --- & --- \\
+SpeechBrain$^{\dagger}$ & --- & --- & --- & --- \\
+\bottomrule
+\multicolumn{5}{p{0.95\columnwidth}}{\footnotesize $^{\dagger}$English-oriented checkpoints. The TR column is the coverage result the pooled table cannot show.}
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\caption{2026 refresh, normalized WER/CER by language. Empty until the seven videos are re-run. TR-matched Turbo is scored on TR only.}
+\label{tab:asr-2026}
+\centering
+\renewcommand{\arraystretch}{1.15}
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Model} & \textbf{TR WER} & \textbf{TR CER} & \textbf{EN WER} & \textbf{EN CER} \\
+\midrule
+Whisper Turbo & --- & --- & --- & --- \\
+Qwen3-ASR 1.7B & --- & --- & --- & --- \\
+Qwen3-ASR 0.6B & --- & --- & --- & --- \\
+Whisper Turbo TR & --- & --- & -- & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  ybar,
+  bar width=7pt,
+  width=\columnwidth,
+  height=4.4cm,
+  ymin=0, ymax=0.65,
+  ylabel={Normalized error rate},
+  symbolic x coords={Med., Large-v3, Wav2Vec2, SpeechBrain},
+  xtick=data,
+  x tick label style={font=\scriptsize},
+  legend style={at={(0.5,0.97)}, anchor=north, legend columns=2, font=\scriptsize, draw=none, fill=none},
+  enlarge x limits=0.18,
+  grid=major,
+  major grid style={dotted,black!20},
+  tick label style={font=\scriptsize},
+  label style={font=\scriptsize},
+]
+\addplot[fill=black!55] coordinates {(Med.,0.021) (Large-v3,0.129) (Wav2Vec2,0.548) (SpeechBrain,0.382)};
+\addplot[fill=black!20] coordinates {(Med.,0.015) (Large-v3,0.112) (Wav2Vec2,0.196) (SpeechBrain,0.273)};
+\legend{WER (norm.), CER (norm.)}
+\end{axis}
+\end{tikzpicture}
+\caption{Normalized WER and CER for the four ASR systems (same values as Table~\ref{tab:asr}).}
+\label{fig:wer}
+\end{figure}
+
+On the pooled numbers in Table~\ref{tab:asr} and Fig.~\ref{fig:wer}, the two Whisper models have much lower error than Wav2Vec~2.0 and SpeechBrain. Normalized WER/CER are the figures we use when discussing downstream usability. Table~\ref{tab:rtf} shows the complementary efficiency picture: Wav2Vec~2.0 is the cheapest (mean RTF~$0.051$) and SpeechBrain the most expensive (mean RTF~$2.005$, slower than real time). Whisper Medium sits in a usable range (mean RTF~$0.156$) at the lowest error.
+
+Two points of interpretation matter. First, Whisper is pretrained on large-scale multilingual data, whereas the Wav2Vec~2.0 and SpeechBrain checkpoints used here are primarily English-oriented. The high error of the latter two, especially on the Turkish portion of the set, is an out-of-the-box coverage result. We therefore rank systems by suitability for this multilingual setting, not by architecture. The 2026 refresh replaces that gap with Qwen3-ASR and a Turkish-matched Whisper Turbo fine-tune (Table~\ref{tab:hf2026}) rather than fine-tuning Wav2Vec~2.0 or SpeechBrain.
+
+Second, Whisper Medium has a \emph{much} lower normalized WER than Large-v3 ($0.021$ vs.\ $0.129$ --- about six times lower), not a slight edge. This is consistent with Large-v3's known sensitivity, on long-form audio, to language detection and to decoding flags such as \texttt{condition\_on\_previous\_text}. We treat the gap as configuration-dependent and do not present Medium as generally superior to Large-v3.
+
+\begin{table}[t]
+\caption{ASR computational cost (CPU).}
+\label{tab:rtf}
+\centering
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Model} & \textbf{Mean latency (s)} & \textbf{Mean RTF} \\
+\midrule
+Whisper Medium & 136.5 & 0.156 \\
+Whisper Large-v3 & 653.4 & 0.703 \\
+Wav2Vec2 & 46.1 & 0.051 \\
+SpeechBrain & 1795.1 & 2.005 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Semantic results are in Table~\ref{tab:sem}. GPT-4.1 emits more terms than GPT-4o-mini in both languages (105 vs.\ 56 on English; 78 vs.\ 36 on Turkish) while keeping R1\% and D1\% high (96.2\% context consistency in both languages; explanation accuracy 99.0\% EN / 98.7\% TR). The smaller model is also accurate, but it under-extracts relative to GPT-4.1. Because there is no gold term list, the extra terms from GPT-4.1 are a coverage \emph{indication}, not a recall measurement; R1\% says only that the terms it did emit were mostly context-consistent.
+
+On English, GPT-4.1 also has the lower B1+ ratio ($0.074$ vs.\ $0.191$), i.e.\ fewer advanced words in the explanations, and a slightly higher BLEU ($0.61$ vs.\ $0.57$). BLEU against dictionary definitions is a weak semantic metric and is reported only as an auxiliary score.
+
+\begin{table*}[t]
+\caption{Semantic analysis on Whisper transcripts. R1\% $= R1/(R1+R0)$, D1\% $= D1/(D1+D0)$. B1+ and BLEU are defined only for English (Section~III-E). Lower B1+ is more beginner-friendly.}
+\label{tab:sem}
+\centering
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{llccccc}
+\toprule
+\textbf{Model} & \textbf{Lang.} & \textbf{Terms} & \textbf{R1/R0 (R1\%)} & \textbf{D1/D0 (D1\%)} & \textbf{B1+ ratio} & \textbf{BLEU} \\
+\midrule
+GPT-4.1 & EN & 105 & 101/4 (96.2\%) & 104/1 (99.0\%) & 0.074 & 0.61 \\
+GPT-4o-mini & EN & 56 & 51/5 (91.1\%) & 54/2 (96.4\%) & 0.191 & 0.57 \\
+GPT-4.1 & TR & 78 & 75/3 (96.2\%) & 77/1 (98.7\%) & -- & -- \\
+GPT-4o-mini & TR & 36 & 33/3 (91.7\%) & 34/2 (94.4\%) & -- & -- \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+LLM latency on the Turkish subset is in Table~\ref{tab:llmlat}. GPT-4o-mini is faster and more stable (mean $12.53$\,s, s.d.\ $1.77$) than GPT-4.1 (mean $17.79$\,s, s.d.\ $5.40$). Combined with the ASR numbers, two deployment pairings follow:
+
+\begin{itemize}
+\item \textbf{Accuracy-oriented:} Whisper Medium + GPT-4.1, when terminology coverage and explanation quality matter more than a few extra seconds per call.
+\item \textbf{Latency-oriented:} Whisper Medium + GPT-4o-mini, when a smaller, more stable semantic model is enough and compute is limited.
+\end{itemize}
+
+Wav2Vec~2.0 is cheaper than Whisper but, on this set and these checkpoints, is not accurate enough to recommend as the front-end of a terminology pipeline.
+
+Table~\ref{tab:ablation} is the cross-layer ablation: GPT-4o-mini on every pilot ASR hypothesis of the same seven videos. Term counts are automatic. R1\% and D1\% require the two-annotator labels and stay empty until those labels exist. We do not interpret this table until it is filled.
+
+\begin{table}[t]
+\caption{Cross-layer ablation (same LLM, GPT-4o-mini by default, on every ASR hypothesis). Term count is automatic; R1\%/D1\% need human labels.}
+\label{tab:ablation}
+\centering
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{llccc}
+\toprule
+\textbf{ASR} & \textbf{Lang.} & \textbf{Terms} & \textbf{R1\%} & \textbf{D1\%} \\
+\midrule
+Whisper Medium & TR / EN & --- & --- & --- \\
+Whisper Large-v3 & TR / EN & --- & --- & --- \\
+Wav2Vec2 & TR / EN & --- & --- & --- \\
+SpeechBrain & TR / EN & --- & --- & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\caption{LLM processing latency on the Turkish subset.}
+\label{tab:llmlat}
+\centering
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Model} & \textbf{Mean (s)} & \textbf{Std} & \textbf{Min (s)} & \textbf{Max (s)} \\
+\midrule
+GPT-4.1 & 17.79 & 5.40 & 10.99 & 34.44 \\
+GPT-4o-mini & 12.53 & 1.77 & 9.16 & 14.85 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Limitations}
+
+This is a focused benchmark. (i)~Dataset size: seven videos, about 95 minutes; reported values are averages over this set, with no significance tests. (ii)~ASR scope of the completed pilot: default checkpoints only, so that ranking is out-of-the-box multilingual suitability, not each architecture's ceiling. (iii)~Tables~\ref{tab:asr-lang}, \ref{tab:asr-2026}, and \ref{tab:ablation} are part of the protocol but are empty until the evaluation kit is run on the original wavs; we do not invent those cells. (iv)~Semantic labels in the pilot: a single annotator; $\kappa$ is defined but not yet measured. R/D are binary and there is no gold term list, so recall is unmeasured. (v)~Language coverage of metrics: B1+ and BLEU are English-only. (vi)~API-hosted LLMs: outputs can change as providers update models. (vii)~Pilot LLMs were run on the best transcripts only. (viii)~Dataset card fields for source, license, and speakers are unknown until the authors complete them.
+
+\section{Conclusion and Future Work}
+
+We presented a two-layer evaluation of off-the-shelf ASR and LLM components for beginner-oriented support on Turkish and English educational speech. Whisper-based models, especially Medium under our decoding setup, provided usable transcripts at acceptable real-time factor. GPT-4.1 extracted more terms than GPT-4o-mini and produced more beginner-friendly English explanations, at higher and more variable latency. For accuracy-first deployments we recommend Whisper Medium with GPT-4.1; for latency-first deployments, Whisper Medium with GPT-4o-mini.
+
+We did not measure how ASR errors propagate into LLM outputs. Immediate next step is to drop the seven wavs into the evaluation kit and fill Tables~\ref{tab:asr-lang}, \ref{tab:asr-2026}, and \ref{tab:ablation}, then double-label a subset for $\kappa$. Further work: (a)~intermediate modules such as confidence filtering and ASR-aware prompting; (b)~prompt, chain-of-thought, and retrieval-augmented variants of the term-extraction instruction; (c)~a larger set, statistical tests, and symmetric metrics for both languages. A longer-term goal is to wrap this first stage in an adaptive loop that shows a learner only the terms they still need.
+
+\appendix
+\label{app:prompt}
+\section{Prompt Template}
+
+The following instruction was held fixed across all runs. Placeholders \texttt{\{LANG\}} and \texttt{\{TRANSCRIPT\}} are filled at call time.
+
+\begin{quote}
+\small
+You are a terminology assistant for \{\texttt{LANG}\} educational content. Step 1: From the transcript below, extract domain-specific terms (including multi-word terms). Step 2: For each term, write one short explanation at CEFR B1 level that a beginner can understand. Use only information consistent with the transcript context. Return strictly a JSON array of objects with fields ``term'' and ``explanation''. Transcript: \{\texttt{TRANSCRIPT}\}
+\end{quote}
+
+\section{Decoding Settings and Hardware}
+\label{app:hw}
+
+Two settings must not be mixed. \emph{Pilot (Tables~\ref{tab:asr}--\ref{tab:rtf}).} All four ASR systems were run on CPU with default pretrained weights. The original draft did not record the CPU model, Whisper \texttt{language} / \texttt{condition\_on\_previous\_text}, beam size, or chunk length. Those published scores, including the Medium vs.\ Large-v3 gap, are therefore configuration-sensitive.
+
+\emph{Refresh kit.} Scripts force \texttt{task=transcribe} and, when the clip language is known, \texttt{language=tr} or \texttt{en}. Long-form audio is decoded in 30\,s chunks with timestamps. \texttt{condition\_on\_previous\_text} is off unless \texttt{--condition-on-prev} is set. Device is CUDA if a GPU build of PyTorch is available, otherwise CPU. Each run writes a sidecar metadata file with these flags.
+
+\emph{Kit development machine (28 August 2026), not claimed as the pilot host.} Intel Core i7-14650HX (16 cores / 24 threads), 32\,GB RAM, NVIDIA GeForce RTX 5060 Laptop GPU, Windows, Python 3.12. The PyTorch install present when the kit was written was CPU-only (2.12.0+cpu). Qwen3-ASR 1.7B and Qwen3-8B are not practical on that CPU wheel.
+
+\section{Annotation and Agreement}
+\label{app:iaa}
+
+R and D are binary (Section~III-E). Annotators work independently from the same item list, using TDK or OED, and do not see each other's labels. Cohen's $\kappa$~\cite{cohen1960} is computed separately for R and for D on the double-labeled subset; adjudication, if any, is used only for the final R1/D1 counts, not for $\kappa$. The item schema and the scoring script are in the accompanying repository (\texttt{annotation/PROTOCOL.md}, \texttt{iaa.py}). This draft does not invent a $\kappa$ value.
+
+\begin{thebibliography}{00}
+
+\bibitem{conde2016}
+A.~Conde, M.~Larra{\~n}aga, A.~Arruarte, J.~A. Elorriaga, and D.~Roth, ``{LiTeWi}: A combined term extraction and entity linking method for eliciting educational ontologies from textbooks,'' \emph{J. Assoc. Inf. Sci. Technol.}, vol.~67, no.~2, pp.~380--399, 2016.
+
+\bibitem{xu2024}
+H.~Xu, W.~Gan, Z.~Qi, J.~Wu, and P.~S. Yu, ``Large language models for education: A survey,'' arXiv:2405.13001, 2024.
+
+\bibitem{bloom1984}
+B.~S. Bloom, ``The 2 sigma problem: The search for methods of group instruction as effective as one-to-one tutoring,'' \emph{Educ. Researcher}, vol.~13, no.~6, pp.~4--16, 1984.
+
+\bibitem{brusilovsky2007}
+P.~Brusilovsky and E.~Mill{\'a}n, ``User models for adaptive hypermedia and adaptive educational systems,'' in \emph{The Adaptive Web}, LNCS 4321. Springer, 2007, pp.~3--53.
+
+\bibitem{corbett1995}
+A.~T. Corbett and J.~R. Anderson, ``Knowledge tracing: Modeling the acquisition of procedural knowledge,'' \emph{User Model. User-Adap. Inter.}, vol.~4, no.~4, pp.~253--278, 1995.
+
+\bibitem{vanlehn2011}
+K.~VanLehn, ``The relative effectiveness of human tutoring, intelligent tutoring systems, and other tutoring systems,'' \emph{Educ. Psychologist}, vol.~46, no.~4, pp.~197--221, 2011.
+
+\bibitem{southwell2022}
+R.~Southwell \emph{et al.}, ``Challenges and feasibility of automatic speech recognition for modeling student collaborative discourse in classrooms,'' in \emph{Proc. Int. Conf. Educational Data Mining}, 2022.
+
+\bibitem{radford2023}
+A.~Radford, J.~W. Kim, T.~Xu, G.~Brockman, C.~McLeavey, and I.~Sutskever, ``Robust speech recognition via large-scale weak supervision,'' in \emph{Proc. ICML}, 2023, pp.~28492--28518.
+
+\bibitem{whisper-turbo}
+OpenAI, ``{Whisper large-v3-turbo},'' Hugging Face model card, 2024. [Online]. Available: \url{https://huggingface.co/openai/whisper-large-v3-turbo}
+
+\bibitem{qwen3asr2026}
+X.~Wang \emph{et al.}, ``{Qwen3-ASR} technical report,'' arXiv:2601.21337, 2026.
+
+\bibitem{jurafsky2026}
+D.~Jurafsky and J.~H. Martin, \emph{Speech and Language Processing}, 3rd~ed., online manuscript, 2026. [Online]. Available: \url{https://web.stanford.edu/~jurafsky/slp3}
+
+\bibitem{baevski2020}
+A.~Baevski, Y.~Zhou, A.~Mohamed, and M.~Auli, ``wav2vec 2.0: A framework for self-supervised learning of speech representations,'' in \emph{Adv. Neural Inf. Process. Syst.}, vol.~33, 2020, pp.~12449--12460.
+
+\bibitem{ravanelli2021}
+M.~Ravanelli \emph{et al.}, ``{SpeechBrain}: A general-purpose speech toolkit,'' arXiv:2106.04624, 2021.
+
+\bibitem{frantzi2000}
+K.~Frantzi, S.~Ananiadou, and H.~Mima, ``Automatic recognition of multi-word terms: The C-value/NC-value method,'' \emph{Int. J. Digit. Libr.}, vol.~3, no.~2, pp.~115--130, 2000.
+
+\bibitem{kuhn2024}
+K.~Kuhn, V.~Kersken, B.~Reuter, N.~Egger, and G.~Zimmermann, ``Measuring the accuracy of automatic speech recognition solutions,'' \emph{ACM Trans. Access. Comput.}, vol.~16, no.~4, pp.~1--23, 2024.
+
+\bibitem{mercan2023}
+{\"O}.~B. Mercan, S.~{\c{C}}epni, D.~E. Ta{\c{s}}ar, and {\c{S}}.~Ozan, ``Performance comparison of pre-trained models for Turkish speech-to-text: Whisper-small and wav2vec2-xls-r-300m,'' \emph{Turkish Informatics Found. J. Comput. Sci. Eng.}, vol.~16, no.~2, pp.~109--116, 2023.
+
+\bibitem{manning2008}
+C.~D. Manning, P.~Raghavan, and H.~Sch{\"u}tze, \emph{Introduction to Information Retrieval}. Cambridge, UK: Cambridge Univ. Press, 2008.
+
+\bibitem{lossio2016}
+J.~A. Lossio-Ventura, C.~Jonquet, M.~Roche \emph{et al.}, ``Biomedical term extraction: Overview and a new methodology,'' \emph{Inf. Retrieval J.}, vol.~19, pp.~59--99, 2016.
+
+\bibitem{tran2026}
+H.~T.~H. Tran, M.~Martinc, J.~Caporusso, A.~Doucet, and S.~Pollak, ``Recent advances in automatic term extraction: A comprehensive survey,'' \emph{ACM Comput. Surv.}, vol.~58, no.~9, pp.~1--35, 2026.
+
+\bibitem{vanzo2025}
+A.~Vanzo, S.~Pal Chowdhury, and M.~Sachan, ``{GPT-4} as a homework tutor can improve student engagement and learning outcomes,'' in \emph{Proc. ACL} (Vol.~1: Long Papers), 2025, pp.~31119--31136.
+
+\bibitem{papineni2002}
+K.~Papineni, S.~Roukos, T.~Ward, and W.-J. Zhu, ``{BLEU}: A method for automatic evaluation of machine translation,'' in \emph{Proc. ACL}, 2002, pp.~311--318.
+
+\bibitem{openai2026}
+OpenAI, ``OpenAI API.'' [Online]. Available: \url{https://platform.openai.com/}
+
+\bibitem{oed2026}
+Oxford University Press, ``Oxford English Dictionary.'' [Online]. Available: \url{https://www.oed.com}
+
+\bibitem{tdk2026}
+Turkish Language Association (TDK), ``G{\"u}ncel T{\"u}rk{\c{c}}e S{\"o}zl{\"u}k.'' [Online]. Available: \url{https://sozluk.gov.tr}
+
+\bibitem{cohen1960}
+J.~Cohen, ``A coefficient of agreement for nominal scales,'' \emph{Educ. Psychol. Meas.}, vol.~20, no.~1, pp.~37--46, 1960.
+
+\end{thebibliography}
+
+\end{document}

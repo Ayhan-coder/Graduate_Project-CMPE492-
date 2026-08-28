@@ -1,0 +1,12 @@
+huggingface_hub>=0.27.0
+transformers>=4.57.0
+accelerate>=1.0.0
+torch>=2.4.0
+torchaudio>=2.4.0
+librosa>=0.10.0
+soundfile>=0.12.0
+jiwer>=3.0.0
+numpy>=1.26.0
+tqdm>=4.66.0
+openai>=1.40.0
+speechbrain>=1.0.0

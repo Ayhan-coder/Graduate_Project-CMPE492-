@@ -1,0 +1,167 @@
+{
+  "fetched_at": "2026-08-28",
+  "selection_rule": "Must support both Turkish and English out of the box, or be a documented Turkish-matched Whisper fine-tune used only on the TR subset. English-only 2026 leaderboard models are recorded as rejected, not evaluated as multilingual systems.",
+  "asr_selected": [
+    {
+      "id": "openai/whisper-medium",
+      "role": "pilot_baseline",
+      "revision": "abdf7c39ab9d0397620ccaea8974cc764cd0953e",
+      "params": "769M",
+      "langs": "99 incl. tr,en",
+      "license": "apache-2.0",
+      "backend": "whisper",
+      "subset": "all",
+      "notes": "Original paper baseline. Lowest WER in the pilot."
+    },
+    {
+      "id": "openai/whisper-large-v3",
+      "role": "pilot_multilingual",
+      "revision": "06f233fe06e710322aca913c1bc4249a0d71fce1",
+      "params": "1.55B",
+      "langs": "99 incl. tr,en",
+      "license": "apache-2.0",
+      "backend": "whisper",
+      "subset": "all",
+      "notes": "Original paper multilingual reference."
+    },
+    {
+      "id": "openai/whisper-large-v3-turbo",
+      "role": "refresh_speed",
+      "revision": "41f01f3fe87f28c78e2fbf8b568835947dd65ed9",
+      "params": "809M",
+      "langs": "99 incl. tr,en",
+      "license": "mit",
+      "backend": "whisper",
+      "subset": "all",
+      "notes": "Pruned Large-v3 decoder (32->4 layers). Same language set, much faster. Primary 2026 Whisper refresh."
+    },
+    {
+      "id": "Qwen/Qwen3-ASR-1.7B-hf",
+      "role": "refresh_sota_multilingual",
+      "revision": "bcd2b5b7f32b480ab5790554cfa8347f246a14f3",
+      "params": "1.7B",
+      "langs": "30 incl. tr,en",
+      "license": "apache-2.0",
+      "backend": "qwen3_asr",
+      "subset": "all",
+      "notes": "Transformers-native Qwen3-ASR. Turkish is an official support language. Prefer this ID over Qwen/Qwen3-ASR-1.7B."
+    },
+    {
+      "id": "Qwen/Qwen3-ASR-0.6B-hf",
+      "role": "refresh_efficient_multilingual",
+      "revision": "7f1569a48a89f3e3f4dc3a5c9d28bddd903bc76c",
+      "params": "0.6B",
+      "langs": "30 incl. tr,en",
+      "license": "apache-2.0",
+      "backend": "qwen3_asr",
+      "subset": "all",
+      "notes": "Same language set as 1.7B, smaller/faster sibling."
+    },
+    {
+      "id": "selimc/whisper-large-v3-turbo-turkish",
+      "role": "language_matched_tr",
+      "revision": "e914cebbaa5f7eefd2b77c2441f2d9a5e30e0286",
+      "params": "809M",
+      "langs": "tr",
+      "license": "mit",
+      "backend": "whisper",
+      "subset": "tr",
+      "notes": "Common Voice 17 Turkish fine-tune of Whisper Turbo. Run only on TR-1..TR-3. Addresses limitation (a)."
+    }
+  ],
+  "asr_pilot": [
+    {
+      "id": "openai/whisper-medium",
+      "role": "pilot_baseline",
+      "revision": "abdf7c39ab9d0397620ccaea8974cc764cd0953e",
+      "backend": "whisper",
+      "subset": "all",
+      "notes": "Same checkpoint as asr_selected. Listed here so --all-pilot reproduces the original four-system set."
+    },
+    {
+      "id": "openai/whisper-large-v3",
+      "role": "pilot_multilingual",
+      "revision": "06f233fe06e710322aca913c1bc4249a0d71fce1",
+      "backend": "whisper",
+      "subset": "all"
+    },
+    {
+      "id": "facebook/wav2vec2-large-xlsr-53",
+      "role": "pilot_english_oriented",
+      "backend": "hf_ctc",
+      "subset": "all",
+      "notes": "Hub ID cited in the paper. This is a pretrained encoder; if the pipeline has no CTC head the run will fail and the exact fine-tune used in the pilot must be recorded here."
+    },
+    {
+      "id": "speechbrain/asr-crdnn-rnnlm-librispeech",
+      "role": "pilot_speechbrain_default",
+      "backend": "speechbrain",
+      "subset": "all",
+      "notes": "The paper said 'SpeechBrain with default greedy/beam settings' but did not pin a Hub ID. This is a documented English LibriSpeech default. Confirm or replace before treating SpeechBrain rows as a reproduction of the pilot."
+    }
+  ],
+  "llm_selected": [
+    {
+      "id": "gpt-4.1",
+      "provider": "openai_api",
+      "role": "pilot_capacity",
+      "subset": "all"
+    },
+    {
+      "id": "gpt-4o-mini",
+      "provider": "openai_api",
+      "role": "pilot_latency",
+      "subset": "all"
+    },
+    {
+      "id": "Qwen/Qwen3-8B",
+      "provider": "huggingface",
+      "role": "refresh_open_capacity",
+      "revision": "b968826d9c46dd6066d109eabc6255188de91218",
+      "params": "8B",
+      "license": "apache-2.0",
+      "subset": "all",
+      "notes": "Public, ungated. Open-weight counterpart to GPT-4.1."
+    },
+    {
+      "id": "Qwen/Qwen2.5-3B-Instruct",
+      "provider": "huggingface",
+      "role": "refresh_open_latency",
+      "revision": "aa8e72537993ba99e69dfaafa59ed015b17504d1",
+      "params": "3B",
+      "license": "qwen",
+      "subset": "all",
+      "notes": "Public, ungated. Open-weight counterpart to GPT-4o-mini."
+    }
+  ],
+  "rejected": [
+    {
+      "id": "nvidia/parakeet-tdt-0.6b-v3",
+      "reason": "25 European languages only. Turkish is not in the official list (bg,hr,cs,da,nl,en,et,fi,fr,de,el,hu,it,lv,lt,mt,pl,pt,ro,sk,sl,es,sv,ru,uk)."
+    },
+    {
+      "id": "nvidia/canary-1b-v2",
+      "reason": "Same 25-language European set as Parakeet v3. No Turkish."
+    },
+    {
+      "id": "nvidia/canary-qwen-2.5b",
+      "reason": "English only. Would repeat the unfair Wav2Vec2/SpeechBrain comparison."
+    },
+    {
+      "id": "CohereLabs/cohere-transcribe-03-2026",
+      "reason": "14 enterprise languages (ar,de,el,en,es,fr,it,ja,ko,nl,pl,pt,vi,zh). No Turkish."
+    },
+    {
+      "id": "facebook/seamless-m4t-v2-large",
+      "reason": "Has Turkish, but CC-BY-NC-4.0 and a 2024 speech-translation stack, not a 2026 ASR specialist."
+    },
+    {
+      "id": "CohereLabs/aya-expanse-8b",
+      "reason": "Has Turkish, but gated (gated=auto) and CC-BY-NC-4.0. Optional later if a HF token is available."
+    },
+    {
+      "id": "facebook/wav2vec2-large-xlsr-53",
+      "reason": "Kept only as the original English-oriented pilot checkpoint, not as a 2026 refresh candidate."
+    }
+  ]
+}

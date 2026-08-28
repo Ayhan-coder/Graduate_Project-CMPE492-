@@ -1,0 +1,2 @@
+{"id": "TR-1", "lang": "tr", "audio": "data/TR-1.wav", "duration_s": 720, "reference": "gold transcript goes here"}
+{"id": "EN-1", "lang": "en", "audio": "data/EN-1.wav", "duration_s": 780, "reference": "gold transcript goes here"}

@@ -1,0 +1,37 @@
+# Local data and model weights
+experiments/data/*.wav
+experiments/data/*.mp3
+experiments/data/*.mp4
+experiments/data/manifest.jsonl
+experiments/hf_cache/
+experiments/outputs/*.jsonl
+experiments/outputs/*.json
+experiments/outputs/*.md
+experiments/annotation/labels_a1.csv
+experiments/annotation/labels_a2.csv
+experiments/annotation/labels_todo.csv
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# LaTeX
+paper/*.aux
+paper/*.bbl
+paper/*.blg
+paper/*.log
+paper/*.out
+paper/*.synctex.gz
+paper/*.toc
+paper/*.fdb_latexmk
+paper/*.fls
