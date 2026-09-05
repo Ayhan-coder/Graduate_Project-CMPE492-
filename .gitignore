@@ -5,6 +5,7 @@ experiments/data/*.mp4
 experiments/data/raw/
 experiments/data/smoke/
 experiments/data/_work/
+experiments/gui/temp/
 experiments/hf_cache/
 
 # Python
