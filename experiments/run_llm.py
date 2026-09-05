@@ -4,7 +4,7 @@ Manifest (JSONL):
     {"id": "TR-1", "lang": "Turkish", "transcript": "..."}
 
 Usage:
-    python run_llm.py --manifest data/transcripts.jsonl --model Qwen/Qwen2.5-3B-Instruct
+    python run_llm.py --manifest data/transcripts.jsonl --model Qwen/Qwen3.5-4B
     python run_llm.py --manifest data/transcripts.jsonl --all-open
 """
 
@@ -15,10 +15,18 @@ import json
 import time
 from pathlib import Path
 
-from fetch_models import load_registry
+from fetch_models import hub_slug, load_registry, resolve_hub_cache
 
 ROOT = Path(__file__).resolve().parent
 OUT_DIR = ROOT / "outputs"
+
+
+def _local_model_path(model_id: str) -> str:
+    cache = resolve_hub_cache(model_id)
+    snaps = list((cache / hub_slug(model_id) / "snapshots").glob("*"))
+    if snaps:
+        return str(snaps[0])
+    return model_id
 
 PROMPT = (
     "You are a terminology assistant for {LANG} educational content. "
@@ -53,24 +61,87 @@ def parse_terms(text: str) -> list[dict]:
     return [x for x in data if isinstance(x, dict) and "term" in x]
 
 
+def _hf_model_class(model_id: str, cache: str):
+    """Causal LM for Qwen2.5/Qwen3; image-text class for Qwen3.5+."""
+    from transformers import AutoConfig
+
+    path = _local_model_path(model_id)
+    cfg = AutoConfig.from_pretrained(path, cache_dir=cache)
+    arch = ""
+    if getattr(cfg, "architectures", None):
+        arch = cfg.architectures[0]
+    if "ForCausalLM" in arch:
+        from transformers import AutoModelForCausalLM
+
+        return AutoModelForCausalLM
+    try:
+        from transformers import AutoModelForImageTextToText
+
+        return AutoModelForImageTextToText
+    except ImportError:
+        from transformers import AutoModelForCausalLM
+
+        return AutoModelForCausalLM
+
+
+def _strip_think(text: str) -> str:
+    marker = "</think>"
+    if marker in text:
+        return text.split(marker, 1)[1].strip()
+    return text.strip()
+
+
+_HF_LLM_CACHE: dict[str, tuple[object, object]] = {}
+
+
 def generate_hf(model_id: str, prompt: str) -> str:
     import torch
-    from transformers import AutoModelForCausalLM, AutoTokenizer
+    from transformers import AutoTokenizer
 
-    tok = AutoTokenizer.from_pretrained(model_id)
-    model = AutoModelForCausalLM.from_pretrained(
-        model_id,
-        torch_dtype=torch.bfloat16 if torch.cuda.is_available() else torch.float32,
-        device_map="auto" if torch.cuda.is_available() else None,
-    )
-    if not torch.cuda.is_available():
-        model = model.to("cpu")
+    packed = _HF_LLM_CACHE.get(model_id)
+    if packed is None:
+        cache = str(resolve_hub_cache(model_id))
+        path = _local_model_path(model_id)
+        tok = AutoTokenizer.from_pretrained(path, cache_dir=cache)
+        Model = _hf_model_class(model_id, cache)
+        model_kwargs = {"cache_dir": cache}
+        if torch.cuda.is_available():
+            from transformers import BitsAndBytesConfig
+
+            model_kwargs["quantization_config"] = BitsAndBytesConfig(
+                load_in_4bit=True, bnb_4bit_compute_dtype=torch.bfloat16
+            )
+            model_kwargs["device_map"] = "auto"
+        else:
+            model_kwargs["dtype"] = torch.float32
+        model = Model.from_pretrained(path, **model_kwargs)
+        if not torch.cuda.is_available():
+            model = model.to("cpu")
+        packed = (tok, model)
+        _HF_LLM_CACHE[model_id] = packed
+    tok, model = packed
     messages = [{"role": "user", "content": prompt}]
-    inputs = tok.apply_chat_template(messages, return_tensors="pt", add_generation_prompt=True)
-    inputs = inputs.to(model.device)
+    tmpl_kwargs = {
+        "return_tensors": "pt",
+        "add_generation_prompt": True,
+        "enable_thinking": False,
+    }
+    try:
+        inputs = tok.apply_chat_template(messages, **tmpl_kwargs)
+    except TypeError:
+        tmpl_kwargs.pop("enable_thinking", None)
+        inputs = tok.apply_chat_template(messages, **tmpl_kwargs)
+    if isinstance(inputs, dict) or hasattr(inputs, "data"):
+        gen_in = {k: v.to(model.device) if hasattr(v, "to") else v for k, v in inputs.items()}
+        input_len = gen_in["input_ids"].shape[-1]
+    else:
+        inputs = inputs.to(model.device)
+        input_len = inputs.shape[-1]
+        gen_in = {"input_ids": inputs}
     with torch.inference_mode():
-        out = model.generate(inputs, max_new_tokens=2048, do_sample=False)
-    return tok.decode(out[0][inputs.shape[-1] :], skip_special_tokens=True)
+        out = model.generate(**gen_in, max_new_tokens=2048, do_sample=False)
+    text = tok.decode(out[0][input_len:], skip_special_tokens=True)
+    return _strip_think(text)
 
 
 def generate_openai(model_id: str, prompt: str) -> str:

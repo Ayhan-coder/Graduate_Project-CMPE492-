@@ -1,0 +1,118 @@
+{
+  "note": "Public title+duration matches, confirmed as the evaluation-set files used with the gold transcripts in data/gold/. Audio remains third-party; do not redistribute the wavs.",
+  "updated": "2026-09-05",
+  "clips": [
+    {
+      "id": "TR-1",
+      "lang": "tr",
+      "paper_title": "Project Management, Unit 7, Lecture 1",
+      "paper_duration": "~12 min",
+      "confidence": "high",
+      "confirmed": true,
+      "candidate": {
+        "title": "PROJE YÖNETİMİ - Ünite 7 Konu Anlatımı 1",
+        "channel": "Açıköğretim Fakültesi - Anadolu Üniversitesi",
+        "youtube_id": "rz5JCvMlCMs",
+        "url": "https://www.youtube.com/watch?v=rz5JCvMlCMs",
+        "duration": "12:01",
+        "license_guess": "Anadolu University educational video; redistribution not assumed"
+      }
+    },
+    {
+      "id": "TR-2",
+      "lang": "tr",
+      "paper_title": "Comprehensive Tourism Training for Tour Guides",
+      "paper_duration": "12 min",
+      "confidence": "medium",
+      "confirmed": true,
+      "candidate": {
+        "title": "Turist Rehberleri için Kapsamlı Turizm Eğitimi",
+        "channel": "Forteliber",
+        "youtube_id": "yzsHZVU_Y7w",
+        "url": "https://www.youtube.com/watch?v=yzsHZVU_Y7w",
+        "duration": "11:17",
+        "license_guess": "YouTube standard; redistribution not assumed"
+      }
+    },
+    {
+      "id": "TR-3",
+      "lang": "tr",
+      "paper_title": "What Is Data Science? Intro to Data Science (Python)",
+      "paper_duration": "~14 min",
+      "confidence": "medium",
+      "confirmed": true,
+      "candidate": {
+        "title": "VERİ BİLİMİ NEDİR | VERİ BİLİMİNE GİRİŞ | PYTHON DERSLERİ",
+        "channel": "Tirendaz AI / Tirendaz Academy",
+        "youtube_id": "DQAiWukoOgI",
+        "url": "https://www.youtube.com/watch?v=DQAiWukoOgI",
+        "duration": "14:15",
+        "license_guess": "YouTube standard; redistribution not assumed"
+      }
+    },
+    {
+      "id": "EN-1",
+      "lang": "en",
+      "paper_title": "Introduction to Agile Methodologies",
+      "paper_duration": "~13 min",
+      "confidence": "high",
+      "confirmed": true,
+      "candidate": {
+        "title": "Introduction to Agile Methodologies | Google Project Management Certificate",
+        "channel": "Grow with Google",
+        "youtube_id": "BaH04m_fS1c",
+        "url": "https://www.youtube.com/watch?v=BaH04m_fS1c",
+        "duration": "13:17",
+        "license_guess": "YouTube standard; redistribution not assumed"
+      }
+    },
+    {
+      "id": "EN-2",
+      "lang": "en",
+      "paper_title": "What is sustainable tourism?",
+      "paper_duration": "~9 min",
+      "confidence": "high",
+      "confirmed": true,
+      "candidate": {
+        "title": "What is sustainable tourism? Why sustainable tourism management is so important",
+        "channel": "Dr Hayley Stainton | Tourism Teacher",
+        "youtube_id": "kgAHZHkMTQU",
+        "url": "https://www.youtube.com/watch?v=kgAHZHkMTQU",
+        "duration": "9:16",
+        "license_guess": "YouTube standard; redistribution not assumed"
+      }
+    },
+    {
+      "id": "EN-3",
+      "lang": "en",
+      "paper_title": "Generative AI in a nutshell",
+      "paper_duration": "~18 min",
+      "confidence": "high",
+      "confirmed": true,
+      "candidate": {
+        "title": "Generative AI in a Nutshell - how to survive and thrive in the age of AI",
+        "channel": "Henrik Kniberg",
+        "youtube_id": "2IK3DFHRFfw",
+        "url": "https://www.youtube.com/watch?v=2IK3DFHRFfw",
+        "duration": "17:57",
+        "license_guess": "YouTube standard; redistribution not assumed"
+      }
+    },
+    {
+      "id": "EN-4",
+      "lang": "en",
+      "paper_title": "Understanding thermal radiation",
+      "paper_duration": "~17 min",
+      "confidence": "high",
+      "confirmed": true,
+      "candidate": {
+        "title": "Understanding Thermal Radiation",
+        "channel": "The Efficient Engineer",
+        "youtube_id": "FDmYCI_xYlA",
+        "url": "https://www.youtube.com/watch?v=FDmYCI_xYlA",
+        "duration": "17:33",
+        "license_guess": "YouTube standard; redistribution not assumed"
+      }
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 """Download selected Hugging Face checkpoints for the paper refresh.
 
-By default only configs / tokenizers are fetched (already done on 2026-08-28).
+By default only configs / tokenizers are fetched (registry refreshed 2026-09-04).
 Pass --weights to pull the full models into experiments/hf_cache/.
 
 Usage:
@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import time
 from pathlib import Path
 
 from huggingface_hub import hf_hub_download, snapshot_download
@@ -21,6 +22,33 @@ ROOT = Path(__file__).resolve().parent
 REGISTRY = ROOT / "models.json"
 SNAP_DIR = ROOT / "hf_snapshots"
 CACHE_DIR = ROOT / "hf_cache"
+
+
+def hub_slug(model_id: str) -> str:
+    return "models--" + model_id.replace("/", "--")
+
+
+def default_hub_cache() -> Path:
+    return Path.home() / ".cache" / "huggingface" / "hub"
+
+
+def resolve_hub_cache(model_id: str | None = None) -> Path:
+    """Prefer the kit cache, then the user Hugging Face hub cache.
+
+    fetch_models.py --weights writes into experiments/hf_cache.
+    Earlier Whisper Medium runs landed in ~/.cache/huggingface/hub.
+    from_pretrained must see the same directory or it re-downloads.
+    """
+    kit = CACHE_DIR
+    default = default_hub_cache()
+    if model_id:
+        slug = hub_slug(model_id)
+        if (kit / slug).exists():
+            return kit
+        if (default / slug).exists():
+            return default
+    kit.mkdir(parents=True, exist_ok=True)
+    return kit
 CONFIG_FILES = (
     "config.json",
     "preprocessor_config.json",
@@ -74,16 +102,40 @@ def fetch_configs(models: list[dict]) -> None:
         print(f"configs  {m['id']}: {got}")
 
 
-def fetch_weights(models: list[dict]) -> None:
+WEIGHT_IGNORE = (
+    "*.fp32*",
+    "flax_model*",
+    "tf_model*",
+    "pytorch_model.bin*",
+    "*.h5",
+    "*.msgpack",
+)
+
+
+def fetch_weights(models: list[dict], retries: int = 6) -> None:
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     for m in models:
         print(f"weights  {m['id']} ...")
-        snapshot_download(
-            repo_id=m["id"],
-            revision=m.get("revision"),
-            cache_dir=str(CACHE_DIR),
-        )
-        print(f"         done")
+        last = None
+        for attempt in range(1, retries + 1):
+            try:
+                snapshot_download(
+                    repo_id=m["id"],
+                    revision=m.get("revision"),
+                    cache_dir=str(CACHE_DIR),
+                    ignore_patterns=WEIGHT_IGNORE,
+                )
+                last = None
+                break
+            except Exception as exc:
+                last = exc
+                wait = min(60, 2 ** attempt)
+                print(f"         attempt {attempt}/{retries} failed: {exc}")
+                print(f"         retry in {wait}s")
+                time.sleep(wait)
+        if last is not None:
+            raise last
+        print("         done")
 
 
 def main() -> None:

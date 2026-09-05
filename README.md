@@ -7,7 +7,7 @@ Benchmark of off-the-shelf speech recognition and terminology-extraction models 
 | `paper/main.tex` | IEEE conference source (single file; compiles on Overleaf) |
 | `paper/original/` | Unchanged starting PDF |
 | `experiments/` | Evaluation kit: ASR, LLM, ablation, IAA, table export |
-| `experiments/data/DATASET_CARD.md` | Dataset card (source / license / speakers still unknown) |
+| `experiments/data/DATASET_CARD.md` | Dataset card (source, license, speakers, gold how) |
 | `experiments/HARDWARE.md` | Decoding flags + kit machine |
 | `experiments/annotation/PROTOCOL.md` | Second-annotator protocol |
 | `notes/` | Review and change log |
@@ -27,7 +27,7 @@ python check_env.py
 # put TR-1.wav … EN-4.wav and data/manifest.jsonl here first
 python run_asr.py --manifest data/manifest.jsonl --all-pilot
 python report.py --asr outputs/asr-TIMESTAMP.jsonl
-python run_ablation.py --asr-outputs outputs/asr-TIMESTAMP.jsonl --model gpt-4o-mini
+python run_ablation.py --asr-outputs outputs/asr-TIMESTAMP.jsonl --model Qwen/Qwen3.5-4B
 python iaa.py --a1 annotation/labels_a1.csv --a2 annotation/labels_a2.csv
 ```
 
@@ -37,7 +37,7 @@ Full command list: `experiments/README.md`.
 
 - **Filled:** pooled pilot WER/CER/RTF and GPT-4.1 / GPT-4o-mini semantic scores from the original study.
 - **Protocol ready, cells empty:** Table per-language ASR, Table 2026 refresh, Table ablation, κ.
-- **Blocked on you:** the seven wavs + gold transcripts, OpenAI key (for GPT ablation), second annotator, dataset-card source/license/speakers, GitHub remote.
+- **Blocked on you:** second annotator + κ, GitHub remote. Wavs, gold transcripts (`experiments/data/gold/`), and the dataset-card source/license/speaker fields are in place; `report.py --write-tex` is no longer refused on the gold gate. New LLM/ablation runs use free Qwen3.5 weights (no paid API). Rescore existing ASR JSONL against gold before pasting tables.
 
 ## License
 

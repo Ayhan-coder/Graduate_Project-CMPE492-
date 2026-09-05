@@ -1,6 +1,6 @@
 {
-  "fetched_at": "2026-08-28",
-  "selection_rule": "Must support both Turkish and English out of the box, or be a documented Turkish-matched Whisper fine-tune used only on the TR subset. English-only 2026 leaderboard models are recorded as rejected, not evaluated as multilingual systems.",
+  "fetched_at": "2026-09-04",
+  "selection_rule": "Must support both Turkish and English out of the box, or be a documented Turkish-matched Whisper fine-tune used only on the TR subset. English-only 2026 leaderboard models are recorded as rejected, not evaluated as multilingual systems. Pilot IDs stay so the original tables remain comparable. Refresh IDs are the newest compatible checkpoints as of this snapshot.",
   "asr_selected": [
     {
       "id": "openai/whisper-medium",
@@ -22,7 +22,7 @@
       "license": "apache-2.0",
       "backend": "whisper",
       "subset": "all",
-      "notes": "Original paper multilingual reference."
+      "notes": "Original paper multilingual reference. Still the latest official OpenAI Whisper accuracy checkpoint."
     },
     {
       "id": "openai/whisper-large-v3-turbo",
@@ -33,7 +33,7 @@
       "license": "mit",
       "backend": "whisper",
       "subset": "all",
-      "notes": "Pruned Large-v3 decoder (32->4 layers). Same language set, much faster. Primary 2026 Whisper refresh."
+      "notes": "Pruned Large-v3 decoder (32->4 layers). Same language set, much faster. Still the latest official OpenAI Whisper speed checkpoint."
     },
     {
       "id": "Qwen/Qwen3-ASR-1.7B-hf",
@@ -44,7 +44,7 @@
       "license": "apache-2.0",
       "backend": "qwen3_asr",
       "subset": "all",
-      "notes": "Transformers-native Qwen3-ASR. Turkish is an official support language. Prefer this ID over Qwen/Qwen3-ASR-1.7B."
+      "notes": "Transformers-native Qwen3-ASR. Turkish is an official support language. Prefer this ID over Qwen/Qwen3-ASR-1.7B. Latest Qwen ASR as of 2026-09-04."
     },
     {
       "id": "Qwen/Qwen3-ASR-0.6B-hf",
@@ -56,6 +56,17 @@
       "backend": "qwen3_asr",
       "subset": "all",
       "notes": "Same language set as 1.7B, smaller/faster sibling."
+    },
+    {
+      "id": "nvidia/nemotron-3.5-asr-streaming-0.6b",
+      "role": "refresh_nvidia_multilingual",
+      "revision": "1c8deaecc64b91f034d73e08dd8b64625eb3395d",
+      "params": "0.6B",
+      "langs": "40 locales incl. tr-TR,en-US (transcription-ready)",
+      "license": "openmdw-1.1",
+      "backend": "nemotron_asr",
+      "subset": "all",
+      "notes": "June 2026 NVIDIA multilingual streaming ASR. Turkish (tr-TR) and English (en-US) are official transcription-ready locales. This is the NVIDIA model that passes the TR+EN rule Parakeet/Canary failed. Requires transformers>=5.13. Long-form audio is decoded in non-overlapping 60 s windows."
     },
     {
       "id": "selimc/whisper-large-v3-turbo-turkish",
@@ -105,39 +116,41 @@
       "id": "gpt-4.1",
       "provider": "openai_api",
       "role": "pilot_capacity",
-      "subset": "all"
+      "subset": "all",
+      "notes": "Kept so the completed pilot semantic table remains comparable."
     },
     {
       "id": "gpt-4o-mini",
       "provider": "openai_api",
       "role": "pilot_latency",
-      "subset": "all"
+      "subset": "all",
+      "notes": "Default ablation LLM. Kept so the pilot semantic table remains comparable."
     },
     {
-      "id": "Qwen/Qwen3-8B",
+      "id": "Qwen/Qwen3.5-9B",
       "provider": "huggingface",
       "role": "refresh_open_capacity",
-      "revision": "b968826d9c46dd6066d109eabc6255188de91218",
-      "params": "8B",
+      "revision": "c202236235762e1c871ad0ccb60c8ee5ba337b9a",
+      "params": "9B",
       "license": "apache-2.0",
       "subset": "all",
-      "notes": "Public, ungated. Open-weight counterpart to GPT-4.1."
+      "notes": "Free ungated Apache-2.0 Qwen3.5 dense model. Replaces paid GPT-5.6 Sol as the 2026 capacity counterpart to GPT-4.1, and supersedes Qwen3-8B. Native multimodal architecture; the kit runs it text-only with thinking disabled. Qwen3.8-27B is newer but too large for the kit laptop GPU."
     },
     {
-      "id": "Qwen/Qwen2.5-3B-Instruct",
+      "id": "Qwen/Qwen3.5-4B",
       "provider": "huggingface",
       "role": "refresh_open_latency",
-      "revision": "aa8e72537993ba99e69dfaafa59ed015b17504d1",
-      "params": "3B",
-      "license": "qwen",
+      "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+      "params": "4B",
+      "license": "apache-2.0",
       "subset": "all",
-      "notes": "Public, ungated. Open-weight counterpart to GPT-4o-mini."
+      "notes": "Free ungated Apache-2.0 Qwen3.5 small model. Default for new ablation runs (no API key). Replaces Qwen2.5-3B-Instruct and the paid GPT-5.6 Luna slot. Fits the RTX 5060 Laptop in bf16. Thinking disabled for JSON term extraction."
     }
   ],
   "rejected": [
     {
       "id": "nvidia/parakeet-tdt-0.6b-v3",
-      "reason": "25 European languages only. Turkish is not in the official list (bg,hr,cs,da,nl,en,et,fi,fr,de,el,hu,it,lv,lt,mt,pl,pt,ro,sk,sl,es,sv,ru,uk)."
+      "reason": "25 European languages only. Turkish is not in the official list (bg,hr,cs,da,nl,en,et,fi,fr,de,el,hu,it,lv,lt,mt,pl,pt,ro,sk,sl,es,sv,ru,uk). Nemotron 3.5 ASR is the NVIDIA model that does list Turkish."
     },
     {
       "id": "nvidia/canary-1b-v2",
@@ -152,6 +165,10 @@
       "reason": "14 enterprise languages (ar,de,el,en,es,fr,it,ja,ko,nl,pl,pt,vi,zh). No Turkish."
     },
     {
+      "id": "FunAudioLLM/Fun-ASR-MLT-Nano-2512",
+      "reason": "31-language multilingual Fun-ASR. Official list has no Turkish."
+    },
+    {
       "id": "facebook/seamless-m4t-v2-large",
       "reason": "Has Turkish, but CC-BY-NC-4.0 and a 2024 speech-translation stack, not a 2026 ASR specialist."
     },
@@ -162,6 +179,30 @@
     {
       "id": "facebook/wav2vec2-large-xlsr-53",
       "reason": "Kept only as the original English-oriented pilot checkpoint, not as a 2026 refresh candidate."
+    },
+    {
+      "id": "Qwen/Qwen3-8B",
+      "reason": "Superseded on 2026-09-04 by Qwen/Qwen3.5-9B. Still public; not a language-coverage reject."
+    },
+    {
+      "id": "Qwen/Qwen2.5-3B-Instruct",
+      "reason": "Superseded on 2026-09-04 by Qwen/Qwen3.5-4B. Still public; not a language-coverage reject."
+    },
+    {
+      "id": "Qwen/Qwen3.8-27B",
+      "reason": "Newest Qwen open dense model (2026-08-14) but 27B is not practical on the kit RTX 5060 Laptop. Recorded so the size cut is explicit."
+    },
+    {
+      "id": "gpt-5.6-sol",
+      "reason": "Paid OpenAI API. This project cannot use paid hosted models for new runs. Free replacement: Qwen/Qwen3.5-9B."
+    },
+    {
+      "id": "gpt-5.6-luna",
+      "reason": "Paid OpenAI API. Same no-paid-model rule. Free replacement for new ablation: Qwen/Qwen3.5-4B."
+    },
+    {
+      "id": "gpt-6-astra",
+      "reason": "Paid OpenAI API (released 2026-09-03). Excluded under the no-paid-model rule."
     }
   ]
 }

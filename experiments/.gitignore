@@ -1,5 +1,9 @@
 hf_cache/
 outputs/
+data/raw/
+data/smoke/
+data/*.wav
+data/_work/
 __pycache__/
 *.pyc
 .venv/

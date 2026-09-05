@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduTerm AI — Speech-to-Terminology Studio</title>
+  <meta name="description" content="State-of-the-art interactive speech-to-terminology extraction and CEFR B1 explanation studio for educational YouTube lectures.">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Navbar / Header -->
+    <header class="top-nav">
+      <div class="brand-group">
+        <div class="logo-badge">
+          <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>
+        </div>
+        <div>
+          <h1 class="brand-title">EduTerm <span class="gradient-text">AI</span></h1>
+          <p class="brand-subtitle">Cross-Layer Speech-to-Terminology Studio</p>
+        </div>
+      </div>
+
+      <div class="system-pills" id="systemPills">
+        <div class="pill pill-gpu" id="pillGpu">
+          <span class="status-dot online"></span>
+          <span id="gpuText">Detecting Hardware...</span>
+        </div>
+        <div class="pill pill-mode">
+          <span class="pill-tag">B1 LEVEL</span>
+          <span>CEFR Explanations</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="workspace-grid">
+      <!-- Left Column: Input & Controls -->
+      <section class="control-panel glass-card">
+        <div class="tabs-header">
+          <button type="button" class="tab-btn active" id="tabYoutube" data-tab="youtube">
+            <svg class="tab-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+            </svg>
+            YouTube Video
+          </button>
+          <button type="button" class="tab-btn" id="tabUpload" data-tab="upload">
+            <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            File Upload
+          </button>
+        </div>
+
+        <!-- Tab 1: YouTube -->
+        <div class="tab-content" id="youtubeTabContent">
+          <div class="form-group">
+            <label for="ytUrlInput">YouTube Video URL</label>
+            <div class="input-with-button">
+              <input type="text" id="ytUrlInput" placeholder="https://www.youtube.com/watch?v=..." autocomplete="off">
+              <button type="button" class="btn btn-secondary" id="btnFetchMeta">Inspect</button>
+            </div>
+            <p class="field-hint">Paste any educational lecture or video URL from YouTube.</p>
+          </div>
+
+          <!-- YouTube Preview Card -->
+          <div class="video-preview-card hidden" id="videoPreviewCard">
+            <img src="" alt="Thumbnail" id="previewThumb" class="preview-thumb">
+            <div class="preview-details">
+              <h3 id="previewTitle" class="preview-title">Loading...</h3>
+              <p id="previewAuthor" class="preview-author">Author</p>
+              <div class="preview-badges">
+                <span class="mini-badge" id="previewDuration">00:00</span>
+                <span class="mini-badge ready">Ready to Extract</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 2: Upload -->
+        <div class="tab-content hidden" id="uploadTabContent">
+          <div class="upload-dropzone" id="dropZone">
+            <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="12" y1="18" x2="12" y2="12"></line>
+              <line x1="9" y1="15" x2="15" y2="15"></line>
+            </svg>
+            <p class="upload-prompt">Drag & Drop audio/video file here</p>
+            <span class="upload-or">or</span>
+            <label for="fileInput" class="btn btn-secondary btn-sm">Browse Files</label>
+            <input type="file" id="fileInput" accept="video/mp4,video/webm,audio/wav,audio/mp3,audio/m4a,audio/flac" class="hidden">
+            <p class="upload-formats">MP4, WEBM, WAV, MP3, M4A up to 500MB</p>
+            <div class="file-chosen-banner hidden" id="fileChosenBanner">
+              <span id="chosenFileName">filename.mp4</span>
+              <button type="button" class="btn-clear" id="btnClearFile">&times;</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Audio Slicing / Duration Controls -->
+        <div class="config-section">
+          <div class="section-title-row">
+            <h4>Audio Scope</h4>
+            <span class="scope-info" id="scopeInfo">Full Duration</span>
+          </div>
+          <div class="preset-pills">
+            <button type="button" class="preset-btn active" data-range="full">Full Audio</button>
+            <button type="button" class="preset-btn" data-range="120">First 2 Min</button>
+            <button type="button" class="preset-btn" data-range="300">First 5 Min</button>
+            <button type="button" class="preset-btn" data-range="custom">Custom</button>
+          </div>
+          <div class="custom-range-inputs hidden" id="customRangeGroup">
+            <div class="range-input-col">
+              <label for="inputStartSec">Start (seconds)</label>
+              <input type="number" id="inputStartSec" min="0" value="0" step="1">
+            </div>
+            <div class="range-input-col">
+              <label for="inputDurationSec">Duration (seconds)</label>
+              <input type="number" id="inputDurationSec" min="10" placeholder="e.g. 180" step="1">
+            </div>
+          </div>
+        </div>
+
+        <!-- Model Configuration -->
+        <div class="config-section">
+          <h4>Models & Language</h4>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="selectAsrModel">ASR Model</label>
+              <select id="selectAsrModel" class="custom-select">
+                <option value="openai/whisper-large-v3-turbo" selected>Whisper Large-v3 Turbo (Fastest, ~0.025 RTF)</option>
+                <option value="openai/whisper-large-v3">Whisper Large-v3 (Highest Accuracy)</option>
+                <option value="openai/whisper-medium">Whisper Medium (Balanced)</option>
+                <option value="selimc/whisper-large-v3-turbo-turkish">Whisper Turbo TR (Turkish Specialist)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="selectLang">Audio Language</label>
+              <select id="selectLang" class="custom-select">
+                <option value="auto" selected>Auto-Detect</option>
+                <option value="tr">Turkish (tr)</option>
+                <option value="en">English (en)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="selectLlmModel">Terminology Extraction LLM</label>
+            <select id="selectLlmModel" class="custom-select" disabled>
+              <option value="Qwen/Qwen3.5-4B" selected>Qwen3.5-4B (4-bit Quantized CUDA • RTX 5060)</option>
+            </select>
+            <p class="field-hint">Extracts domain terms + B1 beginner explanations using the paper's exact prompt.</p>
+          </div>
+        </div>
+
+        <!-- Action Button -->
+        <button type="button" class="btn btn-primary btn-run" id="btnRunPipeline">
+          <span class="btn-icon">⚡</span>
+          <span class="btn-text">Run Speech-to-Terminology Pipeline</span>
+        </button>
+
+        <!-- Progress Box -->
+        <div class="pipeline-progress hidden" id="pipelineProgress">
+          <div class="progress-bar-container">
+            <div class="progress-bar-fill" id="progressBarFill"></div>
+          </div>
+          <div class="progress-status-row">
+            <span class="pulse-indicator"></span>
+            <span class="status-msg" id="statusMessage">Initializing...</span>
+          </div>
+          <div class="log-stream" id="logStream"></div>
+        </div>
+      </section>
+
+      <!-- Right Column: Results & Interactive Player -->
+      <section class="results-panel">
+        <!-- Empty Placeholder State -->
+        <div class="empty-state glass-card" id="emptyState">
+          <div class="empty-icon-ring">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 14.5h-2v-2h2zm0-4.5h-2V7h2z"/>
+            </svg>
+          </div>
+          <h2>Ready to Transcribe & Analyze</h2>
+          <p>Paste a YouTube URL or upload a video clip on the left to begin automatic transcription and domain terminology extraction.</p>
+          <div class="demo-hints">
+            <span>Quick Samples:</span>
+            <button type="button" class="demo-chip" data-url="https://www.youtube.com/watch?v=rz5JCvMlCMs">TR-1: Project Management (Anadolu Üniv)</button>
+            <button type="button" class="demo-chip" data-url="https://www.youtube.com/watch?v=yzsHZVU_Y7w">TR-2: Tourism Training (Forteliber)</button>
+          </div>
+        </div>
+
+        <!-- Active Results View -->
+        <div class="results-view hidden" id="resultsView">
+          <!-- Player Card -->
+          <div class="player-card glass-card">
+            <div class="player-wrapper">
+              <!-- YouTube Iframe container -->
+              <div id="ytPlayerContainer" class="yt-container hidden">
+                <div id="ytPlayer"></div>
+              </div>
+              <!-- HTML5 Audio container for uploads -->
+              <div id="htmlAudioContainer" class="audio-container hidden">
+                <audio id="audioPlayer" controls class="native-audio"></audio>
+              </div>
+            </div>
+
+            <!-- Diagnostics Bar -->
+            <div class="diagnostics-bar">
+              <div class="diag-item">
+                <span class="diag-label">ASR Speed</span>
+                <span class="diag-val" id="diagRtf">0.00 RTF</span>
+              </div>
+              <div class="diag-item">
+                <span class="diag-label">ASR Time</span>
+                <span class="diag-val" id="diagAsrLat">0.0s</span>
+              </div>
+              <div class="diag-item">
+                <span class="diag-label">LLM Extraction</span>
+                <span class="diag-val" id="diagLlmLat">0.0s</span>
+              </div>
+              <div class="diag-item">
+                <span class="diag-label">Terms Extracted</span>
+                <span class="diag-val highlight" id="diagTermsCount">0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dual Tabs: Terminology & Transcript -->
+          <div class="output-tabs glass-card">
+            <div class="output-header">
+              <div class="tab-subnav">
+                <button type="button" class="subnav-btn active" data-subtab="terms" id="subtabTermsBtn">
+                  Extracted Terminology (<span id="termCounter">0</span>)
+                </button>
+                <button type="button" class="subnav-btn" data-subtab="transcript" id="subtabTranscriptBtn">
+                  Interactive Transcript
+                </button>
+              </div>
+
+              <!-- Export Hub -->
+              <div class="export-actions">
+                <button type="button" class="btn btn-sm btn-ghost" id="btnExportCsv" title="Export CSV for Annotation Protocol">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                  CSV (Protocol)
+                </button>
+                <button type="button" class="btn btn-sm btn-ghost" id="btnExportJson" title="Export JSON">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                  JSON
+                </button>
+                <button type="button" class="btn btn-sm btn-ghost" id="btnCopyMd" title="Copy Markdown Summary">
+                  Copy MD
+                </button>
+              </div>
+            </div>
+
+            <!-- Tab 1: Terms Cards Grid -->
+            <div class="subtab-content" id="subtabTermsContent">
+              <div class="terms-filter-row">
+                <input type="text" id="termsSearchInput" placeholder="Filter terms or explanations..." class="filter-input">
+                <span class="terms-count-badge" id="filteredTermsCount">Showing all terms</span>
+              </div>
+              <div class="terms-grid" id="termsGrid"></div>
+            </div>
+
+            <!-- Tab 2: Transcript with Timestamps -->
+            <div class="subtab-content hidden" id="subtabTranscriptContent">
+              <div class="transcript-controls">
+                <span class="transcript-hint">💡 Click on any timestamp or sentence to jump the player to that exact moment.</span>
+                <button type="button" class="btn btn-xs btn-ghost" id="btnCopyTranscript">Copy Full Text</button>
+              </div>
+              <div class="transcript-scroll" id="transcriptScroll"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Toast Notifications -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- YouTube Iframe API Script -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script src="/static/app.js"></script>
+</body>
+</html>

@@ -41,8 +41,9 @@ def main() -> None:
             "task": "transcribe",
             "language": "forced tr|en when clip.lang is set",
             "chunk_length_s": 30,
+            "longform": "sequential_generate",
             "return_timestamps": True,
-            "condition_on_previous_text": False,
+            "condition_on_prev_tokens": False,
         },
     }
     print(json.dumps(rec, indent=2))

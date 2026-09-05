@@ -9,6 +9,7 @@ Reads completed run files and writes:
 
 Usage:
     python report.py --asr outputs/asr-20260828.jsonl
+    python report.py --asr outputs/asr-medium.jsonl outputs/asr-large-v3.jsonl
     python report.py --asr outputs/asr.jsonl --ablation outputs/ablation.jsonl --write-tex
 """
 
@@ -37,10 +38,15 @@ DISPLAY = {
     "Qwen/Qwen3-ASR-1.7B-hf": "Qwen3-ASR 1.7B",
     "Qwen/Qwen3-ASR-0.6B-hf": "Qwen3-ASR 0.6B",
     "selimc/whisper-large-v3-turbo-turkish": "Whisper Turbo TR",
+    "nvidia/nemotron-3.5-asr-streaming-0.6b": "Nemotron 3.5 ASR",
     "gpt-4.1": "GPT-4.1",
     "gpt-4o-mini": "GPT-4o-mini",
+    "gpt-5.6-sol": "GPT-5.6 Sol",
+    "gpt-5.6-luna": "GPT-5.6 Luna",
     "Qwen/Qwen3-8B": "Qwen3-8B",
     "Qwen/Qwen2.5-3B-Instruct": "Qwen2.5-3B",
+    "Qwen/Qwen3.5-9B": "Qwen3.5-9B",
+    "Qwen/Qwen3.5-4B": "Qwen3.5-4B",
 }
 
 PILOT_ASR = (
@@ -53,6 +59,7 @@ REFRESH_ASR = (
     "openai/whisper-large-v3-turbo",
     "Qwen/Qwen3-ASR-1.7B-hf",
     "Qwen/Qwen3-ASR-0.6B-hf",
+    "nvidia/nemotron-3.5-asr-streaming-0.6b",
     "selimc/whisper-large-v3-turbo-turkish",
 )
 
@@ -90,12 +97,17 @@ def fmt(value: float | None, digits: int = 3) -> str:
     return f"{value:.{digits}f}"
 
 
+def _scored_asr_row(row: dict) -> bool:
+    """A row that can enter a WER/CER mean. Missing-reference clips keep the key as null."""
+    if row.get("skipped") or row.get("error"):
+        return False
+    return row.get("wer_norm") is not None
+
+
 def summarize_asr(rows: list[dict]) -> dict:
     groups: dict[tuple[str, str], list[dict]] = defaultdict(list)
     for row in rows:
-        if row.get("skipped"):
-            continue
-        if "wer_norm" not in row:
+        if not _scored_asr_row(row):
             continue
         groups[(row.get("model", "?"), _lang(row))].append(row)
 
@@ -116,7 +128,7 @@ def summarize_asr(rows: list[dict]) -> dict:
                     # unweighted over clips, not over languages
                     pass
         # recompute pooled over all clips of this model
-        clips = [r for r in rows if r.get("model") == rec["model"] and not r.get("skipped") and "wer_norm" in r]
+        clips = [r for r in rows if r.get("model") == rec["model"] and _scored_asr_row(r)]
         rec["pooled"] = {k: mean([float(x[k]) for x in clips if x.get(k) is not None]) for k in METRIC_KEYS}
         rec["pooled"]["n"] = len(clips)
     return {"models": by_model, "n_rows": len(rows)}
@@ -271,7 +283,54 @@ def pending_ablation_tex() -> str:
     return ablation_tex({"models": {}, "llm": "GPT-4o-mini"})
 
 
-def write_markdown(asr: dict | None, ablation: dict | None) -> str:
+def paper_blockers(manifest_path: Path | None = None) -> list[str]:
+    """Reasons the IEEE tables must stay empty. Caption drafts are not gold."""
+    path = manifest_path or (ROOT / "data" / "manifest.jsonl")
+    if not path.exists():
+        return [f"manifest missing: {path}"]
+    blockers: list[str] = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if not line.strip():
+            continue
+        row = json.loads(line)
+        cid = row.get("id", "?")
+        if not row.get("confirmed"):
+            blockers.append(f"{cid}: confirmed=false")
+        src = row.get("reference_source") or "missing"
+        if src != "gold":
+            blockers.append(f"{cid}: reference_source={src} (need gold)")
+        if src == "gold":
+            from gold_io import resolve_reference
+            if not resolve_reference(row):
+                blockers.append(f"{cid}: gold text is empty")
+    return blockers
+
+
+def write_clip_markdown(rows: list[dict]) -> str:
+    """One row per clip. Used as a lab diagnostic, not an IEEE table."""
+    lines = [
+        "## Per-clip (lab diagnostic)",
+        "",
+        "| id | model | lang | ref | confirmed | WER_n | CER_n | RTF |",
+        "|---|---|---|---|---|---:|---:|---:|",
+    ]
+    for row in rows:
+        if row.get("skipped"):
+            continue
+        mid = DISPLAY.get(row.get("model", "?"), row.get("model", "?"))
+        err = row.get("error")
+        wer = "ERR" if err else fmt(row.get("wer_norm"))
+        cer = "ERR" if err else fmt(row.get("cer_norm"))
+        rtf = "ERR" if err else fmt(row.get("rtf"))
+        lines.append(
+            f"| {row.get('id', '?')} | {mid} | {_lang(row)} | "
+            f"{row.get('reference_source') or 'missing'} | "
+            f"{bool(row.get('confirmed'))} | {wer} | {cer} | {rtf} |"
+        )
+    return "\n".join(lines) + "\n"
+
+
+def write_markdown(asr: dict | None, ablation: dict | None, asr_rows: list[dict] | None = None) -> str:
     lines = ["# Generated tables", "", "Numbers appear only if a JSONL run was passed in.", ""]
     if asr:
         lines.append("## ASR by language (normalized)")
@@ -286,6 +345,8 @@ def write_markdown(asr: dict | None, ablation: dict | None) -> str:
                     f"{fmt(block.get('latency_s'), 1)} | {fmt(block.get('rtf'))} |"
                 )
         lines.append("")
+        if asr_rows:
+            lines.append(write_clip_markdown(asr_rows))
     else:
         lines.append("No `--asr` file given.")
         lines.append("")
@@ -309,14 +370,24 @@ def write_markdown(asr: dict | None, ablation: dict | None) -> str:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--asr", type=Path)
+    parser.add_argument("--asr", type=Path, nargs="+",
+                        help="one or more run_asr.py JSONL files")
     parser.add_argument("--ablation", type=Path)
     parser.add_argument("--labels", type=Path, help="annotation CSV to attach R/D to ablation rows")
-    parser.add_argument("--write-tex", action="store_true")
+    parser.add_argument("--write-tex", action="store_true",
+                        help="write paper/tables/*.tex (refused unless clips are confirmed gold)")
+    parser.add_argument("--allow-unconfirmed", action="store_true",
+                        help="override: write TeX even if confirmed=false or reference is not gold")
+    parser.add_argument("--manifest", type=Path, default=ROOT / "data" / "manifest.jsonl")
     args = parser.parse_args()
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    asr_sum = summarize_asr(load_jsonl(args.asr)) if args.asr else None
+    asr_rows = None
+    if args.asr:
+        asr_rows = []
+        for path in args.asr:
+            asr_rows.extend(load_jsonl(path))
+    asr_sum = summarize_asr(asr_rows) if asr_rows is not None else None
     abl_sum = None
     if args.ablation:
         abl_rows = load_jsonl(args.ablation)
@@ -329,11 +400,27 @@ def main() -> None:
     if abl_sum:
         (OUT_DIR / "ablation.json").write_text(json.dumps(abl_sum, indent=2), encoding="utf-8")
 
-    md = write_markdown(asr_sum, abl_sum)
+    md = write_markdown(asr_sum, abl_sum, asr_rows)
+    blockers = paper_blockers(args.manifest)
+    if blockers:
+        banner = (
+            "CANDIDATE / NOT FOR THE IEEE PAPER\n"
+            "Clips are unconfirmed or the reference is not gold. "
+            "Do not paste these cells into tab:asr-lang, tab:asr-2026, or tab:ablation.\n"
+            + "\n".join(f"- {b}" for b in blockers)
+            + "\n\n"
+        )
+        md = banner + md
     (OUT_DIR / "tables.md").write_text(md, encoding="utf-8")
     print(md)
 
     if args.write_tex:
+        if blockers and not args.allow_unconfirmed:
+            raise SystemExit(
+                "refusing --write-tex: clips are unconfirmed or reference is not gold.\n"
+                + "\n".join(blockers)
+                + "\nPass --allow-unconfirmed only for a local scratch copy, never the paper."
+            )
         TEX_DIR.mkdir(parents=True, exist_ok=True)
         (TEX_DIR / "asr_bylang.tex").write_text(
             asr_lang_tex(asr_sum or {"models": {}}, PILOT_ASR,
