@@ -6,7 +6,13 @@ experiments/data/raw/
 experiments/data/smoke/
 experiments/data/_work/
 experiments/gui/temp/
+experiments/gui/data/
 experiments/hf_cache/
+
+# Reference archives
+speech2text-main.zip
+speech2text-main/
+
 
 # Python
 .venv/

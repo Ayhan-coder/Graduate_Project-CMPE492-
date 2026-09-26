@@ -44,10 +44,14 @@ python run_asr.py --manifest data/manifest.jsonl --all-selected
 python run_asr.py --manifest data/manifest.jsonl --model openai/whisper-medium --output outputs/asr-TIMESTAMP.jsonl --resume
 
 # Per-language + 2026 tables (no invented cells)
-# --write-tex is refused until every clip is confirmed=true and reference_source=gold
-python report.py --asr outputs/asr-TIMESTAMP.jsonl
-python report.py --asr outputs/asr-medium.jsonl outputs/asr-large-v3.jsonl
-python report.py --asr outputs/asr-TIMESTAMP.jsonl --write-tex
+# Gold is in place; --write-tex writes paper/tables/*.tex
+python report.py --asr outputs/asr-whisper-combined.rescored.jsonl \
+  outputs/asr-qwen3-0.6b.rescored.jsonl \
+  outputs/asr-qwen3-1.7b.rescored.jsonl \
+  outputs/asr-selimc-turbo.rescored.jsonl \
+  outputs/asr-nemotron.rescored.jsonl \
+  --ablation outputs/ablation-20260905-143731.jsonl \
+  --labels annotation/labels_a1.csv --write-tex
 
 # Cross-layer ablation: same LLM on every ASR hypothesis
 python run_ablation.py --asr-outputs outputs/asr-TIMESTAMP.jsonl --model Qwen/Qwen3.5-4B
@@ -70,5 +74,5 @@ Rejected despite leaderboard rank: NVIDIA Parakeet TDT 0.6B v3, Canary 1B v2, Ca
 ## Tests (no GPU, no wavs)
 
 ```text
-python -m unittest tests.test_eval_kit
+python -m unittest tests.test_eval_kit tests.test_gui_api
 ```

@@ -35,9 +35,9 @@ Full command list: `experiments/README.md`.
 
 ## What is already filled vs empty
 
-- **Filled:** pooled pilot WER/CER/RTF and GPT-4.1 / GPT-4o-mini semantic scores from the original study.
-- **Protocol ready, cells empty:** Table per-language ASR, Table 2026 refresh, Table ablation, κ.
-- **Blocked on you:** second annotator + κ, GitHub remote. Wavs, gold transcripts (`experiments/data/gold/`), and the dataset-card source/license/speaker fields are in place; `report.py --write-tex` is no longer refused on the gold gate. New LLM/ablation runs use free Qwen3.5 weights (no paid API). Rescore existing ASR JSONL against gold before pasting tables.
+- **Filled:** pooled CPU-pilot WER/CER/RTF and GPT-4.1 / GPT-4o-mini semantic scores from the original study; gold-rescored GPU per-language ASR (Whisper Medium / Large-v3 / Turbo, Qwen3-ASR 0.6B / 1.7B, Turkish-matched Turbo); same-LLM ablation on Whisper hypotheses (`Qwen3.5-4B`, annotator-1 R1/D1); Cohen’s κ on the 115-item double-labeled subset (`κ_R=0.782`, `κ_D=1.000`).
+- **Still empty:** Wav2Vec2 / SpeechBrain / Nemotron 3.5 gold cells; Qwen3-ASR 1.7B on EN-4.
+- **Blocked on you:** GitHub remote. Wavs and gold stay local. New semantic and ablation runs use free Qwen3.5 weights (no paid API).
 
 ## License
 

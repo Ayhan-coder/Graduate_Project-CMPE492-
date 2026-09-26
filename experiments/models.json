@@ -78,6 +78,17 @@
       "backend": "whisper",
       "subset": "tr",
       "notes": "Common Voice 17 Turkish fine-tune of Whisper Turbo. Run only on TR-1..TR-3. Addresses limitation (a)."
+    },
+    {
+      "id": "mpoyraz/wav2vec2-xls-r-300m-cv7-turkish",
+      "role": "language_matched_wav2vec2_tr",
+      "revision": "main",
+      "params": "300M",
+      "langs": "tr",
+      "license": "apache-2.0",
+      "backend": "hf_ctc",
+      "subset": "tr",
+      "notes": "Common Voice 7 Turkish fine-tuned Wav2Vec2/XLS-R checkpoint with CTC language model head. Evaluated on TR subset."
     }
   ],
   "asr_pilot": [
@@ -145,6 +156,33 @@
       "license": "apache-2.0",
       "subset": "all",
       "notes": "Free ungated Apache-2.0 Qwen3.5 small model. Default for new ablation runs (no API key). Replaces Qwen2.5-3B-Instruct and the paid GPT-5.6 Luna slot. Fits the RTX 5060 Laptop in bf16. Thinking disabled for JSON term extraction."
+    },
+    {
+      "id": "google/gemma-4-E4B-it",
+      "provider": "huggingface",
+      "role": "alternative_google_multilingual",
+      "params": "8B",
+      "license": "gemma",
+      "subset": "all",
+      "notes": "Google Gemma 4 open 8B parameter instruction model (~16 GB unquantized weights across multimodal towers). Multilingual reasoning and terminology extraction alternative. Fits RTX 5060 Laptop in 4-bit (~5.2 GB VRAM)."
+    },
+    {
+      "id": "meta-llama/Llama-3.1-8B-Instruct",
+      "provider": "huggingface",
+      "role": "alternative_meta_multilingual",
+      "params": "8B",
+      "license": "llama3.1",
+      "subset": "all",
+      "notes": "Meta Llama 3.1 8B Instruct (the 8B parameter model of Meta's Llama 3.1/3.3 generation; official Meta Llama 3.3 was released as 70B). Supports multilingual instruction following and terminology extraction. Fits RTX 5060 Laptop in 4-bit NF4 (~5.4 GB VRAM). Also accessible via unsloth/Meta-Llama-3.1-8B-Instruct for ungated downloads."
+    },
+    {
+      "id": "meta-llama/Llama-3.3-8B-Instruct",
+      "provider": "huggingface",
+      "role": "alternative_meta_multilingual_alias",
+      "params": "8B",
+      "license": "llama3.3",
+      "subset": "all",
+      "notes": "Alias for Meta Llama 3.x 8B Instruct architecture for terminology extraction experiments."
     }
   ],
   "rejected": [
@@ -182,7 +220,7 @@
     },
     {
       "id": "Qwen/Qwen3-8B",
-      "reason": "Superseded on 2026-09-04 by Qwen/Qwen3.5-9B. Still public; not a language-coverage reject."
+      "reason": "Superseded on 2026-09-04 by Qwen/Qwen3.5-9B for the paper primary benchmark tables, but supported in the runtime and Web GUI as an 8B parameter terminology extractor option."
     },
     {
       "id": "Qwen/Qwen2.5-3B-Instruct",

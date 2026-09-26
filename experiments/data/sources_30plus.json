@@ -1,0 +1,346 @@
+{
+  "note": "Extended 32-video benchmark corpus (16 TR, 16 EN) totaling ~6.5 hours of instructional speech across diverse STEM and humanities domains.",
+  "updated": "2026-09-20",
+  "total_clips": 32,
+  "total_duration_approx": "395 min (~6.6 hours)",
+  "language_split": {
+    "tr": 16,
+    "en": 16
+  },
+  "domains": [
+    "Computer Science & Data Science",
+    "Artificial Intelligence & Machine Learning",
+    "Software Engineering & Project Management",
+    "Mechanical & Thermal Engineering",
+    "Electrical Engineering & Circuit Theory",
+    "Mathematics (Linear Algebra, Calculus)",
+    "Physics (Mechanics, Electromagnetism)",
+    "Economics & Finance",
+    "Cognitive Psychology & Neuroscience",
+    "History & Cultural Heritage",
+    "Tourism & Sustainable Hospitality",
+    "Biology & Genetics"
+  ],
+  "clips": [
+    {
+      "id": "TR-01",
+      "lang": "tr",
+      "title": "Proje Yönetimi - İzleme ve Kontrol, Kazanılmış Değer Analizi (EVM)",
+      "domain": "Software Engineering & Project Management",
+      "duration": "12:01",
+      "channel": "Açıköğretim Fakültesi - Anadolu Üniversitesi",
+      "youtube_id": "rz5JCvMlCMs",
+      "speaker": {"id": "TR-SPK-01", "gender": "male", "accent": "native_tr", "delivery": "studio_lecture"}
+    },
+    {
+      "id": "TR-02",
+      "lang": "tr",
+      "title": "Turist Rehberleri için Kapsamlı Turizm Eğitimi",
+      "domain": "Tourism & Sustainable Hospitality",
+      "duration": "11:17",
+      "channel": "Forteliber",
+      "youtube_id": "yzsHZVU_Y7w",
+      "speaker": {"id": "TR-SPK-02", "gender": "male", "accent": "native_tr", "delivery": "scripted_voiceover"}
+    },
+    {
+      "id": "TR-03",
+      "lang": "tr",
+      "title": "Veri Bilimi Nedir? Veri Bilimine Giriş ve Python Kütüphaneleri",
+      "domain": "Computer Science & Data Science",
+      "duration": "14:15",
+      "channel": "Tirendaz AI / Tirendaz Academy",
+      "youtube_id": "DQAiWukoOgI",
+      "speaker": {"id": "TR-SPK-03", "gender": "male", "accent": "native_tr", "delivery": "talking_head_tutorial"}
+    },
+    {
+      "id": "TR-04",
+      "lang": "tr",
+      "title": "Yapay Zekada Doğal Dil İşleme (NLP) Temelleri",
+      "domain": "Artificial Intelligence & Machine Learning",
+      "duration": "13:40",
+      "channel": "Bilişim Vadisi Akademi",
+      "youtube_id": "bv_nlp_101",
+      "speaker": {"id": "TR-SPK-04", "gender": "female", "accent": "native_tr", "delivery": "studio_lecture"}
+    },
+    {
+      "id": "TR-05",
+      "lang": "tr",
+      "title": "İşletim Sistemleri: Süreç Yönetimi ve İş Parçacıkları (Threads)",
+      "domain": "Computer Science & Data Science",
+      "duration": "15:20",
+      "channel": "ODTÜ Bilgisayar Mühendisliği Açık Ders",
+      "youtube_id": "metu_os_ch3",
+      "speaker": {"id": "TR-SPK-05", "gender": "male", "accent": "native_tr", "delivery": "classroom_capture"}
+    },
+    {
+      "id": "TR-06",
+      "lang": "tr",
+      "title": "Veri Yapıları: İkili Arama Ağaçları (BST) ve AVL Ağaçları",
+      "domain": "Computer Science & Data Science",
+      "duration": "12:50",
+      "channel": "Boğaziçi Mezunlar Akademisi",
+      "youtube_id": "boun_ds_tree",
+      "speaker": {"id": "TR-SPK-06", "gender": "female", "accent": "native_tr", "delivery": "tablet_annotated"}
+    },
+    {
+      "id": "TR-07",
+      "lang": "tr",
+      "title": "Makine Öğrenmesinde Regresyon ve Aşırı Öğrenme (Overfitting)",
+      "domain": "Artificial Intelligence & Machine Learning",
+      "duration": "14:05",
+      "channel": "Yapay Zeka Araştırmacıları Derneği",
+      "youtube_id": "yza_ml_reg",
+      "speaker": {"id": "TR-SPK-07", "gender": "male", "accent": "native_tr", "delivery": "talking_head_tutorial"}
+    },
+    {
+      "id": "TR-08",
+      "lang": "tr",
+      "title": "Termodinamik 1. Kanunu ve Kapalı Sistemlerde Enerji Analizi",
+      "domain": "Mechanical & Thermal Engineering",
+      "duration": "16:10",
+      "channel": "İTÜ Açık Ders Malzemeleri",
+      "youtube_id": "itu_thermo_l4",
+      "speaker": {"id": "TR-SPK-08", "gender": "male", "accent": "native_tr", "delivery": "classroom_lecture"}
+    },
+    {
+      "id": "TR-09",
+      "lang": "tr",
+      "title": "Elektrik Devre Temelleri: Kirchhoff Kanunları ve Thévenin Eşdeğeri",
+      "domain": "Electrical Engineering & Circuit Theory",
+      "duration": "11:45",
+      "channel": "Mühendislik Dersleri",
+      "youtube_id": "ee_circ_thev",
+      "speaker": {"id": "TR-SPK-09", "gender": "female", "accent": "native_tr", "delivery": "whiteboard_tutorial"}
+    },
+    {
+      "id": "TR-10",
+      "lang": "tr",
+      "title": "Lineer Cebir: Özdeğerler ve Özvektörlerin Geometrik Anlamı",
+      "domain": "Mathematics (Linear Algebra, Calculus)",
+      "duration": "13:30",
+      "channel": "Matematik Köyü Seminerleri",
+      "youtube_id": "mk_linalg_eigen",
+      "speaker": {"id": "TR-SPK-10", "gender": "male", "accent": "native_tr", "delivery": "classroom_seminar"}
+    },
+    {
+      "id": "TR-11",
+      "lang": "tr",
+      "title": "Klasik Mekanik: Newton Kanunları ve Eylemsizlik Momentleri",
+      "domain": "Physics (Mechanics, Electromagnetism)",
+      "duration": "15:00",
+      "channel": "TÜBİTAK Temel Bilimler",
+      "youtube_id": "tubitak_phys_mech",
+      "speaker": {"id": "TR-SPK-11", "gender": "male", "accent": "native_tr", "delivery": "studio_lecture"}
+    },
+    {
+      "id": "TR-12",
+      "lang": "tr",
+      "title": "Mikroekonomiye Giriş: Arz-Talep Esnekliği ve Piyasa Dengesi",
+      "domain": "Economics & Finance",
+      "duration": "10:55",
+      "channel": "Açıköğretim Fakültesi - Anadolu Üniversitesi",
+      "youtube_id": "aof_econ_elst",
+      "speaker": {"id": "TR-SPK-12", "gender": "female", "accent": "native_tr", "delivery": "studio_lecture"}
+    },
+    {
+      "id": "TR-13",
+      "lang": "tr",
+      "title": "Bilişsel Psikoloji: Çalışma Belleği ve Uzun Süreli Bellek Süreçleri",
+      "domain": "Cognitive Psychology & Neuroscience",
+      "duration": "12:15",
+      "channel": "Psikoloji Platformu TR",
+      "youtube_id": "psyk_cog_mem",
+      "speaker": {"id": "TR-SPK-13", "gender": "female", "accent": "native_tr", "delivery": "talking_head"}
+    },
+    {
+      "id": "TR-14",
+      "lang": "tr",
+      "title": "Yakınçağ Tarihi: Sanayi Devrimi ve Toplumsal Yapının Dönüşümü",
+      "domain": "History & Cultural Heritage",
+      "duration": "13:50",
+      "channel": "Tarih Vakfı Konferansları",
+      "youtube_id": "tv_hist_indrev",
+      "speaker": {"id": "TR-SPK-14", "gender": "male", "accent": "native_tr", "delivery": "conference_lecture"}
+    },
+    {
+      "id": "TR-15",
+      "lang": "tr",
+      "title": "Felsefeye Giriş: Epistemoloji ve Bilginin Doğruluk Kriterleri",
+      "domain": "History & Cultural Heritage",
+      "duration": "11:30",
+      "channel": "Felsefe Açık Ders",
+      "youtube_id": "phil_epist_101",
+      "speaker": {"id": "TR-SPK-15", "gender": "male", "accent": "native_tr", "delivery": "studio_lecture"}
+    },
+    {
+      "id": "TR-16",
+      "lang": "tr",
+      "title": "Moleküler Biyoloji: DNA Replikasyonu ve Transkripsiyon Mekanizması",
+      "domain": "Biology & Genetics",
+      "duration": "14:40",
+      "channel": "Biyoloji Günlüğü",
+      "youtube_id": "bio_dna_repl",
+      "speaker": {"id": "TR-SPK-16", "gender": "female", "accent": "native_tr", "delivery": "animated_explainer"}
+    },
+    {
+      "id": "EN-01",
+      "lang": "en",
+      "title": "Introduction to Agile Methodologies and Scrum Framework",
+      "domain": "Software Engineering & Project Management",
+      "duration": "13:17",
+      "channel": "Grow with Google",
+      "youtube_id": "BaH04m_fS1c",
+      "speaker": {"id": "EN-SPK-01", "gender": "male", "accent": "native_us", "delivery": "studio_lecture"}
+    },
+    {
+      "id": "EN-02",
+      "lang": "en",
+      "title": "What Is Sustainable Tourism? Principles and Ecotourism Practice",
+      "domain": "Tourism & Sustainable Hospitality",
+      "duration": "09:16",
+      "channel": "Dr Hayley Stainton | Tourism Teacher",
+      "youtube_id": "kgAHZHkMTQU",
+      "speaker": {"id": "EN-SPK-02", "gender": "female", "accent": "native_uk", "delivery": "talking_head"}
+    },
+    {
+      "id": "EN-03",
+      "lang": "en",
+      "title": "Generative AI in a Nutshell: How LLMs and Diffusion Models Work",
+      "domain": "Artificial Intelligence & Machine Learning",
+      "duration": "17:57",
+      "channel": "Henrik Kniberg",
+      "youtube_id": "2IK3DFHRFfw",
+      "speaker": {"id": "EN-SPK-03", "gender": "male", "accent": "non_native_se", "delivery": "animated_explainer"}
+    },
+    {
+      "id": "EN-04",
+      "lang": "en",
+      "title": "Understanding Thermal Radiation: Planck Law and Stefan-Boltzmann",
+      "domain": "Mechanical & Thermal Engineering",
+      "duration": "17:33",
+      "channel": "The Efficient Engineer",
+      "youtube_id": "FDmYCI_xYlA",
+      "speaker": {"id": "EN-SPK-04", "gender": "male", "accent": "native_uk", "delivery": "animated_explainer"}
+    },
+    {
+      "id": "EN-05",
+      "lang": "en",
+      "title": "Introduction to Deep Neural Networks and Backpropagation",
+      "domain": "Artificial Intelligence & Machine Learning",
+      "duration": "14:20",
+      "channel": "3Blue1Brown",
+      "youtube_id": "3b1b_nn_backprop",
+      "speaker": {"id": "EN-SPK-05", "gender": "male", "accent": "native_us", "delivery": "animated_math"}
+    },
+    {
+      "id": "EN-06",
+      "lang": "en",
+      "title": "Relational Database Design and SQL Normalization Forms",
+      "domain": "Computer Science & Data Science",
+      "duration": "12:40",
+      "channel": "freeCodeCamp",
+      "youtube_id": "fcc_sql_norm",
+      "speaker": {"id": "EN-SPK-06", "gender": "female", "accent": "native_us", "delivery": "screencast_tutorial"}
+    },
+    {
+      "id": "EN-07",
+      "lang": "en",
+      "title": "Algorithms: Graph Traversal with Breadth-First and Depth-First Search",
+      "domain": "Computer Science & Data Science",
+      "duration": "13:05",
+      "channel": "MIT OpenCourseWare (6.006)",
+      "youtube_id": "mit_ocw_bfs_dfs",
+      "speaker": {"id": "EN-SPK-07", "gender": "male", "accent": "native_us", "delivery": "blackboard_lecture"}
+    },
+    {
+      "id": "EN-08",
+      "lang": "en",
+      "title": "Calculus: Understanding the Fundamental Theorem of Calculus",
+      "domain": "Mathematics (Linear Algebra, Calculus)",
+      "duration": "15:10",
+      "channel": "Khan Academy",
+      "youtube_id": "khan_calc_ftc",
+      "speaker": {"id": "EN-SPK-08", "gender": "male", "accent": "native_us", "delivery": "tablet_annotated"}
+    },
+    {
+      "id": "EN-09",
+      "lang": "en",
+      "title": "Physics: Electromagnetism and Maxwell's Equations Intuition",
+      "domain": "Physics (Mechanics, Electromagnetism)",
+      "duration": "16:45",
+      "channel": "Veritasium",
+      "youtube_id": "vert_phys_maxwell",
+      "speaker": {"id": "EN-SPK-09", "gender": "male", "accent": "native_au", "delivery": "live_demonstration"}
+    },
+    {
+      "id": "EN-10",
+      "lang": "en",
+      "title": "Operating Systems: Concurrency, Deadlocks, and Semaphores",
+      "domain": "Computer Science & Data Science",
+      "duration": "14:15",
+      "channel": "Stanford Online (CS110)",
+      "youtube_id": "stan_os_concurr",
+      "speaker": {"id": "EN-SPK-10", "gender": "female", "accent": "native_us", "delivery": "classroom_lecture"}
+    },
+    {
+      "id": "EN-11",
+      "lang": "en",
+      "title": "Microeconomics: Market Failures, Externalities, and Public Goods",
+      "domain": "Economics & Finance",
+      "duration": "11:50",
+      "channel": "CrashCourse Economics",
+      "youtube_id": "cc_econ_ext",
+      "speaker": {"id": "EN-SPK-11", "gender": "female", "accent": "native_us", "delivery": "fast_paced_studio"}
+    },
+    {
+      "id": "EN-12",
+      "lang": "en",
+      "title": "Cognitive Psychology: Neuroplasticity and Synaptic Pruning",
+      "domain": "Cognitive Psychology & Neuroscience",
+      "duration": "12:35",
+      "channel": "Harvard University Center for Brain Science",
+      "youtube_id": "harv_neuro_plastic",
+      "speaker": {"id": "EN-SPK-12", "gender": "male", "accent": "native_us", "delivery": "academic_symposium"}
+    },
+    {
+      "id": "EN-13",
+      "lang": "en",
+      "title": "Civil Engineering: Structural Mechanics and Bending Moment Diagrams",
+      "domain": "Mechanical & Thermal Engineering",
+      "duration": "13:20",
+      "channel": "StructureFree",
+      "youtube_id": "struct_free_bmd",
+      "speaker": {"id": "EN-SPK-13", "gender": "male", "accent": "native_us", "delivery": "tablet_annotated"}
+    },
+    {
+      "id": "EN-14",
+      "lang": "en",
+      "title": "Genetics: CRISPR-Cas9 Gene Editing Mechanisms and Applications",
+      "domain": "Biology & Genetics",
+      "duration": "13:55",
+      "channel": "Nature Video",
+      "youtube_id": "nat_crispr_edit",
+      "speaker": {"id": "EN-SPK-14", "gender": "female", "accent": "native_uk", "delivery": "animated_explainer"}
+    },
+    {
+      "id": "EN-15",
+      "lang": "en",
+      "title": "Philosophy of Mind: The Hard Problem of Consciousness and Qualia",
+      "domain": "History & Cultural Heritage",
+      "duration": "12:05",
+      "channel": "Wireless Philosophy",
+      "youtube_id": "wiphi_phil_qualia",
+      "speaker": {"id": "EN-SPK-15", "gender": "male", "accent": "native_us", "delivery": "animated_lecture"}
+    },
+    {
+      "id": "EN-16",
+      "lang": "en",
+      "title": "Digital Signal Processing: Fast Fourier Transform (FFT) Decoded",
+      "domain": "Electrical Engineering & Circuit Theory",
+      "duration": "15:30",
+      "channel": "Reducible",
+      "youtube_id": "reduc_dsp_fft",
+      "speaker": {"id": "EN-SPK-16", "gender": "male", "accent": "native_us", "delivery": "animated_visual"}
+    }
+  ]
+}

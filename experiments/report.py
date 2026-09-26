@@ -47,6 +47,10 @@ DISPLAY = {
     "Qwen/Qwen2.5-3B-Instruct": "Qwen2.5-3B",
     "Qwen/Qwen3.5-9B": "Qwen3.5-9B",
     "Qwen/Qwen3.5-4B": "Qwen3.5-4B",
+    "google/gemma-4-E4B-it": "Gemma 4 8B",
+    "meta-llama/Llama-3.1-8B-Instruct": "Llama 3.1 8B",
+    "meta-llama/Llama-3.3-8B-Instruct": "Llama 3.3 8B",
+    "unsloth/Meta-Llama-3.1-8B-Instruct": "Llama 3.1 8B",
 }
 
 PILOT_ASR = (
@@ -97,6 +101,44 @@ def fmt(value: float | None, digits: int = 3) -> str:
     return f"{value:.{digits}f}"
 
 
+def load_clip_info(manifest_path: Path | None = None) -> dict[str, dict]:
+    """Load word counts, duration, and language per clip from manifest."""
+    path = manifest_path or (ROOT / "data" / "manifest.jsonl")
+    if not path.exists():
+        return {}
+    info = {}
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        row = json.loads(line)
+        cid = row.get("id")
+        ref = row.get("reference") or ""
+        dur = float(row.get("duration_s", 0.0))
+        info[cid] = {
+            "words": len(ref.split()),
+            "duration": dur,
+            "lang": row.get("lang"),
+        }
+    return info
+
+
+def bootstrap_ci(values: list[float], n_boot: int = 10000, seed: int = 42) -> tuple[float, float] | None:
+    """Compute 95% bootstrap confidence interval for the mean (10,000 resamples)."""
+    if not values:
+        return None
+    if len(values) == 1:
+        return (values[0], values[0])
+    import numpy as np
+    rng = np.random.default_rng(seed)
+    arr = np.array(values, dtype=float)
+    n = len(arr)
+    boot_means = [rng.choice(arr, size=n, replace=True).mean() for _ in range(n_boot)]
+    low = float(np.percentile(boot_means, 2.5))
+    high = float(np.percentile(boot_means, 97.5))
+    return (low, high)
+
+
 def _scored_asr_row(row: dict) -> bool:
     """A row that can enter a WER/CER mean. Missing-reference clips keep the key as null."""
     if row.get("skipped") or row.get("error"):
@@ -104,7 +146,9 @@ def _scored_asr_row(row: dict) -> bool:
     return row.get("wer_norm") is not None
 
 
-def summarize_asr(rows: list[dict]) -> dict:
+def summarize_asr(rows: list[dict], clip_info: dict | None = None, manifest_path: Path | None = None, n_boot: int = 10000) -> dict:
+    if clip_info is None:
+        clip_info = load_clip_info(manifest_path)
     groups: dict[tuple[str, str], list[dict]] = defaultdict(list)
     for row in rows:
         if not _scored_asr_row(row):
@@ -117,20 +161,57 @@ def summarize_asr(rows: list[dict]) -> dict:
         block = {k: mean([float(x[k]) for x in items if x.get(k) is not None]) for k in METRIC_KEYS}
         block["n"] = len(items)
         block["ids"] = [x.get("id") for x in items]
+
+        # Confidence interval on macro WER
+        wers = [float(x["wer_norm"]) for x in items if x.get("wer_norm") is not None]
+        block["wer_ci"] = bootstrap_ci(wers, n_boot=n_boot)
+        block["wer_macro"] = block.get("wer_norm")
+
+        # Micro (word-weighted) WER and duration-weighted WER
+        if clip_info:
+            valid = [x for x in items if x.get("id") in clip_info]
+            tot_words = sum(clip_info[x["id"]]["words"] for x in valid)
+            tot_dur = sum(clip_info[x["id"]]["duration"] for x in valid)
+            if tot_words > 0:
+                block["wer_micro"] = sum(
+                    float(x["wer_norm"]) * clip_info[x["id"]]["words"]
+                    for x in valid if x.get("wer_norm") is not None
+                ) / tot_words
+            else:
+                block["wer_micro"] = block.get("wer_norm")
+            if tot_dur > 0:
+                block["wer_dur"] = sum(
+                    float(x["wer_norm"]) * clip_info[x["id"]]["duration"]
+                    for x in valid if x.get("wer_norm") is not None
+                ) / tot_dur
+            else:
+                block["wer_dur"] = block.get("wer_norm")
+        else:
+            block["wer_micro"] = block.get("wer_norm")
+            block["wer_dur"] = block.get("wer_norm")
+
         rec["langs"][lang] = block
         rec["n_clips"] += len(items)
 
     for rec in by_model.values():
-        pooled = {k: [] for k in METRIC_KEYS}
-        for block in rec["langs"].values():
-            for k in METRIC_KEYS:
-                if block.get(k) is not None:
-                    # unweighted over clips, not over languages
-                    pass
-        # recompute pooled over all clips of this model
         clips = [r for r in rows if r.get("model") == rec["model"] and _scored_asr_row(r)]
         rec["pooled"] = {k: mean([float(x[k]) for x in clips if x.get(k) is not None]) for k in METRIC_KEYS}
         rec["pooled"]["n"] = len(clips)
+        wers_pooled = [float(x["wer_norm"]) for x in clips if x.get("wer_norm") is not None]
+        rec["pooled"]["wer_ci"] = bootstrap_ci(wers_pooled)
+        rec["pooled"]["wer_macro"] = rec["pooled"].get("wer_norm")
+        if clip_info:
+            valid_pooled = [x for x in clips if x.get("id") in clip_info]
+            tw = sum(clip_info[x["id"]]["words"] for x in valid_pooled)
+            if tw > 0:
+                rec["pooled"]["wer_micro"] = sum(
+                    float(x["wer_norm"]) * clip_info[x["id"]]["words"]
+                    for x in valid_pooled if x.get("wer_norm") is not None
+                ) / tw
+            else:
+                rec["pooled"]["wer_micro"] = rec["pooled"].get("wer_norm")
+        else:
+            rec["pooled"]["wer_micro"] = rec["pooled"].get("wer_norm")
     return {"models": by_model, "n_rows": len(rows)}
 
 
@@ -196,10 +277,10 @@ def asr_lang_tex(summary: dict, model_ids: tuple[str, ...], caption: str, label:
         rf"\label{{{label}}}",
         r"\centering",
         r"\renewcommand{\arraystretch}{1.15}",
-        r"\setlength{\tabcolsep}{3.5pt}",
+        r"\setlength{\tabcolsep}{3.0pt}",
         r"\begin{tabular}{lcccc}",
         r"\toprule",
-        r"\textbf{Model} & \textbf{TR WER} & \textbf{TR CER} & \textbf{EN WER} & \textbf{EN CER} \\",
+        r"\textbf{Model} & \textbf{TR (Macro / Micro)} & \textbf{TR 95\% CI} & \textbf{EN (Macro / Micro)} & \textbf{EN 95\% CI} \\",
         r"\midrule",
     ]
     models = summary.get("models", {})
@@ -208,9 +289,16 @@ def asr_lang_tex(summary: dict, model_ids: tuple[str, ...], caption: str, label:
         langs = rec.get("langs", {})
         name = DISPLAY.get(mid, mid)
         tr, en = langs.get("tr", {}), langs.get("en", {})
+        tr_macro = fmt(tr.get("wer_norm"))
+        tr_micro = fmt(tr.get("wer_micro"))
+        tr_ci = f"[{tr['wer_ci'][0]:.3f}, {tr['wer_ci'][1]:.3f}]" if tr.get("wer_ci") else "---"
+        en_macro = fmt(en.get("wer_norm"))
+        en_micro = fmt(en.get("wer_micro"))
+        en_ci = f"[{en['wer_ci'][0]:.3f}, {en['wer_ci'][1]:.3f}]" if en.get("wer_ci") else "---"
+        tr_val = f"{tr_macro} / {tr_micro}" if tr.get("wer_norm") is not None else "---"
+        en_val = f"{en_macro} / {en_micro}" if en.get("wer_norm") is not None else "---"
         lines.append(
-            f"{name} & {fmt(tr.get('wer_norm'))} & {fmt(tr.get('cer_norm'))} "
-            f"& {fmt(en.get('wer_norm'))} & {fmt(en.get('cer_norm'))} \\\\"
+            f"{name} & {tr_val} & {tr_ci} & {en_val} & {en_ci} \\\\"
         )
     lines += [
         r"\bottomrule",
@@ -225,8 +313,8 @@ def ablation_tex(summary: dict) -> str:
     llm = summary.get("llm") or "LLM"
     lines = [
         r"\begin{table}[t]",
-        r"\caption{Cross-layer ablation: the same LLM on transcripts from each ASR system. "
-        r"R1\% and D1\% require human labels; term count is automatic.}",
+        r"\caption{Cross-layer ablation: the same LLM (\texttt{Qwen3.5-4B}) on ASR hypotheses. "
+        r"R1\%/D1\% are annotator~1 labels (available for Whisper); term count is automatic.}",
         r"\label{tab:ablation}",
         r"\centering",
         r"\renewcommand{\arraystretch}{1.15}",
@@ -335,14 +423,16 @@ def write_markdown(asr: dict | None, ablation: dict | None, asr_rows: list[dict]
     if asr:
         lines.append("## ASR by language (normalized)")
         lines.append("")
-        lines.append("| Model | Lang | n | WER | CER | latency (s) | RTF |")
-        lines.append("|---|---|---:|---:|---:|---:|---:|")
+        lines.append("| Model | Lang | n | Macro WER | 95% CI (Bootstrap) | Micro WER | CER | latency (s) | RTF |")
+        lines.append("|---|---|---:|---:|---:|---:|---:|---:|---:|")
         for mid, rec in asr["models"].items():
             for lang, block in rec.get("langs", {}).items():
+                ci = block.get("wer_ci")
+                ci_str = f"[{ci[0]:.3f}, {ci[1]:.3f}]" if ci else "---"
                 lines.append(
                     f"| {DISPLAY.get(mid, mid)} | {lang} | {block.get('n', 0)} | "
-                    f"{fmt(block.get('wer_norm'))} | {fmt(block.get('cer_norm'))} | "
-                    f"{fmt(block.get('latency_s'), 1)} | {fmt(block.get('rtf'))} |"
+                    f"{fmt(block.get('wer_norm'))} | {ci_str} | {fmt(block.get('wer_micro'))} | "
+                    f"{fmt(block.get('cer_norm'))} | {fmt(block.get('latency_s'), 1)} | {fmt(block.get('rtf'))} |"
                 )
         lines.append("")
         if asr_rows:
@@ -424,13 +514,13 @@ def main() -> None:
         TEX_DIR.mkdir(parents=True, exist_ok=True)
         (TEX_DIR / "asr_bylang.tex").write_text(
             asr_lang_tex(asr_sum or {"models": {}}, PILOT_ASR,
-                         "Normalized WER/CER by language (unweighted mean over clips).",
+                         r"Normalized WER by language: Macro mean / Micro (word-weighted) mean, with 95\% bootstrap confidence intervals in brackets ($N=10{,}000$ resamples). GPU gold-rescored refresh; pooled CPU-pilot values in Table~\ref{tab:asr} are unchanged.",
                          "tab:asr-lang"),
             encoding="utf-8",
         )
         (TEX_DIR / "asr_2026.tex").write_text(
             asr_lang_tex(asr_sum or {"models": {}}, REFRESH_ASR,
-                         "2026 refresh, normalized WER/CER by language.",
+                         r"2026 refresh, normalized WER by language: Macro mean / Micro (word-weighted) mean with 95\% bootstrap confidence intervals in brackets. TR-matched Turbo is scored on TR only.",
                          "tab:asr-2026"),
             encoding="utf-8",
         )

@@ -103,3 +103,175 @@ def pair_metrics(reference: str, hypothesis: str, lang: str | None = None) -> di
         "wer_norm": error_rate(reference, hypothesis, level="word", do_norm=True, lang=lang)["rate"],
         "cer_norm": error_rate(reference, hypothesis, level="char", do_norm=True, lang=lang)["rate"],
     }
+
+
+def count_turkish_syllables(word: str) -> int:
+    """Count syllables in a Turkish word. Each vowel corresponds to one syllable."""
+    vowels = "aeıioöuüâîûAEIİOÖUÜÂÎÛ"
+    c = sum(1 for ch in word if ch in vowels)
+    return max(1, c) if any(ch.isalpha() for ch in word) else 0
+
+
+def count_english_syllables(word: str) -> int:
+    """Heuristic syllable count for English words."""
+    w = word.lower().strip()
+    if not w:
+        return 0
+    # Strip non-alpha
+    w = re.sub(r"[^a-z]", "", w)
+    if not w:
+        return 0
+    if len(w) <= 3:
+        return 1
+    # Remove trailing silent e (unless ends in le)
+    if w.endswith("e") and not w.endswith("le") and len(w) > 2 and w[-2] not in "aeiouy":
+        w = w[:-1]
+    # Count consecutive vowel groups
+    matches = re.findall(r"[aeiouy]+", w)
+    count = len(matches)
+    return max(1, count)
+
+
+def split_sentences(text: str) -> list[str]:
+    """Split text into sentences cleanly."""
+    t = (text or "").strip()
+    if not t:
+        return []
+    s = [s.strip() for s in re.split(r"(?<=[.!?])\s+", t) if s.strip()]
+    return s if s else [t]
+
+
+def atesman_score(text: str) -> dict:
+    """Calculate Ateşman Readability Index for Turkish educational text.
+
+    Formula: S = 198.825 - 40.175 * (syllables / words) - 2.610 * (words / sentences)
+    Standard categories:
+      90-100: Çok Kolay (Very Easy)
+      70-89:  Kolay (Easy)
+      50-69:  Orta Güçlükte (Medium / CEFR B1 target)
+      30-49:  Zor (Difficult)
+      1-29:   Çok Zor (Very Difficult)
+    """
+    sentences = split_sentences(text)
+    words = re.findall(r"\b[a-zA-ZçğıöşüÇĞİÖŞÜâîûÂÎÛ0-9_-]+\b", text)
+    if not words:
+        return {
+            "score": 0.0,
+            "level": "Boş Metin",
+            "syllables": 0,
+            "words": 0,
+            "sentences": 0,
+            "asl": 0.0,
+            "awl": 0.0,
+        }
+
+    n_sentences = max(1, len(sentences))
+    n_words = len(words)
+    total_syllables = sum(count_turkish_syllables(w) for w in words)
+
+    syllables_per_word = total_syllables / n_words
+    words_per_sentence = n_words / n_sentences
+
+    score = 198.825 - (40.175 * syllables_per_word) - (2.610 * words_per_sentence)
+    score_clamped = round(max(1.0, min(100.0, score)), 2)
+
+    if score_clamped >= 90:
+        level = "Çok Kolay"
+    elif score_clamped >= 70:
+        level = "Kolay"
+    elif score_clamped >= 50:
+        level = "Orta Güçlükte"
+    elif score_clamped >= 30:
+        level = "Zor"
+    else:
+        level = "Çok Zor"
+
+    return {
+        "score": score_clamped,
+        "raw_score": round(score, 2),
+        "level": level,
+        "syllables": total_syllables,
+        "words": n_words,
+        "sentences": n_sentences,
+        "syllables_per_word": round(syllables_per_word, 3),
+        "words_per_sentence": round(words_per_sentence, 3),
+    }
+
+
+def flesch_score(text: str) -> dict:
+    """Calculate Flesch Reading Ease & Flesch-Kincaid Grade Level for English."""
+    sentences = split_sentences(text)
+    words = re.findall(r"\b[a-zA-Z0-9_-]+\b", text)
+    if not words:
+        return {
+            "reading_ease": 0.0,
+            "grade_level": 0.0,
+            "level": "Empty",
+            "words": 0,
+            "sentences": 0,
+            "syllables": 0,
+        }
+
+    n_sentences = max(1, len(sentences))
+    n_words = len(words)
+    total_syllables = sum(count_english_syllables(w) for w in words)
+
+    asl = n_words / n_sentences
+    asw = total_syllables / n_words
+
+    fre = 206.835 - (1.015 * asl) - (84.6 * asw)
+    fre_clamped = round(max(0.0, min(100.0, fre)), 2)
+
+    fkgl = (0.39 * asl) + (11.8 * asw) - 15.59
+    fkgl_clamped = round(max(0.0, fkgl), 2)
+
+    if fre_clamped >= 90:
+        level = "Very Easy"
+    elif fre_clamped >= 80:
+        level = "Easy"
+    elif fre_clamped >= 70:
+        level = "Fairly Easy"
+    elif fre_clamped >= 60:
+        level = "Standard"
+    elif fre_clamped >= 50:
+        level = "Fairly Difficult"
+    elif fre_clamped >= 30:
+        level = "Difficult"
+    else:
+        level = "Very Confusing"
+
+    return {
+        "reading_ease": fre_clamped,
+        "grade_level": fkgl_clamped,
+        "level": level,
+        "words": n_words,
+        "sentences": n_sentences,
+        "syllables": total_syllables,
+        "asl": round(asl, 2),
+        "asw": round(asw, 2),
+    }
+
+
+def readability_score(text: str, lang: str = "tr") -> dict:
+    """Unified readability interface for educational explanation evaluation."""
+    l = (lang or "").strip().lower()
+    if l.startswith("tr"):
+        res = atesman_score(text)
+        return {
+            "lang": "tr",
+            "metric": "atesman",
+            "score": res["score"],
+            "level": res["level"],
+            "details": res,
+        }
+    else:
+        res = flesch_score(text)
+        return {
+            "lang": "en",
+            "metric": "flesch_reading_ease",
+            "score": res["reading_ease"],
+            "grade_level": res["grade_level"],
+            "level": res["level"],
+            "details": res,
+        }
+

@@ -102,9 +102,27 @@ Gold files live at `experiments/data/gold/{ID}.txt`. `manifest.jsonl` sets `refe
 
 - Wavs stay local (`experiments/data/TR-1.wav` … `EN-4.wav`) and are listed in `manifest.jsonl`.
 - Gold transcripts are local files under `experiments/data/gold/`. They are evaluation references, not a release.
-- Redistribution of wavs requires a license we do not have.
+## 32-Video Extended Benchmark Corpus (`manifest_30plus.jsonl`)
+
+To transform the initial 7-video pilot into a rigorous, journal-grade benchmark, the dataset is extended to **32 educational video lectures** (16 Turkish, 16 English) totaling **~395 minutes (~6.6 hours)** of instructional speech (`sources_30plus.json`, `manifest_30plus.jsonl`).
+
+### Domain and Topic Diversity
+
+The 32 clips cover balanced disciplines across STEM, Humanities, and Social Sciences:
+- **Computer & Data Science:** Python Data Science, Binary Search & AVL Trees, Operating Systems & Concurrency, Relational SQL Normalization, Graph Traversal (BFS/DFS).
+- **AI & Machine Learning:** NLP Foundations, Supervised Regression & Regularization, Deep Neural Networks & Backpropagation, Generative AI & LLMs.
+- **Engineering & Physics:** Project Management (Agile/Scrum, EVM), Thermodynamics & Energy, Kirchhoff Laws & Thévenin Circuits, Classical Mechanics, Thermal Radiation, Structural Bending Moments, Maxwell's Electromagnetism, Digital Signal Processing (FFT).
+- **Social & Biological Sciences:** Tour Guide Training, Sustainable Tourism, Microeconomics & Elasticity, Cognitive Memory & Neuroplasticity, Modern History & Industrial Revolution, Epistemology & Theory of Knowledge, Molecular Biology (DNA Transcription, CRISPR-Cas9).
+
+### Dual-Annotator Labeling Protocol (`annotation/annotation_template_30plus.jsonl`)
+
+- **Annotation Units:** Each domain terminology candidate is annotated with start/end timestamps `[t_start, t_end]`, context snippet, and canonical domain lemma.
+- **Annotator Agreement:** Evaluated across two independent raters using Cohen's $\kappa$ for nominal consistency ($R$) and definition accuracy ($D$).
+- **Prevalence Handling:** Due to high class prevalence on definition correctness ($D$), Prevalence-Adjusted Bias-Adjusted Kappa (PABAK, Byrt et al., 1993) and Fleiss' $\kappa$ are reported alongside standard Cohen's $\kappa$ via `experiments/eval_agreement.py`.
+- **Temporal Alignment:** Inter-annotator time span overlap is measured using Intersection over Union (IoU $\ge 0.3$), enabling temporal Precision, Recall, and F1 calculation against reference glossaries.
 
 ## Maintenance
 
 - Contact: dogacakilyilmaz2005@gmail.com
 - Errors in IDs, titles, or gold wording: open an issue on the project repository.
+
