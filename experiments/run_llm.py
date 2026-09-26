@@ -12,8 +12,22 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging
+import threading
 import time
+import warnings
 from pathlib import Path
+
+warnings.filterwarnings("ignore", message=r".*triton not found.*")
+warnings.filterwarnings("ignore", category=FutureWarning)
+warnings.filterwarnings("ignore", category=UserWarning)
+
+logging.getLogger("huggingface_hub").setLevel(logging.ERROR)
+try:
+    from transformers.utils import logging as tf_logging
+    tf_logging.set_verbosity_error()
+except Exception:
+    pass
 
 from fetch_models import hub_slug, load_registry, resolve_hub_cache
 
@@ -24,8 +38,9 @@ OUT_DIR = ROOT / "outputs"
 def _local_model_path(model_id: str) -> str:
     cache = resolve_hub_cache(model_id)
     snaps = list((cache / hub_slug(model_id) / "snapshots").glob("*"))
-    if snaps:
-        return str(snaps[0])
+    for snap in snaps:
+        if any(snap.glob("*.safetensors")) or any(snap.glob("*.bin")):
+            return str(snap)
     return model_id
 
 PROMPT = (
@@ -62,7 +77,11 @@ def parse_terms(text: str) -> list[dict]:
 
 
 def _hf_model_class(model_id: str, cache: str):
-    """Causal LM for Qwen2.5/Qwen3; image-text class for Qwen3.5+."""
+    """Causal LM for Llama/Qwen2.5/Qwen3/Qwen3.5-9B; image-text class for Qwen3.5 multimodal."""
+    if any(k in model_id.lower() for k in ("9b", "llama")):
+        from transformers import AutoModelForCausalLM
+
+        return AutoModelForCausalLM
     from transformers import AutoConfig
 
     path = _local_model_path(model_id)
@@ -92,14 +111,60 @@ def _strip_think(text: str) -> str:
 
 
 _HF_LLM_CACHE: dict[str, tuple[object, object]] = {}
+_ACTIVE_LLM_MODEL: str | None = None
 
 
-def generate_hf(model_id: str, prompt: str) -> str:
+def clear_llm_cache() -> None:
+    """Clear cached HuggingFace LLM models and free CUDA memory."""
+    import gc
     import torch
+
+    global _HF_LLM_CACHE, _ACTIVE_LLM_MODEL
+    _HF_LLM_CACHE.clear()
+    _ACTIVE_LLM_MODEL = None
+    gc.collect()
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+
+
+_LLM_LOAD_LOCK = threading.Lock()
+
+
+def get_or_load_llm(model_id: str = "Qwen/Qwen3.5-4B") -> tuple[object, object]:
+    """Retrieve cached LLM tokenizer & model or load into memory once."""
+    import gc
+    import torch
+    import safetensors
     from transformers import AutoTokenizer
 
-    packed = _HF_LLM_CACHE.get(model_id)
-    if packed is None:
+    # On Windows, enforce pread backend for safetensors to avoid mmap OS error 1455 / pagefile overflow
+    import transformers.modeling_utils
+    if hasattr(transformers.modeling_utils, "safe_open") and not getattr(transformers.modeling_utils, "_pread_patched", False):
+        _orig_mu_safe_open = transformers.modeling_utils.safe_open
+
+        def _mu_pread_safe_open(*args, **kwargs):
+            kwargs["backend"] = "pread"
+            return _orig_mu_safe_open(*args, **kwargs)
+
+        transformers.modeling_utils.safe_open = _mu_pread_safe_open
+        safetensors.safe_open = _mu_pread_safe_open
+        transformers.modeling_utils._pread_patched = True
+        safetensors._pread_patched = True
+
+    global _ACTIVE_LLM_MODEL
+    with _LLM_LOAD_LOCK:
+        packed = _HF_LLM_CACHE.get(model_id)
+        if packed is not None:
+            return packed
+
+        # If switching models, evict previous LLM to free GPU VRAM
+        if _ACTIVE_LLM_MODEL is not None and _ACTIVE_LLM_MODEL != model_id:
+            clear_llm_cache()
+
+        if torch.cuda.is_available():
+            gc.collect()
+            torch.cuda.empty_cache()
+
         cache = str(resolve_hub_cache(model_id))
         path = _local_model_path(model_id)
         tok = AutoTokenizer.from_pretrained(path, cache_dir=cache)
@@ -109,17 +174,28 @@ def generate_hf(model_id: str, prompt: str) -> str:
             from transformers import BitsAndBytesConfig
 
             model_kwargs["quantization_config"] = BitsAndBytesConfig(
-                load_in_4bit=True, bnb_4bit_compute_dtype=torch.bfloat16
+                load_in_4bit=True,
+                bnb_4bit_compute_dtype=torch.bfloat16,
+                bnb_4bit_quant_type="nf4",
+                bnb_4bit_use_double_quant=True,
+                llm_int8_enable_fp32_cpu_offload=True,
             )
+            # Use normal RAM (CPU) fallback if GPU VRAM is full
             model_kwargs["device_map"] = "auto"
         else:
             model_kwargs["dtype"] = torch.float32
+            model_kwargs["device_map"] = "cpu"
         model = Model.from_pretrained(path, **model_kwargs)
-        if not torch.cuda.is_available():
-            model = model.to("cpu")
         packed = (tok, model)
         _HF_LLM_CACHE[model_id] = packed
-    tok, model = packed
+        _ACTIVE_LLM_MODEL = model_id
+        return packed
+
+
+def generate_hf(model_id: str, prompt: str, max_new_tokens: int = 1024) -> str:
+    import torch
+
+    tok, model = get_or_load_llm(model_id)
     messages = [{"role": "user", "content": prompt}]
     tmpl_kwargs = {
         "return_tensors": "pt",
@@ -139,8 +215,8 @@ def generate_hf(model_id: str, prompt: str) -> str:
         input_len = inputs.shape[-1]
         gen_in = {"input_ids": inputs}
     with torch.inference_mode():
-        out = model.generate(**gen_in, max_new_tokens=2048, do_sample=False)
-    text = tok.decode(out[0][input_len:], skip_special_tokens=True)
+        out = model.generate(**gen_in, max_new_tokens=max_new_tokens, do_sample=False)
+    text = tok.decode(out[0][input_len:], skip_special_tokens=True, clean_up_tokenization_spaces=False)
     return _strip_think(text)
 
 

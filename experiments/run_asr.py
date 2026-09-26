@@ -13,9 +13,22 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging
 import platform
 import time
+import warnings
 from pathlib import Path
+
+warnings.filterwarnings("ignore", message=r".*triton not found.*")
+warnings.filterwarnings("ignore", category=FutureWarning)
+warnings.filterwarnings("ignore", category=UserWarning)
+
+logging.getLogger("huggingface_hub").setLevel(logging.ERROR)
+try:
+    from transformers.utils import logging as tf_logging
+    tf_logging.set_verbosity_error()
+except Exception:
+    pass
 
 from fetch_models import load_registry, resolve_hub_cache
 from gold_io import resolve_reference
@@ -92,13 +105,29 @@ def _load_wav_16k(audio_path: str):
     return audio, sr
 
 
-def transcribe_whisper(model_id: str, audio_path: str, lang: str | None, args) -> str:
-    """Sequential long-form generate() — not pipeline(chunk_length_s).
+def _get_glossary_prompt(clip_id: str | None, lang: str | None, custom_text: str | None = None) -> str:
+    """Build domain biasing prompt from slide terms or glossary."""
+    if custom_text:
+        return custom_text.strip()
+    if not clip_id:
+        return ""
+    gold_path = ROOT / "data" / "gold_terms.json"
+    if gold_path.exists():
+        try:
+            gold_data = json.loads(gold_path.read_text(encoding="utf-8"))
+            if clip_id in gold_data:
+                terms = [t["canonical"] for t in gold_data[clip_id].get("terms", [])[:25]]
+                if lang and str(lang).lower().startswith("tr"):
+                    return "Ders konusu ve teknik terimler: " + ", ".join(terms)
+                else:
+                    return "Lecture topic and technical terms: " + ", ".join(terms)
+        except Exception:
+            pass
+    return ""
 
-    The experimental pipeline chunker can stall on lecture audio (no
-    compression-ratio / logprob fallback). Whisper's own generate()
-    slides 30 s windows and applies the official halt thresholds.
-    """
+
+def transcribe_whisper(model_id: str, audio_path: str, lang: str | None, args, clip_id: str | None = None) -> str:
+    """Sequential long-form generate() with optional VAD speech chunking and domain biasing."""
     import torch
     from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor
 
@@ -110,14 +139,10 @@ def transcribe_whisper(model_id: str, audio_path: str, lang: str | None, args) -
         model = AutoModelForSpeechSeq2Seq.from_pretrained(
             model_id,
             dtype=dtype,
-            low_cpu_mem_usage=True,
+            device_map="cuda" if device == 0 else "cpu",
             cache_dir=cache,
         )
-        model = model.to("cuda" if device == 0 else "cpu")
         processor = AutoProcessor.from_pretrained(model_id, cache_dir=cache)
-        # generation_config ships max_length=448; passing max_new_tokens=440
-        # without clearing it warns on every 30 s window. max_new_tokens already
-        # takes precedence, so this is log-only.
         if getattr(model.generation_config, "max_length", None):
             model.generation_config.max_length = None
         packed = (processor, model)
@@ -125,6 +150,66 @@ def transcribe_whisper(model_id: str, audio_path: str, lang: str | None, args) -
     processor, model = packed
 
     audio, sr = _load_wav_16k(audio_path)
+    target = "cuda" if device == 0 else "cpu"
+
+    # Domain Biasing: Encode glossary terms as Whisper prompt_ids
+    prompt_ids = None
+    prompt_str = ""
+    if getattr(args, "prompt_glossary", False) or getattr(args, "prompt_text", None):
+        prompt_str = _get_glossary_prompt(clip_id, lang, getattr(args, "prompt_text", None))
+        if prompt_str:
+            try:
+                p_ids = processor.get_prompt_ids(prompt_str, return_tensors="pt")
+                prompt_ids = p_ids.to(target)
+                print(f"    [Domain Biasing Active]: '{prompt_str[:70]}...'", flush=True)
+            except Exception as exc:
+                print(f"    [Domain Biasing Warning]: Could not encode prompt_ids: {exc}", flush=True)
+
+    gen_kwargs = {
+        "task": "transcribe",
+        "return_timestamps": True,
+        "condition_on_prev_tokens": bool(getattr(args, "condition_on_prev", False)),
+        "temperature": 0.0,
+        "num_beams": 1,
+        "max_new_tokens": 440,
+    }
+    if prompt_ids is not None:
+        gen_kwargs["prompt_ids"] = prompt_ids
+    if not getattr(args, "language_detect", False) and lang in {"tr", "en"}:
+        gen_kwargs["language"] = lang
+
+    # VAD Long-form handling: segment audio on silence boundaries to prevent looping/hallucinations
+    if getattr(args, "use_vad", False):
+        from vad_chunker import segment_audio_vad
+
+        intervals = segment_audio_vad(audio, sr=sr, min_chunk_s=12.0, max_chunk_s=28.0)
+        print(f"    [VAD Enabled]: segmented {len(audio)/sr:.1f}s audio into {len(intervals)} speech chunks ...", flush=True)
+        parts = []
+        for i, (st, en) in enumerate(intervals):
+            st_idx = int(st * sr)
+            en_idx = min(len(audio), int(en * sr))
+            piece = audio[st_idx:en_idx]
+            if len(piece) < int(0.4 * sr):
+                continue
+            inputs = processor(
+                piece,
+                sampling_rate=sr,
+                return_tensors="pt",
+                truncation=False,
+                padding="longest",
+                return_attention_mask=True,
+            )
+            inputs = {k: v.to(target) for k, v in inputs.items()}
+            if "input_features" in inputs:
+                inputs["input_features"] = inputs["input_features"].to(dtype=dtype)
+            with torch.inference_mode():
+                ids = model.generate(**inputs, **gen_kwargs)
+            txt = processor.batch_decode(ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)[0].strip()
+            if txt:
+                parts.append(txt)
+        return " ".join(parts).strip()
+
+    # Standard sequential generate
     print(f"    sequential generate ({len(audio) / sr:.1f}s audio) ...", flush=True)
     inputs = processor(
         audio,
@@ -134,29 +219,13 @@ def transcribe_whisper(model_id: str, audio_path: str, lang: str | None, args) -
         padding="longest",
         return_attention_mask=True,
     )
-    target = "cuda" if device == 0 else "cpu"
     inputs = {k: v.to(target) for k, v in inputs.items()}
     if "input_features" in inputs:
         inputs["input_features"] = inputs["input_features"].to(dtype=dtype)
 
-    gen_kwargs = {
-        "task": "transcribe",
-        "return_timestamps": True,
-        "condition_on_prev_tokens": bool(args.condition_on_prev),
-        "compression_ratio_threshold": 1.35,
-        "logprob_threshold": -1.0,
-        "no_speech_threshold": 0.6,
-        "temperature": (0.0, 0.2, 0.4, 0.6, 0.8, 1.0),
-        "num_beams": 1,
-        # 448 is the model max_target_positions; language/task tokens already
-        # occupy a few of those, so 448 here overflows.
-        "max_new_tokens": 440,
-    }
-    if not args.language_detect and lang in {"tr", "en"}:
-        gen_kwargs["language"] = lang
     with torch.inference_mode():
         ids = model.generate(**inputs, **gen_kwargs)
-    return processor.batch_decode(ids, skip_special_tokens=True)[0].strip()
+    return processor.batch_decode(ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)[0].strip()
 
 
 def transcribe_hf_ctc(model_id: str, audio_path: str) -> str:
@@ -207,7 +276,7 @@ def transcribe_qwen3(model_id: str, audio_path: str, lang: str | None, args=None
         processor = AutoProcessor.from_pretrained(model_id, cache_dir=cache)
         model = _Model.from_pretrained(
             model_id,
-            torch_dtype=torch.bfloat16 if torch.cuda.is_available() else torch.float32,
+            dtype=torch.bfloat16 if torch.cuda.is_available() else torch.float32,
             device_map="auto" if torch.cuda.is_available() else None,
             cache_dir=cache,
         )
@@ -244,7 +313,7 @@ def transcribe_qwen3(model_id: str, audio_path: str, lang: str | None, args=None
         with torch.inference_mode():
             out = model.generate(**inputs, max_new_tokens=440)
         gen_ids = out[:, inputs["input_ids"].shape[1] :]
-        decoded = processor.batch_decode(gen_ids, skip_special_tokens=True)[0].strip()
+        decoded = processor.batch_decode(gen_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)[0].strip()
         if "<asr_text>" in decoded:
             decoded = decoded.split("<asr_text>", 1)[-1].strip()
         if decoded:
@@ -271,7 +340,7 @@ def transcribe_nemotron(model_id: str, audio_path: str, lang: str | None, args) 
         dtype = torch.float16 if torch.cuda.is_available() else torch.float32
         model = AutoModelForRNNT.from_pretrained(
             model_id,
-            torch_dtype=dtype,
+            dtype=dtype,
             device_map="auto" if torch.cuda.is_available() else None,
             cache_dir=cache,
         )
@@ -304,10 +373,10 @@ def transcribe_nemotron(model_id: str, audio_path: str, lang: str | None, args) 
             output = model.generate(**inputs, return_dict_in_generate=True)
         seq = output.sequences if hasattr(output, "sequences") else output
         if hasattr(processor, "batch_decode"):
-            text = processor.batch_decode(seq, skip_special_tokens=True)
+            text = processor.batch_decode(seq, skip_special_tokens=True, clean_up_tokenization_spaces=False)
             text = text[0] if isinstance(text, list) else text
         else:
-            text = processor.decode(seq, skip_special_tokens=True)
+            text = processor.decode(seq, skip_special_tokens=True, clean_up_tokenization_spaces=False)
         text = (text or "").strip()
         if text:
             parts.append(text)
@@ -353,7 +422,7 @@ def run_one(model: dict, row: dict, args) -> dict:
     t0 = time.perf_counter()
     backend = model["backend"]
     if backend == "whisper":
-        hyp = transcribe_whisper(model["id"], audio, lang, args)
+        hyp = transcribe_whisper(model["id"], audio, lang, args, clip_id=row.get("id"))
     elif backend == "qwen3_asr":
         hyp = transcribe_qwen3(model["id"], audio, lang, args)
     elif backend == "nemotron_asr":
@@ -379,24 +448,34 @@ def run_one(model: dict, row: dict, args) -> dict:
         "reference_source": row.get("reference_source") or "missing",
     }
     if rec["audio_duration_s"]:
-        rec["rtf"] = elapsed / float(rec["audio_duration_s"])
-    reference = resolve_reference(row)
-    if reference:
-        rec.update(pair_metrics(reference, hyp, lang=lang))
+        rec["rtf"] = elapsed / rec["audio_duration_s"]
+
+    ref_text = resolve_reference(row)
+    if ref_text:
+        rec.update(pair_metrics(ref_text, hyp, lang=lang))
     return rec
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--manifest", type=Path, required=True)
-    parser.add_argument("--model", help="one ASR repo id from asr_selected or asr_pilot")
-    parser.add_argument("--all-selected", action="store_true", help="2026 refresh set")
-    parser.add_argument("--all-pilot", action="store_true", help="original four pilot systems")
-    parser.add_argument("--chunk-s", type=float, default=30.0)
+    parser.add_argument("--manifest", type=Path, default=ROOT / "data" / "manifest.jsonl")
+    parser.add_argument("--model", help="single model id (see models.json)")
+    parser.add_argument("--all-selected", action="store_true",
+                        help="run all refresh models officially covering TR+EN (Table tab:asr-2026)")
+    parser.add_argument("--all-pilot", action="store_true",
+                        help="run the 4 paper pilot systems (Table tab:asr-pilot)")
+    parser.add_argument("--chunk-s", type=float, default=30.0,
+                        help="Nemotron window size (Whisper ignores; stays sequential)")
     parser.add_argument("--language-detect", action="store_true",
                         help="do not force language=tr|en (Whisper auto-detect)")
     parser.add_argument("--condition-on-prev", action="store_true",
                         help="Whisper condition_on_prev_tokens=True (openai-whisper: condition_on_previous_text)")
+    parser.add_argument("--use-vad", action="store_true",
+                        help="use Voice Activity Detection pause chunking (prevents long-form hallucination/looping)")
+    parser.add_argument("--prompt-glossary", action="store_true",
+                        help="inject domain terms from gold_terms.json into Whisper initial prompt (Domain Biasing)")
+    parser.add_argument("--prompt-text", type=str, default=None,
+                        help="custom initial prompt text to bias Whisper domain decoding")
     parser.add_argument("--ids", nargs="*", default=[],
                         help="restrict to these clip ids (e.g. TR-1 EN-2)")
     parser.add_argument("--output", type=Path,
