@@ -13,7 +13,10 @@ import asyncio
 import csv
 import io
 import json
+import logging
 import os
+import re
+import secrets
 import shutil
 import threading
 import time
@@ -21,18 +24,45 @@ import uuid
 from pathlib import Path
 from typing import Optional
 
+logger = logging.getLogger("eduterm.gui")
+
 import torch
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse, HTMLResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
+from gui.exam import (
+    analysis_after_exam,
+    generate_practice_exam,
+    load_exam,
+    public_questions,
+    save_exam,
+    score_exam,
+)
+from gui.learner import (
+    annotate_terms,
+    build_adaptive_analysis,
+    build_learner_prompt_block,
+    empty_profile,
+    load_profile,
+    public_profile,
+    record_exam,
+    save_profile,
+)
 from gui.pipeline import (
+    JobCancelledError,
+    clear_gpu_memory,
     convert_local_audio,
+    detect_lang,
     download_youtube_audio,
     extract_terms,
+    extract_youtube_id,
+    fetch_instant_transcript,
+    build_slide_specification,
+    get_or_load_whisper,
     get_youtube_info,
+    preload_models,
     transcribe_audio,
 )
 
@@ -41,18 +71,177 @@ STATIC_DIR = Path(__file__).resolve().parent / "static"
 TEMP_DIR = Path(__file__).resolve().parent / "temp"
 TEMP_DIR.mkdir(parents=True, exist_ok=True)
 
+ALLOWED_UPLOAD_EXTENSIONS = {
+    ".wav", ".mp3", ".m4a", ".mp4", ".webm", ".flac",
+    ".mkv", ".mov", ".avi", ".wmv", ".m4v", ".ogg", ".opus", ".aac", ".ts"
+}
+ALLOWED_VIDEO_EXTENSIONS = {
+    ".mp4", ".webm", ".mkv", ".mov", ".avi", ".wmv", ".m4v", ".ts"
+}
+VIDEO_MIME_TYPES = {
+    ".mp4": "video/mp4",
+    ".webm": "video/webm",
+    ".mkv": "video/x-matroska",
+    ".mov": "video/quicktime",
+    ".avi": "video/x-msvideo",
+    ".wmv": "video/x-ms-wmv",
+    ".m4v": "video/mp4",
+    ".ts": "video/mp2t",
+}
+MAX_UPLOAD_BYTES = 500 * 1024 * 1024  # 500 MB limit
+
 app = FastAPI(title="EduTerm AI Web GUI", version="1.0.0")
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
-# Jobs state store: job_id -> {"status": ..., "events": [], "result": ..., "audio_file": ...}
+@app.on_event("startup")
+def prewarm_default_models():
+    def _warmup_worker():
+        try:
+            time.sleep(1.5)  # Allow server to bind and start listening
+            if is_job_active():
+                return
+            with PIPELINE_LOCK:
+                if is_job_active():
+                    return
+                logger.info("Pre-warming default models in background so runs are instant...")
+                get_or_load_whisper("openai/whisper-large-v3-turbo")
+                from run_llm import get_or_load_llm
+                get_or_load_llm("Qwen/Qwen3.5-4B")
+                logger.info("Default models (Whisper + Qwen) are resident in memory.")
+        except Exception as exc:
+            logger.debug("Background pre-warm notice: %s", exc)
+
+    threading.Thread(target=_warmup_worker, daemon=True).start()
+
+# Jobs state store: job_id -> {"status": ..., "events": [], "result": ..., "audio_file": ..., "cancel_event": ...}
 JOBS: dict[str, dict] = {}
+JOB_LOCK = threading.Lock()
+PIPELINE_LOCK = threading.Lock()
+
+
+def is_job_active() -> bool:
+    """Return True if any job is currently uploading, queued, or processing."""
+    return any(j.get("status") in ("queued", "uploading", "processing") for j in JOBS.values())
+
+
+def get_active_job() -> Optional[dict]:
+    """Return summary of the currently active job, if one exists."""
+    for jid, j in JOBS.items():
+        if j.get("status") in ("queued", "uploading", "processing"):
+            return {
+                "job_id": jid,
+                "status": j.get("status"),
+                "meta": j.get("meta"),
+            }
+    return None
+
+
+JOB_TTL_S = 1800.0  # 30-minute TTL for finished jobs and audio files
+
+
+def cleanup_temp_dir(max_age_s: float = 0.0) -> int:
+    """Remove temporary audio and video files from TEMP_DIR.
+    If max_age_s > 0, only removes files modified more than max_age_s seconds ago.
+    If max_age_s <= 0, removes all orphan temporary files not currently in use by an active job.
+    """
+    removed = 0
+    now = time.time()
+    if not TEMP_DIR.exists():
+        return 0
+    with JOB_LOCK:
+        active_files = set()
+        for j in JOBS.values():
+            if j.get("status") in ("queued", "uploading", "processing"):
+                if j.get("audio_file"):
+                    active_files.add(Path(j["audio_file"]).resolve())
+                if j.get("video_file"):
+                    active_files.add(Path(j["video_file"]).resolve())
+    for f in TEMP_DIR.iterdir():
+        if f.is_file():
+            try:
+                if f.resolve() in active_files:
+                    continue
+                if max_age_s <= 0 or (now - f.stat().st_mtime) >= max_age_s:
+                    f.unlink(missing_ok=True)
+                    removed += 1
+            except Exception as e:
+                logger.warning("Failed to delete temp file %s: %s", f, e)
+    return removed
+
+
+def cleanup_expired_jobs(ttl_s: float = JOB_TTL_S) -> int:
+    """Drop completed/error/cancelled jobs older than ttl_s and delete their audio/video files."""
+    now = time.time()
+    expired_ids = []
+    with JOB_LOCK:
+        for jid, job in list(JOBS.items()):
+            if job.get("status") in ("queued", "uploading", "processing"):
+                continue
+            created = job.get("created_at", 0.0)
+            accessed = job.get("last_accessed", created)
+            if (now - accessed) >= ttl_s:
+                expired_ids.append(jid)
+
+        for jid in expired_ids:
+            job = JOBS.pop(jid, None)
+            if job:
+                if job.get("audio_file"):
+                    try:
+                        Path(job["audio_file"]).unlink(missing_ok=True)
+                    except Exception as e:
+                        logger.warning("Failed to remove audio file for expired job %s: %s", jid, e)
+                if job.get("video_file"):
+                    try:
+                        Path(job["video_file"]).unlink(missing_ok=True)
+                    except Exception as e:
+                        logger.warning("Failed to remove video file for expired job %s: %s", jid, e)
+
+    cleanup_temp_dir(max_age_s=ttl_s)
+    return len(expired_ids)
+
+
+def _temp_cleaner_daemon():
+    while True:
+        try:
+            time.sleep(300)  # Every 5 minutes
+            cleanup_expired_jobs(ttl_s=JOB_TTL_S)
+        except Exception as e:
+            logger.warning("Background temp cleaner encountered error: %s", e)
+
+
+# Startup sweep of TEMP_DIR: purge any leftover temporary files from prior runs
+cleanup_temp_dir(max_age_s=0.0)
+
+# Start background periodic cleaner thread (daemon)
+_cleaner_thread = threading.Thread(target=_temp_cleaner_daemon, daemon=True, name="EduTermTempCleaner")
+_cleaner_thread.start()
+
+
+@app.middleware("http")
+async def auth_middleware(request: Request, call_next):
+    expected_token = os.environ.get("EDUTERM_AUTH_TOKEN")
+    if expected_token and request.url.path.startswith("/api/"):
+        auth_header = request.headers.get("Authorization") or request.headers.get("X-Auth-Token")
+        token_param = request.query_params.get("token")
+        provided = None
+        if auth_header:
+            if auth_header.lower().startswith("bearer "):
+                provided = auth_header[7:].strip()
+            else:
+                provided = auth_header.strip()
+        elif token_param:
+            provided = token_param.strip()
+
+        if not provided or not secrets.compare_digest(provided, expected_token):
+            from fastapi.responses import JSONResponse
+            return JSONResponse(
+                status_code=401,
+                content={"detail": "Unauthorized: invalid or missing authentication token."},
+            )
+    return await call_next(request)
+
+
+DEFAULT_MAX_SCOPE_S = 600.0  # 10 minutes default safety cap for audio processing
 
 
 class YouTubeRequest(BaseModel):
@@ -62,10 +251,39 @@ class YouTubeRequest(BaseModel):
     asr_model: str = "openai/whisper-large-v3-turbo"
     lang: str = "auto"
     llm_model: str = "Qwen/Qwen3.5-4B"
+    confirm_long: bool = False
 
 
 class URLInfoRequest(BaseModel):
     url: str
+
+
+class ExamGenerateRequest(BaseModel):
+    job_id: str
+    use_llm: bool = True
+
+
+class ExamAnswer(BaseModel):
+    question_id: str
+    selected_index: Optional[int] = None
+    self_grade: Optional[str] = None
+
+
+class ExamSubmitRequest(BaseModel):
+    exam_id: str
+    answers: list[ExamAnswer]
+
+
+class HelperSlideRequest(BaseModel):
+    job_id: str
+    current_time_s: float = 0.0
+    llm_analogy: bool = False
+    generate_deep_slide: bool = False
+
+
+@app.get("/api/health")
+def health():
+    return {"ok": True, "service": "eduterm"}
 
 
 @app.get("/api/system-info")
@@ -113,9 +331,33 @@ def get_models():
         "llm_models": [
             {
                 "id": "Qwen/Qwen3.5-4B",
-                "name": "Qwen3.5-4B (4-bit Quantized CUDA)",
-                "desc": "Local open model, zero API costs, fits in ~3.1 GB VRAM",
+                "name": "Qwen3.5-4B (Recommended for RTX 5060 • Fast • Zero Crash)",
+                "desc": "Lightweight open 4B model, runs in ~3.1 GB VRAM in 4-bit, highly stable on Windows",
                 "default": True,
+            },
+            {
+                "id": "Qwen/Qwen3-8B",
+                "name": "Qwen3-8B (8 Billion Parameters, High Accuracy)",
+                "desc": "Powerful 8B open model (~5.2 GB VRAM in 4-bit)",
+                "default": False,
+            },
+            {
+                "id": "Qwen/Qwen3.5-9B",
+                "name": "Qwen3.5-9B (9 Billion Parameters, Maximum Capacity)",
+                "desc": "Deepest open reasoning capacity benchmark (~6.2 GB VRAM in 4-bit)",
+                "default": False,
+            },
+            {
+                "id": "google/gemma-4-E4B-it",
+                "name": "Gemma 4 (8 Billion Parameters, Google Open Alternative)",
+                "desc": "Google Gemma 4 (~8B total parameters across multimodal towers)",
+                "default": False,
+            },
+            {
+                "id": "meta-llama/Llama-3.1-8B-Instruct",
+                "name": "Llama 3.1 / 3.3 (8 Billion Parameters • Meta Open Weights • 4-bit CUDA)",
+                "desc": "Meta Llama 3.x 8B instruction model for terminology extraction (~5.4 GB VRAM in 4-bit)",
+                "default": False,
             },
         ],
         "languages": [
@@ -126,18 +368,131 @@ def get_models():
     }
 
 
+def get_allowed_model_ids() -> tuple[set[str], set[str]]:
+    """Return (allowed_asr_ids, allowed_llm_ids) from /api/models and models.json."""
+    models_api = get_models()
+    asr_ids = {m["id"] for m in models_api.get("asr_models", []) if "id" in m}
+    llm_ids = {m["id"] for m in models_api.get("llm_models", []) if "id" in m}
+
+    models_file = ROOT / "models.json"
+    if models_file.exists():
+        try:
+            reg = json.loads(models_file.read_text(encoding="utf-8"))
+            for section in ("asr_selected", "asr_pilot"):
+                for m in reg.get(section, []):
+                    if "id" in m:
+                        asr_ids.add(m["id"])
+            for m in reg.get("llm_selected", []):
+                if "id" in m:
+                    llm_ids.add(m["id"])
+        except Exception:
+            pass
+
+    return asr_ids, llm_ids
+
+
 @app.post("/api/youtube-info")
 def fetch_yt_info(req: URLInfoRequest):
+    cleaned = req.url.strip() if req.url else ""
+    if not cleaned:
+        raise HTTPException(status_code=400, detail="Please enter a valid YouTube URL.")
+    vid = extract_youtube_id(cleaned)
+    if not vid:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid YouTube URL. Only valid 11-character YouTube video IDs or URLs are allowed.",
+        )
     try:
-        info = get_youtube_info(req.url)
+        info = get_youtube_info(cleaned)
         return info
     except Exception as exc:
-        raise HTTPException(status_code=400, detail=str(exc))
+        logger.error("Failed to fetch YouTube metadata for '%s': %s", cleaned, exc, exc_info=True)
+        raise HTTPException(
+            status_code=400,
+            detail="Failed to retrieve YouTube video metadata. Please verify the URL.",
+        )
+
+
+@app.get("/api/transcript-preview")
+@app.post("/api/transcript-preview")
+def get_transcript_preview(url: str = "", req: Optional[URLInfoRequest] = None):
+    """Instant transcript and terminology pre-fetch before starting full pipeline."""
+    target_url = url or (req.url if req else "")
+    cleaned = target_url.strip()
+    if not cleaned:
+        raise HTTPException(status_code=400, detail="Please provide a valid YouTube URL or clip identifier.")
+    try:
+        payload = fetch_instant_transcript(cleaned)
+        job_id = payload.get("job_id")
+        if job_id:
+            JOBS[job_id] = {
+                "status": "completed",
+                "result": payload,
+                "events": [],
+                "created_at": time.time(),
+                "last_accessed": time.time(),
+            }
+        return payload
+    except Exception as exc:
+        logger.error("Failed to generate transcript preview for '%s': %s", cleaned, exc, exc_info=True)
+        raise HTTPException(status_code=500, detail="Failed to load transcript preview.")
 
 
 def _push_event(job_id: str, event_type: str, data: dict):
     if job_id in JOBS:
         JOBS[job_id]["events"].append({"event": event_type, "data": data})
+
+
+def _set_job_status(job_id: str, status: str, result: Optional[dict] = None):
+    if job_id in JOBS:
+        JOBS[job_id]["status"] = status
+        JOBS[job_id]["last_accessed"] = time.time()
+        if result is not None:
+            JOBS[job_id]["result"] = result
+
+
+def align_terms_with_segments(terms: list[dict], segments: list[dict]) -> list[dict]:
+    """Map each extracted terminology item to its earliest timestamped ASR segment."""
+    for item in terms:
+        term_text = (item.get("term") or "").strip().lower()
+        if not term_text:
+            item["start_s"] = None
+            item["end_s"] = None
+            item["timestamp"] = None
+            continue
+
+        matched_seg = None
+        # 1. Exact substring pass
+        for seg in segments:
+            seg_txt = (seg.get("text") or "").lower()
+            if term_text in seg_txt:
+                matched_seg = seg
+                break
+
+        # 2. Token overlap pass if multi-word term or morphology variations
+        if not matched_seg:
+            words = [w for w in re.findall(r"\w+", term_text) if len(w) >= 3]
+            if words:
+                for seg in segments:
+                    seg_txt = (seg.get("text") or "").lower()
+                    if all(w in seg_txt for w in words):
+                        matched_seg = seg
+                        break
+
+        if matched_seg and matched_seg.get("start") is not None:
+            start_s = float(matched_seg["start"])
+            end_s = float(matched_seg["end"]) if matched_seg.get("end") is not None else None
+            m = int(start_s // 60)
+            s = int(start_s % 60)
+            item["start_s"] = round(start_s, 2)
+            item["end_s"] = round(end_s, 2) if end_s is not None else None
+            item["timestamp"] = f"{m:02d}:{s:02d}"
+        else:
+            item["start_s"] = None
+            item["end_s"] = None
+            item["timestamp"] = None
+
+    return terms
 
 
 def _run_pipeline_job(
@@ -147,104 +502,256 @@ def _run_pipeline_job(
     lang: str,
     llm_model: str,
     video_meta: Optional[dict] = None,
+    cancel_event: Optional[threading.Event] = None,
 ):
+    def is_cancelled() -> bool:
+        if cancel_event and cancel_event.is_set():
+            return True
+        job = JOBS.get(job_id)
+        return bool(job and job.get("status") == "cancelled")
+
     try:
-        JOBS[job_id]["status"] = "processing"
+        with PIPELINE_LOCK:
+            if is_cancelled():
+                raise JobCancelledError("Job cancelled before pipeline execution.")
 
-        # Step 1: Transcribe ASR
-        _push_event(job_id, "step", {"step": "asr", "message": f"Running ASR ({asr_model})..."})
+            _set_job_status(job_id, "processing")
 
-        def asr_cb(msg: str):
-            _push_event(job_id, "log", {"message": msg})
+            # Step 1: Transcribe ASR
+            _push_event(job_id, "step", {"step": "asr", "message": f"Running ASR ({asr_model})..."})
 
-        asr_res = transcribe_audio(audio_wav, model_id=asr_model, lang=lang, progress_cb=asr_cb)
-        _push_event(
-            job_id,
-            "asr_done",
-            {
-                "text": asr_res["text"],
-                "duration_s": asr_res["duration_s"],
-                "latency_s": asr_res["latency_s"],
-                "rtf": asr_res["rtf"],
-            },
-        )
+            def asr_cb(msg: str):
+                if is_cancelled():
+                    raise JobCancelledError("ASR cancelled.")
+                _push_event(job_id, "log", {"message": msg})
 
-        # Step 2: Terminology Extraction with LLM
-        _push_event(job_id, "step", {"step": "llm", "message": f"Extracting domain terminology ({llm_model})..."})
+            asr_res = transcribe_audio(
+                audio_wav,
+                model_id=asr_model,
+                lang=lang,
+                progress_cb=asr_cb,
+                is_cancelled=is_cancelled,
+            )
 
-        def llm_cb(msg: str):
-            _push_event(job_id, "log", {"message": msg})
+            if is_cancelled():
+                raise JobCancelledError("Job cancelled after ASR.")
 
-        detected_lang = lang if lang in ("tr", "en") else ("tr" if any(c in asr_res["text"] for c in "çğıöşüÇĞİÖŞÜ") else "en")
-        llm_res = extract_terms(asr_res["text"], lang=detected_lang, model_id=llm_model, progress_cb=llm_cb)
+            _push_event(
+                job_id,
+                "asr_done",
+                {
+                    "text": asr_res["text"],
+                    "duration_s": asr_res["duration_s"],
+                    "latency_s": asr_res["latency_s"],
+                    "rtf": asr_res["rtf"],
+                },
+            )
 
-        _push_event(
-            job_id,
-            "llm_done",
-            {
-                "n_terms": llm_res["n_terms"],
-                "latency_s": llm_res["latency_s"],
-            },
-        )
+            # Step 2: Terminology Extraction with LLM
+            transcript_text = (asr_res.get("text") or "").strip()
+            if not transcript_text:
+                _push_event(job_id, "step", {"step": "llm", "message": "Transcript is empty. Skipping LLM terminology extraction."})
+                _push_event(job_id, "log", {"message": "No spoken text detected in audio; skipping LLM extraction."})
+                detected_lang = lang if lang in ("tr", "en") else "en"
+                llm_res = {
+                    "terms": [],
+                    "n_terms": 0,
+                    "latency_s": 0.0,
+                    "raw_output": "",
+                    "model_id": llm_model,
+                }
+                _push_event(
+                    job_id,
+                    "llm_done",
+                    {
+                        "n_terms": 0,
+                        "latency_s": 0.0,
+                    },
+                )
+            else:
+                _push_event(job_id, "step", {"step": "llm", "message": f"Extracting domain terminology ({llm_model})..."})
 
-        # Complete result payload
-        final_payload = {
-            "job_id": job_id,
-            "video_meta": video_meta,
-            "lang": detected_lang,
-            "asr": asr_res,
-            "llm": llm_res,
-            "has_audio_file": True,
-        }
+                def llm_cb(msg: str):
+                    if is_cancelled():
+                        raise JobCancelledError("LLM extraction cancelled.")
+                    _push_event(job_id, "log", {"message": msg})
 
-        JOBS[job_id]["status"] = "completed"
-        JOBS[job_id]["result"] = final_payload
-        _push_event(job_id, "done", final_payload)
+                detected_lang = lang if lang in ("tr", "en") else detect_lang(asr_res["text"])
+                profile = load_profile()
+                learner_context = build_learner_prompt_block(profile)
+                if learner_context:
+                    _push_event(
+                        job_id,
+                        "log",
+                        {"message": "Applying saved practice-exam history as learner weight on terminology analysis."},
+                    )
+                llm_res = extract_terms(
+                    asr_res["text"],
+                    lang=detected_lang,
+                    model_id=llm_model,
+                    progress_cb=llm_cb,
+                    is_cancelled=is_cancelled,
+                    learner_context=learner_context or None,
+                )
 
+                if is_cancelled():
+                    raise JobCancelledError("Job cancelled after LLM extraction.")
+
+                # Align extracted terms to timestamped transcript segments
+                align_terms_with_segments(llm_res.get("terms", []), asr_res.get("segments", []))
+
+                _push_event(
+                    job_id,
+                    "llm_done",
+                    {
+                        "n_terms": llm_res["n_terms"],
+                        "latency_s": llm_res["latency_s"],
+                    },
+                )
+
+            profile = load_profile()
+            annotate_terms(llm_res.get("terms", []), profile)
+            adaptive = build_adaptive_analysis(profile, llm_res.get("terms", []))
+
+            # Complete result payload
+            has_vid = bool(JOBS.get(job_id, {}).get("video_file"))
+            is_vid = (video_meta.get("is_video", False) if isinstance(video_meta, dict) else False) or has_vid
+            final_payload = {
+                "job_id": job_id,
+                "video_meta": video_meta,
+                "lang": detected_lang,
+                "asr": asr_res,
+                "llm": llm_res,
+                "adaptive": adaptive,
+                "has_audio_file": True,
+                "has_video_file": has_vid,
+                "is_video": is_vid,
+            }
+
+            _set_job_status(job_id, "completed", result=final_payload)
+            _push_event(job_id, "done", final_payload)
+
+    except JobCancelledError:
+        logger.info("Pipeline job %s cancelled by user.", job_id)
+        _set_job_status(job_id, "cancelled")
+        _push_event(job_id, "cancelled", {"message": "Job was cancelled by the user."})
+        clear_gpu_memory()
     except Exception as exc:
-        import traceback
-        traceback.print_exc()
-        JOBS[job_id]["status"] = "error"
-        _push_event(job_id, "error", {"message": str(exc)})
+        if is_cancelled():
+            logger.info("Pipeline job %s cancelled during processing.", job_id)
+            _set_job_status(job_id, "cancelled")
+            _push_event(job_id, "cancelled", {"message": "Job was cancelled by the user."})
+            clear_gpu_memory()
+        else:
+            logger.error("Pipeline job %s failed: %s", job_id, exc, exc_info=True)
+            _set_job_status(job_id, "error")
+            _push_event(job_id, "job_error", {"message": "Processing failed due to an internal server error."})
+    finally:
+        if is_cancelled():
+            clear_gpu_memory()
 
 
 @app.post("/api/process-youtube")
 def process_youtube(req: YouTubeRequest):
+    cleaned_url = req.url.strip() if req.url else ""
+    vid = extract_youtube_id(cleaned_url)
+    if not vid:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid YouTube URL. Only valid 11-character YouTube video IDs or URLs are allowed.",
+        )
+
+    allowed_asr, allowed_llm = get_allowed_model_ids()
+    if req.asr_model not in allowed_asr:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Disallowed ASR model '{req.asr_model}'. Allowed models: {', '.join(sorted(allowed_asr))}",
+        )
+    if req.llm_model not in allowed_llm:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Disallowed LLM model '{req.llm_model}'. Allowed models: {', '.join(sorted(allowed_llm))}",
+        )
+
     job_id = str(uuid.uuid4())
     audio_wav = TEMP_DIR / f"{job_id}.wav"
+    canonical_url = f"https://www.youtube.com/watch?v={vid}"
 
     try:
-        meta = get_youtube_info(req.url)
+        meta = get_youtube_info(canonical_url)
     except Exception:
-        meta = {"id": "", "title": req.url, "url": req.url, "duration": 0}
+        meta = {
+            "id": vid,
+            "title": f"YouTube Video ({vid})",
+            "url": canonical_url,
+            "channel": "YouTube",
+            "duration": 0,
+            "thumbnail": f"https://i.ytimg.com/vi/{vid}/hqdefault.jpg",
+        }
 
-    JOBS[job_id] = {
-        "status": "queued",
-        "events": [],
-        "result": None,
-        "audio_file": audio_wav,
-        "meta": meta,
-    }
+    cancel_event = threading.Event()
+    with JOB_LOCK:
+        if is_job_active():
+            raise HTTPException(
+                status_code=429,
+                detail="Another speech-to-terminology job is currently running. Only one active job is allowed at a time.",
+            )
+        now = time.time()
+        JOBS[job_id] = {
+            "status": "queued",
+            "events": [],
+            "result": None,
+            "audio_file": audio_wav,
+            "meta": meta,
+            "cancel_event": cancel_event,
+            "created_at": now,
+            "last_accessed": now,
+        }
+
+    effective_duration_s = req.duration_s
+    if not req.confirm_long:
+        if effective_duration_s is None or effective_duration_s > DEFAULT_MAX_SCOPE_S:
+            effective_duration_s = DEFAULT_MAX_SCOPE_S
 
     def worker():
         try:
+            if cancel_event.is_set():
+                JOBS[job_id]["status"] = "cancelled"
+                _push_event(job_id, "cancelled", {"message": "Job was cancelled by the user."})
+                clear_gpu_memory()
+                return
+
             _push_event(job_id, "step", {"step": "download", "message": "Downloading YouTube audio..."})
 
             def dl_cb(msg: str):
+                if cancel_event.is_set():
+                    raise JobCancelledError("Download cancelled.")
                 _push_event(job_id, "log", {"message": msg})
 
             dur = download_youtube_audio(
-                req.url,
+                canonical_url,
                 audio_wav,
                 start_s=req.start_s,
-                duration_s=req.duration_s,
+                duration_s=effective_duration_s,
                 progress_cb=dl_cb,
+                is_cancelled=cancel_event.is_set,
             )
             _push_event(job_id, "download_done", {"duration_s": dur})
-            _run_pipeline_job(job_id, audio_wav, req.asr_model, req.lang, req.llm_model, meta)
+            _run_pipeline_job(job_id, audio_wav, req.asr_model, req.lang, req.llm_model, meta, cancel_event=cancel_event)
+        except JobCancelledError:
+            logger.info("YouTube job %s cancelled.", job_id)
+            _set_job_status(job_id, "cancelled")
+            _push_event(job_id, "cancelled", {"message": "Job was cancelled by the user."})
+            clear_gpu_memory()
         except Exception as e:
-            JOBS[job_id]["status"] = "error"
-            _push_event(job_id, "error", {"message": str(e)})
+            if cancel_event.is_set():
+                _set_job_status(job_id, "cancelled")
+                _push_event(job_id, "cancelled", {"message": "Job was cancelled by the user."})
+                clear_gpu_memory()
+            else:
+                logger.error("Job %s download worker failed: %s", job_id, e, exc_info=True)
+                _set_job_status(job_id, "error")
+                _push_event(job_id, "job_error", {"message": "Failed to download audio from YouTube."})
 
     threading.Thread(target=worker, daemon=True).start()
     return {"job_id": job_id, "meta": meta}
@@ -258,58 +765,203 @@ async def process_upload(
     asr_model: str = Form("openai/whisper-large-v3-turbo"),
     lang: str = Form("auto"),
     llm_model: str = Form("Qwen/Qwen3.5-4B"),
+    confirm_long: bool = Form(False),
 ):
+    allowed_asr, allowed_llm = get_allowed_model_ids()
+    if asr_model not in allowed_asr:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Disallowed ASR model '{asr_model}'. Allowed models: {', '.join(sorted(allowed_asr))}",
+        )
+    if llm_model not in allowed_llm:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Disallowed LLM model '{llm_model}'. Allowed models: {', '.join(sorted(allowed_llm))}",
+        )
+
     job_id = str(uuid.uuid4())
-    temp_upload = TEMP_DIR / f"upload_{job_id}_{file.filename}"
+    cancel_event = threading.Event()
+
+    with JOB_LOCK:
+        if is_job_active():
+            raise HTTPException(
+                status_code=429,
+                detail="Another speech-to-terminology job is currently running. Only one active job is allowed at a time.",
+            )
+        # Atomically reserve slot to prevent race condition during upload streaming
+        now = time.time()
+        JOBS[job_id] = {
+            "status": "uploading",
+            "events": [],
+            "result": None,
+            "audio_file": None,
+            "meta": None,
+            "cancel_event": cancel_event,
+            "created_at": now,
+            "last_accessed": now,
+        }
+
+    raw_filename = file.filename or ""
+    # 1. Path traversal protection: isolate strict basename and remove path separators
+    basename = Path(raw_filename.replace("\\", "/")).name.strip()
+    if not basename:
+        with JOB_LOCK:
+            JOBS.pop(job_id, None)
+        raise HTTPException(status_code=400, detail="A valid filename must be provided.")
+
+    # 2. File extension validation whitelist
+    suffix = Path(basename).suffix.lower()
+    if suffix not in ALLOWED_UPLOAD_EXTENSIONS:
+        with JOB_LOCK:
+            JOBS.pop(job_id, None)
+        allowed_str = ", ".join(sorted(ALLOWED_UPLOAD_EXTENSIONS))
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unsupported file type '{suffix}'. Allowed formats: {allowed_str}",
+        )
+
+    temp_upload = TEMP_DIR / f"upload_{job_id}_{basename}"
+
+    # Verify temp_upload stays strictly inside TEMP_DIR
+    if not temp_upload.resolve().is_relative_to(TEMP_DIR.resolve()):
+        with JOB_LOCK:
+            JOBS.pop(job_id, None)
+        raise HTTPException(status_code=400, detail="Invalid upload filename path.")
+
     audio_wav = TEMP_DIR / f"{job_id}.wav"
 
-    with temp_upload.open("wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+    # 3. Stream-copy with a strict 500 MB limit
+    chunk_size = 1024 * 1024  # 1 MB chunk
+    total_bytes = 0
+    try:
+        with temp_upload.open("wb") as buffer:
+            while True:
+                chunk = await file.read(chunk_size)
+                if not chunk:
+                    break
+                total_bytes += len(chunk)
+                if total_bytes > MAX_UPLOAD_BYTES:
+                    buffer.close()
+                    if temp_upload.exists():
+                        temp_upload.unlink()
+                    raise HTTPException(
+                        status_code=413,
+                        detail="Uploaded file exceeds the maximum allowed limit of 500 MB.",
+                    )
+                buffer.write(chunk)
+    except HTTPException:
+        with JOB_LOCK:
+            JOBS.pop(job_id, None)
+        raise
+    except Exception as exc:
+        with JOB_LOCK:
+            JOBS.pop(job_id, None)
+        logger.error("Failed to save uploaded file %s for job %s: %s", temp_upload, job_id, exc, exc_info=True)
+        if temp_upload.exists():
+            temp_upload.unlink()
+        raise HTTPException(status_code=500, detail="Failed to save uploaded file.")
 
+    if total_bytes == 0:
+        with JOB_LOCK:
+            JOBS.pop(job_id, None)
+        if temp_upload.exists():
+            temp_upload.unlink()
+        raise HTTPException(status_code=400, detail="Uploaded file is empty.")
+
+    is_video = suffix in ALLOWED_VIDEO_EXTENSIONS
     meta = {
         "id": "",
-        "title": file.filename,
+        "title": basename,
         "url": "",
         "channel": "Local Upload",
         "duration": 0,
         "thumbnail": "",
+        "is_video": is_video,
+        "media_type": suffix,
     }
 
-    JOBS[job_id] = {
-        "status": "queued",
-        "events": [],
-        "result": None,
-        "audio_file": audio_wav,
-        "meta": meta,
-    }
+    with JOB_LOCK:
+        JOBS[job_id]["status"] = "queued"
+        JOBS[job_id]["audio_file"] = audio_wav
+        if is_video:
+            JOBS[job_id]["video_file"] = temp_upload
+        JOBS[job_id]["meta"] = meta
+
+    effective_duration_s = duration_s
+    if not confirm_long:
+        if effective_duration_s is None or effective_duration_s > DEFAULT_MAX_SCOPE_S:
+            effective_duration_s = DEFAULT_MAX_SCOPE_S
 
     def worker():
         try:
+            if cancel_event.is_set():
+                JOBS[job_id]["status"] = "cancelled"
+                _push_event(job_id, "cancelled", {"message": "Job was cancelled by the user."})
+                clear_gpu_memory()
+                return
+
             _push_event(job_id, "step", {"step": "convert", "message": "Converting uploaded file..."})
 
             def conv_cb(msg: str):
+                if cancel_event.is_set():
+                    raise JobCancelledError("Conversion cancelled.")
                 _push_event(job_id, "log", {"message": msg})
 
             dur = convert_local_audio(
                 temp_upload,
                 audio_wav,
                 start_s=start_s,
-                duration_s=duration_s,
+                duration_s=effective_duration_s,
                 progress_cb=conv_cb,
+                is_cancelled=cancel_event.is_set,
             )
-            try:
-                temp_upload.unlink()
-            except Exception:
-                pass
+            if not is_video:
+                try:
+                    temp_upload.unlink()
+                except Exception:
+                    pass
 
             _push_event(job_id, "convert_done", {"duration_s": dur})
-            _run_pipeline_job(job_id, audio_wav, asr_model, lang, llm_model, meta)
+            _run_pipeline_job(job_id, audio_wav, asr_model, lang, llm_model, meta, cancel_event=cancel_event)
+        except JobCancelledError:
+            logger.info("Upload job %s cancelled.", job_id)
+            _set_job_status(job_id, "cancelled")
+            _push_event(job_id, "cancelled", {"message": "Job was cancelled by the user."})
+            clear_gpu_memory()
         except Exception as e:
-            JOBS[job_id]["status"] = "error"
-            _push_event(job_id, "error", {"message": str(e)})
+            if cancel_event.is_set():
+                _set_job_status(job_id, "cancelled")
+                _push_event(job_id, "cancelled", {"message": "Job was cancelled by the user."})
+                clear_gpu_memory()
+            else:
+                logger.error("Job %s conversion worker failed: %s", job_id, e, exc_info=True)
+                _set_job_status(job_id, "error")
+                _push_event(job_id, "job_error", {"message": "Failed to convert uploaded media."})
 
     threading.Thread(target=worker, daemon=True).start()
     return {"job_id": job_id, "meta": meta}
+
+
+@app.get("/api/job/{job_id}")
+def get_job_status(job_id: str):
+    """Query current status and result for a given job."""
+    job = JOBS.get(job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    job["last_accessed"] = time.time()
+    error_msg = None
+    if job.get("status") == "error":
+        for ev in reversed(job.get("events", [])):
+            if ev.get("event") == "job_error":
+                error_msg = ev.get("data", {}).get("message")
+                break
+    return {
+        "job_id": job_id,
+        "status": job.get("status", "unknown"),
+        "result": job.get("result"),
+        "meta": job.get("meta"),
+        "error": error_msg,
+    }
 
 
 @app.get("/api/stream/{job_id}")
@@ -319,6 +971,7 @@ async def stream_job(job_id: str):
 
     async def event_generator():
         last_index = 0
+        heartbeat_ticks = 0
         while True:
             job = JOBS.get(job_id)
             if not job:
@@ -328,11 +981,77 @@ async def stream_job(job_id: str):
                 ev = events[last_index]
                 last_index += 1
                 yield f"event: {ev['event']}\ndata: {json.dumps(ev['data'])}\n\n"
-            if job["status"] in ("completed", "error"):
+            if job["status"] in ("completed", "error", "cancelled"):
                 break
+            heartbeat_ticks += 1
+            if heartbeat_ticks >= 5:  # Heartbeat every ~2 seconds to prevent idle socket drop
+                yield ": keepalive\n\n"
+                heartbeat_ticks = 0
             await asyncio.sleep(0.4)
 
-    return StreamingResponse(event_generator(), media_type="text/event-stream")
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )
+
+
+@app.get("/api/health")
+def health_check():
+    """Lightweight health check endpoint."""
+    return {"status": "ok", "service": "eduterm", "version": "1.0.0"}
+
+
+@app.get("/api/active-job")
+def get_active_job_endpoint():
+    """Return currently active job status if one is running."""
+    active = get_active_job()
+    return {"active": active is not None, "job": active}
+
+
+@app.post("/api/cancel-job")
+@app.post("/api/cancel/{job_id}")
+def cancel_job(job_id: Optional[str] = None):
+    """Cancel an in-flight job, set cancellation flag, and release GPU memory."""
+    with JOB_LOCK:
+        target_job_id = job_id
+        if not target_job_id:
+            active = get_active_job()
+            if active:
+                target_job_id = active["job_id"]
+
+        if not target_job_id or target_job_id not in JOBS:
+            raise HTTPException(status_code=404, detail="No active job found to cancel.")
+
+        job = JOBS[target_job_id]
+        if job.get("status") not in ("queued", "uploading", "processing"):
+            return {
+                "job_id": target_job_id,
+                "status": job.get("status"),
+                "message": f"Job is not active (status: {job.get('status')}).",
+            }
+
+        job["status"] = "cancelled"
+        cancel_event = job.get("cancel_event")
+        if cancel_event:
+            cancel_event.set()
+
+        _push_event(target_job_id, "cancelled", {"message": "Job was cancelled by the user."})
+
+    try:
+        clear_gpu_memory()
+    except Exception as exc:
+        logger.warning("Error clearing GPU memory during cancel: %s", exc)
+
+    return {
+        "job_id": target_job_id,
+        "status": "cancelled",
+        "message": "Job cancellation initiated and GPU memory released.",
+    }
 
 
 @app.get("/api/audio/{job_id}")
@@ -340,7 +1059,27 @@ def get_audio(job_id: str):
     job = JOBS.get(job_id)
     if not job or not job.get("audio_file") or not Path(job["audio_file"]).exists():
         raise HTTPException(status_code=404, detail="Audio file not found")
+    job["last_accessed"] = time.time()
     return FileResponse(job["audio_file"], media_type="audio/wav")
+
+
+@app.get("/api/video/{job_id}")
+def get_video(job_id: str):
+    job = JOBS.get(job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    job["last_accessed"] = time.time()
+    v_file = job.get("video_file")
+    if v_file and Path(v_file).exists():
+        vpath = Path(v_file)
+        suffix = vpath.suffix.lower()
+        media_type = VIDEO_MIME_TYPES.get(suffix, "video/mp4")
+        return FileResponse(vpath, media_type=media_type)
+    # Fallback if only audio exists
+    a_file = job.get("audio_file")
+    if a_file and Path(a_file).exists():
+        return FileResponse(a_file, media_type="audio/wav")
+    raise HTTPException(status_code=404, detail="Video or media file not found for this job")
 
 
 @app.get("/api/export-csv/{job_id}")
@@ -348,6 +1087,7 @@ def export_csv(job_id: str):
     job = JOBS.get(job_id)
     if not job or not job.get("result"):
         raise HTTPException(status_code=404, detail="Result not found")
+    job["last_accessed"] = time.time()
     res = job["result"]
     terms = res["llm"]["terms"]
     meta = res.get("video_meta") or {}
@@ -359,7 +1099,7 @@ def export_csv(job_id: str):
     output = io.StringIO()
     writer = csv.DictWriter(
         output,
-        fieldnames=["item_id", "video_id", "model", "lang", "term", "explanation", "R", "D", "comment"],
+        fieldnames=["item_id", "video_id", "model", "lang", "term", "timestamp", "explanation", "R", "D", "comment"],
     )
     writer.writeheader()
     for i, t in enumerate(terms, start=1):
@@ -369,6 +1109,7 @@ def export_csv(job_id: str):
             "model": tag,
             "lang": res.get("lang", "tr"),
             "term": t.get("term", ""),
+            "timestamp": t.get("timestamp") or "",
             "explanation": t.get("explanation", ""),
             "R": "",
             "D": "",
@@ -382,6 +1123,248 @@ def export_csv(job_id: str):
     )
 
 
+@app.get("/api/export-json/{job_id}")
+def export_json(job_id: str):
+    job = JOBS.get(job_id)
+    if not job or not job.get("result"):
+        raise HTTPException(status_code=404, detail="Result not found")
+    job["last_accessed"] = time.time()
+    payload = json.dumps(job["result"], ensure_ascii=False, indent=2)
+    return StreamingResponse(
+        iter([payload]),
+        media_type="application/json",
+        headers={"Content-Disposition": f"attachment; filename=eduterm_{job_id[:8]}.json"},
+    )
+
+
+
+@app.post("/api/exam/generate")
+def create_exam(req: ExamGenerateRequest):
+    job = JOBS.get(req.job_id)
+    if not job or not job.get("result"):
+        raise HTTPException(status_code=404, detail="Job or extracted terms not found")
+    res = job["result"]
+    terms = res.get("llm", {}).get("terms", [])
+    if not terms:
+        raise HTTPException(status_code=400, detail="No extracted terms available for this lecture.")
+    transcript = res.get("asr", {}).get("text", "")
+    lang = res.get("lang", "en")
+    llm_model = res.get("llm", {}).get("model", "Qwen/Qwen3.5-4B")
+    profile = load_profile()
+    exam = None
+    if req.use_llm:
+        import concurrent.futures
+        try:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as ex:
+                fut = ex.submit(
+                    generate_practice_exam,
+                    terms=terms,
+                    transcript=transcript,
+                    lang=lang,
+                    model_id=llm_model,
+                    profile=profile,
+                    use_llm=True,
+                )
+                exam = fut.result(timeout=15.0)
+        except Exception as exc:
+            logger.warning("LLM exam generation timed out or failed (%s); using instant flashcards.", exc)
+            exam = None
+
+    if not exam:
+        exam = generate_practice_exam(
+            terms=terms,
+            transcript=transcript,
+            lang=lang,
+            profile=profile,
+            use_llm=False,
+        )
+    meta = res.get("video_meta") or {}
+    exam["job_id"] = req.job_id
+    exam["video_id"] = meta.get("id", "")
+    exam["video_title"] = meta.get("title", "")
+    save_exam(exam)
+    return {
+        "exam_id": exam["exam_id"],
+        "source": exam["source"],
+        "lang": exam["lang"],
+        "questions": public_questions(exam["questions"]),
+        "total": len(exam["questions"]),
+        "video_title": exam["video_title"],
+    }
+
+
+@app.get("/api/exam/{exam_id}")
+def get_exam(exam_id: str):
+    exam = load_exam(exam_id)
+    if not exam:
+        raise HTTPException(status_code=404, detail="Exam not found")
+    if exam.get("submitted"):
+        return exam
+    return {
+        "exam_id": exam["exam_id"],
+        "source": exam["source"],
+        "lang": exam["lang"],
+        "questions": public_questions(exam["questions"]),
+        "total": len(exam["questions"]),
+        "video_title": exam.get("video_title", ""),
+        "submitted": False,
+    }
+
+
+@app.post("/api/exam/submit")
+def submit_exam(req: ExamSubmitRequest):
+    exam = load_exam(req.exam_id)
+    if not exam:
+        raise HTTPException(status_code=404, detail="Exam not found")
+    if exam.get("submitted") and exam.get("result"):
+        return exam["result"]
+    answers_dicts = [a.model_dump() if hasattr(a, "model_dump") else a.dict() for a in req.answers]
+    scored = score_exam(exam["questions"], answers_dicts)
+
+    profile = load_profile()
+    exam_record = {
+        "exam_id": exam["exam_id"],
+        "job_id": exam.get("job_id"),
+        "video_id": exam.get("video_id", ""),
+        "video_title": exam.get("video_title", ""),
+        "score": scored["score"],
+        "correct": scored["correct"],
+        "total": scored["total"],
+        "weak_terms": scored["weak_terms"],
+        "answers": scored["answers"],
+    }
+    record_exam(profile, exam_record)
+    save_profile(profile)
+
+    adaptive_info = build_adaptive_analysis(profile)
+    summary_text = analysis_after_exam(scored, adaptive_info)
+
+    result_payload = {
+        "exam_id": exam["exam_id"],
+        "score": scored["score"],
+        "correct": scored["correct"],
+        "total": scored["total"],
+        "weak_terms": scored["weak_terms"],
+        "strong_terms": scored["strong_terms"],
+        "answers": scored["answers"],
+        "analysis_summary": summary_text,
+        "adaptive": adaptive_info,
+        "profile_stats": profile.get("stats"),
+    }
+
+    exam["submitted"] = True
+    exam["result"] = result_payload
+    save_exam(exam)
+    return result_payload
+
+
+@app.get("/api/learner/profile")
+def get_learner_profile():
+    return public_profile()
+
+
+@app.post("/api/learner/reset")
+def reset_learner_profile():
+    prof = empty_profile()
+    save_profile(prof)
+    return {"ok": True, "profile": public_profile(prof)}
+
+
+@app.post("/api/helper-slide")
+def get_helper_slide(req: HelperSlideRequest):
+    """Generate an instant summary helper slide based on the lecture section just listened to."""
+    job = JOBS.get(req.job_id)
+    if not job or not job.get("result"):
+        cand_id = f"preview_{req.job_id}" if not req.job_id.startswith("preview_") else req.job_id
+        if cand_id in JOBS and JOBS[cand_id].get("result"):
+            job = JOBS[cand_id]
+        else:
+            try:
+                payload = fetch_instant_transcript(req.job_id)
+                JOBS[payload["job_id"]] = {"result": payload, "status": "completed"}
+                job = JOBS[payload["job_id"]]
+            except Exception:
+                pass
+    if not job or not job.get("result"):
+        for j in reversed(list(JOBS.values())):
+            if j.get("result"):
+                job = j
+                break
+    if not job or not job.get("result"):
+        raise HTTPException(status_code=404, detail="Job or lecture result not found")
+    res = job["result"]
+    asr = res.get("asr", {})
+    segments = asr.get("segments", [])
+    terms = res.get("llm", {}).get("terms", [])
+    lang = res.get("lang", "tr")
+
+    t = max(0.0, float(req.current_time_s))
+    window_start = max(0.0, t - 50.0)
+    window_end = t + 5.0
+
+    recent_segments = [
+        s for s in segments
+        if s.get("start") is not None and s.get("end") is not None
+        and float(s["end"]) >= window_start and float(s["start"]) <= window_end
+    ]
+    recent_text = " ".join(s.get("text", "").strip() for s in recent_segments) if recent_segments else asr.get("text", "")[:350]
+
+    recent_lower = recent_text.lower()
+    active_terms = []
+    for term_obj in terms:
+        t_name = term_obj.get("term", "").strip()
+        if not t_name:
+            continue
+        in_window = False
+        if term_obj.get("start") is not None:
+            ts = float(term_obj["start"])
+            if window_start <= ts <= window_end:
+                in_window = True
+        if in_window or (t_name.lower() in recent_lower):
+            active_terms.append(term_obj)
+
+    if not active_terms and terms:
+        active_terms = terms[:2]
+
+    topic_title = active_terms[0].get("term") if active_terms else "Ders Bölümü"
+
+    core_summary = ""
+    if active_terms:
+        core_summary = " • ".join(f"{t['term']}: {t.get('explanation', '')}" for t in active_terms[:2])
+    else:
+        core_summary = recent_text[:200]
+
+    # Build structured presentation slide specification (with Mermaid diagram & cards)
+    llm_model_name = res.get("llm", {}).get("model", "Qwen/Qwen3.5-4B")
+    use_deep_llm = bool(req.generate_deep_slide or req.llm_analogy)
+    slide_spec = build_slide_specification(
+        topic=topic_title,
+        recent_text=recent_text,
+        active_terms=active_terms,
+        lang=lang,
+        model_id=llm_model_name,
+        use_llm=use_deep_llm,
+    )
+
+    analogy_text = slide_spec.get("analogy")
+
+    start_m, start_s = divmod(int(window_start), 60)
+    cur_m, cur_s = divmod(int(t), 60)
+    time_range = f"{start_m:02d}:{start_s:02d} - {cur_m:02d}:{cur_s:02d}"
+
+    return {
+        "topic": topic_title,
+        "time_range": time_range,
+        "current_time_s": t,
+        "rewind_time_s": max(0.0, t - 10.0),
+        "core_summary": slide_spec.get("core_takeaway") or core_summary,
+        "terms": active_terms[:4],
+        "recent_transcript": recent_text,
+        "analogy": analogy_text,
+        "slide_spec": slide_spec,
+    }
+
+
 # Mount static assets
 STATIC_DIR.mkdir(parents=True, exist_ok=True)
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
@@ -392,4 +1375,8 @@ def serve_index():
     index_file = STATIC_DIR / "index.html"
     if not index_file.exists():
         return "<h1>EduTerm AI GUI Loading...</h1>"
-    return index_file.read_text(encoding="utf-8")
+    resp = HTMLResponse(content=index_file.read_text(encoding="utf-8"))
+    resp.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    resp.headers["Pragma"] = "no-cache"
+    resp.headers["Expires"] = "0"
+    return resp
