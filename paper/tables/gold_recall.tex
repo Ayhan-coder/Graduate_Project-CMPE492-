@@ -1,0 +1,25 @@
+\begin{table}[t]
+\caption{Closed-list terminology recall and precision on TR-1 and EN-1 reference subsets only ($N=32$ curated domain terms each). Matching enforces strict exact-alias or token-boundary matching. Metric is subset-only.}
+\label{tab:gold-recall}
+\centering
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lllcccccc}
+\toprule
+\textbf{LLM} & \textbf{ASR Input} & \textbf{Clip} & \textbf{Gold} & \textbf{Emit.} & \textbf{TP} & \textbf{P\%} & \textbf{R\%} & \textbf{F1\%} \\
+\midrule
+Qwen3.5-4B & Whisper Medium   & TR-1 & 32 & 10 & 7  & 70.0 & 21.9 & 33.3 \\
+Qwen3.5-4B & Whisper Large-v3 & TR-1 & 32 & 12 & 8  & 66.7 & 25.0 & 36.4 \\
+Qwen3.5-4B & Whisper Turbo    & TR-1 & 32 & 8  & 7  & 87.5 & 21.9 & 35.0 \\
+Qwen3.5-4B & Turkish Turbo    & TR-1 & 32 & 8  & 7  & 87.5 & 21.9 & 35.0 \\
+Qwen3.5-4B & Nemotron 3.5 ASR & TR-1 & 32 & 9  & 9  & 100.0 & 28.1 & 43.9 \\
+Qwen3.5-4B & Qwen3-ASR 0.6B   & TR-1 & 32 & 10 & 5  & 50.0 & 15.6 & 23.8 \\
+Qwen3.5-9B & Gold Reference   & TR-1 & 32 & 16 & 15 & 93.8 & 46.9 & 62.5 \\
+\midrule
+Qwen3.5-4B & Whisper Medium   & EN-1 & 32 & 14 & 13 & 92.9 & 40.6 & 56.5 \\
+Qwen3.5-4B & Whisper Large-v3 & EN-1 & 32 & 21 & 18 & 85.7 & 56.2 & 67.9 \\
+Qwen3.5-4B & Whisper Turbo    & EN-1 & 32 & 20 & 17 & 85.0 & 53.1 & 65.4 \\
+Qwen3.5-4B & Qwen3-ASR 0.6B   & EN-1 & 32 & 18 & 16 & 88.9 & 50.0 & 64.0 \\
+Qwen3.5-4B & Nemotron 3.5 ASR & EN-1 & 32 & 16 & 14 & 87.5 & 43.8 & 58.3 \\
+\bottomrule
+\end{tabular}
+\end{table}

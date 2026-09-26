@@ -21,6 +21,12 @@ Experimental numbers are unchanged. Only claims, structure, production, and refe
 - RQ1–RQ3 now state the actual questions.
 - Whisper Medium vs Large-v3 is a ~6× WER gap, not “slightly lower.”
 - ASR ranking is framed as out-of-the-box multilingual suitability.
+- Clarified $\kappa_D = 1.000$ vs $\kappa_R = 0.782$: on the 115-item overlap, D has 112 ones and 3 zeros ($P_e \approx 0.95$), so perfect kappa reflects extreme class prevalence rather than strong annotator discernment; $\kappa_R = 0.782$ (8–12 negatives, 4 disagreements) is the number that actually demonstrates inter-annotator reliability.
+- Clarified Gold transcript provenance: references are human-verified post-edits of caption tracks and ASR drafts (not scratch-built independent transcriptions); explicitly noted that post-editing auto-captions slightly aligns reference style toward Whisper-like captions.
+- Reframed Turkish vs. English ASR comparison: with $n=7$ clips (3 TR + 4 EN), unweighted means, and no confidence intervals or significance tests, we stay humble and explicitly avoid claiming "Turkish is harder" as a general linguistic or architectural result.
+- Aligned empty cells across documents: removed any implication that Nemotron 3.5 ASR was benchmarked; explicitly noted that Nemotron 3.5, gold GPU Wav2Vec 2.0 / SpeechBrain, and Qwen3-ASR 1.7B on EN-4 remain unfilled table cells (---) matching the paper.
+- Reaffirmed absence of semantic recall: explicitly documented that R1% is a precision-like score over emitted terms and GPT-4.1's higher term counts (105 vs 56) are an extraction volume indication rather than proven recall (flagged as a mandatory reminder for oral defense).
+- Reframed GUI as an interactive local studio: clarified that the FastAPI interface is a local proof-of-concept demo (with CORS *, in-memory job store, temp WAVs, and no auth) and must not be presented as a deployed production product.
 
 ## Structure
 

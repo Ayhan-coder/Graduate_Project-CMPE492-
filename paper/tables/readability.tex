@@ -1,0 +1,18 @@
+\begin{table}[t]
+\caption{Symmetric Pedagogical Readability and Semantic Similarity Across Generated Explanations.}
+\label{tab:readability}
+\centering
+\renewcommand{\arraystretch}{1.15}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}llcccc@{}}
+\toprule
+\textbf{Model} & \textbf{Lang.} & \textbf{Metric} & \textbf{Readability Score} & \textbf{CEFR Level} & \textbf{BERTScore} \\
+\midrule
+GPT-4.1 & TR & Ate\c{s}man & 61.4 & Orta G\"u\c{c}l\"ukte (B1) & 0.842 \\
+Qwen3.5-4B & TR & Ate\c{s}man & 58.4 & Orta G\"u\c{c}l\"ukte (B1) & 0.828 \\
+GPT-4.1 & EN & Flesch & 65.8 & Standard (B1) & 0.865 \\
+Qwen3.5-4B & EN & Flesch & 64.2 & Standard (B1) & 0.851 \\
+\bottomrule
+\multicolumn{6}{p{0.95\columnwidth}}{\footnotesize Ate\c{s}man scores ($50$--$69$) and Flesch scores ($60$--$70$) correspond strictly to target CEFR B1 intermediate readability. BERTScore reports token cosine similarity against authorized TDK and Oxford reference definitions.}
+\end{tabular}
+\end{table}

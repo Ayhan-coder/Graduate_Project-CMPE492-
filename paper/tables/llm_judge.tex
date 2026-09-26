@@ -1,0 +1,16 @@
+\begin{table}[t]
+\caption{Validation of Automated LLM-as-a-Judge against Independent Human Annotations ($N=233$ Term-Explanation Pairs).}
+\label{tab:llm_judge}
+\centering
+\renewcommand{\arraystretch}{1.15}
+\setlength{\tabcolsep}{4.5pt}
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+\textbf{Dimension} & \textbf{Obs. Agree.} & \textbf{$P_o$} & \textbf{$P_e$} & \textbf{Cohen's $\kappa$} & \textbf{PABAK} \\
+\midrule
+Context-Consistency ($R$) & 97.00\% & 0.970 & 0.887 & 0.735 & \textbf{0.940} \\
+Beginner Suitability ($D$) & 97.42\% & 0.974 & 0.949 & 0.490 & \textbf{0.948} \\
+\bottomrule
+\multicolumn{6}{p{0.95\columnwidth}}{\footnotesize Evaluated on 233 items from \texttt{labels\_a1.csv}. Low raw Cohen's $\kappa$ on $D$ stems directly from high positive prevalence ($97.4\%$ true); Prevalence-Adjusted and Bias-Adjusted Kappa (PABAK) confirms true $94.8\%$ agreement.}
+\end{tabular}
+\end{table}

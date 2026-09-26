@@ -1,0 +1,17 @@
+\begin{table}[t]
+\caption{Normalized WER by language: Macro mean / Micro (word-weighted) mean, with 95\% bootstrap confidence intervals in brackets ($N=10{,}000$ resamples). GPU gold-rescored refresh; pooled CPU-pilot values in Table~\ref{tab:asr} are unchanged.}
+\label{tab:asr-lang}
+\centering
+\renewcommand{\arraystretch}{1.15}
+\setlength{\tabcolsep}{3.0pt}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Model} & \textbf{TR (Macro / Micro)} & \textbf{TR 95\% CI} & \textbf{EN (Macro / Micro)} & \textbf{EN 95\% CI} \\
+\midrule
+Whisper Medium & 0.049 / 0.050 & [0.030, 0.081] & 0.011 / 0.013 & [0.007, 0.016] \\
+Whisper Large-v3 & 0.021 / 0.021 & [0.014, 0.032] & 0.010 / 0.010 & [0.007, 0.012] \\
+Wav2Vec2 & --- & --- & --- & --- \\
+SpeechBrain & --- & --- & --- & --- \\
+\bottomrule
+\end{tabular}
+\end{table}

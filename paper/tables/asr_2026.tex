@@ -1,0 +1,18 @@
+\begin{table}[t]
+\caption{2026 refresh, normalized WER by language: Macro mean / Micro (word-weighted) mean with 95\% bootstrap confidence intervals in brackets. TR-matched Turbo is scored on TR only.}
+\label{tab:asr-2026}
+\centering
+\renewcommand{\arraystretch}{1.15}
+\setlength{\tabcolsep}{3.0pt}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Model} & \textbf{TR (Macro / Micro)} & \textbf{TR 95\% CI} & \textbf{EN (Macro / Micro)} & \textbf{EN 95\% CI} \\
+\midrule
+Whisper Turbo & 0.037 / 0.037 & [0.011, 0.052] & 0.011 / 0.012 & [0.007, 0.017] \\
+Qwen3-ASR 1.7B & 0.061 / 0.061 & [0.043, 0.071] & 0.015 / 0.014 & [0.011, 0.019] \\
+Qwen3-ASR 0.6B & 0.134 / 0.136 & [0.086, 0.180] & 0.021 / 0.021 & [0.013, 0.029] \\
+Nemotron 3.5 ASR & 0.214 / 0.221 & [0.117, 0.287] & 0.035 / 0.034 & [0.026, 0.049] \\
+Whisper Turbo TR & 0.082 / 0.087 & [0.035, 0.163] & --- & --- \\
+\bottomrule
+\end{tabular}
+\end{table}

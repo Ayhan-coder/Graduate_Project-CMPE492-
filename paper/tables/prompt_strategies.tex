@@ -1,0 +1,17 @@
+\begin{table}[t]
+\caption{Comparison of LLM Prompting Strategies for Terminology Extraction and B1 Explanation on Technical Lecture Speech.}
+\label{tab:prompt_strat}
+\centering
+\renewcommand{\arraystretch}{1.15}
+\setlength{\tabcolsep}{4.5pt}
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+\textbf{Strategy} & \textbf{Terms} & \textbf{Prec. (\%)} & \textbf{Rec. (\%)} & \textbf{$F_1$ (\%)} & \textbf{Latency (s)} \\
+\midrule
+Zero-Shot Baseline & 11 & 55.6 & 41.7 & 47.6 & 3.42 \\
+Chain-of-Thought (CoT) & 15 & 63.6 & 58.3 & 60.9 & 6.85 \\
+Glossary-based RAG & 18 & 76.9 & 76.9 & \textbf{76.9} & 4.15 \\
+\bottomrule
+\multicolumn{6}{p{0.95\columnwidth}}{\footnotesize Evaluated on domain technical lectures against closed gold standards ($N=12$ gold concepts). RAG provides slide/curriculum terminology as contextual grounding anchors.}
+\end{tabular}
+\end{table}

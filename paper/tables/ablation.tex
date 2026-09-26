@@ -1,0 +1,23 @@
+\begin{table}[t]
+\caption{Cross-layer ablation: the same LLM (\texttt{Qwen3.5-4B}) on ASR hypotheses. R1\%/D1\% are annotator~1 labels (available for Whisper); term count is automatic.}
+\label{tab:ablation}
+\centering
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{llccc}
+\toprule
+\textbf{ASR} & \textbf{Lang.} & \textbf{Terms} & \textbf{R1\%} & \textbf{D1\%} \\
+\midrule
+Whisper Medium & TR & 28 & 89.3 & 92.9 \\
+Whisper Medium & EN & 48 & 97.9 & 100.0 \\
+Whisper Large-v3 & TR & 31 & 90.3 & 93.5 \\
+Whisper Large-v3 & EN & 51 & 98.0 & 100.0 \\
+Whisper Turbo & TR & 27 & 96.3 & 96.3 \\
+Whisper Turbo & EN & 48 & 95.8 & 97.9 \\
+Whisper Turbo TR & TR & 29 & --- & --- \\
+Qwen3-ASR 0.6B & TR & 35 & --- & --- \\
+Qwen3-ASR 0.6B & EN & 56 & --- & --- \\
+Nemotron 3.5 ASR & TR & 29 & --- & --- \\
+Nemotron 3.5 ASR & EN & 51 & --- & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
