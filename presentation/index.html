@@ -1,0 +1,1711 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduTerm AI — Bitirme Projesi Tez Savunması 2026</title>
+  <style>
+    :root {
+      --bg-dark: #070b14;
+      --bg-card: rgba(15, 23, 42, 0.75);
+      --bg-card-hover: rgba(30, 41, 59, 0.85);
+      --border-glow: rgba(56, 189, 248, 0.25);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent-blue: #38bdf8;
+      --accent-indigo: #818cf8;
+      --accent-emerald: #34d399;
+      --accent-amber: #fbbf24;
+      --accent-rose: #f43f5e;
+      --accent-gradient: linear-gradient(135deg, #38bdf8, #818cf8);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: radial-gradient(circle at 15% 15%, #0f172a 0%, #030712 100%);
+      color: var(--text-main);
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Presentation Deck Container */
+    #deck-container {
+      position: relative;
+      width: 96vw;
+      height: 90vh;
+      max-width: 1600px;
+      max-height: 900px;
+      background: rgba(10, 15, 30, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 40px rgba(56, 189, 248, 0.08);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Header Bar */
+    .deck-header {
+      height: 52px;
+      padding: 0 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 13px;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+    }
+
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .header-logo .dot {
+      width: 8px;
+      height: 8px;
+      background: var(--accent-blue);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--accent-blue);
+    }
+
+    .header-institutions {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .inst-badge {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /* Slide viewport */
+    #slide-viewport {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      padding: 40px 60px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(40px) scale(0.98);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow-y: auto;
+    }
+
+    .slide.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(0) scale(1);
+    }
+
+    .slide.prev {
+      transform: translateX(-40px) scale(0.98);
+      opacity: 0;
+    }
+
+    /* Slide Typography */
+    .slide-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      align-self: flex-start;
+      padding: 4px 12px;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent-blue);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+
+    .slide-title {
+      font-size: 34px;
+      font-weight: 800;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+      line-height: 1.25;
+    }
+
+    .slide-subtitle {
+      font-size: 17px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    /* Grid Layouts */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      flex: 1;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+      flex: 1;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: all 0.25s ease;
+      position: relative;
+    }
+
+    .card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-glow);
+      transform: translateY(-2px);
+    }
+
+    .card-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--accent-blue);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-desc {
+      font-size: 14px;
+      color: #cbd5e1;
+      line-height: 1.6;
+    }
+
+    /* Tables */
+    .data-table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(15, 23, 42, 0.6);
+      margin-top: 10px;
+    }
+
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      text-align: left;
+    }
+
+    table.data-table th {
+      background: rgba(30, 41, 59, 0.9);
+      color: var(--accent-blue);
+      padding: 11px 16px;
+      font-weight: 700;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+      cursor: pointer;
+    }
+
+    table.data-table th:hover {
+      color: #fff;
+    }
+
+    table.data-table td {
+      padding: 10px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: #e2e8f0;
+    }
+
+    table.data-table tr:hover td {
+      background: rgba(56, 189, 248, 0.05);
+    }
+
+    .val-best {
+      color: var(--accent-emerald);
+      font-weight: 700;
+    }
+
+    .val-fast {
+      color: var(--accent-blue);
+      font-weight: 700;
+    }
+
+    .val-warn {
+      color: var(--accent-amber);
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .tag-blue { background: rgba(56, 189, 248, 0.2); color: #38bdf8; }
+    .tag-green { background: rgba(52, 211, 153, 0.2); color: #34d399; }
+    .tag-amber { background: rgba(251, 191, 36, 0.2); color: #fbbf24; }
+    .tag-rose { background: rgba(244, 63, 94, 0.2); color: #f43f5e; }
+
+    /* Guardrail Banner */
+    .guardrail-alert {
+      margin-top: 14px;
+      background: rgba(251, 191, 36, 0.08);
+      border-left: 4px solid var(--accent-amber);
+      border-radius: 0 8px 8px 0;
+      padding: 10px 16px;
+      font-size: 13px;
+      color: #fde68a;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Bottom Control Bar */
+    .deck-footer {
+      height: 60px;
+      padding: 0 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(15, 23, 42, 0.5);
+    }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-nav {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text-main);
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-nav:hover {
+      background: var(--accent-blue);
+      color: #020617;
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+    }
+
+    .progress-bar-container {
+      flex: 1;
+      max-width: 400px;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      margin: 0 24px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--accent-gradient);
+      width: 6.25%;
+      transition: width 0.3s ease;
+    }
+
+    .slide-counter {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent-blue);
+      min-width: 65px;
+      text-align: center;
+    }
+
+    /* Timer Pill */
+    .timer-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-family: monospace;
+      color: #38bdf8;
+    }
+
+    /* Presenter Mode Modal / Split View */
+    #presenter-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(2, 6, 23, 0.95);
+      backdrop-filter: blur(15px);
+      z-index: 1000;
+      padding: 30px;
+      flex-direction: column;
+    }
+
+    #presenter-modal.open {
+      display: flex;
+    }
+
+    .presenter-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+      flex: 1;
+      height: calc(100% - 60px);
+    }
+
+    .presenter-preview {
+      background: #000;
+      border: 2px solid #1e293b;
+      border-radius: 14px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .presenter-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      overflow-y: auto;
+    }
+
+    .notes-box {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 18px;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .notes-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--accent-blue);
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .notes-content {
+      font-size: 14px;
+      color: #e2e8f0;
+      line-height: 1.6;
+      white-space: pre-line;
+    }
+
+    .qa-box {
+      background: rgba(251, 191, 36, 0.08);
+      border: 1px solid rgba(251, 191, 36, 0.3);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .qa-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent-amber);
+      margin-bottom: 6px;
+    }
+
+    .qa-content {
+      font-size: 13px;
+      color: #fef3c7;
+      line-height: 1.5;
+    }
+
+    /* Overview Modal */
+    #overview-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(2, 6, 23, 0.95);
+      backdrop-filter: blur(15px);
+      z-index: 1000;
+      padding: 40px;
+      overflow-y: auto;
+    }
+
+    #overview-modal.open {
+      display: block;
+    }
+
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .overview-thumb {
+      background: #0f172a;
+      border: 2px solid #1e293b;
+      border-radius: 10px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      height: 140px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .overview-thumb:hover {
+      border-color: var(--accent-blue);
+      transform: scale(1.03);
+    }
+
+    .overview-thumb.current {
+      border-color: var(--accent-emerald);
+      box-shadow: 0 0 15px rgba(52, 211, 153, 0.3);
+    }
+
+    .thumb-num {
+      font-size: 12px;
+      font-weight: bold;
+      color: var(--accent-blue);
+    }
+
+    .thumb-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    /* Interactive Pipeline SVG Diagram */
+    .pipeline-interactive {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin: 20px 0;
+      padding: 20px;
+      background: rgba(15, 23, 42, 0.5);
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .pipeline-node {
+      flex: 1;
+      padding: 18px;
+      background: #1e293b;
+      border: 2px solid #334155;
+      border-radius: 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .pipeline-node:hover, .pipeline-node.active {
+      border-color: var(--accent-blue);
+      background: rgba(56, 189, 248, 0.1);
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+    }
+
+    .pipeline-arrow {
+      color: var(--accent-blue);
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    /* Interactive Quiz Widget */
+    .quiz-widget {
+      background: #1e293b;
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid #334155;
+      margin-top: 10px;
+    }
+
+    .quiz-opt {
+      display: block;
+      margin: 8px 0;
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .quiz-opt:hover {
+      background: rgba(56, 189, 248, 0.15);
+      border-color: var(--accent-blue);
+    }
+
+    .quiz-opt.correct {
+      background: rgba(52, 211, 153, 0.25);
+      border-color: var(--accent-emerald);
+      color: #34d399;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="deck-container">
+    <!-- Header -->
+    <header class="deck-header">
+      <div class="header-logo">
+        <span class="dot"></span>
+        <span>EduTerm AI — Tez Savunması 2026</span>
+      </div>
+      <div class="header-institutions">
+        <span class="inst-badge">Koç Üniversitesi</span>
+        <span class="inst-badge">Tatilsepeti Ar-Ge</span>
+        <span id="current-slide-title" style="color: var(--accent-blue); font-weight: 600;">Giriş</span>
+      </div>
+    </header>
+
+    <!-- Slide Viewport -->
+    <main id="slide-viewport">
+
+      <!-- SLIDE 1: Başlık -->
+      <section class="slide active" data-title="Başlık ve Karşılama">
+        <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+          <div class="slide-badge">Bitirme Projesi Savunması — Eylül 2026</div>
+          <h1 class="slide-title" style="font-size: 38px; max-width: 1100px;">
+            Çok Dilli Eğitim İçin Konuşma Tanıma (ASR) ve Büyük Dil Modeli (LLM) Tabanlı Terminoloji Çıkarma Sistemlerinin İki Katmanlı Değerlendirilmesi
+          </h1>
+          <p class="slide-subtitle" style="font-size: 19px; max-width: 900px; margin-top: 10px; color: #94a3b8;">
+            <em>A Two-Layer Evaluation of Speech-to-Text and LLM-Based Terminology Extraction Systems for Multilingual Education</em>
+          </p>
+
+          <div style="margin-top: 36px; display: flex; gap: 40px; text-align: left;">
+            <div style="background: rgba(255,255,255,0.03); padding: 18px 24px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
+              <div style="font-size: 12px; text-transform: uppercase; color: var(--accent-blue); font-weight: bold;">Proje Ekibi</div>
+              <div style="font-size: 16px; font-weight: 600; margin-top: 6px;">Çakıl Yılmaz <span style="font-size: 13px; color: #94a3b8;">(Koç Üniv.)</span></div>
+              <div style="font-size: 14px; color: #cbd5e1; margin-top: 4px;">Berat Enes Dadak · Efe Batur Giritli · Yekta Said Can <span style="font-size: 12px; color: #94a3b8;">(Tatilsepeti Ar-Ge)</span></div>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.03); padding: 18px 24px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
+              <div style="font-size: 12px; text-transform: uppercase; color: var(--accent-emerald); font-weight: bold;">Kurumlar</div>
+              <div style="font-size: 15px; font-weight: 600; margin-top: 6px;">Koç Üniversitesi Bilgisayar Mühendisliği</div>
+              <div style="font-size: 14px; color: #cbd5e1; margin-top: 4px;">Tatilsepeti Ar-Ge Merkezi</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 2: Problem ve Motivasyon -->
+      <section class="slide" data-title="Problem & Motivasyon">
+        <div class="slide-badge">Bölüm 1: Motivasyon</div>
+        <h2 class="slide-title">Eğitimde Bilişsel Yük & Terminoloji Engeli</h2>
+        <p class="slide-subtitle">Video tabanlı derslerde bilgi ses sinyaline gömülüdür; yeni başlayanlar için terminolojik sürtünme oluşturur.</p>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">🧠 Bilişsel Yük (Cognitive Load)</div>
+            <div class="card-desc">
+              • Uzman eğitmenler, dinleyicinin temel terimleri bildiğini varsayar ("MICE turizmi", "Scrum backlog", "ANOVA testi", "Wien kayma yasası").<br><br>
+              • Başlangıç seviyesindeki öğrenci (beginner) videoyu durdurup dış kaynak aramak zorunda kalır.<br><br>
+              • Bu kesinti, öğrencinin çalışma belleğini tüketir ve <strong>öğrenme akışını (flow)</strong> dağıtır.
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">🎯 Benjamin Bloom'un 2-Sigma Problemi (1984)</div>
+            <div class="card-desc">
+              • Bire bir öğretmen ve uyarlanabilir usta öğrenimi (mastery learning), geleneksel sınıfa kıyasla <strong>iki standart sapma (+2σ)</strong> başarı artışı sağlar.<br><br>
+              • <strong>Amacımız:</strong> İki katmanlı yapay zekâ hattıyla, video içindeki teknik kavramları otomatik tespit edip öğrencinin düzeyine (CEFR B1) uygun anlık açıklamalarla dijital bir özel öğretmen deneyimi sunmaktır.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 3: Araştırma Soruları -->
+      <section class="slide" data-title="Araştırma Soruları">
+        <div class="slide-badge">Bölüm 1: Araştırma Soruları</div>
+        <h2 class="slide-title">Odaklandığımız Üç Temel Soru (RQ1 – RQ3)</h2>
+        <p class="slide-subtitle">Sistemin akustik, semantik ve katmanlar arası eşleşme boyutlarındaki bilimsel hedefleri.</p>
+
+        <div class="grid-3">
+          <div class="card">
+            <div class="card-title">🎙️ RQ1: ASR Doğruluk & Hız</div>
+            <div class="card-desc">
+              Güncel konuşma tanıma modelleri (Whisper vs. Qwen3-ASR vs. Nemotron), Türkçe ve İngilizce eğitim konuşmalarında <strong>WER, CER, Latency ve RTF</strong> açısından nasıl bir başarım sergiler?
+            </div>
+            <div class="tag tag-blue" style="align-self: flex-start;">Akustik Katman</div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">💡 RQ2: LLM Semantik Çıkarım</div>
+            <div class="card-desc">
+              Ticari modeller (GPT-4.1) ile açık kaynaklı modeller (Qwen3.5), terim yakalama kapsamı, bağlam uyumluluğu (<span class="val-fast">R1%</span>) ve CEFR B1 pedagojik okunabilirlik açısından nasıl ayrışır?
+            </div>
+            <div class="tag tag-green" style="align-self: flex-start;">Semantik Katman</div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">⚡ RQ3: Katmanlar Arası Tercih</div>
+            <div class="card-desc">
+              Doğruluk-öncelikli vs. Hız-öncelikli kullanımda hangi ASR+LLM ikilileri seçilmelidir? Sabit LLM farklı ASR hipotezlerinde tutarlılığını korur mu?
+            </div>
+            <div class="tag tag-amber" style="align-self: flex-start;">Uçtan Uca Boru Hattı</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 4: İki Katmanlı Sistem Mimarisi -->
+      <section class="slide" data-title="Sistem Mimarisi">
+        <div class="slide-badge">Bölüm 2: Mimari Tasarım</div>
+        <h2 class="slide-title">İki Katmanlı Bağımsız Boru Hattı Mimarisi</h2>
+        <p class="slide-subtitle">Bileşenlere tıklayarak katmanlar arası veri akışını ve teknik detayları inceleyebilirsiniz.</p>
+
+        <div class="pipeline-interactive">
+          <div class="pipeline-node active" onclick="selectNode(this, 'node-audio')">
+            <div style="font-size: 24px;">🎵</div>
+            <div style="font-weight: bold; margin-top: 4px;">Ses İçe Alma</div>
+            <div style="font-size: 11px; color: #94a3b8;">yt-dlp + ffmpeg (16kHz Mono)</div>
+          </div>
+          <div class="pipeline-arrow">➔</div>
+          <div class="pipeline-node" onclick="selectNode(this, 'node-asr')">
+            <div style="font-size: 24px;">🎙️</div>
+            <div style="font-weight: bold; margin-top: 4px;">Katman 1: ASR</div>
+            <div style="font-size: 11px; color: #38bdf8;">Whisper / Qwen3-ASR</div>
+          </div>
+          <div class="pipeline-arrow">➔</div>
+          <div class="pipeline-node" onclick="selectNode(this, 'node-llm')">
+            <div style="font-size: 24px;">🧠</div>
+            <div style="font-weight: bold; margin-top: 4px;">Katman 2: LLM</div>
+            <div style="font-size: 11px; color: #818cf8;">Qwen3.5 / GPT-4.1</div>
+          </div>
+          <div class="pipeline-arrow">➔</div>
+          <div class="pipeline-node" onclick="selectNode(this, 'node-gui')">
+            <div style="font-size: 24px;">💻</div>
+            <div style="font-weight: bold; margin-top: 4px;">EduTerm AI Studio</div>
+            <div style="font-size: 11px; color: #34d399;">FastAPI + Web Arayüzü</div>
+          </div>
+        </div>
+
+        <div id="node-detail-box" class="card" style="min-height: 120px;">
+          <div class="card-title" id="node-detail-title">🎵 Ses İçe Alma (Audio Ingestion)</div>
+          <div class="card-desc" id="node-detail-desc">
+            YouTube video URL'si veya yerel dosya alınır. `yt-dlp` ile ses akışı çekilir ve `ffmpeg` yardımıyla 16 kHz Mono 16-bit PCM WAV biçimine normalize edilir. Silero VAD (Ses Aktivite Algılama) ile doğal konuşma duraklarından bölünür.
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 5: Veri Kümesi -->
+      <section class="slide" data-title="Altın Veri Kümesi">
+        <div class="slide-badge">Bölüm 3: Veri & Metodoloji</div>
+        <h2 class="slide-title">Altın Standart Transkripsiyon Veri Kümesi</h2>
+        <p class="slide-subtitle">7 ders videosu, ~95 dakika toplam süre, 13.599 kelime, Türkçe ve İngilizce 5 akademik disiplin.</p>
+
+        <div class="data-table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Klip ID</th>
+                <th>Dil</th>
+                <th>Ders Adı & Konu</th>
+                <th>Süre</th>
+                <th>Kelime</th>
+                <th>Altın Referans Kökeni (Provenance)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>TR-1</strong></td>
+                <td><span class="tag tag-rose">TR</span></td>
+                <td>AÖF Proje Yönetimi - Ünite 7</td>
+                <td>12:00</td>
+                <td>1.466</td>
+                <td>Altyazı taslağı + İnsan denetimli terim düzeltmesi</td>
+              </tr>
+              <tr>
+                <td><strong>TR-2</strong></td>
+                <td><span class="tag tag-rose">TR</span></td>
+                <td>Turist Rehberleri İçin Turizm Eğitimi</td>
+                <td>11:17</td>
+                <td>1.489</td>
+                <td>YouTube altyazısı + İnsan düzeltmeli (MICE, UKTKG vb.)</td>
+              </tr>
+              <tr>
+                <td><strong>TR-3</strong></td>
+                <td><span class="tag tag-rose">TR</span></td>
+                <td>Tirendaz AI Veri Bilimi & Python</td>
+                <td>14:15</td>
+                <td>1.841</td>
+                <td>Sesten doğrudan transkripsiyon taslağı + İnsan kontrolü</td>
+              </tr>
+              <tr>
+                <td><strong>EN-1</strong></td>
+                <td><span class="tag tag-blue">EN</span></td>
+                <td>Grow with Google: Agile Project Mgmt</td>
+                <td>13:17</td>
+                <td>2.137</td>
+                <td>Resmi temizlenmiş insan altyazısı (Coursera)</td>
+              </tr>
+              <tr>
+                <td><strong>EN-2</strong></td>
+                <td><span class="tag tag-blue">EN</span></td>
+                <td>What is Sustainable Tourism?</td>
+                <td>09:16</td>
+                <td>1.424</td>
+                <td>YouTube altyazısı + İnsan düzeltmeli (Brundtland vb.)</td>
+              </tr>
+              <tr>
+                <td><strong>EN-3</strong></td>
+                <td><span class="tag tag-blue">EN</span></td>
+                <td>Generative AI in a Nutshell</td>
+                <td>17:57</td>
+                <td>2.875</td>
+                <td>YouTube altyazısı + İnsan düzeltmeli (Prompt, Kanban)</td>
+              </tr>
+              <tr>
+                <td><strong>EN-4</strong></td>
+                <td><span class="tag tag-blue">EN</span></td>
+                <td>Understanding Thermal Radiation</td>
+                <td>17:33</td>
+                <td>2.367</td>
+                <td>İnsan üretimi altyazı (Stefan-Boltzmann, Planck)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="guardrail-alert">
+          🛡️ <strong>Guardrail 1 (Bilimsel Şeffaflık):</strong> Altın metinler sıfırdan bağımsız transkripsiyon değildir; insan kontrolüyle düzeltilmiş altyazı ve ASR taslaklarıdır (post-editing). Whisper stiline hafif bir biçimsel yakınlık olabilir.
+        </div>
+      </section>
+
+      <!-- SLIDE 6: Katman 1 Deney Düzeneği -->
+      <section class="slide" data-title="Katman 1 Deneyleri">
+        <div class="slide-badge">Bölüm 4: ASR Değerlendirmesi</div>
+        <h2 class="slide-title">Katman 1: Konuşma Tanıma Modelleri ve Donanım</h2>
+        <p class="slide-subtitle">NVIDIA GeForce RTX 5060 Laptop GPU (8 GB GDDR6) üzerinde yürütülen GPU test protokolü.</p>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">🖥️ Donanım ve Çıkarım Profili</div>
+            <div class="card-desc">
+              • <strong>GPU:</strong> NVIDIA GeForce RTX 5060 Laptop GPU (8 GB GDDR6, CUDA 13.0, Driver 616.56)<br>
+              • <strong>CPU & RAM:</strong> Intel Core i7-14650HX (16 Çekirdek, 24 Thread), 32 GB DDR5 RAM<br>
+              • <strong>Ortam:</strong> Python 3.12, PyTorch 2.12.0+cu130, HuggingFace Transformers ≥5.13<br>
+              • <strong>Kod Çözme:</strong> Sequential `generate()`, `max_new_tokens=440`, `condition_on_prev_tokens=True`
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">📦 Değerlendirilen Model Aileleri</div>
+            <div class="card-desc">
+              • <strong>OpenAI Whisper Ailesi:</strong> Medium (769M), Large-v3 (1550M), Large-v3 Turbo (809M)<br>
+              • <strong>Türkçe Uyarlanmış Model:</strong> `selimc/whisper-turbo-turkish` (809M)<br>
+              • <strong>2026 Açık Ağırlıklı Çok Modlu Modeller:</strong> Qwen3-ASR 0.6B ve 1.7B<br>
+              • <strong>Protokol / Tarihsel Modeller:</strong> NVIDIA Nemotron 3.5 ASR, Wav2Vec 2.0, SpeechBrain
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 7: ASR Sonuçları -->
+      <section class="slide" data-title="ASR Kıyaslama Tablosu">
+        <div class="slide-badge">Bölüm 4: ASR Kıyaslaması</div>
+        <h2 class="slide-title">Katman 1: Dil Bazında ASR Bulguları</h2>
+        <p class="slide-subtitle">GPU Altın-Yeniden Puanlanmış Normalleştirilmiş WER (Macro / Micro) ve RTF Sonuçları.</p>
+
+        <div class="data-table-wrapper">
+          <table class="data-table" id="asr-table">
+            <thead>
+              <tr>
+                <th onclick="sortAsrTable(0)">Model Adı ⬍</th>
+                <th onclick="sortAsrTable(1)">TR WER (Macro/Micro) ⬍</th>
+                <th>TR 95% Güven Aralığı</th>
+                <th onclick="sortAsrTable(3)">EN WER (Macro/Micro) ⬍</th>
+                <th>EN 95% Güven Aralığı</th>
+                <th onclick="sortAsrTable(5)">TR RTF ⬍</th>
+                <th onclick="sortAsrTable(6)">EN RTF ⬍</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Whisper Large-v3</strong></td>
+                <td class="val-best">0.021 / 0.021</td>
+                <td>[0.014, 0.032]</td>
+                <td class="val-best">0.010 / 0.010</td>
+                <td>[0.007, 0.012]</td>
+                <td>0.151</td>
+                <td>0.216</td>
+              </tr>
+              <tr>
+                <td><strong>Whisper Turbo</strong></td>
+                <td>0.037 / 0.037</td>
+                <td>[0.011, 0.052]</td>
+                <td>0.011 / 0.012</td>
+                <td>[0.007, 0.017]</td>
+                <td class="val-fast">0.044</td>
+                <td class="val-fast">0.025</td>
+              </tr>
+              <tr>
+                <td><strong>Whisper Medium</strong></td>
+                <td>0.049 / 0.050</td>
+                <td>[0.030, 0.081]</td>
+                <td>0.011 / 0.013</td>
+                <td>[0.007, 0.016]</td>
+                <td>0.296</td>
+                <td>0.321</td>
+              </tr>
+              <tr>
+                <td><strong>selimc/turbo-tr</strong></td>
+                <td>0.082 / 0.087</td>
+                <td>[0.035, 0.163]</td>
+                <td>—</td>
+                <td>—</td>
+                <td>0.076</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td><strong>Qwen3-ASR 1.7B</strong></td>
+                <td>0.061 / 0.061</td>
+                <td>[0.043, 0.071]</td>
+                <td>0.015 / 0.014</td>
+                <td>[0.011, 0.019]</td>
+                <td>0.382</td>
+                <td>0.203</td>
+              </tr>
+              <tr>
+                <td><strong>Qwen3-ASR 0.6B</strong></td>
+                <td>0.134 / 0.136</td>
+                <td>[0.086, 0.180]</td>
+                <td>0.021 / 0.021</td>
+                <td>[0.013, 0.029]</td>
+                <td>0.180</td>
+                <td>0.118</td>
+              </tr>
+              <tr>
+                <td><strong>Nemotron 3.5 ASR</strong></td>
+                <td>0.214 / 0.221</td>
+                <td>[0.117, 0.287]</td>
+                <td>0.035 / 0.034</td>
+                <td>[0.026, 0.049]</td>
+                <td>0.242</td>
+                <td>0.176</td>
+              </tr>
+              <tr>
+                <td><strong>Wav2Vec 2.0 / SB</strong></td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="guardrail-alert">
+          🛡️ <strong>Guardrail 4 & 7:</strong> n=7 video ile "Türkçe ASR için daha zordur" genellemesi yapılamaz (akustik farklar mevcuttur). GPU'da çalıştırılmayan modeller tablolarda dürüstçe `—` olarak korunmuştur.
+        </div>
+      </section>
+
+      <!-- SLIDE 8: Katman 2 Terminoloji Çıkarma -->
+      <section class="slide" data-title="Katman 2 Terminoloji">
+        <div class="slide-badge">Bölüm 5: Semantik Çıkarım</div>
+        <h2 class="slide-title">Katman 2: Terminoloji & Prompt Stratejileri</h2>
+        <p class="slide-subtitle">Alana özgü terim tespiti ve CEFR B1 açıklama üretimi için test edilen istem stratejileri.</p>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">📝 Yapılandırılmış JSON Şablonu</div>
+            <div class="card-desc">
+              <pre style="background: rgba(0,0,0,0.4); padding: 10px; border-radius: 6px; font-size: 12px; color: #38bdf8; overflow-x: auto;">
+[
+  {
+    "term": "MICE Turizmi",
+    "explanation": "Toplantı, kongre ve sergi amaçlı seyahatleri kapsayan ticari turizm dalıdır."
+  }
+]</pre>
+              • <strong>İki Aşamalı Kural:</strong> 1. Transkriptten çok kelimeli teknik terimleri yakala. 2. Her terim için başlangıç düzeyinde (B1) tek cümlelik tanım üret.
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">📊 Prompt Stratejileri Başarımı (N=12 Altın Kavram)</div>
+            <div class="data-table-wrapper" style="margin-top: 0;">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Strateji</th>
+                    <th>Terim</th>
+                    <th>Precision</th>
+                    <th>Recall</th>
+                    <th>F1 Skoru</th>
+                    <th>Gecikme</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Zero-Shot</td>
+                    <td>11</td>
+                    <td>55.6%</td>
+                    <td>41.7%</td>
+                    <td>47.6%</td>
+                    <td>3.42 s</td>
+                  </tr>
+                  <tr>
+                    <td>CoT</td>
+                    <td>15</td>
+                    <td>63.6%</td>
+                    <td>58.3%</td>
+                    <td>60.9%</td>
+                    <td>6.85 s</td>
+                  </tr>
+                  <tr style="background: rgba(56, 189, 248, 0.1);">
+                    <td><strong>RAG (Sözlük)</strong></td>
+                    <td><strong>18</strong></td>
+                    <td class="val-best">76.9%</td>
+                    <td class="val-best">76.9%</td>
+                    <td class="val-best">76.9%</td>
+                    <td><strong>4.15 s</strong></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div style="font-size: 12px; color: #94a3b8; margin-top: 6px;">
+              • Sözlük Destekli RAG, terim çekirdeği sağlayarak halüsinasyonu önlemiş ve F1'i %76.9'a taşımıştır.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 9: Pedagojik Okunabilirlik & CEFR B1 -->
+      <section class="slide" data-title="Pedagojik Okunabilirlik">
+        <div class="slide-badge">Bölüm 5: Pedagojik Seviye</div>
+        <h2 class="slide-title">Pedagojik Okunabilirlik ve Sözlük Doğruluğu</h2>
+        <p class="slide-subtitle">Açıklamaların başlangıç seviyesine (CEFR B1) uygunluğu iki bağımsız formülle doğrulanmıştır.</p>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">🇹🇷 Türkçe Çıktılar: Ateşman Okunabilirlik İndeksi</div>
+            <div class="card-desc">
+              <div style="font-size: 26px; font-weight: bold; color: var(--accent-blue); margin: 6px 0;">
+                58.4 – 61.4 <span style="font-size: 15px; color: #34d399;">(Orta Güçlükte / CEFR B1)</span>
+              </div>
+              • <strong>GPT-4.1:</strong> 61.4 | <strong>BERTScore (TDK):</strong> 0.842<br>
+              • <strong>Qwen3.5-4B:</strong> 58.4 | <strong>BERTScore (TDK):</strong> 0.828<br>
+              • <em>Hedef Aralık:</em> 50 – 70 (Lise ve Üniversite başlangıç seviyesi)<br>
+              • Hece ve kelime uzunluğu analizi açıklamaların yalın tutulduğunu gösterir.
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">🇬🇧 İngilizce Çıktılar: Flesch Reading Ease</div>
+            <div class="card-desc">
+              <div style="font-size: 26px; font-weight: bold; color: var(--accent-indigo); margin: 6px 0;">
+                64.2 – 65.8 <span style="font-size: 15px; color: #34d399;">(Standard / CEFR B1)</span>
+              </div>
+              • <strong>GPT-4.1:</strong> 65.8 | <strong>BERTScore (Oxford):</strong> 0.865<br>
+              • <strong>Qwen3.5-4B:</strong> 64.2 | <strong>BERTScore (Oxford):</strong> 0.851<br>
+              • <em>Hedef Aralık:</em> 60 – 70 (Plain English / 8th-9th Grade)<br>
+              • Her iki model de profesyonel sözlüklerle yüksek anlamsal örtüşme sağlamıştır.
+            </div>
+          </div>
+        </div>
+
+        <div class="guardrail-alert">
+          🛡️ <strong>Guardrail 3:</strong> R1% bir kesinlik (precision) metriğidir; kapalı bir sözlük olmadığından gerçek recall ölçülemez. GPT-4.1'in 105 terim çıkarması bir kapsam göstergesidir.
+        </div>
+      </section>
+
+      <!-- SLIDE 10: Değerlendirici Uyumu & Prevalans Paradoksu -->
+      <section class="slide" data-title="Değerlendirici Uyumu">
+        <div class="slide-badge">Bölüm 6: İstatistiksel Güvenilirlik</div>
+        <h2 class="slide-title">Değerlendirici Uyumu & Prevalans Paradoksu</h2>
+        <p class="slide-subtitle">İki bağımsız insan değerlendirici (N=115) ve LLM-as-a-Judge (N=233) uzlaşma analizi.</p>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">👥 Çift Değerlendirici Cohen's Kappa Analizi (N=115)</div>
+            <div class="card-desc">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span>Bağlamsal Tutarlılık (<strong style="color:#38bdf8;">R</strong>):</span>
+                <span class="val-best" style="font-size: 16px;">κ_R = 0.782 (Belirgin Uyum)</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span>Tanım Doğruluğu (<strong style="color:#fbbf24;">D</strong>):</span>
+                <span class="val-warn" style="font-size: 16px;">κ_D = 1.000 (Paradoks)</span>
+              </div>
+              <hr style="border-color: rgba(255,255,255,0.08); margin: 8px 0;">
+              <div style="font-size: 12.5px; line-height: 1.5; color: #cbd5e1;">
+                • <strong>Matematiksel Paradoks:</strong> D etiketinde 112 pozitif, yalnızca 3 negatif vardır. Şans eseri beklenen uyum <em>Pe ≈ 0.949</em>'dur. Aşırı sınıf dengesizliğinde κ_D formül gereği 1.000 çıkar.<br>
+                • <strong>Asıl Güvenilirlik Kanıtı:</strong> 4 uyuşmazlığı ve negatif sınıfı içeren <strong>κ_R = 0.782</strong> skorudur.
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">🤖 LLM-as-a-Judge Doğrulaması (N=233 Çift)</div>
+            <div class="card-desc">
+              • İnsan Etiketleyici vs. LLM Hakem Uyum: <strong>%97.42</strong><br>
+              • Ham Kappa: <em>0.490</em> (yüksek pozitif prevalans önyargısı)<br>
+              • <strong>PABAK (Prevalence-Adjusted Bias-Adjusted Kappa):</strong> <span class="val-best" style="font-size: 17px;">0.948</span><br><br>
+              PABAK katsayısı, marjinal asimetriyi düzelterek insan ile model hakem arasındaki uzlaşmanın %94.8 olduğunu kanıtlamıştır.
+            </div>
+          </div>
+        </div>
+
+        <div class="guardrail-alert">
+          🛡️ <strong>Guardrail 2:</strong> κ_D = 1.000 göründüğünden daha zayıf bir kanıttır (Prevalence Paradox). Jüriye savunmada asıl ayırt edici güvenilirlik metriğinin κ_R = 0.782 olduğu aktarılmalıdır.
+        </div>
+      </section>
+
+      <!-- SLIDE 11: Çapraz Katmanlı Analiz & Hata Yayılımı -->
+      <section class="slide" data-title="Hata Yayılımı">
+        <div class="slide-badge">Bölüm 7: Çapraz Katman Analizi</div>
+        <h2 class="slide-title">ASR ➔ LLM Hata Yayılımı & Ablasyon</h2>
+        <p class="slide-subtitle">Sabit LLM (Qwen3.5-4B) transkript duyarlılığı ve sentetik gürültü degradasyon eğrisi.</p>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">🔬 Whisper Hipotezleri Ablasyonu (Qwen3.5-4B)</div>
+            <div class="data-table-wrapper" style="margin-top: 0;">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>ASR Sistemi</th>
+                    <th>Dil</th>
+                    <th>Çıkarılan Terim</th>
+                    <th>R1% (Bağlam)</th>
+                    <th>D1% (Doğruluk)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Whisper Medium</td>
+                    <td>TR / EN</td>
+                    <td>28 / 48</td>
+                    <td>89.3% / 97.9%</td>
+                    <td>92.9% / 100%</td>
+                  </tr>
+                  <tr>
+                    <td>Whisper Large-v3</td>
+                    <td>TR / EN</td>
+                    <td>31 / 51</td>
+                    <td>90.3% / 98.0%</td>
+                    <td>93.5% / 100%</td>
+                  </tr>
+                  <tr>
+                    <td>Whisper Turbo</td>
+                    <td>TR / EN</td>
+                    <td>27 / 48</td>
+                    <td>96.3% / 95.8%</td>
+                    <td>96.3% / 97.9%</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div style="font-size: 12px; color: #94a3b8; margin-top: 6px;">
+              • <strong>Bulgu:</strong> WER &lt; %5 rejiminde ASR modelleri arasında terim kalitesi açısından kritik bir fark oluşmamaktadır.
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">📉 Sentetik Fonetik Gürültü Eğrisi (F1 vs WER)</div>
+            <div style="flex: 1; display: flex; align-items: center; justify-content: center;">
+              <svg width="100%" height="160" viewBox="0 0 400 160">
+                <!-- Axes -->
+                <line x1="40" y1="130" x2="380" y2="130" stroke="#475569" stroke-width="2"/>
+                <line x1="40" y1="20" x2="40" y2="130" stroke="#475569" stroke-width="2"/>
+                <!-- Ticks -->
+                <text x="35" y="145" fill="#94a3b8" font-size="10">0%</text>
+                <text x="120" y="145" fill="#94a3b8" font-size="10">10%</text>
+                <text x="200" y="145" fill="#94a3b8" font-size="10">20%</text>
+                <text x="290" y="145" fill="#94a3b8" font-size="10">35%</text>
+                <text x="360" y="145" fill="#94a3b8" font-size="10">50%</text>
+                
+                <text x="15" y="30" fill="#94a3b8" font-size="10">F1 %</text>
+                <text x="330" y="125" fill="#94a3b8" font-size="10">WER %</text>
+
+                <!-- Curve -->
+                <path d="M 40 35 C 100 40, 160 55, 200 85 C 240 115, 300 122, 380 126" fill="none" stroke="#38bdf8" stroke-width="3"/>
+                <circle cx="40" cy="35" r="4" fill="#34d399"/>
+                <circle cx="200" cy="85" r="5" fill="#fbbf24"/>
+                <circle cx="380" cy="126" r="4" fill="#f43f5e"/>
+
+                <text x="210" y="80" fill="#fbbf24" font-size="10">Kritik Kırılma (WER > %20)</text>
+              </svg>
+            </div>
+            <div style="font-size: 12px; color: #94a3b8;">
+              • WER %20'yi aştığında F1 skoru %40'ın altına düşmektedir.
+            </div>
+          </div>
+        </div>
+
+        <div class="guardrail-alert">
+          🛡️ <strong>Guardrail 5:</strong> Whisper ablasyonu bir hata yayılım eğrisi değildir (hepsi düşük WER'dir). Sürekli hata eğrisi kontrollü sentetik gürültü deneyiyle gösterilmiştir.
+        </div>
+      </section>
+
+      <!-- SLIDE 12: EduTerm AI Studio Web Arayüzü -->
+      <section class="slide" data-title="EduTerm AI Studio">
+        <div class="slide-badge">Bölüm 8: Sistem Demonstrasyonu</div>
+        <h2 class="slide-title">Sistem Gösterimi: EduTerm AI Studio</h2>
+        <p class="slide-subtitle">Uçtan uca boru hattını somutlaştıran etkileşimli yerel PoC stüdyosu.</p>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">🖥️ Yerel Ar-Ge PoC Mimarisi</div>
+            <div class="card-desc">
+              • <strong>Backend:</strong> Python 3.12, FastAPI, Uvicorn, yt-dlp, ffmpeg<br>
+              • <strong>Frontend:</strong> Vanilla CSS & JS, Koyu Cam Efekti (Glassmorphism), İnteraktif DAG<br>
+              • <strong>Uyarlanabilir Öğrenci:</strong> Aralıklı tekrar (spaced repetition) ile ustalık kazancı/kaybı<br>
+              • <strong>Sınav Motoru:</strong> Terimlerden otomatik 4 seçenekli MCQ ve bilgi kartı (Flashcard) üretimi<br>
+              • <strong>Yardımcı Slaytlar:</strong> Terim hiyerarşisi ve Mermaid akış şeması sentezi
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">🎯 İnteraktif Mini Sınav Simülasyonu</div>
+            <div class="quiz-widget">
+              <div style="font-size: 14px; font-weight: 600; color: #fff;">
+                Soru: "Bilişsel Yük" kavramının eğitimdeki temel pedagojik tanımı nedir?
+              </div>
+              <div class="quiz-opt" onclick="checkQuiz(this, false)">A) Eğitmenin ders sırasında harcadığı kalori miktarı</div>
+              <div class="quiz-opt" onclick="checkQuiz(this, true)">B) Öğrenme sırasında aktif bellek kapasitesinin zorlanma düzeyi</div>
+              <div class="quiz-opt" onclick="checkQuiz(this, false)">C) Video izleme platformunun sunucu bant genişliği</div>
+              <div class="quiz-opt" onclick="checkQuiz(this, false)">D) Öğrencinin aldığı notların genel ortalaması</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="guardrail-alert">
+          🛡️ <strong>Guardrail 6:</strong> EduTerm AI Studio ticarileşmiş bir bulut ürünü değil, boru hattını yerel ortamda kanıtlayan bir Ar-Ge Konsept Kanıtlama (PoC) demo stüdyosudur.
+        </div>
+      </section>
+
+      <!-- SLIDE 13: Yazılım Mühendisliği Güvenilirliği -->
+      <section class="slide" data-title="Test ve Güvenilirlik">
+        <div class="slide-badge">Bölüm 8: Mühendislik Standartları</div>
+        <h2 class="slide-title">Yazılım Mühendisliği & Test Güvenilirliği</h2>
+        <p class="slide-subtitle">213 otomatik birim test ile Ar-Ge kalitesi ve güvenilirliği kanıtlanmıştır.</p>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">🧪 213 Kapsamlı Birim Test (%100 Geçiş)</div>
+            <div class="card-desc">
+              • <strong>Pipeline:</strong> ASR/LLM iptal edilebilir iş kuyruğu ve bellek yönetimi<br>
+              • <strong>API & WebSocket:</strong> REST uç noktaları, SSE olayları ve durum raporlama<br>
+              • <strong>Uyarlanabilir Öğrenci:</strong> Aralıklı tekrar formülleri, tavan/taban sınırları<br>
+              • <strong>Sınav Üretimi:</strong> 4 seçenekli MCQ doğruluğu, çeldirici ayrımı<br>
+              • <strong>Yardımcı Slayt:</strong> Mermaid şablon sentezi ve acil durum şablonları<br>
+              • <em>Komut:</em> `python -m unittest discover -s experiments/tests` (5.1 sn)
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">🔒 Dayanıklılık & Güvenlik Korumaları</div>
+            <div class="card-desc">
+              • <strong>Otomatik Port Bulma (Port Hunting):</strong> 7860 meşgulse çökmeden 7861'e otomatik geçiş.<br><br>
+              • <strong>Erişim Belirteci (Token Auth):</strong> Dış ağa bağlanıldığında (`0.0.0.0`) URL'e zorunlu güvenlik tokeni eklenmesi.<br><br>
+              • <strong>VRAM Taşma Önleme:</strong> GPU OOM anında kural tabanlı acil durum şablonuna otomatik geri düşüş (fallback).
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 14: Dağıtım Matrisi & Öneriler -->
+      <section class="slide" data-title="Dağıtım Önerileri">
+        <div class="slide-badge">Bölüm 9: Pratik Öneriler</div>
+        <h2 class="slide-title">Dağıtım Önerileri: Doğruluk vs. Hız Matrisi</h2>
+        <p class="slide-subtitle">Kullanım senaryosuna göre önerilen model kombinasyonları ve mühendislik takasları.</p>
+
+        <div class="grid-2">
+          <div class="card" style="border-color: rgba(52, 211, 153, 0.4);">
+            <div class="card-title" style="color: var(--accent-emerald);">🎯 Doğruluk-Öncelikli Dağıtım</div>
+            <div class="card-desc">
+              • <strong>ASR:</strong> Whisper Large-v3 (TR WER 0.021 / EN WER 0.010)<br>
+              • <strong>LLM:</strong> Qwen3.5-9B veya GPT-4.1<br>
+              • <strong>Özellik:</strong> Maksimum terminolojik kapsam (105+ terim), kusursuz transkripsiyon.<br>
+              • <strong>Kullanım Alanı:</strong> Resmi ders arşivleme, çeviri, akredite ders kitabı sözlükleri.<br>
+              • <strong>Donanım:</strong> Yüksek GPU VRAM veya bulut API bütçesi.
+            </div>
+          </div>
+
+          <div class="card" style="border-color: rgba(56, 189, 248, 0.4);">
+            <div class="card-title" style="color: var(--accent-blue);">⚡ Hız/Gecikme-Öncelikli Dağıtım</div>
+            <div class="card-desc">
+              • <strong>ASR:</strong> Whisper Large-v3 Turbo (TR RTF 0.044 / EN RTF 0.025)<br>
+              • <strong>LLM:</strong> Qwen3.5-4B veya GPT-4o-mini<br>
+              • <strong>Özellik:</strong> 4-8 kat hızlı işlem, anlık etkileşim (&lt;4 sn yanıt).<br>
+              • <strong>Kullanım Alanı:</strong> Eşzamanlı canlı ders altyazılama, video içi anlık terim kartı gösterimi.<br>
+              • <strong>Donanım:</strong> RTX 5060 8GB VRAM (4-bit nicemleme ile yerel maliyetsiz).
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 15: Kısıtlar ve Gelecek Çalışmalar -->
+      <section class="slide" data-title="Kısıtlar & Gelecek">
+        <div class="slide-badge">Bölüm 10: Değerlendirme</div>
+        <h2 class="slide-title">Kısıtlar ve Gelecek Çalışma Yol Haritası</h2>
+        <p class="slide-subtitle">Akademik kısıtların farkındalığı ve sistemin gelecekteki potansiyeli.</p>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">⚠️ Metodolojik Kısıtlar</div>
+            <div class="card-desc">
+              • <strong>Veri Büyüklüğü:</strong> 7 video sınırlı bir kümedir; dil genellemesi yapılmamalıdır.<br><br>
+              • <strong>Altın Transkript:</strong> Sıfırdan bağımsız değil, insan denetimli post-edittir.<br><br>
+              • <strong>Kapalı Sözlük Yokluğu:</strong> R1% bir kesinlik metriğidir; tam duyarlılık ölçülmemiştir.
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">🚀 Gelecek Çalışmalar (Future Work)</div>
+            <div class="card-desc">
+              • <strong>LMS Entegrasyonu:</strong> Moodle veya Canvas için LTI/SCORM uyumlu eklenti geliştirilmesi.<br><br>
+              • <strong>Derin Öğrenci Bilgi Takibi (DKT):</strong> Öğrencinin geçmiş sınav ve duraklatma verilerinden beslenen BKT/DKT modelleri.<br><br>
+              • <strong>Üretime Taşınma:</strong> Docker konteyneri, Redis iş kuyruğu ve PostgreSQL kalıcı veri tabanı.<br><br>
+              • <strong>Genişletilmiş Korpus:</strong> 30+ saatlik tam çift-kör bağımsız etiketli veri kümesi.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 16: Kapanış ve Teşekkür -->
+      <section class="slide" data-title="Kapanış & Teşekkür">
+        <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+          <div class="slide-badge">Bitirme Projesi Savunması — Eylül 2026</div>
+          <h1 class="slide-title" style="font-size: 42px; margin-bottom: 12px;">Teşekkür Ederiz</h1>
+          <p class="slide-subtitle" style="font-size: 20px; color: var(--accent-blue);">
+            Sorularınız ve Değerlendirmeleriniz?
+          </p>
+
+          <div style="margin-top: 30px; display: flex; gap: 20px; font-size: 14px; color: #94a3b8;">
+            <div class="card" style="padding: 14px 20px;">📄 IEEE Bildirisi: <strong>paper/main.tex</strong></div>
+            <div class="card" style="padding: 14px 20px;">📘 Tez Raporu: <strong>notes/Bitirme_Projesi_Raporu.pdf</strong></div>
+            <div class="card" style="padding: 14px 20px;">🛡️ Savunma Rehberi: <strong>presentation/DEFENSE_QA_GUIDE.md</strong></div>
+            <div class="card" style="padding: 14px 20px;">💻 Canlı Demo: <strong>experiments/gui/</strong></div>
+          </div>
+
+          <div style="margin-top: 36px; font-size: 14px; color: #64748b;">
+            Koç Üniversitesi Bilgisayar Mühendisliği Bölümü & Tatilsepeti Ar-Ge Merkezi
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer Navigation & Controls -->
+    <footer class="deck-footer">
+      <div class="nav-controls">
+        <button class="btn-nav" onclick="prevSlide()" title="Önceki Slayt (Sol Ok)">◀ Önceki</button>
+        <button class="btn-nav" onclick="nextSlide()" title="Sonraki Slayt (Sağ Ok)">Sonraki ▶</button>
+        <button class="btn-nav" onclick="toggleOverview()" title="Tüm Slaytlar (O)">📑 Genel Bakış</button>
+        <button class="btn-nav" onclick="togglePresenter()" title="Konuşmacı Modu (P)">🎤 Sunucu Modu</button>
+      </div>
+
+      <div class="progress-bar-container">
+        <div class="progress-bar-fill" id="progress-fill"></div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <div class="timer-pill" id="presentation-timer" title="Sunum Süresi">⏱️ 00:00</div>
+        <div class="slide-counter" id="slide-counter">1 / 16</div>
+        <button class="btn-nav" onclick="toggleFullscreen()" title="Tam Ekran (F)">⛶</button>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Presenter Mode Modal -->
+  <div id="presenter-modal">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <div style="font-size: 18px; font-weight: bold; color: var(--accent-blue);">
+        🎤 Konuşmacı Ekranı (Presenter View) — EduTerm AI
+      </div>
+      <div style="display: flex; gap: 12px; align-items: center;">
+        <span class="timer-pill" id="presenter-timer" style="font-size: 16px;">⏱️ 00:00</span>
+        <button class="btn-nav" onclick="resetTimer()">Sıfırla</button>
+        <button class="btn-nav" onclick="togglePresenter()">Kapat (P)</button>
+      </div>
+    </div>
+
+    <div class="presenter-grid">
+      <!-- Preview Pane -->
+      <div class="presenter-preview" id="presenter-preview-content">
+        <div style="padding: 10px 16px; background: #0f172a; font-size: 12px; color: #94a3b8; border-bottom: 1px solid #1e293b;">
+          Canlı İzleyici Ekranı (Slayt <span id="p-cur-num">1</span>/16: <strong id="p-cur-title">Başlık</strong>)
+        </div>
+        <div id="p-slide-clone" style="flex: 1; padding: 24px; overflow-y: auto;"></div>
+      </div>
+
+      <!-- Sidebar with Notes & Guardrails -->
+      <div class="presenter-sidebar">
+        <div class="notes-box">
+          <div class="notes-title">
+            <span>🗣️ Bu Slaytta Ne Söylenmeli?</span>
+            <span style="font-size: 11px; color: #38bdf8;">Konuşmacı Notları</span>
+          </div>
+          <div class="notes-content" id="speaker-notes-content">
+            Hoş geldiniz. Bitirme projemizin sunumuna başlıyoruz.
+          </div>
+        </div>
+
+        <div class="qa-box">
+          <div class="qa-title">🛡️ Jüri Muhtemel Sorusu & Savunma Refleksi</div>
+          <div class="qa-content" id="speaker-qa-content">
+            Bu slayt için henüz kritik jüri sorusu tanımlanmadı.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overview Grid Modal -->
+  <div id="overview-modal" onclick="if(event.target===this) toggleOverview()">
+    <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto 24px auto;">
+      <h2 style="font-size: 24px; color: var(--accent-blue);">Slayt Dizin Kataloğu (16 Slayt)</h2>
+      <button class="btn-nav" onclick="toggleOverview()">Kapat (ESC)</button>
+    </div>
+    <div class="overview-grid" id="overview-grid-container"></div>
+  </div>
+
+  <!-- Interactive Slide Logic -->
+  <script>
+    // Speaker notes and defense Q&A for each slide
+    const SLIDE_METADATA = [
+      {
+        notes: "Sayın Jüri Üyeleri ve Değerli Hocalarım, hoş geldiniz.\nBugün Koç Üniversitesi ve Tatilsepeti Ar-Ge Merkezi ortaklığında yürüttüğümüz, eğitim konuşmalarını yeni başlayan öğrenciler için anlık olarak erişilebilir kılmayı amaçlayan iki katmanlı yapay zekâ değerlendirme çalışmamızı sunacağız.",
+        qa: "Klasik Jüri Açılış Sorusu: 'Projede sanayi (Tatilsepeti) ve akademi (Koç) iş birliği nasıl şekillendi?'\nYanıt: ASR altyapısı ve GPU kıyaslama testleri Tatilsepeti Ar-Ge kaynaklarında, eğitim pedagojisi, metodoloji ve deneysel analizler Koç Üniversitesi rehberliğinde yürütülmüştür."
+      },
+      {
+        notes: "Eğitim videolarında bilgi ses sinyaline gömülüdür. Başlangıç düzeyindeki bir öğrenci, eğitmenin varsaydığı teknik bir kavramla karşılaştığında videoyu durdurup harici kaynak aramak zorunda kalır.\nBu durum bilişsel yükü (cognitive load) artırır ve öğrenme akışını kesintiye uğratır. Bloom'un 2-Sigma problemi bire bir özel rehberliğin iki standart sapma başarı getirdiğini gösterir.",
+        qa: "'Bloom'un 2-Sigma çalışması 1984 yılına ait, modern yapay zekâ çağında geçerli mi?'\nYanıt: Evet, Vanzo ve ark. (ACL 2025) güncel çalışmalarında LLM tabanlı uyarlanabilir rehberliğin öğrenci etkileşimini doğrudan artırdığını deneysel olarak kanıtlamıştır."
+      },
+      {
+        notes: "Çalışmamız 3 ana araştırma sorusuna yanıt arar:\nRQ1: ASR modellerinin Türkçe ve İngilizcedeki akustik ve işlem verimliliği.\nRQ2: LLM'lerin terim çıkarma kapsamı, bağlamsal uyumu (R1) ve CEFR B1 okunabilirlik seviyesi.\nRQ3: Doğruluk vs hız senaryolarında hangi ASR+LLM çiftlerinin seçilmesi gerektiği.",
+        qa: "'Ablasyon çalışmasında neden sadece Whisper transkriptleri kullanıldı?'\nYanıt: Bu RQ3'ün önemli bir bulgusudur. Whisper Medium, Large ve Turbo modellerinin hepsi WER <%5 rejimindedir; bu sebeple çalışmamız düşük WER rejimindeki kararlılığı gösterir."
+      },
+      {
+        notes: "Mimarimiz iki gevşek bağlantılı (decoupled) katmandan oluşur. Ses yt-dlp ile çekilir, ffmpeg ile 16 kHz mono WAV'a çevrilir. Katman 1 transkripsiyonu üretir, Katman 2 ise terimleri yakalayıp CEFR B1 düzeyinde açıklar. Bu yapı EduTerm AI Web Studio arayüzümüzle canlı olarak görselleştirilmiştir.",
+        qa: "'Neden uçtan uca tek bir multimodal model değil de 2 katmanlı mimari seçtiniz?'\nYanıt: İki katmanlı yapı modülerlik sağlar. ASR veya LLM tarafında yeni ve daha verimli bir model çıktığında boru hattının geri kalanını bozmadan bağımsızca güncelleyebiliriz."
+      },
+      {
+        notes: "Veri kümemiz 5 alandan 7 dersten ve ~95 dakika sesten oluşur. Burada kritik bir bilimsel guardrail vurgulamak isteriz: Referans metinlerimiz sıfırdan bağımsız çift-kör transkripsiyon değildir; insan kontrolünde düzeltilmiş altyazı ve ASR taslaklarıdır.",
+        qa: "Guardrail 1: 'Altın referanslar Whisper stiline yanlı (biased) olabilir mi?'\nYanıt: Evet, post-editing altyazı formatına biçimsel bir yakınlık yaratabilir. Bu sebeple %1-2'lik WER skorlarını mutlak bir tavan skordan ziyade post-edit referansına karşı göreli bir kıyaslama olarak sunuyoruz."
+      },
+      {
+        notes: "Deneylerimizi RTX 5060 Laptop GPU üzerinde gerçekleştirdik. Whisper Medium, Large-v3, Turbo ve 2026 modellerinden Qwen3-ASR 0.6B ve 1.7B'yi değerlendirdik. Sequential generate decoding parametreleriyle deterministik sonuçlar aldık.",
+        qa: "'RTX 5060 8GB VRAM modeller için yeterli oldu mu?'\nYanıt: Whisper Large-v3 ve Turbo fp16/bf16 olarak sorunsuz sığdı. LLM katmanında Qwen3.5-4B modeli 4-bit nicemleme (bitsandbytes) ile çalıştırılarak VRAM kullanımı 4.5 GB altında tutuldu."
+      },
+      {
+        notes: "Tablomuz net bir ayrım gösterir: Whisper Large-v3 mutlak doğrulukta %2.1 TR ve %1.0 EN WER ile liderdir. Ancak Whisper Turbo modeli 0.025 RTF ile sesi gerçek zamandan 40 kat hızlı çözerek canlı uygulamalar için devasa bir hız avantajı sağlar.",
+        qa: "Guardrail 4 & 7: 'Türkçe ASR için İngilizceden daha zordur diyebilir miyiz? Boş hücreler neden var?'\nYanıt: Hayır, n=7 video akustik ve konuşmacı farkları içerir, dil genellemesi yapılamaz. GPU altın kümesinde koşturulmayan modeller uydurma verilerle değil, dürüstçe '—' olarak bırakılmıştır."
+      },
+      {
+        notes: "İkinci katmanda LLM istem mühendisliğini 3 stratejiyle test ettik. Zero-shot %47.6 F1'de kalırken, Sözlük Destekli RAG yaklaşımı kavram tohumları sağlayarak halüsinasyonu engellemiş ve F1'i %76.9'a çıkarmıştır. Üstelik 4.15 sn ile CoT'a göre çok daha hızlıdır.",
+        qa: "'RAG yaklaşımında sözlük tohumları nereden sağlanıyor?'\nYanıt: Müfredat konu başlıkları veya ders izlencesindeki ana kavramlardan (örneğin TDK/Oxford eğitimsel kavram listeleri) çekilen hafif bir terim indeksi isteme enjekte edilmektedir."
+      },
+      {
+        notes: "Üretilen tanımların pedagojik düzeyini Ateşman (TR: 58-61) ve Flesch (EN: 64-66) indeksleriyle ölçtük. Her iki dilde de tam olarak CEFR B1 (Orta güçlükte) seviyesine oturduğunu ve TDK/Oxford sözlükleriyle BERTScore > 0.82 örtüşme yakaladığımızı kanıtladık.",
+        qa: "Guardrail 3: 'R1% neden Duyarlılık (Recall) değildir?'\nYanıt: Eğitim konuşmalarında terimsellik sürekli bir spektrumdur ve kapalı bir sözlük yoktur. R1% üretilen terimlerin video bağlamıyla uyumunu ölçen bir kesinlik (precision) metriğidir."
+      },
+      {
+        notes: "Çift değerlendirici insan analizinde tanım doğruluğunda kappa 1.000 çıksa da bunu prevalans paradoksu olarak literatüre uygun şekilde açıkladık (112 pozitif, 3 negatif, Pe ≈ 0.95). Asıl güvenilirlik kanıtımız sınır vakaları temsil eden κ_R = 0.782 skorudur. LLM hakem testinde de PABAK %94.8 çıkmıştır.",
+        qa: "Guardrail 2: 'Kappa 1.000 çıkması şüpheli değil mi?'\nYanıt: Kesinlikle şüphelidir ve biz de bunu raporda Prevalans Paradoksu olarak belirttik. Şans eseri beklenen uyum %95 olduğunda kappa formülü marjinal asimetri nedeniyle 1.000 çıkar; asıl güvenilirlik κ_R = 0.782'dedir."
+      },
+      {
+        notes: "Sabit bir dil modeline Whisper transkriptlerini verdiğimizde terim çıkarımında bozulma görmedik çünkü tüm modeller düşük WER rejimindedir. Gerçek hata yayılımını görmek için yaptığımız kontrollü sentetik gürültü deneyinde, WER %20'yi aştığında F1'in hızla %40'ın altına çöktüğünü gösterdik.",
+        qa: "Guardrail 5: 'Ablasyon tablosu bir hata yayılım eğrisi midir?'\nYanıt: Hayır, ablasyon tablosu düşük WER rejimindeki stabilitedir. Geniş hata yayılımı ise sentetik fonetik hata enjeksiyonu deneyiyle modellenmiştir."
+      },
+      {
+        notes: "Çalışmamızı sadece teoride bırakmadık; FastAPI ve modern Vanilla web arayüzüyle EduTerm AI Studio adında yerel bir web prototipi geliştirdik. Sistem YouTube linkinden dinamik terim kartları, uyarlanabilir öğrenci profili ve pratik sınavlar üretebilmektedir.",
+        qa: "Guardrail 6: 'EduTerm AI Studio canlıda çalışan bir ürün mü?'\nYanıt: Hayır, yerel Ar-Ge PoC demo stüdyosudur. İş kuyruğu bellek içi sözlüktedir, geçici WAV dosyaları tutar ve yetkilendirme içermez; laboratuvar konsept kanıtıdır."
+      },
+      {
+        notes: "Yazılım mühendisliği açısından projemiz 213 bağımsız birim testten %100 başarıyla geçmektedir. Port çakışmalarında otomatik port bulma (port hunting), dış bağlantılarda zorunlu token güvenliği ve GPU OOM anında acil durum geri düşüşü mevcuttur.",
+        qa: "'213 test GPU gerektiriyor mu?'\nYanıt: Hayır, testlerin tamamı mock nesnelerle ve hafif girdi matrisleriyle tasarlanmıştır. Bu sayede CI/CD ortamında sadece 5.1 saniyede koşulabilmektedir."
+      },
+      {
+        notes: "Uygulama dünyasına iki net reçete sunuyoruz: Resmi arşivleme ve ders kitabı sözlüklerinde Whisper Large-v3 ve yüksek kapasiteli LLM önerirken; canlı dersler ve sınıf içi etkileşimli sistemlerde Whisper Turbo ve Qwen 4B ikilisiyle 4-8 kat hız ve minimum donanım maliyeti elde edilmektedir.",
+        qa: "'Hangi durumda Whisper Turbo tercih edilmemeli?'\nYanıt: Tıbbi, hukuki veya resmi akreditasyon gerektiren ders arşivlemelerinde, %1.6'lık hata farkı tolere edilemeyeceğinden Whisper Large-v3 zorunludur."
+      },
+      {
+        notes: "Metodolojik kısıtlarımızın farkındayız: 7 video sınırlı bir kümedir. Gelecek vizyonumuzda boru hattını Moodle/Canvas LMS sistemlerine LTI standardıyla bağlamak ve derin bilgi takibi (Knowledge Tracing) algoritmaları geliştirmek yer almaktadır.",
+        qa: "'LMS entegrasyonu teknik olarak nasıl çalışacak?'\nYanıt: LTI 1.3 standardı üzerinden ders kaydı tamamlandığında arka planda webhook tetiklenecek; terim kartları ve sınav soruları ders modülüne otomatik yüklenecektir."
+      },
+      {
+        notes: "Dinlediğiniz için çok teşekkür ederiz. Şimdi değerli jüri üyelerimizin sorularını, yapıcı eleştirilerini ve katkılarını almaktan büyük onur duyarız.",
+        qa: "Kapanış: Sorular geldikçe DEFENSE_QA_GUIDE.md rehberindeki 15 soru maddesine paralel olarak alçakgönüllü ve istatistiksel yanıtlar verilmelidir."
+      }
+    ];
+
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    let presentationStartTime = Date.now();
+    let timerInterval = null;
+
+    // Navigation
+    function showSlide(index) {
+      if (index < 0 || index >= totalSlides) return;
+      
+      slides.forEach((s, i) => {
+        s.classList.remove('active', 'prev');
+        if (i < index) s.classList.add('prev');
+      });
+
+      slides[index].classList.add('active');
+      currentSlide = index;
+
+      // Update UI elements
+      document.getElementById('slide-counter').textContent = `${index + 1} / ${totalSlides}`;
+      const progressPercent = ((index + 1) / totalSlides) * 100;
+      document.getElementById('progress-fill').style.width = `${progressPercent}%`;
+
+      const title = slides[index].getAttribute('data-title') || `Slayt ${index + 1}`;
+      document.getElementById('current-slide-title').textContent = title;
+
+      // Update presenter view if open
+      updatePresenterData();
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides - 1) showSlide(currentSlide + 1);
+    }
+
+    function prevSlide() {
+      if (currentSlide > 0) showSlide(currentSlide - 1);
+    }
+
+    // Keyboard controls
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'Space' || e.key === 'PageDown') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp' || e.key === 'Backspace') {
+        prevSlide();
+      } else if (e.key === 'Home') {
+        showSlide(0);
+      } else if (e.key === 'End') {
+        showSlide(totalSlides - 1);
+      } else if (e.key === 'f' || e.key === 'F') {
+        toggleFullscreen();
+      } else if (e.key === 'p' || e.key === 'P') {
+        togglePresenter();
+      } else if (e.key === 'o' || e.key === 'O') {
+        toggleOverview();
+      } else if (e.key === 'Escape') {
+        document.getElementById('presenter-modal').classList.remove('open');
+        document.getElementById('overview-modal').classList.remove('open');
+      }
+    });
+
+    // Fullscreen
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => console.log(err));
+      } else {
+        document.exitFullscreen().catch(err => console.log(err));
+      }
+    }
+
+    // Timer
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        const elapsedSec = Math.floor((Date.now() - presentationStartTime) / 1000);
+        const mins = String(Math.floor(elapsedSec / 60)).padStart(2, '0');
+        const secs = String(elapsedSec % 60).padStart(2, '0');
+        const formatted = `⏱️ ${mins}:${secs}`;
+        document.getElementById('presentation-timer').textContent = formatted;
+        const pTimer = document.getElementById('presenter-timer');
+        if (pTimer) pTimer.textContent = formatted;
+      }, 1000);
+    }
+
+    function resetTimer() {
+      presentationStartTime = Date.now();
+    }
+
+    // Presenter Mode
+    function togglePresenter() {
+      const modal = document.getElementById('presenter-modal');
+      modal.classList.toggle('open');
+      if (modal.classList.contains('open')) {
+        updatePresenterData();
+      }
+    }
+
+    function updatePresenterData() {
+      const pClone = document.getElementById('p-slide-clone');
+      if (pClone) {
+        pClone.innerHTML = slides[currentSlide].innerHTML;
+      }
+      document.getElementById('p-cur-num').textContent = currentSlide + 1;
+      document.getElementById('p-cur-title').textContent = slides[currentSlide].getAttribute('data-title');
+
+      const meta = SLIDE_METADATA[currentSlide] || { notes: "Not girilmedi.", qa: "Soru girilmedi." };
+      document.getElementById('speaker-notes-content').textContent = meta.notes;
+      document.getElementById('speaker-qa-content').textContent = meta.qa;
+    }
+
+    // Overview Mode
+    function toggleOverview() {
+      const modal = document.getElementById('overview-modal');
+      modal.classList.toggle('open');
+      if (modal.classList.contains('open')) {
+        buildOverviewGrid();
+      }
+    }
+
+    function buildOverviewGrid() {
+      const container = document.getElementById('overview-grid-container');
+      container.innerHTML = '';
+      slides.forEach((slide, index) => {
+        const thumb = document.createElement('div');
+        thumb.className = `overview-thumb ${index === currentSlide ? 'current' : ''}`;
+        thumb.onclick = () => {
+          showSlide(index);
+          toggleOverview();
+        };
+        const title = slide.getAttribute('data-title') || `Slayt ${index + 1}`;
+        thumb.innerHTML = `
+          <div class="thumb-num">Slayt ${index + 1}</div>
+          <div class="thumb-title">${title}</div>
+          <div style="font-size: 11px; color: #64748b;">Tıkla ve Git ➔</div>
+        `;
+        container.appendChild(thumb);
+      });
+    }
+
+    // Interactive Architecture Node Selector
+    const nodeDetails = {
+      'node-audio': {
+        title: '🎵 Ses İçe Alma (Audio Ingestion)',
+        desc: 'YouTube video URL\'si veya yerel ses dosyası sisteme aktarılır. yt-dlp ile ses akışı çekilir ve ffmpeg yardımıyla 16 kHz Mono 16-bit PCM WAV biçimine normalize edilir. Silero VAD (Ses Aktivite Algılama) ile doğal konuşma duraklarından dinamik segmentasyon yapılır.'
+      },
+      'node-asr': {
+        title: '🎙️ Katman 1: Konuşma Tanıma (ASR)',
+        desc: 'Whisper Medium/Large-v3/Turbo veya Qwen3-ASR modelleri GPU VRAM önbelleğinde tutulur. 30 saniyelik pencereler veya VAD parçaları paralel/sıralı olarak transkribe edilir. Kelime düzeyinde zaman damgalı transkript üretilir.'
+      },
+      'node-llm': {
+        title: '🧠 Katman 2: Semantik Terminoloji ve Pedagoji (LLM)',
+        desc: 'Transkript Qwen3.5-4B (4-bit yerel) veya GPT modellerine beslenir. İstem (prompt) yönergeleri doğrultusunda metindeki teknik terimler ayrıştırılır ve her biri için CEFR B1 düzeyinde başlangıç seviyesine uygun pedagojik açıklamalar JSON formatında üretilir.'
+      },
+      'node-gui': {
+        title: '💻 EduTerm AI Studio & Uyarlanabilir Öğrenme',
+        desc: 'FastAPI REST/WebSocket sunucusu üzerinden istemciye akar. Canlı video oynatıcı üzerinde terimler belirdikçe dinamik terim kartları açılır. Aralıklı tekrar algoritması öğrencinin terim ustalığını kaydeder ve terimlerden otomatik 4 seçenekli MCQ sınavları oluşturulur.'
+      }
+    };
+
+    function selectNode(elem, key) {
+      document.querySelectorAll('.pipeline-node').forEach(n => n.classList.remove('active'));
+      elem.classList.add('active');
+      const data = nodeDetails[key];
+      if (data) {
+        document.getElementById('node-detail-title').textContent = data.title;
+        document.getElementById('node-detail-desc').textContent = data.desc;
+      }
+    }
+
+    // Interactive Quiz
+    function checkQuiz(elem, isCorrect) {
+      const parent = elem.parentElement;
+      parent.querySelectorAll('.quiz-opt').forEach(opt => {
+        opt.style.pointerEvents = 'none';
+      });
+      if (isCorrect) {
+        elem.classList.add('correct');
+        elem.innerHTML += ' ✅ <strong>Doğru Yanıt! (+10 Puan Ustalık Kazancı)</strong>';
+      } else {
+        elem.style.background = 'rgba(244, 63, 94, 0.2)';
+        elem.style.borderColor = '#f43f5e';
+        elem.style.color = '#f43f5e';
+        elem.innerHTML += ' ❌ <strong>Yanlış</strong>';
+        parent.children[2].classList.add('correct'); // Highlight option B
+      }
+    }
+
+    // Table sorting
+    let sortDir = {};
+    function sortAsrTable(colIndex) {
+      const table = document.getElementById('asr-table');
+      const tbody = table.querySelector('tbody');
+      const rows = Array.from(tbody.querySelectorAll('tr'));
+      sortDir[colIndex] = !sortDir[colIndex];
+      const asc = sortDir[colIndex];
+
+      rows.sort((a, b) => {
+        const valA = a.children[colIndex].textContent.trim();
+        const valB = b.children[colIndex].textContent.trim();
+        const numA = parseFloat(valA);
+        const numB = parseFloat(valB);
+        if (!isNaN(numA) && !isNaN(numB)) {
+          return asc ? numA - numB : numB - numA;
+        }
+        return asc ? valA.localeCompare(valB) : valB.localeCompare(valA);
+      });
+
+      rows.forEach(r => tbody.appendChild(r));
+    }
+
+    // Initialize presentation
+    window.addEventListener('DOMContentLoaded', () => {
+      showSlide(0);
+      startTimer();
+    });
+  </script>
+</body>
+</html>
