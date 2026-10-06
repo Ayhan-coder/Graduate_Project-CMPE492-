@@ -486,5 +486,48 @@ class InferenceMocksTests(unittest.TestCase):
             pipeline.clear_asr_cache()
 
 
+class YouTubeErrorHandlingTests(unittest.TestCase):
+    def test_parse_age_restriction_error(self):
+        err_msg = "ERROR: [youtube] dQw4w9WgXcQ: Sign in to confirm your age. This video may be inappropriate for some users."
+        yt_err = pipeline.parse_youtube_dl_error(err_msg)
+        self.assertEqual(yt_err.error_type, "age_restricted")
+        self.assertTrue(yt_err.suggest_upload)
+        self.assertIn("yaş kısıtlamalıdır", yt_err.user_friendly_message)
+        self.assertIn("File Upload", yt_err.user_friendly_message)
+
+    def test_parse_geo_blocked_error(self):
+        err_msg = "ERROR: [youtube] dQw4w9WgXcQ: The uploader has not made this video available in your country"
+        yt_err = pipeline.parse_youtube_dl_error(err_msg)
+        self.assertEqual(yt_err.error_type, "geo_blocked")
+        self.assertTrue(yt_err.suggest_upload)
+        self.assertIn("coğrafi kısıtlama", yt_err.user_friendly_message)
+
+    def test_parse_private_video_error(self):
+        err_msg = "ERROR: [youtube] dQw4w9WgXcQ: Private video. Sign in if you've been granted access to this video"
+        yt_err = pipeline.parse_youtube_dl_error(err_msg)
+        self.assertEqual(yt_err.error_type, "private_or_members")
+        self.assertIn("gizli", yt_err.user_friendly_message)
+
+    def test_parse_rate_limit_error(self):
+        err_msg = "ERROR: [youtube] dQw4w9WgXcQ: HTTP Error 429: Too Many Requests"
+        yt_err = pipeline.parse_youtube_dl_error(err_msg)
+        self.assertEqual(yt_err.error_type, "rate_limited")
+        self.assertIn("limitine ulaştı", yt_err.user_friendly_message)
+
+    def test_parse_copyright_error(self):
+        err_msg = "ERROR: [youtube] dQw4w9WgXcQ: Video unavailable. This video contains content from Sony, who has blocked it on copyright grounds"
+        yt_err = pipeline.parse_youtube_dl_error(err_msg)
+        self.assertEqual(yt_err.error_type, "copyright")
+        self.assertIn("telif hakkı", yt_err.user_friendly_message)
+
+    def test_download_youtube_audio_raises_custom_error(self):
+        with patch("gui.pipeline._run_cmd", side_effect=RuntimeError("Sign in to confirm your age")):
+            tmp_out = Path(tempfile.gettempdir()) / "test_yt_age.wav"
+            with self.assertRaises(pipeline.YouTubeDownloadError) as ctx:
+                pipeline.download_youtube_audio("https://www.youtube.com/watch?v=dQw4w9WgXcQ", tmp_out)
+            self.assertEqual(ctx.exception.error_type, "age_restricted")
+            self.assertIn("yaş kısıtlamalıdır", ctx.exception.user_friendly_message)
+
+
 if __name__ == "__main__":
     unittest.main()

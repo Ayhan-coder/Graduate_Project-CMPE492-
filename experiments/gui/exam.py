@@ -416,3 +416,141 @@ def analysis_after_exam(scored: dict, adaptive: dict) -> str:
             f"average {float(adaptive.get('avg_score') or 0):.0%}."
         )
     return " ".join(parts)
+
+
+# --------------------------------------------------------------------------
+# Cognitive Science Research on Student Attention Span & Interpolated Testing
+# --------------------------------------------------------------------------
+ATTENTION_MILESTONES = [
+    {
+        "seconds": 180,
+        "minute_label": "3. Dakika (180 sn)",
+        "source": "Risko et al. (2012) & Bunce et al. (2010)",
+        "citation": "Erken Zihin Kayması (Mind Wandering) Onset Noktası: Araştırmalar video dersin 3. dakikasından itibaren ilk dikkat dalgalanmasının başladığını gösterir.",
+    },
+    {
+        "seconds": 300,
+        "minute_label": "5. Dakika (300 sn)",
+        "source": "Szpunar & Schacter (PNAS 2013 - Harvard)",
+        "citation": "Optimal İnterpolated Test Eşiği: 5. dakikada verilen kısa pop-quiz, zihin kaymasını %40'tan %18'e indirir ve dikkati sıfırlar.",
+    },
+    {
+        "seconds": 360,
+        "minute_label": "6. Dakika (360 sn)",
+        "source": "Guo, Kim, Rubin (ACM L@S 2014 - edX 6.9M Video)",
+        "citation": "Kritik Dikkat Kırılma Sınırı: edX verilerine göre online ders videolarında medyan odak 6. dakikada tepe yapar ve ardından hızla çöker.",
+    },
+    {
+        "seconds": 600,
+        "minute_label": "10. Dakika (600 sn)",
+        "source": "Bradbury (2016) / Wilson & Korn (2007)",
+        "citation": "İkincil Bilişsel Yorgunluk Eşiği: Uzun derslerde 10. dakikadan sonra pasif dinlemede derin dikkat çöküşü yaşanır.",
+    },
+]
+
+ATTENTION_RESEARCH_INFO = {
+    "title": "Ders Videolarında Öğrenci Dikkat Dalgalanmaları ve İnterpolated Testing Araştırmaları",
+    "sources": [
+        {
+            "id": "guo_2014",
+            "authors": "Philip J. Guo, Juho Kim, Rob Rubin",
+            "year": 2014,
+            "title": "How Video Production Affects Student Engagement: An Empirical Study of MOOC Videos",
+            "venue": "ACM Conference on Learning at Scale (L@S '14)",
+            "key_finding": "6.9 milyon edX video izleme oturumu analizi: Öğrencilerin video derslere ortalama odaklanma süresi en fazla 6 dakikadır (360 sn). Video uzunluğu ne olursa olsun medyan etkileşim 6. dakikadan sonra hızla düşmektedir.",
+            "critical_seconds": 360,
+            "drop_range": "180s - 360s (3 - 6 dk)",
+        },
+        {
+            "id": "szpunar_2013",
+            "authors": "Karl K. Szpunar, Nova Z. Khan, Daniel L. Schacter",
+            "year": 2013,
+            "title": "Interpolated memory tests reduce mind wandering and improve learning of online lectures",
+            "venue": "Proceedings of the National Academy of Sciences (PNAS)",
+            "key_finding": "Ders videosu izlerken zihin kayması (mind wandering) 4-5. dakikalardan itibaren %40'ın üzerine çıkar. Her 5 dakikada bir (300 sn) araya serpiştirilen kısa bellek testleri (pop-quiz), zihin kaymasını %18'e indirmiş ve kalıcılığı ikiye katlamıştır.",
+            "critical_seconds": 300,
+            "drop_range": "240s - 300s (4 - 5 dk)",
+        },
+        {
+            "id": "bunce_2010",
+            "authors": "Diane M. Bunce, Elizabeth A. Flaherty, Kyle D. VandenPlas",
+            "year": 2010,
+            "title": "Measuring Student Attention in Lectures with Clickers",
+            "venue": "Journal of Chemical Education",
+            "key_finding": "Öğrencilerin saniye bazlı dikkat seviyeleri ilk 4.5-5. dakikada belirgin bir dalgalanma ve kopma yaşamakta, ardından interaktif müdahale olmazsa her 2-3 dakikada bir dikkat kopması tekrarlamaktadır.",
+            "critical_seconds": 270,
+            "drop_range": "240s - 300s (4 - 5 dk)",
+        },
+        {
+            "id": "risko_2012",
+            "authors": "Evan F. Risko, Nicola Anderson, Alyssa Sarwal, Megan Engelhardt, Alan Kingstone",
+            "year": 2012,
+            "title": "Everyday Attention: Variation in Mind Wandering & Memory in a Lecture",
+            "venue": "Applied Cognitive Psychology",
+            "key_finding": "Zaman ilerledikçe zihin kayması doğrusal olarak artar. İlk kaymalar 3. dakikadan (180 sn) itibaren gözlemlenir.",
+            "critical_seconds": 180,
+            "drop_range": "180s - 240s (3 - 4 dk)",
+        },
+        {
+            "id": "bradbury_2016",
+            "authors": "Neil A. Bradbury",
+            "year": 2016,
+            "title": "Attention span during lectures: 8 seconds, 10 minutes, or more?",
+            "venue": "Advances in Physiology Education",
+            "key_finding": "Pasif dinlemede 10-15. dakikada derin dikkat çöküşü yaşanır. Düzenli soru ve aktif hatırlama (retrieval practice) ile dikkat periyodu sıfırlanabilmektedir.",
+            "critical_seconds": 600,
+            "drop_range": "600s - 720s (10 - 12 dk)",
+        },
+    ],
+    "default_thresholds_s": [180, 300, 360, 600],
+}
+
+
+def make_popquiz_question(
+    terms: list[dict],
+    current_time_s: float = 0.0,
+    lang: str = "en",
+    profile: Optional[dict] = None,
+) -> Optional[dict]:
+    """Build a single targeted MCQ pop-quiz based on terms taught up to current playback second."""
+    if not terms:
+        return None
+
+    # Filter terms that occurred around or before current_time_s if timestamps are known
+    earlier_terms = []
+    for t in terms:
+        if not isinstance(t, dict):
+            continue
+        start_s = t.get("start_s")
+        if start_s is not None:
+            try:
+                if float(start_s) <= (current_time_s + 5.0):
+                    earlier_terms.append(t)
+            except (ValueError, TypeError):
+                pass
+
+    pool = earlier_terms if len(earlier_terms) >= 2 else terms
+    selected = prioritize_terms(pool, profile, limit=4)
+    if not selected:
+        selected = prioritize_terms(terms, profile, limit=4)
+    if not selected:
+        return None
+
+    is_tr = (lang or "").lower().startswith("tr")
+    generics = GENERIC_DISTRACTORS_TR if is_tr else GENERIC_DISTRACTORS_EN
+    target_item = selected[0]
+    mcq = _mcq_from_term(target_item, terms, 1, generics, is_tr)
+
+    closest_m = min(
+        ATTENTION_MILESTONES,
+        key=lambda m: abs(m["seconds"] - current_time_s),
+    ) if ATTENTION_MILESTONES else None
+
+    return {
+        "question": mcq,
+        "current_time_s": current_time_s,
+        "term": target_item.get("term"),
+        "explanation": target_item.get("explanation"),
+        "milestone": closest_m,
+    }
+

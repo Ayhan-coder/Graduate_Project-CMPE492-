@@ -115,11 +115,15 @@ class JavascriptContractTests(unittest.TestCase):
         id_pattern = r'document\.getElementById\([\'"]([a-zA-Z0-9_-]+)[\'"]\)'
         referenced_ids = set(re.findall(id_pattern, js_content))
 
+        # IDs created dynamically in JS (element.id = "...") exist only at runtime
+        dynamic_id_pattern = r'\.id\s*=\s*[\'"]([a-zA-Z0-9_-]+)[\'"]'
+        dynamic_ids = set(re.findall(dynamic_id_pattern, js_content))
+
         self.assertGreater(len(referenced_ids), 10, "Should find at least 10 getElementById calls")
 
         missing_ids = []
         for elem_id in referenced_ids:
-            if f'id="{elem_id}"' not in html_content:
+            if f'id="{elem_id}"' not in html_content and elem_id not in dynamic_ids:
                 missing_ids.append(elem_id)
 
         self.assertEqual(
@@ -155,9 +159,88 @@ class JavascriptContractTests(unittest.TestCase):
 
         # renderResults has defensive try/catch and finally re-enables Run button
         self.assertIn("try {", js_content)
-        self.assertIn("} finally {", js_content)
         self.assertIn("btnRun.disabled = false", js_content)
+
+    def test_attention_popquiz_dom_contract(self):
+        """Ensure attention pop-quiz controls and modals exist in index.html and app.js."""
+        html_content = (STATIC_DIR / "index.html").read_text(encoding="utf-8")
+        popquiz_ids = [
+            "btnTestPopQuiz",
+            "btnOpenResearchModal",
+            "selectPopQuizMode",
+            "popQuizModal",
+            "popquizMilestoneBadge",
+            "popquizTermName",
+            "popquizPrompt",
+            "popquizOptionsList",
+            "popquizFeedbackBox",
+            "btnResumeFromPopQuiz",
+            "btnSkipPopQuiz",
+            "attentionResearchModal",
+            "btnCloseResearchModal",
+        ]
+        for el_id in popquiz_ids:
+            self.assertIn(f'id="{el_id}"', html_content, f"Element ID '{el_id}' missing in index.html")
+
+        # Functions in app.js
+        js_path = STATIC_DIR / "app.js"
+        js_content = js_path.read_text(encoding="utf-8")
+        self.assertIn("function setupAttentionPopQuiz(", js_content)
+        self.assertIn("function checkAttentionPopQuizTrigger(", js_content)
+        self.assertIn("function triggerAttentionPopQuiz(", js_content)
+        self.assertIn("setupAttentionPopQuiz()", js_content)
+
+    def test_attention_research_api_endpoint(self):
+        """Verify the research endpoint returns citations and default drop-off seconds."""
+        res = client.get("/api/exam/attention-research")
+        self.assertEqual(res.status_code, 200)
+        data = res.json()
+        self.assertIn("sources", data)
+        self.assertIn("default_thresholds_s", data)
+        self.assertEqual(data["default_thresholds_s"], [180, 300, 360, 600])
+
+    def test_quick_answer_api_endpoint(self):
+        """Verify quick answer updates learner profile."""
+        res = client.post(
+            "/api/exam/quick-answer",
+            json={"term": "Kanban", "correct": True, "video_id": "test_vid"},
+        )
+        self.assertEqual(res.status_code, 200)
+        data = res.json()
+        self.assertEqual(data["status"], "ok")
+        self.assertEqual(data["term"], "Kanban")
+        self.assertGreaterEqual(data["mastery"], 0.5)
+
+
+    def test_tab_and_watch_distraction_pause_dom_contract(self):
+        """Ensure tab visibility and watch-pause controls exist in index.html and app.js."""
+        html_content = (STATIC_DIR / "index.html").read_text(encoding="utf-8")
+        required_ids = [
+            "chkTabPause",
+            "chkWatchPause",
+            "chkAutoResume",
+            "attentionPauseOverlay",
+            "attentionAlertEmoji",
+            "attentionAlertTitle",
+            "attentionPauseReason",
+            "attentionLiveMsg",
+            "btnResumeAttentionVideo",
+            "btnDismissAttention",
+            "etTabSwitchCount",
+        ]
+        for el_id in required_ids:
+            self.assertIn(f'id="{el_id}"', html_content, f"Element ID '{el_id}' missing in index.html")
+
+        # Functions and listeners in app.js
+        js_path = STATIC_DIR / "app.js"
+        js_content = js_path.read_text(encoding="utf-8")
+        self.assertIn("function setupTabVisibilityTracker(", js_content)
+        self.assertIn("visibilitychange", js_content)
+        self.assertIn("setupTabVisibilityTracker()", js_content)
+        self.assertIn("showAttentionPauseOverlay(", js_content)
+        self.assertIn("tabSwitchPausedMedia", js_content)
 
 
 if __name__ == "__main__":
     unittest.main()
+

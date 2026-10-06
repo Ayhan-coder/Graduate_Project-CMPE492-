@@ -18,6 +18,7 @@ import os
 import re
 import secrets
 import shutil
+import tempfile
 import threading
 import time
 import uuid
@@ -33,9 +34,12 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from gui.exam import (
+    ATTENTION_MILESTONES,
+    ATTENTION_RESEARCH_INFO,
     analysis_after_exam,
     generate_practice_exam,
     load_exam,
+    make_popquiz_question,
     public_questions,
     save_exam,
     score_exam,
@@ -49,9 +53,12 @@ from gui.learner import (
     public_profile,
     record_exam,
     save_profile,
+    update_mastery,
 )
 from gui.pipeline import (
     JobCancelledError,
+    YouTubeDownloadError,
+    parse_youtube_dl_error,
     clear_gpu_memory,
     convert_local_audio,
     detect_lang,
@@ -60,11 +67,20 @@ from gui.pipeline import (
     extract_youtube_id,
     fetch_instant_transcript,
     build_slide_specification,
+    generate_cornell_study_sheet,
+    build_concept_knowledge_graph,
+    find_all_term_occurrences,
     get_or_load_whisper,
     get_youtube_info,
     preload_models,
     transcribe_audio,
 )
+from gui.manimator import (
+    produce_student_explainer_video,
+    VIDEOS_DIR,
+    TEMP_DIR as MANIMATOR_TEMP_DIR,
+)
+from gui.socratic import generate_socratic_response
 
 ROOT = Path(__file__).resolve().parent.parent
 STATIC_DIR = Path(__file__).resolve().parent / "static"
@@ -274,11 +290,44 @@ class ExamSubmitRequest(BaseModel):
     answers: list[ExamAnswer]
 
 
+class PopQuizRequest(BaseModel):
+    job_id: str
+    current_time_s: float = 0.0
+
+
+class PopQuizAnswerRequest(BaseModel):
+    term: str
+    correct: bool
+    video_id: Optional[str] = ""
+    job_id: Optional[str] = ""
+
+
+class CornellNotesRequest(BaseModel):
+    job_id: str
+    custom_title: Optional[str] = None
+
+
 class HelperSlideRequest(BaseModel):
     job_id: str
     current_time_s: float = 0.0
     llm_analogy: bool = False
     generate_deep_slide: bool = False
+
+
+class ManimatorGenerateRequest(BaseModel):
+    job_id: Optional[str] = ""
+    current_time_s: float = 0.0
+    topic: Optional[str] = ""
+    context: Optional[str] = ""
+    lang: str = "tr"
+    video_style: str = "manim_animation"  # "manim_animation" or "figure_walkthrough"
+    duration_s: int = 50
+    voice: Optional[str] = None
+    use_local_qwen: bool = True  # Falls back to heuristic script if the model is unavailable
+    model_id: str = "Qwen/Qwen3.5-4B"
+
+
+MANIMATOR_HISTORY: list[dict] = []
 
 
 @app.get("/api/health")
@@ -407,9 +456,14 @@ def fetch_yt_info(req: URLInfoRequest):
         return info
     except Exception as exc:
         logger.error("Failed to fetch YouTube metadata for '%s': %s", cleaned, exc, exc_info=True)
+        parsed_err = parse_youtube_dl_error(str(exc), url=cleaned)
+        if parsed_err.error_type != "generic_yt_error":
+            detail_msg = parsed_err.user_friendly_message
+        else:
+            detail_msg = "Failed to retrieve YouTube video metadata. Please verify the URL."
         raise HTTPException(
             status_code=400,
-            detail="Failed to retrieve YouTube video metadata. Please verify the URL.",
+            detail=detail_msg,
         )
 
 
@@ -452,41 +506,25 @@ def _set_job_status(job_id: str, status: str, result: Optional[dict] = None):
 
 
 def align_terms_with_segments(terms: list[dict], segments: list[dict]) -> list[dict]:
-    """Map each extracted terminology item to its earliest timestamped ASR segment."""
+    """Map each extracted terminology item to its timestamps and all ASR segment occurrences."""
     for item in terms:
-        term_text = (item.get("term") or "").strip().lower()
+        term_text = (item.get("term") or "").strip()
         if not term_text:
             item["start_s"] = None
             item["end_s"] = None
             item["timestamp"] = None
+            item["occurrences"] = []
+            item["occurrences_count"] = 0
             continue
 
-        matched_seg = None
-        # 1. Exact substring pass
-        for seg in segments:
-            seg_txt = (seg.get("text") or "").lower()
-            if term_text in seg_txt:
-                matched_seg = seg
-                break
+        occurrences = find_all_term_occurrences(term_text, segments)
+        item["occurrences"] = occurrences
+        item["occurrences_count"] = len(occurrences)
 
-        # 2. Token overlap pass if multi-word term or morphology variations
-        if not matched_seg:
-            words = [w for w in re.findall(r"\w+", term_text) if len(w) >= 3]
-            if words:
-                for seg in segments:
-                    seg_txt = (seg.get("text") or "").lower()
-                    if all(w in seg_txt for w in words):
-                        matched_seg = seg
-                        break
-
-        if matched_seg and matched_seg.get("start") is not None:
-            start_s = float(matched_seg["start"])
-            end_s = float(matched_seg["end"]) if matched_seg.get("end") is not None else None
-            m = int(start_s // 60)
-            s = int(start_s % 60)
-            item["start_s"] = round(start_s, 2)
-            item["end_s"] = round(end_s, 2) if end_s is not None else None
-            item["timestamp"] = f"{m:02d}:{s:02d}"
+        if occurrences:
+            item["start_s"] = occurrences[0]["start_s"]
+            item["end_s"] = occurrences[0]["end_s"]
+            item["timestamp"] = occurrences[0]["timestamp"]
         else:
             item["start_s"] = None
             item["end_s"] = None
@@ -743,6 +781,20 @@ def process_youtube(req: YouTubeRequest):
             _set_job_status(job_id, "cancelled")
             _push_event(job_id, "cancelled", {"message": "Job was cancelled by the user."})
             clear_gpu_memory()
+        except YouTubeDownloadError as yt_err:
+            logger.warning("YouTube download error for job %s: %s", job_id, yt_err)
+            _set_job_status(job_id, "error")
+            _push_event(
+                job_id,
+                "job_error",
+                {
+                    "message": yt_err.user_friendly_message,
+                    "error_type": yt_err.error_type,
+                    "suggest_upload": yt_err.suggest_upload,
+                    "detail": str(yt_err),
+                },
+            )
+            clear_gpu_memory()
         except Exception as e:
             if cancel_event.is_set():
                 _set_job_status(job_id, "cancelled")
@@ -751,7 +803,17 @@ def process_youtube(req: YouTubeRequest):
             else:
                 logger.error("Job %s download worker failed: %s", job_id, e, exc_info=True)
                 _set_job_status(job_id, "error")
-                _push_event(job_id, "job_error", {"message": "Failed to download audio from YouTube."})
+                parsed_err = parse_youtube_dl_error(str(e))
+                _push_event(
+                    job_id,
+                    "job_error",
+                    {
+                        "message": parsed_err.user_friendly_message,
+                        "error_type": parsed_err.error_type,
+                        "suggest_upload": parsed_err.suggest_upload,
+                        "detail": str(e),
+                    },
+                )
 
     threading.Thread(target=worker, daemon=True).start()
     return {"job_id": job_id, "meta": meta}
@@ -1193,6 +1255,12 @@ def create_exam(req: ExamGenerateRequest):
     }
 
 
+@app.get("/api/exam/attention-research")
+def get_attention_research():
+    """Return scientific literature metadata, findings, and drop-off timestamps."""
+    return ATTENTION_RESEARCH_INFO
+
+
 @app.get("/api/exam/{exam_id}")
 def get_exam(exam_id: str):
     exam = load_exam(exam_id)
@@ -1256,6 +1324,51 @@ def submit_exam(req: ExamSubmitRequest):
     exam["result"] = result_payload
     save_exam(exam)
     return result_payload
+
+
+@app.post("/api/exam/popquiz")
+def get_popquiz_question(req: PopQuizRequest):
+    """Return a single instant pop-quiz question based on the lecture's terms at current playback time."""
+    job = JOBS.get(req.job_id)
+    if not job or not job.get("result"):
+        raise HTTPException(status_code=404, detail="Job or extracted terms not found")
+    res = job["result"]
+    terms = res.get("llm", {}).get("terms", [])
+    if not terms:
+        raise HTTPException(status_code=400, detail="No extracted terms available for this lecture.")
+    lang = res.get("lang", "en")
+    profile = load_profile()
+    pq = make_popquiz_question(
+        terms=terms,
+        current_time_s=req.current_time_s,
+        lang=lang,
+        profile=profile,
+    )
+    if not pq:
+        raise HTTPException(status_code=404, detail="Unable to generate pop-quiz question.")
+    meta = res.get("video_meta") or {}
+    pq["video_id"] = meta.get("id", "")
+    pq["video_title"] = meta.get("title", "")
+    return pq
+
+
+@app.post("/api/exam/quick-answer")
+def record_quick_answer(req: PopQuizAnswerRequest):
+    """Record a single pop-quiz answer into the student learner profile in real-time."""
+    if not req.term:
+        raise HTTPException(status_code=400, detail="Term is required")
+    profile = load_profile()
+    rec = update_mastery(profile, req.term, req.correct, video_id=req.video_id or "")
+    save_profile(profile)
+    return {
+        "status": "ok",
+        "term": rec.get("term"),
+        "mastery": rec.get("mastery"),
+        "focus": rec.get("focus"),
+        "seen": rec.get("seen"),
+        "stats": profile.get("stats"),
+    }
+
 
 
 @app.get("/api/learner/profile")
@@ -1363,6 +1476,373 @@ def get_helper_slide(req: HelperSlideRequest):
         "analogy": analogy_text,
         "slide_spec": slide_spec,
     }
+
+
+@app.post("/api/cornell-notes")
+def get_cornell_study_sheet(req: CornellNotesRequest):
+    """Generate or retrieve a full Cornell Note-Taking Study Sheet for the active lecture."""
+    job = JOBS.get(req.job_id)
+    if not job or not job.get("result"):
+        cand_id = f"preview_{req.job_id}" if not req.job_id.startswith("preview_") else req.job_id
+        if cand_id in JOBS and JOBS[cand_id].get("result"):
+            job = JOBS[cand_id]
+        else:
+            try:
+                payload = fetch_instant_transcript(req.job_id)
+                JOBS[payload["job_id"]] = {"result": payload, "status": "completed"}
+                job = JOBS[payload["job_id"]]
+            except Exception:
+                pass
+    if not job or not job.get("result"):
+        for j in reversed(list(JOBS.values())):
+            if j.get("result"):
+                job = j
+                break
+    if not job or not job.get("result"):
+        raise HTTPException(status_code=404, detail="Job or lecture result not found")
+
+    res = job["result"]
+    lang = res.get("lang", "tr")
+    sheet = generate_cornell_study_sheet(res, custom_title=req.custom_title, lang=lang)
+    return sheet
+
+
+@app.get("/api/export-cornell-markdown/{job_id}")
+def export_cornell_markdown(job_id: str):
+    """Download the Cornell Study Sheet as a clean Markdown (.md) document."""
+    job = JOBS.get(job_id)
+    if not job or not job.get("result"):
+        cand_id = f"preview_{job_id}" if not job_id.startswith("preview_") else job_id
+        if cand_id in JOBS and JOBS[cand_id].get("result"):
+            job = JOBS[cand_id]
+        else:
+            try:
+                payload = fetch_instant_transcript(job_id)
+                JOBS[payload["job_id"]] = {"result": payload, "status": "completed"}
+                job = JOBS[payload["job_id"]]
+            except Exception:
+                pass
+    if not job or not job.get("result"):
+        for j in reversed(list(JOBS.values())):
+            if j.get("result"):
+                job = j
+                break
+    if not job or not job.get("result"):
+        raise HTTPException(status_code=404, detail="Lecture not found")
+
+    res = job["result"]
+    lang = res.get("lang", "tr")
+    sheet = generate_cornell_study_sheet(res, lang=lang)
+    md_content = sheet.get("markdown", "")
+    filename = f"cornell_study_sheet_{job_id}.md"
+
+    from fastapi.responses import Response
+    return Response(
+        content=md_content,
+        media_type="text/markdown; charset=utf-8",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
+class ConceptGraphRequest(BaseModel):
+    job_id: Optional[str] = None
+    custom_title: Optional[str] = None
+    terms: Optional[list[dict]] = None
+    segments: Optional[list[dict]] = None
+    lang: Optional[str] = "tr"
+
+
+@app.post("/api/concept-graph")
+def get_concept_knowledge_graph(req: ConceptGraphRequest):
+    """Generate an Ausubel-grounded Concept Knowledge Graph with video timestamps and semantic relations."""
+    res = None
+    if req.job_id:
+        job = JOBS.get(req.job_id)
+        if not job or not job.get("result"):
+            cand_id = f"preview_{req.job_id}" if not req.job_id.startswith("preview_") else req.job_id
+            if cand_id in JOBS and JOBS[cand_id].get("result"):
+                job = JOBS[cand_id]
+            else:
+                try:
+                    payload = fetch_instant_transcript(req.job_id)
+                    JOBS[payload["job_id"]] = {"result": payload, "status": "completed"}
+                    job = JOBS[payload["job_id"]]
+                except Exception:
+                    pass
+        if job and job.get("result"):
+            res = job["result"]
+
+    if not res:
+        # Check if terms were directly posted
+        if req.terms:
+            res = {
+                "llm": {"terms": req.terms},
+                "asr": {"segments": req.segments or []},
+                "video_meta": {"title": req.custom_title or "Ders Kavram Ağı"},
+                "lang": req.lang or "tr",
+            }
+        else:
+            # Fallback to latest available job with result
+            for j in reversed(list(JOBS.values())):
+                if j.get("result"):
+                    res = j["result"]
+                    break
+
+    if not res:
+        # Predefined benchmark fallback
+        res = {
+            "llm": {"terms": []},
+            "asr": {"segments": []},
+            "video_meta": {"title": req.custom_title or "Proje Yönetimi & EVM"},
+            "lang": req.lang or "tr",
+        }
+
+    lang = req.lang or res.get("lang", "tr")
+    graph = build_concept_knowledge_graph(res, lang=lang)
+    if req.custom_title:
+        graph["title"] = req.custom_title
+
+    return {"status": "ok", "graph": graph}
+
+
+class SocraticChatRequest(BaseModel):
+    job_id: Optional[str] = None
+    message: str
+    history: Optional[list[dict]] = None
+    current_time_s: Optional[float] = None
+    terms: Optional[list[dict]] = None
+    segments: Optional[list[dict]] = None
+    lang: Optional[str] = "tr"
+    use_llm: Optional[bool] = False
+
+
+@app.post("/api/socratic-chat")
+def socratic_chat_endpoint(req: SocraticChatRequest):
+    """Handle student questions using Socratic scaffolding based on Vanzo et al. (ACL 2025)."""
+    res = None
+    if req.job_id:
+        job = JOBS.get(req.job_id)
+        if not job or not job.get("result"):
+            cand_id = f"preview_{req.job_id}" if not req.job_id.startswith("preview_") else req.job_id
+            if cand_id in JOBS and JOBS[cand_id].get("result"):
+                job = JOBS[cand_id]
+            else:
+                try:
+                    payload = fetch_instant_transcript(req.job_id)
+                    JOBS[payload["job_id"]] = {"result": payload, "status": "completed"}
+                    job = JOBS[payload["job_id"]]
+                except Exception:
+                    pass
+        if job and job.get("result"):
+            res = job["result"]
+
+    terms = req.terms or (res.get("llm", {}).get("terms") if res else [])
+    segments = req.segments or (res.get("asr", {}).get("segments") if res else [])
+    lang = req.lang or (res.get("lang") if res else "tr")
+
+    result = generate_socratic_response(
+        user_message=req.message,
+        history=req.history or [],
+        current_time_s=req.current_time_s,
+        terms=terms,
+        segments=segments,
+        lang=lang,
+        use_llm=bool(req.use_llm),
+    )
+    return result
+
+
+@app.post("/api/manimator/generate")
+def generate_manimator_video(req: ManimatorGenerateRequest):
+    """Generate custom narrated animated video tailored to the exact concept the student struggles with."""
+    recent_text = req.context or ""
+    active_terms = []
+    lang = req.lang or "tr"
+    topic_title = (req.topic or "").strip()
+
+    # If job_id provided, extract context around current_time_s
+    if req.job_id:
+        job = JOBS.get(req.job_id)
+        if not job or not job.get("result"):
+            cand_id = f"preview_{req.job_id}" if not req.job_id.startswith("preview_") else req.job_id
+            if cand_id in JOBS and JOBS[cand_id].get("result"):
+                job = JOBS[cand_id]
+            else:
+                try:
+                    payload = fetch_instant_transcript(req.job_id)
+                    JOBS[payload["job_id"]] = {"result": payload, "status": "completed"}
+                    job = JOBS[payload["job_id"]]
+                except Exception:
+                    pass
+
+        if job and job.get("result"):
+            res = job["result"]
+            asr = res.get("asr", {})
+            segments = asr.get("segments", [])
+            terms = res.get("llm", {}).get("terms", [])
+            lang = res.get("lang", lang)
+
+            t = max(0.0, float(req.current_time_s))
+            window_start = max(0.0, t - 45.0)
+            window_end = t + 10.0
+
+            if not recent_text:
+                recent_segments = [
+                    s for s in segments
+                    if s.get("start") is not None and s.get("end") is not None
+                    and float(s["end"]) >= window_start and float(s["start"]) <= window_end
+                ]
+                if recent_segments:
+                    recent_text = " ".join(s.get("text", "").strip() for s in recent_segments)
+                elif asr.get("text"):
+                    recent_text = asr.get("text", "")[:350]
+
+            if not topic_title:
+                # 1. First priority: find term closest to timestamp t
+                timed_candidates = []
+                for term_obj in terms:
+                    t_start = term_obj.get("start")
+                    if t_start is not None:
+                        dist = abs(float(t_start) - t)
+                        timed_candidates.append((dist, term_obj.get("term", "").strip()))
+                if timed_candidates:
+                    timed_candidates.sort(key=lambda x: x[0])
+                    topic_title = timed_candidates[0][1]
+
+                # 2. Second priority: term explicitly mentioned in recent_text
+                if not topic_title and recent_text:
+                    recent_lower = recent_text.lower()
+                    for term_obj in terms:
+                        t_name = term_obj.get("term", "").strip()
+                        if t_name and t_name.lower() in recent_lower:
+                            topic_title = t_name
+                            break
+
+                if not topic_title and terms:
+                    topic_title = terms[0].get("term", "Ders Bölümü")
+
+    if not topic_title:
+        topic_title = "Ders Kavramı"
+
+    try:
+        explainer_result = produce_student_explainer_video(
+            topic=topic_title,
+            context=recent_text,
+            lang=lang,
+            video_style=req.video_style or "manim_animation",
+            duration_s=req.duration_s or 50,
+            voice=req.voice,
+            use_local_qwen=req.use_local_qwen,
+            model_id=req.model_id or "Qwen/Qwen3.5-4B",
+        )
+    except Exception as exc:
+        logger.error("Manimator generation error: %s", exc, exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Manimator video generation failed: {exc}")
+
+    # Record remediation event in learner profile
+    try:
+        focus_terms = [
+            t_item.get("term", "").strip()
+            for t_item in explainer_result.get("terms", [])[:2]
+        ]
+        focus_terms = [t for t in focus_terms if t]
+        if focus_terms:
+            profile = load_profile()
+            for t_str in focus_terms:
+                update_mastery(
+                    profile,
+                    t_str,
+                    False,
+                    video_id=explainer_result.get("video_id", ""),
+                )
+            save_profile(profile)
+    except Exception:
+        logger.warning("Failed to record manimator remediation in learner profile", exc_info=True)
+
+    MANIMATOR_HISTORY.insert(0, {
+        "video_id": explainer_result["video_id"],
+        "title": explainer_result["title"],
+        "video_url": explainer_result["video_url"],
+        "duration_s": explainer_result["duration_s"],
+        "created_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+        "terms": [t.get("term") for t in explainer_result.get("terms", [])],
+    })
+
+    return explainer_result
+
+
+@app.post("/api/manimator/pdf-to-video")
+async def generate_pdf_video(
+    file: UploadFile = File(...),
+    topic: Optional[str] = Form(""),
+    video_style: str = Form("manim_animation"),
+    duration_s: int = Form(50),
+    voice: Optional[str] = Form(None),
+    lang: str = Form("tr"),
+):
+    """Upload PDF and turn it directly into a narrated Manim or Figure Walkthrough video."""
+    safe_name = Path((file.filename or "").replace("\\", "/")).name.strip() or "Ders_Belgesi.pdf"
+    temp_pdf = Path(tempfile.gettempdir()) / f"upload_{uuid.uuid4().hex[:8]}_{safe_name}"
+    try:
+        contents = await file.read()
+        temp_pdf.write_bytes(contents)
+
+        doc_topic = topic.strip() or Path(safe_name).stem.replace("_", " ")
+
+        explainer_result = produce_student_explainer_video(
+            topic=doc_topic,
+            context="",
+            lang=lang,
+            video_style=video_style,
+            duration_s=duration_s,
+            voice=voice,
+            pdf_path=temp_pdf,
+            use_local_qwen=False,
+        )
+
+        MANIMATOR_HISTORY.insert(0, {
+            "video_id": explainer_result["video_id"],
+            "title": explainer_result["title"],
+            "video_url": explainer_result["video_url"],
+            "duration_s": explainer_result["duration_s"],
+            "created_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+            "source": safe_name,
+        })
+
+        return explainer_result
+    except Exception as exc:
+        logger.error("PDF to Video failed: %s", exc, exc_info=True)
+        raise HTTPException(status_code=500, detail=f"PDF video processing failed: {exc}")
+    finally:
+        temp_pdf.unlink(missing_ok=True)
+
+
+@app.get("/api/manimator/history")
+def get_manimator_history():
+    """Retrieve history of generated explainer videos."""
+    return {"videos": MANIMATOR_HISTORY[:25]}
+
+
+@app.get("/api/manimator/video/{filename}")
+def stream_manimator_video(filename: str):
+    """Stream generated MP4 video with range support."""
+    safe_name = os.path.basename(filename)
+    path = VIDEOS_DIR / safe_name
+    if not path.exists():
+        raise HTTPException(status_code=404, detail="Video not found")
+    return FileResponse(path, media_type="video/mp4", filename=safe_name)
+
+
+@app.get("/api/manimator/audio/{filename}")
+def stream_manimator_audio(filename: str):
+    """Stream generated narration audio (MP3)."""
+    safe_name = os.path.basename(filename)
+    path = MANIMATOR_TEMP_DIR / safe_name
+    if not path.resolve().is_relative_to(MANIMATOR_TEMP_DIR.resolve()):
+        raise HTTPException(status_code=400, detail="Invalid audio filename")
+    if not path.exists():
+        raise HTTPException(status_code=404, detail="Audio not found")
+    return FileResponse(path, media_type="audio/mpeg", filename=safe_name)
 
 
 # Mount static assets

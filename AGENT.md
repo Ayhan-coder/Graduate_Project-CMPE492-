@@ -4,19 +4,11 @@ project_metadata:
   title_en: "A Two-Layer Evaluation of Speech-to-Text and LLM-Based Terminology Extraction Systems for Multilingual Education"
   project_code: "Bitirme Projesi 2026"
   institutions:
-    - name: "Koç Üniversitesi"
+    - name: "Boğaziçi Üniversitesi"
       department: "Bilgisayar Mühendisliği Bölümü"
-    - name: "Tatilsepeti"
-      department: "Ar-Ge Merkezi"
   authors:
-    - name: "Çakıl Yılmaz"
-      affiliation: "Koç Üniversitesi"
-    - name: "Berat Enes Dadak"
-      affiliation: "Tatilsepeti Ar-Ge"
-    - name: "Efe Batur Giritli"
-      affiliation: "Tatilsepeti Ar-Ge"
-    - name: "Yekta Said Can"
-      affiliation: "Tatilsepeti Ar-Ge"
+    - name: "Ali Ayhan Günder"
+      affiliation: "Boğaziçi Üniversitesi"
   date: "Eylül 2026"
   license: "MIT (Kod), Modeller kendi lisanslarını korur"
 
@@ -123,6 +115,7 @@ architecture:
       learner_profile: "Aralıklı tekrar (spaced-repetition) tabanlı ustalık kazancı ve unutma eğrisi"
       exam_generator: "Ders terimlerinden otomatik 4 seçenekli çoktan seçmeli soru (MCQ) ve bilgi kartı (Flashcard) üretimi"
       helper_slides: "Terim hiyerarşisi, Mermaid akış şemaları ve pedagojik ipucu slayt sentezi"
+      manimator_module: "Takıldığım Yeri Öğret (Öğrencinin anlamadığı noktaya özel Qwen 3.5 B1 senaryo + Edge-TTS + Manim Community render + Paper2Video Figure Walkthrough)"
     architectural_caveats:
       - "CORS politikası açık ('*') yerel geliştirme modundadır."
       - "İş kuyruğu kalıcı veri tabanı yerine bellek içi sözlükte (in-memory dict) tutulur."

@@ -53,8 +53,8 @@ class TestPresentationPackage(unittest.TestCase):
         self.assertIn("1.000", html_content)
         # PABAK
         self.assertIn("0.948", html_content)
-        # 213 unit tests
-        self.assertIn("213", html_content)
+        # 226 unit tests
+        self.assertIn("226", html_content)
 
     def test_slides_md_marp_frontmatter_and_slides(self):
         """Verify slides.md has valid Marp structure and 16 slide sections."""
@@ -70,9 +70,9 @@ class TestPresentationPackage(unittest.TestCase):
         self.assertGreaterEqual(len(sections), 16, f"Expected at least 16 slides, got {len(sections)}")
 
     def test_defense_qa_guide_content(self):
-        """Ensure DEFENSE_QA_GUIDE.md covers 15 critical questions and 7 guardrails."""
+        """Ensure DEFENSE_QA_GUIDE.md covers 18 critical questions and 7 guardrails."""
         guide_content = (PRESENTATION_DIR / "DEFENSE_QA_GUIDE.md").read_text(encoding="utf-8")
-        for i in range(1, 16):
+        for i in range(1, 19):
             self.assertIn(f"Soru {i}:", guide_content, f"Missing Soru {i} in DEFENSE_QA_GUIDE.md")
 
         for g in range(1, 8):

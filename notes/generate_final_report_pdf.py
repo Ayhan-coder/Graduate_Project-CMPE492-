@@ -107,7 +107,7 @@ class ThesisNumberedCanvas(canvas.Canvas):
         self.line(18 * mm, 12 * mm, w - 18 * mm, 12 * mm)
         self.setFont(F_BODY, 7.5)
         self.setFillColor(MUTED)
-        self.drawString(18 * mm, 7.5 * mm, "Eylül 2026  ·  Bitirme Projesi Raporu  ·  Tatilsepeti Ar-Ge & Koç Üniversitesi")
+        self.drawString(18 * mm, 7.5 * mm, "Eylül 2026  ·  Bitirme Projesi Raporu  ·  Boğaziçi Üniversitesi")
         self.setFont(F_BOLD, 7.5)
         self.setFillColor(NAVY)
         self.drawRightString(w - 18 * mm, 7.5 * mm, f"Sayfa {self._pageNumber} / {total_pages}")
@@ -455,8 +455,8 @@ def build_thesis_pdf():
         topMargin=15 * mm,
         bottomMargin=15 * mm,
         title="Çok Dilli Eğitim İçin ASR ve LLM Tabanlı Terminoloji Çıkarma Sistemlerinin İki Katmanlı Değerlendirilmesi",
-        author="Çakıl Yılmaz, Berat Enes Dadak, Efe Batur Giritli, Yekta Said Can",
-        subject="Bitirme Projesi Raporu - Koç Üniversitesi & Tatilsepeti Ar-Ge",
+        author="Ali Ayhan Günder",
+        subject="Bitirme Projesi Raporu - Boğaziçi Üniversitesi Bilgisayar Mühendisliği Bölümü",
     )
 
     printable_w = 595.27 - 2 * 15 * 2.834645  # ~510 pt
@@ -466,8 +466,8 @@ def build_thesis_pdf():
     # 1. FORMAL COVER PAGE
     # =========================================================================
     story.append(Spacer(1, 10 * mm))
-    story.append(Paragraph("KOÇ ÜNİVERSİTESİ &bull; BİLGİSAYAR MÜHENDİSLİĞİ BÖLÜMÜ", STYLES["cover_inst"]))
-    story.append(Paragraph("TATİLSEPETİ AR-GE MERKEZİ İŞBİRLİĞİ", STYLES["cover_dept"]))
+    story.append(Paragraph("BOĞAZİÇİ ÜNİVERSİTESİ &bull; BİLGİSAYAR MÜHENDİSLİĞİ BÖLÜMÜ", STYLES["cover_inst"]))
+    story.append(Paragraph("BİLGİSAYAR MÜHENDİSLİĞİ LİSANS BİTİRME TEZİ", STYLES["cover_dept"]))
     story.append(Spacer(1, 12 * mm))
 
     story.append(HRFlowable(width="100%", thickness=2.0, color=GOLD, spaceBefore=0, spaceAfter=8 * mm))
@@ -488,12 +488,9 @@ def build_thesis_pdf():
 
     story.append(HRFlowable(width="100%", thickness=0.8, color=LINE, spaceBefore=0, spaceAfter=10 * mm))
 
-    story.append(Paragraph("ARAŞTIRMACILAR VE YAZARLAR", STYLES["cover_author_label"]))
+    story.append(Paragraph("ARAŞTIRMACI VE YAZAR", STYLES["cover_author_label"]))
     story.append(Spacer(1, 2 * mm))
-    story.append(Paragraph("<b>Çakıl Yılmaz</b> (Koç Üniversitesi)", STYLES["cover_author_val"]))
-    story.append(Paragraph("<b>Berat Enes Dadak</b> (Tatilsepeti Ar-Ge)", STYLES["cover_author_val"]))
-    story.append(Paragraph("<b>Efe Batur Giritli</b> (Tatilsepeti Ar-Ge)", STYLES["cover_author_val"]))
-    story.append(Paragraph("<b>Yekta Said Can</b> (Tatilsepeti Ar-Ge)", STYLES["cover_author_val"]))
+    story.append(Paragraph("<b>Ali Ayhan Günder</b> (Boğaziçi Üniversitesi)", STYLES["cover_author_val"]))
 
     story.append(Spacer(1, 12 * mm))
 
@@ -506,17 +503,17 @@ def build_thesis_pdf():
         ],
         [
             Paragraph("Tez Danışmanı", STYLES["table_cell_bold"]),
-            Paragraph("Koç Üniversitesi Bilgisayar Müh.", STYLES["table_cell"]),
-            Paragraph("....................................", STYLES["table_cell_center"]),
-        ],
-        [
-            Paragraph("Sanayi Danışmanı", STYLES["table_cell_bold"]),
-            Paragraph("Tatilsepeti Ar-Ge Merkezi", STYLES["table_cell"]),
+            Paragraph("Boğaziçi Üniversitesi Bilgisayar Müh.", STYLES["table_cell"]),
             Paragraph("....................................", STYLES["table_cell_center"]),
         ],
         [
             Paragraph("Jüri Üyesi", STYLES["table_cell_bold"]),
-            Paragraph("Koç Üniversitesi Bilgisayar Müh.", STYLES["table_cell"]),
+            Paragraph("Boğaziçi Üniversitesi Bilgisayar Müh.", STYLES["table_cell"]),
+            Paragraph("....................................", STYLES["table_cell_center"]),
+        ],
+        [
+            Paragraph("Jüri Üyesi", STYLES["table_cell_bold"]),
+            Paragraph("Boğaziçi Üniversitesi Bilgisayar Müh.", STYLES["table_cell"]),
             Paragraph("....................................", STYLES["table_cell_center"]),
         ],
     ]
@@ -817,7 +814,7 @@ def build_thesis_pdf():
     story.append(Paragraph("7. Donanım, Bellek Darboğazı ve Gecikme Profili", STYLES["h1"]))
     story.append(
         Paragraph(
-            "Deneysel çalışmalar Tatilsepeti Ar-Ge ve Koç Üniversitesi işbirliği kapsamında aşağıdaki laboratuvar donanımında yürütülmüştür:<br/>"
+            "Deneysel çalışmalar Boğaziçi Üniversitesi Bilgisayar Mühendisliği Bölümü bünyesinde aşağıdaki laboratuvar donanımında yürütülmüştür:<br/>"
             "&bull; <b>İşlemci:</b> Intel Core i7-14650HX (16 Çekirdek, 24 İş Parçacığı, 5.2 GHz Turbo)<br/>"
             "&bull; <b>Grafik İşlemci (GPU):</b> NVIDIA GeForce RTX 5060 Laptop GPU (8 GB GDDR6 VRAM, CUDA 13.0)<br/>"
             "&bull; <b>Sistem Belleği:</b> 32 GB DDR5 &bull; <b>Yazılım:</b> Windows 11 64-bit, Python 3.12, PyTorch 2.12.0+cu130, ReportLab 4.4+.<br/><br/>"

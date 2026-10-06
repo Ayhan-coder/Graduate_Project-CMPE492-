@@ -1,11 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>EduTerm AI — Speech-to-Terminology Studio</title>
   <meta name="description" content="State-of-the-art interactive speech-to-terminology extraction and CEFR B1 explanation studio for educational YouTube lectures.">
   
+  <script>
+    (function() {
+      try {
+        var t = localStorage.getItem("eduterm-theme") || "light";
+        document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    })();
+  </script>
+
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,8 +23,32 @@
   <style>
     /* Critical anti-FOUC & immediate modal concealment */
     html, body {
+      background: #f8fafc !important;
+      color: #0f172a;
+    }
+    html[data-theme="light"], html[data-theme="light"] body {
+      background: #f8fafc !important;
+      color: #0f172a;
+    }
+    html[data-theme="dark"], html[data-theme="dark"] body {
       background: #0a0d14 !important;
       color: #f3f4f6;
+    }
+    html[data-theme="nordic"], html[data-theme="nordic"] body {
+      background: #0b132b !important;
+      color: #f0f9ff;
+    }
+    html[data-theme="emerald"], html[data-theme="emerald"] body {
+      background: #05140e !important;
+      color: #ecfdf5;
+    }
+    html[data-theme="sunset"], html[data-theme="sunset"] body {
+      background: #13091f !important;
+      color: #fff1f2;
+    }
+    html[data-theme="sepia"], html[data-theme="sepia"] body {
+      background: #191512 !important;
+      color: #fef3c7;
     }
     .hidden {
       display: none !important;
@@ -34,7 +67,7 @@
       display: flex !important;
     }
   </style>
-  <link rel="stylesheet" href="/static/style.css?v=2.6">
+  <link rel="stylesheet" href="/static/style.css?v=2.7">
 </head>
 <body>
   <div class="app-container">
@@ -67,18 +100,36 @@
 
       <div class="system-pills" id="systemPills">
         <button type="button" class="pill pill-transcript-toggle" id="btnToggleRightSidebar" title="İnteraktif Transkript Panelini Aç/Kapat (Kısayol: T)">
-          <span class="transcript-icon">📜</span>
+          <span class="transcript-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span>
           <span>Transkript</span>
           <span class="pill-counter" id="headerTranscriptBadge">0</span>
           <span class="nav-kbd">T</span>
         </button>
         <button type="button" class="pill pill-eyetracker" id="btnToggleEyeTrackerPill" title="Eye Tracker & Attention Monitor Status">
-          <span class="eyetracker-icon">👁️</span>
+          <span class="eyetracker-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></span>
           <span id="eyeTrackerPillBadge">Eye Tracker: Off</span>
         </button>
         <button type="button" class="pill pill-learner" id="btnOpenLearnerProfile" title="View student background and mastery tracking">
-          <span class="learner-icon">🎓</span>
+          <span class="learner-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></svg></span>
           <span id="learnerProfileBadge">Student Profile</span>
+        </button>
+        <button type="button" class="pill pill-manimator" id="btnNavManimator" title="Manimator Studio: Takıldığın Konuya Özel 60s Video Üret (Qwen 3.5 + Manim)">
+          <span class="manimator-icon"><svg class="ui-icon" viewBox="0 0 24 24"><rect width="20" height="20" x="2" y="2" rx="2.18"/><path d="M7 2v20M17 2v20M2 12h20M2 7h5M2 17h5M17 17h5M17 7h5"/></svg></span>
+          <span id="manimatorPillBadge">Manimator Video</span>
+        </button>
+        <button type="button" class="pill pill-cornell" id="btnNavCornell" title="Cornell Formatında Akıllı Ders Notu & PDF Dışa Aktar">
+          <span class="cornell-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><polyline points="10 2 10 10 13 7 16 10 16 2"/></svg></span>
+          <span>Cornell Notu</span>
+        </button>
+        <button type="button" class="pill pill-graph" id="btnNavConceptGraph" title="İnteraktif Kavram Ağı & Bilgi Grafiği (Ausubel Modeli) (Kısayol: G)">
+          <span class="graph-icon"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></span>
+          <span>Kavram Ağı</span>
+          <span class="nav-kbd">G</span>
+        </button>
+        <button type="button" class="pill pill-socratic" id="btnNavSocratic" title="Sokratik Yapay Zekâ Çalışma Arkadaşı (Vanzo et al., ACL 2025) (Kısayol: S)">
+          <span class="socratic-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="13" y2="13"/></svg></span>
+          <span>Hocaya Sor</span>
+          <span class="nav-kbd">S</span>
         </button>
         <div class="pill pill-gpu" id="pillGpu">
           <span class="status-dot online"></span>
@@ -87,6 +138,67 @@
         <div class="pill pill-mode">
           <span class="pill-tag">B1 LEVEL</span>
           <span>CEFR Explanations</span>
+        </div>
+        <div class="theme-picker-wrapper" id="themePickerWrapper">
+          <button type="button" class="pill pill-theme-toggle" id="btnToggleTheme" title="Tema Seç veya Değiştir (Kısayol: L / Tıkla)">
+            <span class="theme-toggle-icon" id="themeToggleIcon"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></span>
+            <span id="themeToggleLabel">Light</span>
+            <span class="theme-caret">▾</span>
+            <span class="nav-kbd">L</span>
+          </button>
+          <div class="theme-dropdown-menu" id="themeDropdownMenu" role="menu" aria-label="Tema Seçimi">
+            <div class="theme-menu-header"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24M14.83 9.17l4.24-4.24M14.83 14.83l4.24 4.24M9.17 14.83l-4.24 4.24"/></svg> Tema Seçimi</div>
+            <div class="theme-menu-items">
+              <button type="button" class="theme-menu-item active" data-theme-id="light">
+                <span class="theme-item-icon"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></span>
+                <div class="theme-item-meta">
+                  <span class="theme-item-name">Light</span>
+                  <span class="theme-item-desc">Açık Akademik (Varsayılan)</span>
+                </div>
+                <span class="theme-swatch swatch-light"></span>
+              </button>
+              <button type="button" class="theme-menu-item" data-theme-id="dark">
+                <span class="theme-item-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></span>
+                <div class="theme-item-meta">
+                  <span class="theme-item-name">Midnight Dark</span>
+                  <span class="theme-item-desc">Derin Obsidiyen Gece</span>
+                </div>
+                <span class="theme-swatch swatch-dark"></span>
+              </button>
+              <button type="button" class="theme-menu-item" data-theme-id="nordic">
+                <span class="theme-item-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="m10 20-1.25-2.5L6 18M10 4 8.75 6.5 6 6M14 20l1.25-2.5L18 18M14 4l1.25 2.5L18 6M2 12h20M12 2v20"/></svg></span>
+                <div class="theme-item-meta">
+                  <span class="theme-item-name">Nordic Frost</span>
+                  <span class="theme-item-desc">Buzul Mavisi & Kutup</span>
+                </div>
+                <span class="theme-swatch swatch-nordic"></span>
+              </button>
+              <button type="button" class="theme-menu-item" data-theme-id="emerald">
+                <span class="theme-item-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M11 20A7 7 0 0 1 4 13C4 7 11 3 20 3c0 9-4 16-9 17ZM8 12c4 0 8-4 8-8"/></svg></span>
+                <div class="theme-item-meta">
+                  <span class="theme-item-name">Emerald Zen</span>
+                  <span class="theme-item-desc">Zümrüt Ormanı & Odak</span>
+                </div>
+                <span class="theme-swatch swatch-emerald"></span>
+              </button>
+              <button type="button" class="theme-menu-item" data-theme-id="sunset">
+                <span class="theme-item-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 10V2M2 18h20M20 18a8 8 0 0 0-16 0M22 22H2M8 6l4-4 4 4"/></svg></span>
+                <div class="theme-item-meta">
+                  <span class="theme-item-name">Cyber Sunset</span>
+                  <span class="theme-item-desc">Neon Mercan & Alacakaranlık</span>
+                </div>
+                <span class="theme-swatch swatch-sunset"></span>
+              </button>
+              <button type="button" class="theme-menu-item" data-theme-id="sepia">
+                <span class="theme-item-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2zM22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span>
+                <div class="theme-item-meta">
+                  <span class="theme-item-name">Sepia Scholar</span>
+                  <span class="theme-item-desc">Antik Kütüphane & Pergament</span>
+                </div>
+                <span class="theme-swatch swatch-sepia"></span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </header>
@@ -106,7 +218,7 @@
               <span class="drawer-sub-badge" id="mediaStatusBadge">Video Yükle / Çek</span>
             </div>
           </div>
-          <button type="button" class="btn-close-drawer" id="btnCloseLeftSidebar" title="Paneli Kapat (Kısayol: M)">✕</button>
+          <button type="button" class="btn-close-drawer" id="btnCloseLeftSidebar" title="Paneli Kapat (Kısayol: M)"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
         </div>
 
         <div class="sidebar-drawer-body control-panel">
@@ -238,11 +350,11 @@
           <!-- Action Buttons -->
           <div class="action-buttons-row">
             <button type="button" class="btn btn-primary btn-run" id="btnRunPipeline">
-              <span class="btn-icon">⚡</span>
+              <span class="btn-icon"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
               <span class="btn-text">Run Pipeline</span>
             </button>
             <button type="button" class="btn btn-cancel hidden" id="btnCancelJob" title="Cancel active job and unload models from GPU">
-              <span class="btn-icon">✕</span>
+              <span class="btn-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></span>
               <span class="btn-text">Cancel</span>
             </button>
           </div>
@@ -265,35 +377,132 @@
       <main class="workspace-center-stage" id="centerStage">
         <!-- Floating Edge Toggles (shown when sidebars are collapsed) -->
         <button type="button" class="floating-edge-toggle edge-left" id="btnEdgeOpenLeft" title="Medya & Pipeline Panelini Aç (M)" aria-label="Medya & Pipeline Panelini Aç">
-          <span class="edge-icon">📂</span>
+          <span class="edge-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg></span>
         </button>
         <button type="button" class="floating-edge-toggle edge-right" id="btnEdgeOpenRight" title="İnteraktif Transkripti Aç (T)" aria-label="İnteraktif Transkripti Aç">
-          <span class="edge-icon">📜</span>
+          <span class="edge-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/></svg></span>
         </button>
 
         <section class="results-panel">
-          <!-- Empty Placeholder State -->
-          <div class="empty-state glass-card" id="emptyState">
-            <div class="empty-icon-ring">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 14.5h-2v-2h2zm0-4.5h-2V7h2z"/>
-              </svg>
+          <!-- Empty Placeholder State / Modern Studio Launchpad -->
+          <div class="empty-state launchpad-container glass-card" id="emptyState">
+            <div class="launchpad-badge-row">
+              <span class="launchpad-pill">
+                <span class="sparkle-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg></span>
+                <span>EduTerm AI Studio • Cross-Layer Speech-to-Terminology</span>
+              </span>
             </div>
-            <h2>Ready to Transcribe & Analyze</h2>
-            <p>Sol panelden YouTube bağlantısı yapıştırın veya video/ses dosyası yükleyerek otomatik transkripsiyon ve terim analizini başlatın.</p>
-            <div class="demo-hints">
-              <span>Quick Samples:</span>
-              <button type="button" class="demo-chip" data-url="https://www.youtube.com/watch?v=rz5JCvMlCMs">TR-1: Project Management</button>
-              <button type="button" class="demo-chip" data-url="https://www.youtube.com/watch?v=yzsHZVU_Y7w">TR-2: Tourism Training</button>
-              <button type="button" class="demo-chip" data-url="https://www.youtube.com/watch?v=BaH04m_fS1c">EN-1: Agile Methodologies</button>
-              <button type="button" class="demo-chip" data-url="https://www.youtube.com/watch?v=2IK3DFHRFfw">EN-3: Generative AI</button>
+
+            <div class="launchpad-hero">
+              <div class="launchpad-icon-halo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="halo-svg">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                  <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                </svg>
+              </div>
+              <h2 class="launchpad-title">Ders Videosunu Analiz Etmeye Başlayın</h2>
+              <p class="launchpad-desc">
+                Sol panelden dilediğiniz YouTube eğitim videosunu bağlayın veya yerel video/ses yükleyin.
+                GPU hızlandırmalı transkripsiyon, CEFR B1 düzeyinde terim çıkarma ve akıllı öğrenme asistanını tek tıkla başlatın.
+              </p>
             </div>
-            <div style="margin-top: 1.25rem; display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap;">
-              <button type="button" class="btn btn-primary" id="btnOpenMediaFromEmpty" title="Sol Medya Panelini Aç">
-                📂 Medya ve Video Yükleme Panelini Aç (M)
+
+            <!-- Launchpad Quick Action Cards -->
+            <div class="launchpad-samples-section">
+              <div class="launchpad-section-header">
+                <span class="section-label"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Hızlı Başlangıç Ders Örnekleri (1-Tıkla İncele):</span>
+              </div>
+              <div class="launchpad-cards-grid">
+                <div class="demo-chip launchpad-card" data-url="https://www.youtube.com/watch?v=rz5JCvMlCMs">
+                  <div class="lpc-header">
+                    <span class="lpc-flag-badge tr">TR</span>
+                    <span class="lpc-tag tr">TR-1</span>
+                    <span class="lpc-duration">12:01</span>
+                  </div>
+                  <h4 class="lpc-title">Proje Yönetimi & Kontrol Sistemi</h4>
+                  <p class="lpc-subtitle">TR-1: Project Management • Anadolu Üniversitesi</p>
+                  <div class="lpc-footer">
+                    <span class="lpc-model">Whisper Turbo + Qwen 3.5</span>
+                    <span class="lpc-action">Yükle →</span>
+                  </div>
+                </div>
+
+                <div class="demo-chip launchpad-card" data-url="https://www.youtube.com/watch?v=yzsHZVU_Y7w">
+                  <div class="lpc-header">
+                    <span class="lpc-flag-badge tr">TR</span>
+                    <span class="lpc-tag tr">TR-2</span>
+                    <span class="lpc-duration">15:40</span>
+                  </div>
+                  <h4 class="lpc-title">Turizm Eğitimi & Müşteri İlişkileri</h4>
+                  <p class="lpc-subtitle">TR-2: Tourism Training • Anadolu Üniversitesi</p>
+                  <div class="lpc-footer">
+                    <span class="lpc-model">Whisper Turbo + Qwen 3.5</span>
+                    <span class="lpc-action">Yükle →</span>
+                  </div>
+                </div>
+
+                <div class="demo-chip launchpad-card" data-url="https://www.youtube.com/watch?v=BaH04m_fS1c">
+                  <div class="lpc-header">
+                    <span class="lpc-flag-badge en">EN</span>
+                    <span class="lpc-tag en">EN-1</span>
+                    <span class="lpc-duration">08:32</span>
+                  </div>
+                  <h4 class="lpc-title">Agile Methodologies & Scrum</h4>
+                  <p class="lpc-subtitle">EN-1: Agile Methodologies • Software Engineering</p>
+                  <div class="lpc-footer">
+                    <span class="lpc-model">Whisper Turbo + Qwen 3.5</span>
+                    <span class="lpc-action">Load →</span>
+                  </div>
+                </div>
+
+                <div class="demo-chip launchpad-card" data-url="https://www.youtube.com/watch?v=2IK3DFHRFfw">
+                  <div class="lpc-header">
+                    <span class="lpc-flag-badge en">EN</span>
+                    <span class="lpc-tag en">EN-3</span>
+                    <span class="lpc-duration">10:45</span>
+                  </div>
+                  <h4 class="lpc-title">Generative AI & LLM Architecture</h4>
+                  <p class="lpc-subtitle">EN-3: Generative AI • Deep Learning Architecture</p>
+                  <div class="lpc-footer">
+                    <span class="lpc-model">Whisper Turbo + Qwen 3.5</span>
+                    <span class="lpc-action">Load →</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Launchpad Core Features Highlights -->
+            <div class="launchpad-features-row">
+              <div class="lp-feature-pill">
+                <span class="lp-feat-icon"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
+                <div class="lp-feat-text">
+                  <strong>0.025 RTF Turbo Hız</strong>
+                  <small>Whisper Large-v3 Turbo ile GPU üzerinde anında transkripsiyon</small>
+                </div>
+              </div>
+              <div class="lp-feature-pill">
+                <span class="lp-feat-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/><path d="M12 5v13"/></svg></span>
+                <div class="lp-feat-text">
+                  <strong>CEFR B1 Adaptif Terimler</strong>
+                  <small>Öğrenci seviyesine duyarlı yalın kavram açıklamaları</small>
+                </div>
+              </div>
+              <div class="lp-feature-pill">
+                <span class="lp-feat-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></span>
+                <div class="lp-feat-text">
+                  <strong>Göz Takibi & Akıllı Slayt</strong>
+                  <small>Dikkat dağınıklığında oto-duraklama ve Mermaid akış şeması</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bottom Direct Controls -->
+            <div class="launchpad-actions">
+              <button type="button" class="btn btn-primary btn-glow" id="btnOpenMediaFromEmpty" title="Sol Medya Panelini Aç">
+                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg> Medya & Video Panelini Aç (M)
               </button>
               <button type="button" class="btn btn-secondary" id="btnLaunchPlayerDirect" title="Doğrudan oynatıcıyı aç ve Göz Takipçisini test et">
-                ▶️ Oynatıcıyı Aç & Göz Takibini Başlat
+                <svg class="ui-icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg> Oynatıcıyı Aç & Göz Takibini Başlat
               </button>
             </div>
           </div>
@@ -320,9 +529,9 @@
                 <div class="attention-pause-overlay hidden" id="attentionPauseOverlay">
                   <div class="attention-alert-card glass-card">
                     <div class="attention-icon-ring pulse-warning">
-                      <span class="alert-emoji">⚠️</span>
+                      <span class="alert-emoji" id="attentionAlertEmoji"><svg class="ui-icon ui-icon-lg" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
                     </div>
-                    <h3 class="attention-title">Dikkat Dağınıklığı Algılandı!</h3>
+                    <h3 class="attention-title" id="attentionAlertTitle">Dikkat Dağınıklığı Algılandı!</h3>
                     <p class="attention-desc" id="attentionPauseReason">Gözleriniz veya başınız ekrandan uzaklaştığı için video otomatik olarak duraklatıldı.</p>
                     <div class="attention-live-status">
                       <span class="live-dot yellow" id="attentionLiveDot"></span>
@@ -347,7 +556,7 @@
                       <span class="status-pulse-dot" id="pipStatusDot"></span>
                       <span id="pipStatusText">Odaklandı</span>
                     </div>
-                    <button type="button" class="pip-btn" id="btnMinimizePip" title="Kamera HUD'unu Gizle">✕</button>
+                    <button type="button" class="pip-btn" id="btnMinimizePip" title="Kamera HUD'unu Gizle"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
                   </div>
                   <div class="pip-video-wrapper">
                     <video id="webcamVideo" autoplay playsinline muted class="pip-webcam-feed"></video>
@@ -368,15 +577,30 @@
               <div class="eyetracker-toolbar">
                 <div class="eyetracker-primary-actions">
                   <button type="button" class="btn btn-sm btn-eyetracker-toggle" id="btnToggleEyeTracker">
-                    <span class="et-icon">👁️</span>
+                    <span class="et-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></span>
                     <span id="etToggleText">Göz Takibini Başlat</span>
                   </button>
                   <button type="button" class="btn btn-sm btn-ghost btn-pip-toggle" id="btnTogglePip" title="Kamera HUD Penceresini Aç/Kapat">
-                    📷 Kamera HUD
+                    <svg class="ui-icon" viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg> Kamera HUD
                   </button>
                   <button type="button" class="btn btn-sm btn-helper-slide" id="btnOpenHelperSlide" title="Bu konuyu anlamadım! Videoyu durdur ve yardımcı slaytı göster (Kısayol: H)">
-                    <span class="btn-icon">💡</span>
+                    <span class="btn-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5M9 18h6M10 22h4"/></svg></span>
                     <span>Anlamadım / Yardımcı Slayt</span>
+                  </button>
+                  <button type="button" class="btn btn-sm btn-manimator-trigger" id="btnOpenManimator" title="Bu konuyu anlamadım! Bana özel 60 saniyelik animasyonlu video üret (Manimator + Qwen 3.5)">
+                    <span class="btn-icon"><svg class="ui-icon" viewBox="0 0 24 24"><rect width="20" height="20" x="2" y="2" rx="2.18"/><path d="M7 2v20M17 2v20M2 12h20M2 7h5M2 17h5M17 17h5M17 7h5"/></svg></span>
+                    <span>Özel Video Üret (Manimator)</span>
+                  </button>
+                  <button type="button" class="btn btn-sm btn-cornell-trigger" id="btnOpenCornellToolbar" title="Cornell Formatında Akıllı Ders Notu & PDF Dışa Aktar (Kısayol: C)">
+                    <span class="btn-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><polyline points="10 2 10 10 13 7 16 10 16 2"/></svg></span>
+                    <span>Cornell Notu (.PDF)</span>
+                  </button>
+                  <button type="button" class="btn btn-sm btn-popquiz-trigger" id="btnTestPopQuiz" title="Bilişsel Bilimsel Dikkat Pop-Quiz'ini Şimdi Test Et (Saniyeyi beklemeden çalıştır)">
+                    <span class="btn-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/><path d="M12 5v13"/></svg></span>
+                    <span>Test Pop-Quiz</span>
+                  </button>
+                  <button type="button" class="btn btn-sm btn-ghost btn-research-info" id="btnOpenResearchModal" title="Makaleleri ve Bilimsel Araştırma Dayanaklarını İncele">
+                    <span><svg class="ui-icon" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Bilimsel Dayanak</span>
                   </button>
                 </div>
                 <div class="eyetracker-stats-inline">
@@ -385,16 +609,37 @@
                     <span id="etStatusLabel">Takip Kapalı</span>
                   </div>
                   <div class="et-stat-pill" title="Toplam Dağınıklık Duraklatması">
-                    <span class="et-stat-icon">⏸️</span>
+                    <span class="et-stat-icon"><svg class="ui-icon" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg></span>
                     <span id="etPauseCount">0</span> duraklatma
                   </div>
+                  <div class="et-stat-pill" title="Sekme Değiştirme ve Ekran Dışı Sayısı">
+                    <span class="et-stat-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg></span>
+                    <span id="etTabSwitchCount">0</span> sekme
+                  </div>
                   <div class="et-stat-pill" title="Ortalama Odaklanma Oranı">
-                    <span class="et-stat-icon">🎯</span>
+                    <span class="et-stat-icon"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span>
                     <span id="etFocusPercent">-%</span> odak
                   </div>
                 </div>
                 <div class="eyetracker-settings-inline">
-                  <label class="et-switch-label" title="Ekrana tekrar odaklandığında videoyu otomatik başlat">
+                  <div class="popquiz-mode-select-wrap" title="Dikkatin düştüğü saniyelerde videoyu durdurup pop-quiz çözdürme modu">
+                    <span class="mini-label"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/><path d="M12 5v13"/></svg> Pop-Quiz:</span>
+                    <select id="selectPopQuizMode" class="et-select-mini" title="Ders videosunda dikkatin düştüğü saniyelerde duraklatıp pop-quiz sorma modu">
+                      <option value="scientific" selected>Bilimsel (180s, 300s, 360s, 600s)</option>
+                      <option value="frequent">Sık (120s, 240s, 360s)</option>
+                      <option value="demo">Hızlı Demo (45s, 90s, 135s)</option>
+                      <option value="disabled">Kapalı</option>
+                    </select>
+                  </div>
+                  <label class="et-switch-label" title="Başka bir sekmeye geçildiğinde veya pencere dışına çıkıldığında videoyu otomatik duraklat">
+                    <input type="checkbox" id="chkTabPause" checked>
+                    <span><svg class="ui-icon" viewBox="0 0 24 24"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg> Sekmede Durdur</span>
+                  </label>
+                  <label class="et-switch-label" title="Ekrana bakılmadığında veya gözler ekrandan uzaklaştığında videoyu otomatik duraklat">
+                    <input type="checkbox" id="chkWatchPause" checked>
+                    <span><svg class="ui-icon" viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg> İzlenmeyince Durdur</span>
+                  </label>
+                  <label class="et-switch-label" title="Ekrana tekrar odaklandığında veya sekmeye dönüldüğünde videoyu otomatik başlat">
                     <input type="checkbox" id="chkAutoResume" checked>
                     <span>Oto-Devam</span>
                   </label>
@@ -409,23 +654,38 @@
               <!-- Diagnostics Bar -->
               <div class="diagnostics-bar">
                 <div class="diag-item">
-                  <span class="diag-label">ASR Speed</span>
+                  <div class="diag-header-mini">
+                    <span class="diag-icon"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
+                    <span class="diag-label">ASR RTF Hızı</span>
+                  </div>
                   <span class="diag-val" id="diagRtf">0.00 RTF</span>
                 </div>
                 <div class="diag-item">
-                  <span class="diag-label">ASR Time</span>
+                  <div class="diag-header-mini">
+                    <span class="diag-icon"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
+                    <span class="diag-label">ASR Süresi</span>
+                  </div>
                   <span class="diag-val" id="diagAsrLat">0.0s</span>
                 </div>
                 <div class="diag-item">
-                  <span class="diag-label">LLM Extraction</span>
+                  <div class="diag-header-mini">
+                    <span class="diag-icon"><svg class="ui-icon" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 9h6v6H9zM9 1v2M15 1v2M9 21v2M15 21v2M1 9h2M1 15h2M21 9h2M21 15h2"/></svg></span>
+                    <span class="diag-label">LLM Çıkarımı</span>
+                  </div>
                   <span class="diag-val" id="diagLlmLat">0.0s</span>
                 </div>
                 <div class="diag-item">
-                  <span class="diag-label">Terms Extracted</span>
+                  <div class="diag-header-mini">
+                    <span class="diag-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="m21 2-2 2m-1.5 1.5L14 9l-4-4-6 6 4 4 3-3 2 2 3-3 2 2 5-5Z"/><circle cx="7.5" cy="15.5" r="2.5"/></svg></span>
+                    <span class="diag-label">Çıkarılan Terim</span>
+                  </div>
                   <span class="diag-val highlight" id="diagTermsCount">0</span>
                 </div>
                 <div class="diag-item">
-                  <span class="diag-label">Language</span>
+                  <div class="diag-header-mini">
+                    <span class="diag-icon"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></svg></span>
+                    <span class="diag-label">Algılanan Dil</span>
+                  </div>
                   <span class="diag-val" id="diagLang">—</span>
                 </div>
               </div>
@@ -452,7 +712,7 @@
               <div class="output-header">
                 <div class="terms-title-group">
                   <div class="terms-title-badge">
-                    <span class="terms-icon">🔑</span>
+                    <span class="terms-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="m21 2-2 2m-1.5 1.5L14 9l-4-4-6 6 4 4 3-3 2 2 3-3 2 2 5-5Z"/><circle cx="7.5" cy="15.5" r="2.5"/></svg></span>
                     <h3>Çıkarılan Terimler</h3>
                   </div>
                   <span class="terms-count-badge" id="termCounterBadge"><span id="termCounter">0</span> Terim</span>
@@ -461,7 +721,7 @@
                 <!-- Export Hub & Exam Actions & Quick Transcript Toggle -->
                 <div class="export-actions">
                   <button type="button" class="btn btn-sm btn-outline-glow btn-open-trans-quick" id="btnQuickOpenTranscript" title="Sağ İnteraktif Transkript Panelini Aç (T)">
-                    📜 Transkripti Aç
+                    <svg class="ui-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/></svg> Transkripti Aç
                   </button>
                   <button type="button" class="btn btn-sm btn-primary btn-practice-exam" id="btnStartPracticeExam" title="Launch LLM Practice Exam (Flashcards & Quiz)">
                     <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
@@ -471,7 +731,13 @@
                     AI Practice Exam
                   </button>
                   <button type="button" class="btn btn-sm btn-outline btn-instant-exam" id="btnStartInstantExam" title="Instant Practice Exam directly from lecture cards (< 0.1s)">
-                    ⚡ Instant Exam
+                    <svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Instant Exam
+                  </button>
+                  <button type="button" class="btn btn-sm btn-outline-glow btn-cornell-notes" id="btnOpenCornellNotes" title="Cornell Formatında Akıllı Ders Notu & PDF Dışa Aktar">
+                    <svg class="ui-icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><polyline points="10 2 10 10 13 7 16 10 16 2"/></svg> Cornell Notu (PDF)
+                  </button>
+                  <button type="button" class="btn btn-sm btn-outline-glow btn-concept-graph" id="btnOpenConceptGraph" title="Kavram Ağı / Bilgi Grafiğini Gör (Ausubel Modeli)">
+                    <svg class="ui-icon" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Kavram Ağı (Graph)
                   </button>
                   <button type="button" class="btn btn-sm btn-ghost" id="btnExportCsv" title="Export CSV for Annotation Protocol">
                     <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
@@ -489,8 +755,14 @@
 
               <!-- Terms Filter Row -->
               <div class="terms-filter-row">
-                <input type="text" id="termsSearchInput" placeholder="Filter terms or explanations..." class="filter-input">
-                <span class="terms-count-badge" id="filteredTermsCount">Showing all terms</span>
+                <div class="terms-search-wrapper">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" class="terms-search-icon">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                  <input type="text" id="termsSearchInput" placeholder="Terim veya açıklamalarda filtrele..." class="filter-input">
+                </div>
+                <span class="terms-count-badge" id="filteredTermsCount">Tüm terimler gösteriliyor</span>
               </div>
 
               <!-- Terms Cards Grid -->
@@ -512,7 +784,7 @@
       <aside class="sidebar-drawer right-sidebar glass-card" id="rightSidebar" aria-label="Interactive Transcript Drawer">
         <div class="sidebar-drawer-header">
           <div class="sidebar-drawer-title">
-            <span class="drawer-header-icon">📜</span>
+            <span class="drawer-header-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/></svg></span>
             <div>
               <h3>İnteraktif Transkript</h3>
               <p class="drawer-subtitle"><span id="transcriptCounter">0</span> konuşma satırı</p>
@@ -520,23 +792,145 @@
           </div>
           <div class="sidebar-header-tools">
             <button type="button" class="btn btn-xs btn-ghost" id="btnCopyTranscript" title="Tam transkript metnini panoya kopyala">Kopyala</button>
-            <button type="button" class="btn-close-drawer" id="btnCloseRightSidebar" title="Transkript Panelini Kapat (Kısayol: T)">✕</button>
+            <button type="button" class="btn-close-drawer" id="btnCloseRightSidebar" title="Transkript Panelini Kapat (Kısayol: T)"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
           </div>
         </div>
 
-        <div class="transcript-drawer-body">
+        <!-- Drawer Tab Switcher: Transcript vs Concept Graph vs Socratic Tutor -->
+        <div class="drawer-mode-tabs" role="tablist">
+          <button type="button" class="drawer-mode-tab active" id="tabDrawerTranscript" role="tab" aria-selected="true">
+            <svg class="ui-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <span>Transkript</span>
+          </button>
+          <button type="button" class="drawer-mode-tab" id="tabDrawerGraph" role="tab" aria-selected="false">
+            <svg class="ui-icon" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            <span>Kavram Ağı</span>
+          </button>
+          <button type="button" class="drawer-mode-tab" id="tabDrawerSocratic" role="tab" aria-selected="false">
+            <svg class="ui-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="13" y2="13"/></svg>
+            <span>Hocaya Sor</span>
+          </button>
+        </div>
+
+        <!-- Transcript Drawer Body -->
+        <div class="transcript-drawer-body" id="transcriptDrawerBody">
           <div class="transcript-search-wrap">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" class="transcript-search-icon">
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
             <input type="text" id="transcriptSearchInput" placeholder="Transkript içinde ara..." class="transcript-search-input">
-            <button type="button" class="btn-clear-search hidden" id="btnClearTranscriptSearch">✕</button>
+            <button type="button" class="btn-clear-search hidden" id="btnClearTranscriptSearch"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
           </div>
           <div class="transcript-hint-bar">
-            <span>💡 Cümleye tıklayarak o ana gidebilirsiniz. Konuşma akışında aktif cümle otomatik takip edilir.</span>
+            <span><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> Cümleye tıklayarak o ana gidebilirsiniz. Konuşma akışında aktif cümle otomatik takip edilir.</span>
           </div>
           <div class="transcript-scroll" id="transcriptScroll"></div>
+
+          <!-- Mini Socratic AI Tutor Dock (Below Transcript) -->
+          <div class="socratic-mini-dock" id="socraticMiniDock">
+            <div class="socratic-dock-header">
+              <div class="socratic-dock-title">
+                <span class="socratic-pulse-dot"></span>
+                <span class="socratic-badge-label">Hocaya Sor</span>
+                <span class="socratic-pedagogy-tag">Sokratik / ACL '25</span>
+              </div>
+              <button type="button" class="btn btn-xs btn-ghost btn-switch-to-socratic" id="btnSwitchToSocratic" title="Tam Sokratik Sohbete Geç">
+                <span>Tam Sohbet</span>
+                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+              </button>
+            </div>
+            <!-- Quick Chips Carousel -->
+            <div class="socratic-quick-chips" id="socraticMiniQuickChips">
+              <button type="button" class="socratic-chip" data-prompt="Bu formülü anlamadım, mantığını açıklar mısın?">
+                <svg class="chip-svg-icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                <span>Formülü Anlamadım</span>
+              </button>
+              <button type="button" class="socratic-chip" data-prompt="Neden maliyet sapması negatif çıktı?">
+                <svg class="chip-svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                <span>Neden Negatif?</span>
+              </button>
+              <button type="button" class="socratic-chip" data-prompt="Bu kavram için günlük hayattan bir örnek verebilir misin?">
+                <svg class="chip-svg-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <span>Günlük Hayat Örneği</span>
+              </button>
+              <button type="button" class="socratic-chip" data-prompt="Sınavda bu konudan nasıl soru çıkar?">
+                <svg class="chip-svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                <span>Sınav Sorusu Sor</span>
+              </button>
+            </div>
+            <!-- Mini Input Form -->
+            <form class="socratic-input-bar" id="socraticMiniForm" onsubmit="return false;">
+              <input type="text" id="socraticMiniInput" placeholder="Hocaya bir soru sor..." class="socratic-input" autocomplete="off">
+              <button type="submit" class="btn-socratic-send" id="btnSendSocraticMini" title="Soruyu Gönder">
+                <svg class="ui-icon" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Concept Graph Drawer Panel -->
+        <div class="concept-graph-drawer-body hidden" id="conceptGraphDrawerBody">
+          <div class="drawer-graph-header-actions">
+            <span class="drawer-graph-badge" id="drawerGraphBadge">0 Kavram Bağlantısı</span>
+            <button type="button" class="btn btn-xs btn-outline-glow" id="btnExpandGraphModal" title="Tam Ekranda Genişlet (G)">
+              <svg class="ui-icon" viewBox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg> Genişlet
+            </button>
+          </div>
+          <div class="drawer-graph-quick-search">
+            <input type="text" id="drawerGraphSearchInput" placeholder="Kavramlarda saniye ara..." class="filter-input">
+          </div>
+          <div class="drawer-graph-nodes-list" id="drawerGraphNodesList">
+            <!-- Dynamically populated concept cards with timestamps -->
+          </div>
+        </div>
+
+        <!-- Socratic AI Tutor Dedicated Drawer View -->
+        <div class="socratic-drawer-body hidden" id="socraticDrawerBody">
+          <div class="socratic-chat-header">
+            <div class="socratic-tutor-meta">
+              <div class="socratic-avatar">
+                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 2a8 8 0 0 0-8 8c0 3.31 2.02 6.16 4.9 7.37L8 22l4-2 4 2-.9-4.63C17.98 16.16 20 13.31 20 10a8 8 0 0 0-8-8z"/><circle cx="9" cy="10" r="1"/><circle cx="15" cy="10" r="1"/></svg>
+              </div>
+              <div>
+                <h4>Sokratik AI Çalışma Arkadaşı</h4>
+                <p class="socratic-subtitle">Cevabı vermek yerine yönlendirici sorularla derin kavrayış (Vanzo et al., ACL 2025)</p>
+              </div>
+            </div>
+            <button type="button" class="btn btn-xs btn-ghost" id="btnClearSocraticChat" title="Sohbeti Temizle">Temizle</button>
+          </div>
+
+          <!-- Messages Scroll View -->
+          <div class="socratic-messages-scroll" id="socraticMessagesContainer">
+            <!-- Initial Greeting Message -->
+            <div class="socratic-msg msg-assistant">
+              <div class="socratic-bubble">
+                <p>👋 Merhaba! Ben senin <strong>Sokratik Çalışma Arkadaşınım</strong>. Ders videosunu dinlerken takıldığın herhangi bir formülü, kavramı veya cümleyi bana sorabilirsin.</p>
+                <div class="socratic-guiding-box">
+                  <span class="socratic-guide-title">🧠 Nasıl Çalışırım? (Vanzo et al., ACL 2025):</span>
+                  <p>Doğrudan cevabı ezberletmek yerine, sana doğru cevabı kendin bulmanı sağlayacak 1-2 yönlendirici soru sorarım. Böylece bilgiler zihninde kalıcı olur!</p>
+                </div>
+                <div class="socratic-suggested-row">
+                  <button type="button" class="socratic-chip" data-prompt="Bu formülü anlamadım, mantığını açıklar mısın?">💡 Bu formülü anlamadım</button>
+                  <button type="button" class="socratic-chip" data-prompt="Neden maliyet sapması negatif çıktı?">❓ Neden negatif çıktı?</button>
+                  <button type="button" class="socratic-chip" data-prompt="Kazanılmış değer ile gerçekleşen maliyet farkı ne?">🔍 EV ile AC farkı ne?</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chat Input Footer -->
+          <div class="socratic-chat-footer">
+            <div class="socratic-quick-chips" id="socraticChatQuickChips">
+              <!-- Dynamically populated suggested responses -->
+            </div>
+            <form class="socratic-input-bar" id="socraticFullForm" onsubmit="return false;">
+              <input type="text" id="socraticFullInput" placeholder="Aklına takılanı sor veya bir cevabı tahmin et..." class="socratic-input" autocomplete="off">
+              <button type="submit" class="btn-socratic-send" id="btnSendSocraticFull" title="Gönder">
+                <svg class="ui-icon" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              </button>
+            </form>
+          </div>
         </div>
       </aside>
 
@@ -554,7 +948,7 @@
           <h2 class="modal-title" id="examModalTitle">Practice Exam</h2>
           <p class="modal-subtitle" id="examModalSubtitle">Reinforce domain terminology from this lecture</p>
         </div>
-        <button type="button" class="btn-close-modal" id="btnCloseExamModal" aria-label="Close modal">✕</button>
+        <button type="button" class="btn-close-modal" id="btnCloseExamModal" aria-label="Close modal"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
       </div>
 
       <div class="modal-body" id="examModalBody">
@@ -563,7 +957,7 @@
           <div class="exam-spinner"></div>
           <h3 id="examLoadingMsg">Drafting practice exam from lecture terms...</h3>
           <p class="exam-loading-sub">Preparing interactive flashcards and multiple-choice questions.</p>
-          <button type="button" class="btn btn-sm btn-outline" id="btnInstantExamFallback" style="margin-top: 1.25rem;">⚡ Switch to Instant Mode (< 1s)</button>
+          <button type="button" class="btn btn-sm btn-outline" id="btnInstantExamFallback" style="margin-top: 1.25rem;"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Switch to Instant Mode (< 1s)</button>
         </div>
 
         <!-- State 2: Active Exam Container -->
@@ -606,17 +1000,17 @@
             <!-- Self-grade controls for flashcards -->
             <div class="flashcard-grade-bar">
               <button type="button" class="btn btn-grade btn-grade-review" id="btnGradeReview">
-                <span class="grade-icon">❌</span>
+                <span class="grade-icon"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></span>
                 <div>
                   <strong>Need Review</strong>
                   <small>Weight higher in future</small>
                 </div>
               </button>
               <button type="button" class="btn btn-secondary btn-flip-action" id="btnFlipCard">
-                <span>🔄 Flip (Space)</span>
+                <span><svg class="ui-icon" viewBox="0 0 24 24"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg> Flip (Space)</span>
               </button>
               <button type="button" class="btn btn-grade btn-grade-known" id="btnGradeMastered">
-                <span class="grade-icon">✅</span>
+                <span class="grade-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span>
                 <div>
                   <strong>I Know This</strong>
                   <small>Lower weight / brief</small>
@@ -650,7 +1044,7 @@
 
           <div class="exam-adaptive-feedback glass-card">
             <h4>
-              <span class="feedback-icon">⚖️</span>
+              <span class="feedback-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10M12 3v18M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg></span>
               Adaptive Weighting Impact for Future Analyses
             </h4>
             <p id="examAdaptiveSummaryText">Summary will appear here.</p>
@@ -689,7 +1083,7 @@
           <h2 class="modal-title">Learner Profile & Adaptive Weights</h2>
           <p class="modal-subtitle">Your exam history and terminology mastery weights</p>
         </div>
-        <button type="button" class="btn-close-modal" id="btnCloseLearnerModal" aria-label="Close modal">✕</button>
+        <button type="button" class="btn-close-modal" id="btnCloseLearnerModal" aria-label="Close modal"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
       </div>
 
       <div class="modal-body">
@@ -712,7 +1106,7 @@
         <!-- How Adaptive Weighting Works Card -->
         <div class="adaptive-explainer-card">
           <div class="explainer-header">
-            <span class="explainer-icon">🧠</span>
+            <span class="explainer-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/><path d="M12 5v13"/></svg></span>
             <strong>How Your Background Affects Upcoming LLM Analyses</strong>
           </div>
           <p class="explainer-text">
@@ -765,18 +1159,18 @@
     <div class="modal-window helper-slide-window glass-card theme-aurora" id="slideWindowWrapper">
       <div class="slide-header">
         <div class="slide-badge-row">
-          <span class="slide-pill">💡 Akıllı Sunum Slaytı</span>
+          <span class="slide-pill"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5M9 18h6M10 22h4"/></svg> Akıllı Sunum Slaytı</span>
           <span class="slide-time-badge" id="slideTimeRange">00:00 - 00:00</span>
           <span class="slide-shortcut-hint">Kısayol: H</span>
         </div>
         <div class="slide-header-tools">
           <select id="selectSlideTheme" class="slide-theme-select" title="Slayt Görsel Teması">
-            <option value="theme-aurora" selected>🌌 Dark Aurora</option>
-            <option value="theme-cyan">⚡ Cyber Neon</option>
-            <option value="theme-slate">🏛️ Academic Slate</option>
+            <option value="theme-aurora" selected>Dark Aurora</option>
+            <option value="theme-cyan">Cyber Neon</option>
+            <option value="theme-slate">Academic Slate</option>
           </select>
-          <button type="button" class="btn-fullscreen-slide" id="btnFullscreenSlide" title="Tam Ekran Slayt Modu">⛶</button>
-          <button type="button" class="btn-close-modal" id="btnCloseHelperSlide" aria-label="Close slide">✕</button>
+          <button type="button" class="btn-fullscreen-slide" id="btnFullscreenSlide" title="Tam Ekran Slayt Modu"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg></button>
+          <button type="button" class="btn-close-modal" id="btnCloseHelperSlide" aria-label="Close slide"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
         </div>
       </div>
 
@@ -790,11 +1184,11 @@
         <!-- Slide View Mode Segmented Control Bar -->
         <div class="slide-view-mode-bar">
           <div class="slide-view-mode-pills" role="tablist">
-            <button type="button" class="btn-view-pill active" data-view="split" id="btnViewSplit" title="Dengeli Görünüm: Şema ve terimler yan yana, her ikisi de ekranda">📑 Dengeli (Yan Yana)</button>
-            <button type="button" class="btn-view-pill" data-view="diagram" id="btnViewDiagram" title="Şema Odaklı: Şemayı tam genişlikte büyütür, terimleri alt şeride alır">📊 Geniş Şema Odaklı</button>
-            <button type="button" class="btn-view-pill" data-view="cards" id="btnViewCards" title="Terim & Not Odaklı: Kavram açıklamalarına ve sınav kurallarına odaklanır">📚 Terimler & Notlar</button>
+            <button type="button" class="btn-view-pill active" data-view="split" id="btnViewSplit" title="Dengeli Görünüm: Şema ve terimler yan yana, her ikisi de ekranda"><svg class="ui-icon" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M12 3v18"/></svg> Dengeli (Yan Yana)</button>
+            <button type="button" class="btn-view-pill" data-view="diagram" id="btnViewDiagram" title="Şema Odaklı: Şemayı tam genişlikte büyütür, terimleri alt şeride alır"><svg class="ui-icon" viewBox="0 0 24 24"><rect width="6" height="6" x="3" y="3" rx="1"/><rect width="6" height="6" x="15" y="15" rx="1"/><path d="M9 6h6a3 3 0 0 1 3 3v6M9 6v6a3 3 0 0 0 3 3h3"/></svg> Geniş Şema Odaklı</button>
+            <button type="button" class="btn-view-pill" data-view="cards" id="btnViewCards" title="Terim & Not Odaklı: Kavram açıklamalarına ve sınav kurallarına odaklanır"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10"/></svg> Terimler & Notlar</button>
           </div>
-          <button type="button" class="btn-lightbox-trigger" id="btnOpenDiagramLightbox" title="Şemayı tam sayfa büyüteç/ışık masası penceresinde aç">🔍 Şemayı Büyüt (Lightbox)</button>
+          <button type="button" class="btn-lightbox-trigger" id="btnOpenDiagramLightbox" title="Şemayı tam sayfa büyüteç/ışık masası penceresinde aç"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg> Şemayı Büyüt (Lightbox)</button>
         </div>
 
         <!-- 2-Column Presentation Deck Grid -->
@@ -803,7 +1197,7 @@
           <div class="slide-col slide-col-left">
             <div class="slide-core-box">
               <div class="slide-box-header">
-                <span class="box-icon">📌</span>
+                <span class="box-icon"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="12" x2="12" y1="17" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg></span>
                 <h4>Temel Anlatım (CEFR B1 Düzeyi)</h4>
               </div>
               <p class="slide-core-text" id="slideCoreSummary">Özet yükleniyor...</p>
@@ -813,11 +1207,11 @@
             <div class="slide-diagram-box" id="slideDiagramBox">
               <div class="slide-box-header slide-diagram-header">
                 <div class="slide-diagram-title-group">
-                  <span class="box-icon">📊</span>
+                  <span class="box-icon"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="16"/></svg></span>
                   <h4>Kavram Haritası & Akış Şeması</h4>
                 </div>
                 <div class="slide-diagram-tools">
-                  <button type="button" class="btn-diagram-tool btn-lb-direct" id="btnOpenLightboxDirect" title="Şemayı bağımsız Büyüteç penceresinde incele">🔍 Büyüteç</button>
+                  <button type="button" class="btn-diagram-tool btn-lb-direct" id="btnOpenLightboxDirect" title="Şemayı bağımsız Büyüteç penceresinde incele"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg> Büyüteç</button>
                 </div>
               </div>
               <div class="slide-mermaid-wrapper" id="slideMermaidWrapper">
@@ -831,7 +1225,7 @@
             <!-- Key Terms Grid -->
             <div class="slide-terms-section">
               <div class="slide-box-header">
-                <span class="box-icon">🔑</span>
+                <span class="box-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="m21 2-2 2m-1.5 1.5L14 9l-4-4-6 6 4 4 3-3 2 2 3-3 2 2 5-5Z"/><circle cx="7.5" cy="15.5" r="2.5"/></svg></span>
                 <h4>Kilit Terimler & Açıklamalar</h4>
               </div>
               <div class="slide-terms-grid" id="slideTermsGrid"></div>
@@ -840,7 +1234,7 @@
             <!-- Analogy Box -->
             <div class="slide-analogy-box" id="slideAnalogyBox">
               <div class="slide-box-header">
-                <span class="box-icon">🧠</span>
+                <span class="box-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/><path d="M12 5v13"/></svg></span>
                 <h4>Günlük Hayattan Benzetme (Analogy)</h4>
               </div>
               <p class="slide-analogy-text" id="slideAnalogyText"></p>
@@ -849,7 +1243,7 @@
             <!-- Exam Golden Tip Box -->
             <div class="slide-exam-tip-box" id="slideExamTipBox">
               <div class="slide-box-header">
-                <span class="box-icon">⭐</span>
+                <span class="box-icon"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
                 <h4>Sınav & Uygulama Altın Kuralı</h4>
               </div>
               <p class="slide-exam-tip-text" id="slideExamTipText"></p>
@@ -859,7 +1253,7 @@
 
         <!-- Recent Transcript Quote Pill -->
         <div class="slide-quote-pill">
-          <span class="quote-icon">📝</span>
+          <span class="quote-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
           <span class="quote-label">Eğitmenin Son Cümlesi:</span>
           <span class="quote-text" id="slideTranscriptQuote">"..."</span>
         </div>
@@ -869,18 +1263,21 @@
       <div class="slide-footer-bar">
         <div class="slide-footer-left">
           <button type="button" class="btn btn-sm btn-deep-ai" id="btnDeepSlideAI" title="Local Qwen 3.5 modeli ile slaytı ve kavram şemasını baştan tasarla">
-            ✨ Qwen 3.5 ile Yeniden Tasarla
+            <svg class="ui-icon" viewBox="0 0 24 24"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg> Qwen 3.5 ile Yeniden Tasarla
           </button>
           <button type="button" class="btn btn-sm btn-ghost" id="btnSlideSpeak" title="Slayt özetini sesli oku">
-            🔊 Sesli Dinle
+            <svg class="ui-icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg> Sesli Dinle
+          </button>
+          <button type="button" class="btn btn-sm btn-manimator-slide-btn" id="btnSlideToManimator" title="Bu konuyu 60 saniyelik sesli Manim animasyon videosuna dönüştür">
+            <svg class="ui-icon" viewBox="0 0 24 24"><rect width="20" height="20" x="2" y="2" rx="2.18"/><path d="M7 2v20M17 2v20M2 12h20M2 7h5M2 17h5M17 17h5M17 7h5"/></svg> 60s Video Olarak İzle
           </button>
         </div>
         <div class="slide-footer-right">
           <button type="button" class="btn btn-sm btn-secondary btn-rewind" id="btnSlideRewind10" title="10 saniye geri sararak bu konuyu tekrar dinle">
-            ⏪ 10 sn Geri Al ve İzle
+            <svg class="ui-icon" viewBox="0 0 24 24"><polygon points="11 19 2 12 11 5 11 19"/><polygon points="22 19 13 12 22 5 22 19"/></svg> 10 sn Geri Al ve İzle
           </button>
           <button type="button" class="btn btn-sm btn-primary btn-slide-resume" id="btnSlideResume">
-            ▶️ Kaldığım Yerden Devam Et
+            <svg class="ui-icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg> Kaldığım Yerden Devam Et
           </button>
         </div>
       </div>
@@ -892,26 +1289,739 @@
     <div class="modal-window diagram-lightbox-window glass-card">
       <div class="lightbox-header">
         <div class="lightbox-title-group">
-          <span class="box-icon">📊</span>
+          <span class="box-icon"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="16"/></svg></span>
           <div>
             <h3 id="lightboxDiagramTitle">Kavram Haritası & Akış Şeması (Büyüteç Görünümü)</h3>
             <p class="lightbox-subtitle">Ctrl + Fare Tekerleği veya butonlar ile yakınlaştırın, sürükleyerek gezinin</p>
           </div>
         </div>
         <div class="lightbox-zoom-bar">
-          <button type="button" class="btn-diagram-tool" id="btnLbZoomOut" title="Küçült">➖</button>
+          <button type="button" class="btn-diagram-tool" id="btnLbZoomOut" title="Küçült"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
           <span class="diagram-zoom-badge" id="lbZoomLevel">150%</span>
-          <button type="button" class="btn-diagram-tool" id="btnLbZoomIn" title="Büyüt">➕</button>
-          <button type="button" class="btn-diagram-tool" id="btnLbReset" title="Sıfırla">↺</button>
-          <button type="button" class="btn-close-modal" id="btnCloseDiagramLightbox" aria-label="Kapat">✕</button>
+          <button type="button" class="btn-diagram-tool" id="btnLbZoomIn" title="Büyüt"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+          <button type="button" class="btn-diagram-tool" id="btnLbReset" title="Sıfırla"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
+          <button type="button" class="btn-close-modal" id="btnCloseDiagramLightbox" aria-label="Kapat"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
         </div>
       </div>
       <div class="lightbox-body" id="lightboxDiagramWrapper">
         <div id="lightboxDiagramContainer"></div>
       </div>
       <div class="lightbox-footer-hint">
-        <span>💡 İpucu: Şemada rahatça gezinmek için tıklayıp sürükleyebilirsiniz. Çıkmak için <strong>Esc</strong> tuşuna basın.</span>
+        <span><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> İpucu: Şemada rahatça gezinmek için tıklayıp sürükleyebilirsiniz. Çıkmak için <strong>Esc</strong> tuşuna basın.</span>
       </div>
+    </div>
+  </div>
+
+  <!-- Manimator Studio Modal: AI-Powered Explainer Video Generator & Player -->
+  <div class="modal-backdrop hidden" id="manimatorModal" role="dialog" aria-modal="true">
+    <div class="modal-window manimator-window glass-card">
+      <div class="manimator-header">
+        <div class="manimator-header-title">
+          <h3>
+            <svg class="ui-icon ui-icon-lg" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <span>Manimator Studio</span>
+            <span class="pill-tag" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); font-size: 0.72rem; padding: 2px 8px; border-radius: 6px;">Qwen 3.5 + Manim + Edge-TTS</span>
+          </h3>
+          <p>Öğrencinin anlamadığı kavramlara özel, kişiselleştirilmiş 30-90s animasyonlu anlatım videosu üretici</p>
+        </div>
+        <button type="button" class="btn-close-modal" id="btnCloseManimatorModal" aria-label="Close modal"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+      </div>
+
+      <div class="manimator-body">
+        <!-- Input Mode Selection Tabs -->
+        <div class="manimator-mode-tabs" role="tablist">
+          <button type="button" class="manimator-tab-btn active" id="tabManimatorLecture" data-mode="lecture">
+            <svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> Takıldığım Dersi Canlandır
+          </button>
+          <button type="button" class="manimator-tab-btn" id="tabManimatorPdf" data-mode="pdf">
+            <svg class="ui-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> PDF'den Anlatımlı Video (Paper2Video)
+          </button>
+          <button type="button" class="manimator-tab-btn" id="tabManimatorCustom" data-mode="custom">
+            <svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> Özel Konu / Serbest İstem
+          </button>
+        </div>
+
+        <!-- Mode 1: Lecture Moment Context Card -->
+        <div class="manimator-mode-panel" id="panelManimatorLecture">
+          <div class="manimator-context-card">
+            <div class="manimator-context-header">
+              <span id="manimatorLectureTimestamp"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Anlık Zaman: 00:00</span>
+              <span id="manimatorActiveConceptBadge"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg> Odak Kavram: Algılanıyor...</span>
+            </div>
+            <p id="manimatorLectureQuoteText" style="font-style: italic; color: #cbd5e1; margin-bottom: 0.4rem;">
+              "Ders videosundaki ilgili bölüm buraya otomatik aktarılır..."
+            </p>
+            <div style="font-size: 0.8rem; color: #94a3b8;">
+              <svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> <strong>Nasıl çalışır?</strong> Videoda anlamadığınız yerdeki son 45 saniyelik transkript ve teknik terimler yerel Qwen 3.5'e aktarılır, B1 seviyesinde sade bir anlatım senaryosu yazılır, Edge-TTS ile seslendirilir ve Manim motoruyla animasyonlu MP4 videoya dönüştürülür.
+            </div>
+          </div>
+        </div>
+
+        <!-- Mode 2: PDF Upload Panel -->
+        <div class="manimator-mode-panel hidden" id="panelManimatorPdf">
+          <div style="background: rgba(255,255,255,0.02); border: 2px dashed rgba(245, 158, 11, 0.35); border-radius: var(--radius-md); padding: 1.5rem; text-align: center;">
+            <svg class="ui-icon" style="font-size: 2.2rem; width: 2.2rem; height: 2.2rem; display: block; margin: 0 auto 0.5rem auto; stroke: #f59e0b;" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <h4 style="font-size: 1rem; color: #f8fafc; margin-bottom: 0.3rem;">Ders Notu veya Makale PDF'ini Yükleyin</h4>
+            <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 1rem;">
+              PDF'deki metin ve figürler çıkarılır; Figure Walkthrough veya Manim animasyon moduyla narrated videoya dönüştürülür.
+            </p>
+            <input type="file" id="manimatorPdfInput" accept=".pdf" style="display: none;">
+            <button type="button" class="btn btn-secondary btn-sm" id="btnSelectManimatorPdf">
+              <svg class="ui-icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> PDF Dosyası Seç (.pdf)
+            </button>
+            <span id="manimatorSelectedPdfName" style="margin-left: 0.75rem; font-size: 0.85rem; color: #38bdf8; font-weight: 600;">Dosya seçilmedi</span>
+          </div>
+        </div>
+
+        <!-- Mode 3: Custom Topic Panel -->
+        <div class="manimator-mode-panel hidden" id="panelManimatorCustom">
+          <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary);">Anlatılmasını İstediğiniz Kavram veya Soru:</label>
+            <input type="text" id="manimatorCustomTopicInput" class="manimator-input" placeholder="Örn: Kazanılmış Değer Analizi (EVM), Overfitting, UKTKG Modeli...">
+          </div>
+        </div>
+
+        <!-- Generator Configuration Grid -->
+        <div class="manimator-config-grid">
+          <div class="manimator-config-item">
+            <label>Anlatım Tarzı</label>
+            <select id="manimatorStyleSelect" class="manimator-select">
+              <option value="manim_animation" selected>Manim Matematik &amp; Geometri Animasyonu</option>
+              <option value="figure_walkthrough">Figür &amp; Şema Rehberliği (Figure Walkthrough)</option>
+            </select>
+          </div>
+          <div class="manimator-config-item">
+            <label>Süre &amp; Derinlik</label>
+            <select id="manimatorDurationSelect" class="manimator-select">
+              <option value="35">Hızlı Özet (35 saniye)</option>
+              <option value="50" selected>Standart Anlatım (50 saniye)</option>
+              <option value="80">Derinlemesine Detay (80 saniye)</option>
+            </select>
+          </div>
+          <div class="manimator-config-item">
+            <label>Nöral Seslendirme</label>
+            <select id="manimatorVoiceSelect" class="manimator-select">
+              <option value="tr-TR-AhmetNeural" selected>Ahmet (Doğal Türkçe Erkek)</option>
+              <option value="tr-TR-EmelNeural">Emel (Doğal Türkçe Kadın)</option>
+              <option value="en-US-GuyNeural">Guy (English Male)</option>
+              <option value="en-US-JennyNeural">Jenny (English Female)</option>
+            </select>
+          </div>
+          <div class="manimator-config-item">
+            <label>Yapay Zeka Modeli</label>
+            <select id="manimatorModelSelect" class="manimator-select">
+              <option value="fast" selected>Ultra Hızlı Motor (Anında &lt;15s)</option>
+              <option value="deep">Qwen 3.5 Yerel Ağırlıkları (Derin Model)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Main Action Generate Button -->
+        <div style="display: flex; justify-content: center; margin: 0.5rem 0;">
+          <button type="button" class="btn btn-manimator-trigger" id="btnTriggerManimatorGen" style="padding: 0.75rem 2rem; font-size: 1rem; border-radius: var(--radius-md); display: flex; align-items: center; gap: 0.6rem;">
+            <svg class="ui-icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <span id="btnTriggerManimatorText">Takıldığım Yere Özel Videoyu Üret (Manimator)</span>
+          </button>
+        </div>
+
+        <!-- Animated Progress Stepper (Hidden by default, shown during gen) -->
+        <div class="manimator-stepper hidden" id="manimatorProgressStepper">
+          <div class="stepper-step" id="stepQwen">
+            <div class="stepper-icon"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+            <span>1. Qwen 3.5 B1 Senaryo</span>
+          </div>
+          <div class="stepper-step" id="stepTts">
+            <div class="stepper-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></div>
+            <span>2. Edge-TTS Seslendirme</span>
+          </div>
+          <div class="stepper-step" id="stepManim">
+            <div class="stepper-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72Z"/><path d="m14 7 3 3"/><path d="M5 16l3 3"/></svg></div>
+            <span>3. Manim Çizim &amp; Render</span>
+          </div>
+          <div class="stepper-step" id="stepFfmpeg">
+            <div class="stepper-icon"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+            <span>4. MP4 Birleştirme</span>
+          </div>
+        </div>
+
+        <!-- Video Player & Results Presentation Stage (Shown on completion) -->
+        <div class="manimator-result-deck hidden" id="manimatorResultDeck">
+          <!-- Left: Video Player & Subtitle Timeline -->
+          <div class="manimator-video-wrapper">
+            <video id="manimatorVideoPlayer" class="manimator-video-player" controls preload="metadata"></video>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.2rem;">
+              <span style="font-size: 0.78rem; font-weight: 700; color: #38bdf8; display: inline-flex; align-items: center; gap: 0.35rem;">
+                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                Senkronize Anlatım Cümleleri (Tıklayarak Sarın):
+              </span>
+              <span id="manimatorVideoDurationBadge" style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">00:00</span>
+            </div>
+            <div class="manimator-subtitles-timeline" id="manimatorSubtitlesTimeline"></div>
+          </div>
+
+          <!-- Right: Pedagogical Explanations & Learner Actions -->
+          <div class="manimator-pedagogy-panel">
+            <div class="manimator-hook-box">
+              <div class="manimator-hook-title">
+                <svg class="ui-icon" viewBox="0 0 24 24"><line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>
+                <span id="manimatorHookTitle">Somut Benzetme (Analogy)</span>
+              </div>
+              <p class="manimator-hook-text" id="manimatorHookText">Benzetme metni...</p>
+            </div>
+
+            <div class="manimator-terms-section">
+              <div style="font-size: 0.8rem; font-weight: 700; color: #34d399; display: flex; align-items: center; gap: 0.4rem;">
+                <svg class="ui-icon" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></svg>
+                CEFR B1 Düzeyinde Açıklanan Terimler:
+              </div>
+              <div id="manimatorTermsContainer" style="display: flex; flex-direction: column; gap: 0.4rem;"></div>
+            </div>
+
+            <!-- Manim Code View Disclosure -->
+            <details class="manimator-code-toggle">
+              <summary style="cursor: pointer; font-weight: 600; color: #94a3b8; display: inline-flex; align-items: center; gap: 0.35rem;">
+                <svg class="ui-icon" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                Üretilen Python Manim Kodunu İncele
+              </summary>
+              <pre class="manimator-code-content" id="manimatorCodeDisplay"></pre>
+            </details>
+          </div>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="manimator-footer-actions">
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <button type="button" class="btn btn-sm btn-ghost" id="btnDownloadManimVideo" title="Üretilen MP4 videoyu bilgisayarınıza kaydedin">
+              <svg class="ui-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Videoyu İndir (.mp4)
+            </button>
+            <button type="button" class="btn btn-sm btn-ghost" id="btnCopyManimCode" title="Python Manim kodunu panoya kopyala">
+              <svg class="ui-icon" viewBox="0 0 24 24"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg> Kodu Kopyala
+            </button>
+          </div>
+          <div style="display: flex; gap: 0.5rem;">
+            <button type="button" class="btn btn-sm btn-success" id="btnManimatorSaveLearner" title="Bu kavramı anladığınızı profilinize kaydedin">
+              <svg class="ui-icon" viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg> Anladım! Öğrenci Profilime Ekle
+            </button>
+            <button type="button" class="btn btn-sm btn-secondary" id="btnCloseManimatorFooter">
+              Kapat
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Cognitive Science Attention Pop-Quiz Modal -->
+  <div class="modal-backdrop hidden" id="popQuizModal" role="dialog" aria-modal="true">
+    <div class="modal-window popquiz-modal-window glass-card">
+      <div class="modal-header popquiz-header">
+        <div class="modal-title-group">
+          <div class="popquiz-badge-row">
+            <span class="modal-pill popquiz-science-pill"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M10 2v7.31L4.67 19.3A2 2 0 0 0 6.4 22h11.2a2 2 0 0 0 1.73-2.7L14 9.31V2"/></svg> Bilişsel Bilim &amp; Dikkat Molası</span>
+            <span class="popquiz-milestone-pill" id="popquizMilestoneBadge"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 5. Dakika Eşiği (300 sn)</span>
+          </div>
+          <h2 class="modal-title" id="popquizModalTitle">Dikkat Tazeleyici Pop-Quiz</h2>
+          <p class="modal-subtitle" id="popquizModalSubtitle">Video derslerde dikkatin düştüğü kritik saniyelerde kavramı pekiştirin</p>
+        </div>
+        <button type="button" class="btn-close-modal" id="btnClosePopQuizModal" aria-label="Kapat / Atla"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+      </div>
+
+      <div class="modal-body popquiz-body">
+        <!-- Scientific Citation Callout -->
+        <div class="popquiz-citation-box">
+          <div class="citation-icon"><svg class="ui-icon ui-icon-lg" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+          <div class="citation-content">
+            <strong id="popquizCitationTitle">Araştırma Dayanağı: Guo et al. (ACM 2014) &amp; Szpunar et al. (PNAS 2013)</strong>
+            <p id="popquizCitationDesc">
+              Online video derslerde 3-6. dakikalar arasında zihin dalıp gitmesi (mind wandering) %40'ın üzerine çıkar.
+              Kısa bir soru çözmek zihin kaymasını %18'e düşürür ve dikkati anında sıfırlar.
+            </p>
+          </div>
+        </div>
+
+        <!-- Question Container -->
+        <div class="popquiz-card glass-card">
+          <div class="popquiz-term-focus">
+            <span class="focus-mini-label">ODAKLANILAN KAVRAM:</span>
+            <span class="focus-term-name" id="popquizTermName">Terminology</span>
+          </div>
+
+          <h3 class="popquiz-prompt" id="popquizPrompt">Bu derste bu kavram ne anlama gelir?</h3>
+
+          <!-- Options List (MCQ) -->
+          <div class="popquiz-options-list" id="popquizOptionsList">
+            <!-- Dynamically populated with options -->
+          </div>
+
+          <!-- Immediate Feedback Box -->
+          <div class="popquiz-feedback-box hidden" id="popquizFeedbackBox">
+            <div class="feedback-status" id="popquizFeedbackStatus">
+              <span class="fb-icon" id="popquizFbIcon"><svg class="ui-icon ui-icon-lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></span>
+              <strong id="popquizFbTitle">Harika! Doğru Yanıt.</strong>
+            </div>
+            <p class="feedback-expl" id="popquizFbExpl">Explanation text...</p>
+            <div class="feedback-mastery-tag" id="popquizMasteryTag">
+              <span class="tag-icon"><svg class="ui-icon" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span>
+              <span id="popquizMasteryText">Öğrenci Profili: +30% Ustalık Artışı</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer popquiz-footer">
+        <div class="popquiz-footer-left">
+          <span class="popquiz-keyhint"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg> İpucu: Seçenekler için <strong>1 - 4</strong> tuşlarını, devam etmek için <strong>Space</strong> tuşunu kullanabilirsiniz.</span>
+        </div>
+        <div class="popquiz-footer-right">
+          <button type="button" class="btn btn-ghost btn-sm" id="btnSkipPopQuiz">
+            <svg class="ui-icon" viewBox="0 0 24 24"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg> Soruyu Atla &amp; Devam Et
+          </button>
+          <button type="button" class="btn btn-primary btn-popquiz-resume" id="btnResumeFromPopQuiz">
+            <svg class="ui-icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg> Videoya Devam Et (Space)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Research Papers & Cognitive Science Details Modal -->
+  <div class="modal-backdrop hidden" id="attentionResearchModal" role="dialog" aria-modal="true">
+    <div class="modal-window research-modal-window glass-card">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="modal-pill">Literatür &amp; Bilişsel Bilim</span>
+          <h2 class="modal-title">Ders Videolarında Dikkat Düşüşü Araştırmaları</h2>
+          <p class="modal-subtitle">Uygulamamızdaki otomatik duraklatma ve pop-quiz eşiklerinin akademik dayanakları</p>
+        </div>
+        <button type="button" class="btn-close-modal" id="btnCloseResearchModal" aria-label="Kapat"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+      </div>
+
+      <div class="modal-body research-modal-body">
+        <!-- Timeline visualization -->
+        <div class="research-timeline-wrapper">
+          <h4 class="research-section-title"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Video Ders Süresi Boyunca Dikkat Düşüş Noktaları</h4>
+          <div class="attention-drop-timeline">
+            <div class="timeline-step step-green">
+              <div class="step-badge">1. Eşik (180 sn)</div>
+              <span class="step-time">3. Dakika</span>
+              <span class="step-status">Zihin Kayması Başlangıcı</span>
+              <p>İlk dikkat dalgalanması başlar; pasif dinlemede zihin konudan uzaklaşmaya eğilimlidir. <em>(Risko et al. 2012 / Bunce et al. 2010)</em></p>
+            </div>
+            <div class="timeline-arrow"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></div>
+            <div class="timeline-step step-yellow">
+              <div class="step-badge">2. Eşik (300 sn)</div>
+              <span class="step-time">5. Dakika</span>
+              <span class="step-status">Optimal İnterpolated Test</span>
+              <p>Zihin kayması %40'ı aşar. Bu saniyede soru çözdürmek dikkat kaybını %18'e indirir ve dikkati sıfırlar! <em>(Szpunar &amp; Schacter, PNAS 2013)</em></p>
+            </div>
+            <div class="timeline-arrow"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></div>
+            <div class="timeline-step step-orange">
+              <div class="step-badge">3. Eşik (360 sn)</div>
+              <span class="step-time">6. Dakika</span>
+              <span class="step-status">Kritik Kırılma Sınırı (Cliff)</span>
+              <p>edX 6.9 milyon video izleme analizi: Öğrencilerin video derslerde medyan odaklanması tam 6. dakikada çöker. <em>(Guo et al. ACM L@S 2014)</em></p>
+            </div>
+            <div class="timeline-arrow"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></div>
+            <div class="timeline-step step-red">
+              <div class="step-badge">4. Eşik (600 sn)</div>
+              <span class="step-time">10. Dakika</span>
+              <span class="step-status">Bilişsel Yorgunluk</span>
+              <p>Uzun derslerde 10. dakikadan sonra derin dikkat çöküşü. Mikro-quizler bilişsel yükü hafifletir. <em>(Bradbury 2016)</em></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Academic Papers Cards Grid -->
+        <div class="research-papers-grid" id="researchPapersGrid">
+          <div class="research-paper-card glass-card">
+            <div class="paper-header">
+              <span class="paper-tag tag-pnas">PNAS 2013</span>
+              <span class="paper-year">2013</span>
+            </div>
+            <h4 class="paper-title">Interpolated memory tests reduce mind wandering and improve learning of online lectures</h4>
+            <div class="paper-authors">Karl K. Szpunar, Nova Z. Khan, Daniel L. Schacter (Harvard University)</div>
+            <p class="paper-summary">
+              Video derslerde 5. dakikalardan itibaren öğrencilerin %40'tan fazlasının zihninin dersten koptuğu kanıtlanmıştır.
+              Ders aralarına serpiştirilen mikro bellek testleri (interpolated testing), zihin kaymasını %18'e indirmiş ve kalıcı öğrenmeyi iki katına çıkarmıştır.
+            </p>
+            <div class="paper-meta-stat">Kritik Müdahale Aralığı: <strong>Her 4 - 5 Dakika (~240 - 300 sn)</strong></div>
+          </div>
+
+          <div class="research-paper-card glass-card">
+            <div class="paper-header">
+              <span class="paper-tag tag-acm">ACM L@S 2014</span>
+              <span class="paper-year">2014</span>
+            </div>
+            <h4 class="paper-title">How Video Production Affects Student Engagement: An Empirical Study of MOOC Videos</h4>
+            <div class="paper-authors">Philip J. Guo, Juho Kim, Rob Rubin (edX / MIT / Rochester)</div>
+            <p class="paper-summary">
+              edX platformundaki 6.9 milyon video izleme oturumu incelenmiştir. Video süresi ne kadar uzun olursa olsun,
+              öğrencilerin medyan etkileşim ve odaklanma süresinin <strong>en fazla 6 dakika (360 saniye)</strong> sürdüğü ve ardından keskin biçimde çöktüğü bulunmuştur.
+            </p>
+            <div class="paper-meta-stat">Medyan Odak Zirvesi: <strong>6. Dakika (360 sn)</strong></div>
+          </div>
+
+          <div class="research-paper-card glass-card">
+            <div class="paper-header">
+              <span class="paper-tag tag-jce">J. Chem. Educ.</span>
+              <span class="paper-year">2010</span>
+            </div>
+            <h4 class="paper-title">Measuring Student Attention in Lectures with Clickers</h4>
+            <div class="paper-authors">Diane M. Bunce, Elizabeth A. Flaherty, Kyle D. VandenPlas</div>
+            <p class="paper-summary">
+              Öğrencilerin saniye bazlı dikkat dalgalanmaları clicker butonlarıyla ölçülmüştür. İlk dikkat kopması
+              <strong>4.5 - 5. dakikada</strong> meydana gelmekte, interaktif bir soru sorulmadığında ise her 2-3 dakikada bir tekrarlanmaktadır.
+            </p>
+            <div class="paper-meta-stat">İlk Dikkat Kopması: <strong>4.5 - 5. Dakika (270 - 300 sn)</strong></div>
+          </div>
+
+          <div class="research-paper-card glass-card">
+            <div class="paper-header">
+              <span class="paper-tag tag-ape">Adv. Physiol. Educ.</span>
+              <span class="paper-year">2016</span>
+            </div>
+            <h4 class="paper-title">Attention span during lectures: 8 seconds, 10 minutes, or more?</h4>
+            <div class="paper-authors">Neil A. Bradbury</div>
+            <p class="paper-summary">
+              Öğrenci dikkat süresinin evrimini derleyen makalede, pasif tek taraflı anlatımda 10-15. dakikalarda belirgin bir bilişsel yorulma
+              olduğu, soru-cevap veya kısa quiz gibi formatların bu dikkat sayacını sıfırladığı gösterilmiştir.
+            </p>
+            <div class="paper-meta-stat">Bilişsel Yorgunluk Sınırı: <strong>10. Dakika (600 sn)</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer research-footer">
+        <div class="research-footer-note">
+          <span style="display: inline-flex; align-items: center; gap: 0.4rem;"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> <strong>EduTerm AI</strong>, bu akademik araştırmalara göre tasarlanmıştır: Belirlenen saniyelerde videoyu durdurup pop-quiz çözdürerek zihin kaymasını önler ve öğrenci profilini günceller.</span>
+        </div>
+        <button type="button" class="btn btn-primary" id="btnCloseResearchModalBottom">Anladım, Kapat</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cornell Note-Taking Study Sheet Modal -->
+  <div class="modal-backdrop hidden" id="cornellModal" role="dialog" aria-modal="true">
+    <div class="modal-window cornell-modal-window glass-card">
+      <div class="modal-header cornell-modal-header no-print">
+        <div class="modal-title-group">
+          <div class="cornell-badge-row">
+            <span class="modal-pill cornell-pill"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><polyline points="10 2 10 10 13 7 16 10 16 2"/></svg> Walter Pauk Bilişsel Cornell Not Sistemi</span>
+            <span class="cornell-level-pill">CEFR B1 Seviyesi • Aktif Hatırlama (Active Recall)</span>
+          </div>
+          <h2 class="modal-title" id="cornellModalTitle">Cornell Formatında Akıllı Ders Notu</h2>
+          <p class="modal-subtitle">Eğitim bilimlerinde kanıtlanmış 3 bölmeli Cornell metodolojisiyle yapılandırılmış sınav hazırlık dokümanı</p>
+        </div>
+        <div class="cornell-header-actions">
+          <button type="button" class="btn btn-primary btn-sm btn-print-cornell" id="btnPrintCornell" title="A4 formatında yazdır veya PDF olarak kaydet">
+            <svg class="ui-icon" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+            Yazdır / PDF Kaydet
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm" id="btnDownloadCornellMd" title="Obsidian, Notion ve Logseq için Markdown (.md) indir">
+            <svg class="ui-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Markdown (.md) İndir
+          </button>
+          <button type="button" class="btn btn-ghost btn-sm" id="btnCopyCornellMd" title="Panoya kopyala">
+            <svg class="ui-icon" viewBox="0 0 24 24"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>
+            Kopyala
+          </button>
+          <button type="button" class="btn-close-modal" id="btnCloseCornellModal" aria-label="Kapat"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+        </div>
+      </div>
+
+      <div class="modal-body cornell-modal-body">
+        <!-- Printable Cornell Study Sheet Container -->
+        <article class="cornell-sheet" id="cornellPrintableSheet">
+          <!-- Cornell Document Top Header -->
+          <header class="cornell-doc-header">
+            <div class="cornell-doc-title-box">
+              <span class="cornell-doc-badge">CORNELL STUDY SHEET • CEFR B1</span>
+              <h1 class="cornell-doc-title" id="cornellDocTitle">Ders Notu &amp; Kavram Özeti</h1>
+              <div class="cornell-doc-meta-row">
+                <span><strong>Tarih:</strong> <span id="cornellDocDate">--.--.----</span></span>
+                <span><strong>Ders Süresi:</strong> <span id="cornellDocDuration">--:--</span></span>
+                <span><strong>Kavram Sayısı:</strong> <span id="cornellDocTermCount">0 Terim</span></span>
+                <span><strong>Pedagojik Seviye:</strong> CEFR B1 Başlangıç Dostu</span>
+              </div>
+            </div>
+            <div class="cornell-doc-watermark">
+              EduTerm AI
+            </div>
+          </header>
+
+          <!-- Cornell 2-Column Grid -->
+          <div class="cornell-grid-layout">
+            <!-- Left Column: CUES & RECALL QUESTIONS (32%) -->
+            <aside class="cornell-cues-column">
+              <div class="cornell-col-header">
+                <h3><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> İPUÇLARI &amp; SINAV SORULARI</h3>
+                <span class="cornell-col-sub">(Kendi Kendini Sınama / Active Recall)</span>
+              </div>
+              <div class="cornell-cues-content" id="cornellCuesContent">
+                <!-- Dynamically populated -->
+              </div>
+            </aside>
+
+            <!-- Right Column: NOTES & EXPLANATIONS (68%) -->
+            <section class="cornell-notes-column">
+              <div class="cornell-col-header">
+                <h3><svg class="ui-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> DERS NOTLARI &amp; B1 AÇIKLAMALARI</h3>
+                <span class="cornell-col-sub">(Sade Anlatım, Formüller &amp; Analojiler)</span>
+              </div>
+              <div class="cornell-notes-content" id="cornellNotesContent">
+                <!-- Dynamically populated -->
+              </div>
+            </section>
+          </div>
+
+          <!-- Bottom Section: COGNITIVE SYNTHESIS SUMMARY -->
+          <footer class="cornell-summary-section">
+            <div class="cornell-summary-header">
+              <h3><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> BİLİŞSEL SENTEZ &amp; ÖZET (Walter Pauk Metodu)</h3>
+              <span class="cornell-summary-sub">Dersin 3 cümlelik kristalize özeti &amp; sınav öncesi son tekrar</span>
+            </div>
+            <p class="cornell-summary-text" id="cornellSummaryText">
+              Ders verileri yükleniyor...
+            </p>
+            <div class="cornell-reflection-box">
+              <div class="cornell-reflection-title"><svg class="ui-icon" viewBox="0 0 24 24"><path d="m9 12 2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg> Sınav Öncesi Kavrama Kontrol Listesi:</div>
+              <div class="cornell-checklist">
+                <label class="cornell-check-item"><input type="checkbox" checked disabled> <span>Transkript dinlendi ve CEFR B1 terimleri incelendi.</span></label>
+                <label class="cornell-check-item"><input type="checkbox" checked disabled> <span>Sol sütundaki aktif hatırlama soruları test edildi.</span></label>
+                <label class="cornell-check-item"><input type="checkbox" checked disabled> <span>Kavramların formülleri ve analojileri zihinde canlandırıldı.</span></label>
+              </div>
+            </div>
+          </footer>
+        </article>
+      </div>
+
+      <div class="modal-footer cornell-modal-footer no-print">
+        <div class="cornell-footer-hint">
+          <svg class="ui-icon" viewBox="0 0 24 24"><line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>
+          <span>İpucu: Sol sütundaki zaman damgalarına tıklayarak videodaki ilgili bölüme sarabilir, "Yazdır / PDF Kaydet" ile temiz A4 çıktısı alabilirsiniz.</span>
+        </div>
+        <button type="button" class="btn btn-secondary" id="btnCloseCornellFooter">Kapat</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Concept Knowledge Graph Modal (Ausubel Meaningful Learning) -->
+  <div class="modal-backdrop hidden" id="conceptGraphModal" role="dialog" aria-modal="true">
+    <div class="modal-window concept-graph-modal-window glass-card">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div class="graph-modal-badge-row">
+            <span class="modal-pill graph-pill">Ausubel'in Anlamlı Öğrenme Modeli</span>
+            <span class="graph-stats-chip" id="graphStatsChip"><span id="graphNodeCount">0</span> Kavram • <span id="graphEdgeCount">0</span> Bağlantı</span>
+          </div>
+          <h2 class="modal-title" id="conceptGraphModalTitle">İnteraktif Kavram Ağı &amp; Bilgi Grafiği</h2>
+          <p class="modal-subtitle">Kavramların birbirleriyle Neden-Sonuç, Parça-Bütün ve Formül ilişkilerini keşfedin. Düğümlere tıklayarak videodaki konuşma saniyelerine anında zıplayın.</p>
+        </div>
+        <div class="modal-actions-right">
+          <button type="button" class="btn btn-sm btn-ghost" id="btnResetGraphView" title="Görünümü Sıfırla / Ortala">
+            <svg class="ui-icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            Ortala
+          </button>
+          <button type="button" class="btn btn-sm btn-ghost" id="btnToggleGraphPhysics" title="Fizik Simülasyonunu Duraklat / Başlat">
+            <span id="graphPhysicsStatus">Fiziği Durdur</span>
+          </button>
+          <button type="button" class="btn-close-modal" id="btnCloseConceptGraphModal" aria-label="Close modal"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+        </div>
+      </div>
+
+      <!-- Graph Toolbar & Ausubel Category Filter -->
+      <div class="graph-toolbar">
+        <div class="graph-search-box">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" class="graph-search-icon">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="graphSearchInput" placeholder="Kavram veya formül ara..." class="graph-search-input">
+        </div>
+
+        <div class="graph-filter-chips">
+          <button type="button" class="graph-filter-chip active" data-filter="all">Tümü</button>
+          <button type="button" class="graph-filter-chip chip-core" data-filter="core">Kök Kavramlar</button>
+          <button type="button" class="graph-filter-chip chip-metric" data-filter="metric">Metrik &amp; Formül</button>
+          <button type="button" class="graph-filter-chip chip-process" data-filter="process">Süreç &amp; Eylem</button>
+          <button type="button" class="graph-filter-chip chip-artifact" data-filter="artifact">Belge &amp; Yapı</button>
+        </div>
+
+        <div class="graph-zoom-controls">
+          <button type="button" class="btn-graph-zoom" id="btnGraphZoomIn" title="Yakınlaştır">+</button>
+          <button type="button" class="btn-graph-zoom" id="btnGraphZoomOut" title="Uzaklaştır">−</button>
+        </div>
+      </div>
+
+      <!-- Main Layout: Graph Canvas (Left) + Inspector / Timestamps (Right) -->
+      <div class="concept-graph-main-layout">
+        <div class="concept-graph-canvas-container" id="graphCanvasContainer">
+          <canvas id="conceptGraphCanvas"></canvas>
+          <div class="graph-canvas-hint">
+            <span>Düğümleri sürükleyebilir, tekerlekle yakınlaştırabilir, boş alana basılı tutarak kaydırabilirsiniz.</span>
+          </div>
+          <!-- Legend Overlay -->
+          <div class="graph-legend-box">
+            <div class="legend-item"><span class="legend-dot dot-core"></span> Kök Kavram</div>
+            <div class="legend-item"><span class="legend-dot dot-metric"></span> Metrik / Formül</div>
+            <div class="legend-item"><span class="legend-dot dot-process"></span> Süreç / Eylem</div>
+            <div class="legend-item"><span class="legend-dot dot-artifact"></span> Belge / Yapı</div>
+          </div>
+        </div>
+
+        <!-- Inspector Panel: Selected Node Details & All Video Timestamps -->
+        <aside class="concept-graph-inspector glass-card" id="graphInspector">
+          <div class="inspector-empty-state" id="inspectorEmptyState">
+            <svg class="ui-icon large-icon" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            <h4>Bir Kavram Seçin</h4>
+            <p>Ağdaki herhangi bir düğüme tıklayarak CEFR B1 açıklamasını, formüllerini, analojisini ve <strong>videoda geçtiği tüm saniyeleri</strong> inceleyin.</p>
+          </div>
+
+          <div class="inspector-content hidden" id="inspectorContent">
+            <div class="inspector-header">
+              <span class="inspector-category-pill" id="inspectorCategoryPill">Kök Kavram</span>
+              <h3 class="inspector-title" id="inspectorTitle">Kazanılmış Değer</h3>
+              <p class="inspector-ausubel-tag" id="inspectorAusubelTag">Bilişsel Çapa • Ausubel Anlamlı Öğrenme</p>
+            </div>
+
+            <!-- Video Occurrences Section (CORE FEATURE) -->
+            <div class="inspector-section inspector-timestamps-section">
+              <div class="inspector-section-title">
+                <svg class="ui-icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                <span>Videoda Geçtiği Saniyeler (<span id="inspectorOccurrencesCount">0</span>)</span>
+              </div>
+              <p class="inspector-section-hint">Tıkladığınızda video doğrudan o saniyeye atlar:</p>
+              <div class="inspector-timestamps-list" id="inspectorTimestampsList">
+                <!-- Timestamp items dynamically injected -->
+              </div>
+            </div>
+
+            <!-- B1 Explanation Section -->
+            <div class="inspector-section">
+              <div class="inspector-section-title">
+                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>
+                <span>CEFR B1 Açıklaması</span>
+              </div>
+              <p class="inspector-explanation-text" id="inspectorExplanation">--</p>
+            </div>
+
+            <!-- Formula Box (if applicable) -->
+            <div class="inspector-section hidden" id="inspectorFormulaSection">
+              <div class="inspector-section-title">
+                <svg class="ui-icon" viewBox="0 0 24 24"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/></svg>
+                <span>Formül / Hesaplama Kuralı</span>
+              </div>
+              <div class="inspector-formula-box" id="inspectorFormulaBox">--</div>
+            </div>
+
+            <!-- Analogy Section -->
+            <div class="inspector-section">
+              <div class="inspector-section-title">
+                <svg class="ui-icon" viewBox="0 0 24 24"><line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>
+                <span>Gündelik Hayat Benzetimi</span>
+              </div>
+              <p class="inspector-analogy-text" id="inspectorAnalogy">--</p>
+            </div>
+
+            <!-- Connected Concepts List -->
+            <div class="inspector-section">
+              <div class="inspector-section-title">
+                <svg class="ui-icon" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                <span>Bağlantılı Kavramlar (<span id="inspectorConnectedCount">0</span>)</span>
+              </div>
+              <div class="inspector-connections-list" id="inspectorConnectionsList">
+                <!-- Connected chips -->
+              </div>
+            </div>
+
+            <!-- Actions Footer -->
+            <div class="inspector-actions-row">
+              <button type="button" class="btn btn-sm btn-primary" id="btnInspectorQuiz">
+                <svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                Bu Terimden Soru Çöz
+              </button>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Waving AI Animatronic Mascot (Quick Socratic Tutor Trigger) -->
+  <div class="ai-animatronic-widget" id="aiAnimatronicWidget" role="button" tabindex="0" title="Hocaya Sor (Sokratik AI Asistanı Aç)" aria-label="Sokratik AI Asistanına Sor">
+    <!-- Robotic Mascot Avatar with animated waving arm and blinking eyes -->
+    <div class="animatronic-avatar">
+      <svg class="animatronic-svg" viewBox="0 0 100 100" width="68" height="68">
+        <defs>
+          <linearGradient id="botHeadGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#38bdf8"/>
+            <stop offset="50%" stop-color="#6366f1"/>
+            <stop offset="100%" stop-color="#a855f7"/>
+          </linearGradient>
+          <linearGradient id="botVisorGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#090d16"/>
+            <stop offset="100%" stop-color="#0f172a"/>
+          </linearGradient>
+          <filter id="glowFilter" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="2" result="blur"/>
+            <feMerge>
+              <feMergeNode in="blur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+
+        <!-- Floating Aura Glow Base -->
+        <ellipse cx="50" cy="88" rx="20" ry="4.5" class="bot-shadow"/>
+
+        <!-- Robot Body / Torso -->
+        <path d="M34 68 C34 58, 66 58, 66 68 L68 82 C68 85, 32 85, 32 82 Z" fill="url(#botHeadGrad)" class="bot-torso"/>
+        <!-- Chest Core Indicator -->
+        <circle cx="50" cy="73" r="3.5" fill="#38bdf8" filter="url(#glowFilter)" class="bot-core-light"/>
+
+        <!-- Left Arm (Resting) -->
+        <path d="M33 65 C26 69, 24 78, 27 82" stroke="url(#botHeadGrad)" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+        <circle cx="27" cy="82" r="3" fill="#818cf8"/>
+
+        <!-- Robot Head -->
+        <g class="bot-head-group">
+          <!-- Antenna -->
+          <line x1="50" y1="28" x2="50" y2="18" stroke="#818cf8" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="50" cy="15" r="4" fill="#f59e0b" filter="url(#glowFilter)" class="bot-antenna-beacon"/>
+
+          <!-- Head Shape -->
+          <rect x="25" y="26" width="50" height="38" rx="14" fill="url(#botHeadGrad)" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+          <!-- Ear Bolt Decors -->
+          <rect x="21" y="38" width="5" height="14" rx="2.5" fill="#6366f1"/>
+          <rect x="74" y="38" width="5" height="14" rx="2.5" fill="#6366f1"/>
+
+          <!-- Dark Visor Display Screen -->
+          <rect x="30" y="32" width="40" height="26" rx="9" fill="url(#botVisorGrad)"/>
+
+          <!-- Digital Cyber Eyes (Blinking & Glowing) -->
+          <g class="bot-eyes" filter="url(#glowFilter)">
+            <ellipse cx="41" cy="45" rx="4.5" ry="5.5" fill="#38bdf8" class="bot-eye left-eye"/>
+            <ellipse cx="59" cy="45" rx="4.5" ry="5.5" fill="#38bdf8" class="bot-eye right-eye"/>
+            <circle cx="42.5" cy="43.5" r="1.5" fill="#ffffff"/>
+            <circle cx="60.5" cy="43.5" r="1.5" fill="#ffffff"/>
+          </g>
+
+          <!-- Cute Smile Curve -->
+          <path d="M44 52 Q50 55 56 52" stroke="#34d399" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.9"/>
+        </g>
+
+        <!-- Right Arm & Hand (WAVING ANIMATRONIC ARM) -->
+        <g class="bot-waving-arm">
+          <!-- Upper arm & forearm -->
+          <path d="M67 64 C76 58, 82 46, 79 38" stroke="url(#botHeadGrad)" stroke-width="5" stroke-linecap="round" fill="none"/>
+          <!-- Hand & Fingers waving -->
+          <circle cx="79" cy="36" r="4.5" fill="#f59e0b" filter="url(#glowFilter)"/>
+          <path d="M78 33 L76 27 M81 33 L82 26 M84 35 L89 31" stroke="#f59e0b" stroke-width="2.2" stroke-linecap="round"/>
+        </g>
+      </svg>
+
+      <!-- Ambient status pulse ring -->
+      <span class="animatronic-live-ring"></span>
     </div>
   </div>
 

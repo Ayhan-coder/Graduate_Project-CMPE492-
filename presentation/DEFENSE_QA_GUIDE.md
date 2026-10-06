@@ -1,8 +1,8 @@
 # EduTerm AI Bitirme Projesi Savunma Rehberi (Defense Q&A Guide)
 
 **Proje:** Çok Dilli Eğitim İçin Konuşma Tanıma (ASR) ve Büyük Dil Modeli (LLM) Tabanlı Terminoloji Çıkarma ve Pedagojik Açıklama Sistemlerinin İki Katmanlı Değerlendirilmesi  
-**Yazarlar:** Çakıl Yılmaz (Koç Üniv.); Berat Enes Dadak, Efe Batur Giritli, Yekta Said Can (Tatilsepeti Ar-Ge)  
-**Kurumlar:** Koç Üniversitesi & Tatilsepeti Ar-Ge Merkezi  
+**Yazar:** Ali Ayhan Günder (Boğaziçi Üniversitesi)  
+**Kurum:** Boğaziçi Üniversitesi Bilgisayar Mühendisliği Bölümü  
 **Tarih:** Eylül 2026  
 
 ---
@@ -16,7 +16,7 @@
 | **Katman 1: ASR Değerlendirmesi** | 6 – 7 | 4 dk | 2026 modelleri, Macro/Micro WER, RTF, Turbo vs Large-v3 dengesi |
 | **Katman 2: LLM & Pedagojik Semantik** | 8 – 9 | 3 dk | Prompt stratejileri (RAG F1 %76.9), CEFR B1 okunabilirlik (Ateşman/Flesch) |
 | **Güvenilirlik: IAA & Hata Yayılımı** | 10 – 11 | 3.5 dk | Cohen's Kappa, Prevalans Paradoksu, Sentetik Hata Eğrisi |
-| **EduTerm AI Studio & Test Paketi** | 12 – 13 | 2.5 dk | Canlı PoC mimarisi, Uyarlanabilir öğrenci, Sınav motoru, 213 test |
+| **EduTerm AI Studio & Test Paketi** | 12 – 13 | 2.5 dk | Canlı PoC mimarisi, Uyarlanabilir öğrenci, Sınav motoru, 226 test |
 | **Dağıtım Önerileri, Kısıtlar & Sonuç** | 14 – 16 | 2 dk | Doğruluk vs Hız matrisi, 7 Guardrail, Gelecek çalışmalar |
 
 ---
@@ -99,7 +99,7 @@ Sunum ve soru-cevap sırasında bu 7 prensip asla ihlal edilmemeli, tam tersine 
 
 ### Soru 11: Sistemin birim test kapsamı ve yazılım mühendisliği güvenilirliği ne durumdadır?
 > **Model Yanıt:**  
-> "Projemiz yalnızca teorik bir araştırma değil, titiz bir yazılım mühendisliği çalışmasıdır. `experiments/tests/` dizininde toplam **213 birim test** bulunmaktadır ve test paketinin geçiş oranı %100'dür. Testler; GPU gerektirmeyen mocked API çağrıları, port çakışmalarında otomatik dinamik port bulma (port hunting failover), dış ağ bağlamalarında güvenlik belirteci (auth token) doğrulama, aralıklı tekrar ustalık formülleri ve sınav soru üretim mantığını kapsamaktadır."
+> "Projemiz yalnızca teorik bir araştırma değil, titiz bir yazılım mühendisliği çalışmasıdır. `experiments/tests/` dizininde toplam **226 birim test** bulunmaktadır ve test paketinin geçiş oranı %100'dür. Testler; GPU gerektirmeyen mocked API çağrıları, port çakışmalarında otomatik dinamik port bulma (port hunting failover), dış ağ bağlamalarında güvenlik belirteci (auth token) doğrulama, YouTube yaş/erişim kısıtlı video hata yakalama (graceful fallback), aralıklı tekrar ustalık formülleri, sınav soru üretim mantığı ve savunma sunum paketinin bütünlüğünü kapsamaktadır."
 
 ---
 
@@ -121,6 +121,25 @@ Sunum ve soru-cevap sırasında bu 7 prensip asla ihlal edilmemeli, tam tersine 
 
 ---
 
-### Soru 15: Bu projeyi bir eğitim kurumuna (örneğin Koç Üniversitesi'ne) entegre etmek istesek ilk adım ne olmalıdır?
+### Soru 15: Bu projeyi bir eğitim kurumuna (örneğin Boğaziçi Üniversitesi'ne) entegre etmek istesek ilk adım ne olmalıdır?
 > **Model Yanıt:**  
 > "İlk adım, sistemin LTI (Learning Tools Interoperability) standardı üzerinden Moodle, Canvas veya Blackboard gibi mevcut Öğrenme Yönetim Sistemlerine (LMS) bir eklenti olarak bağlanmasıdır. Ders kaydı bittiğinde ASR katmanı arka planda Whisper Turbo ile transkripti çıkaracak, Qwen3.5 terminoloji kartlarını ve sınav sorularını üretecek ve öğrencinin video izleme ekranına senkronize terim sözlüğü olarak yerleştirecektir."
+
+---
+
+### Soru 16: Yapay zekâ modellerinin halüsinasyon (uydurma terim/tanım) üretme riskini eğitim bağlamında nasıl sıfırladınız veya sınırlandırdınız?
+> **Model Yanıt:**  
+> "Pedagojik bağlamda halüsinasyon kabul edilemez bir risktir. Bunu 4 katmanlı bir savunma mekanizmasıyla engelledik: (1) **Katı İstem Kısıtı:** İstemde açıkça *'Use only information consistent with the transcript context'* yönergesi ve kesin JSON şeması zorunlu tutulmuştur. (2) **Sözlük Destekli RAG:** Alana özgü kavram tohumları isteme enjekte edildiğinde modelin bağlam dışı kavram uydurması engellenmiş, F1 skoru %47.6'dan %76.9'a yükselmiştir. (3) **BERTScore Denetimi:** Üretilen tanımlar TDK/Oxford sözlükleriyle taranmış ve 0.82 üzeri anlamsal uyum teyit edilmiştir. (4) **LLM-as-a-Judge & İnsan Doğrulaması:** 233 çiftlik bağımsız denetimde bağlamsal tutarlılık uyumu (PABAK) %94.0 çıkmıştır."
+
+---
+
+### Soru 17: Canlı ders ortamında gerçek zamanlı (streaming) altyazılama ve terim çıkarımı neden Whisper yerine Streaming ASR gerektirir?
+> **Model Yanıt:**  
+> "Whisper mimarisi doğası gereği 30 saniyelik pencereler (offline chunked sequence-to-sequence) üzerinde eğitilmiştir; dolayısıyla bir cümlenin transkripsiyonu için pencerenin dolması ve kod çözümü beklenir (ortalama 2-5 sn gecikme). Kayıtlı ders arşivlemede bu sorun teşkil etmezken, canlı bir amfide öğretmenin anlık konuşmasını öğrenciye akıtmak için FastConformer veya Streaming RNN-T (örneğin NVIDIA Nemotron 3.5 Streaming ASR) gibi 80-160 milisaniye gecikmeli akış mimarileri gereklidir. Raporumuzda ve makalemizde bu iki senaryo (Arşivleme vs. Canlı Ders) arasındaki mimari takas açıkça ortaya konmuştur."
+
+---
+
+### Soru 18: Üniversite ortamında öğrenci verilerinin gizliliği, KVKK/GDPR uyumu ve yerel (on-premise) GPU uygulanabilirliği nasıldır?
+> **Model Yanıt:**  
+> "Eğitim kayıtları ve öğrenci etkileşim verileri kişisel veri (KVKK / GDPR) kapsamındadır. Ticari bulut API'leri (OpenAI GPT-4) her ders kaydını ve öğrenci hatasını harici sunuculara göndermeyi gerektirir ve yüksek maliyet yaratır. Tasarladığımız mimaride Whisper Turbo ve açık ağırlıklı Qwen3.5-4B modelleri 4-bit nicemleme (bitsandbytes) ile tüketici sınıfı tek bir 8 GB VRAM GPU'da (RTX 5060) tamamen çevrimdışı (offline / on-premise) çalışabilmektedir. Böylece üniversite ağından dışarı tek bir bayt veri çıkmadan, sıfır API maliyetiyle tam veri egemenliği sağlanmaktadır."
+

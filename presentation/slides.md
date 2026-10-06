@@ -3,8 +3,8 @@ marp: true
 theme: uncover
 class: invert
 paginate: true
-header: "EduTerm AI — Bitirme Projesi Savunması 2026 | Koç Üniversitesi & Tatilsepeti Ar-Ge"
-footer: "Çakıl Yılmaz, Berat Enes Dadak, Efe Batur Giritli, Yekta Said Can"
+header: "EduTerm AI — Bitirme Projesi Savunması 2026 | Boğaziçi Üniversitesi"
+footer: "Ali Ayhan Günder (Boğaziçi Üniversitesi)"
 style: |
   section {
     font-family: 'Segoe UI', system-ui, sans-serif;
@@ -81,13 +81,12 @@ style: |
 
 **Bitirme Projesi Savunması — Eylül 2026**
 
-**Yazarlar:** Çakıl Yılmaz¹ · Berat Enes Dadak² · Efe Batur Giritli² · Yekta Said Can²  
-¹ *Koç Üniversitesi Bilgisayar Mühendisliği Bölümü*  
-² *Tatilsepeti Ar-Ge Merkezi*
+**Yazar:** Ali Ayhan Günder  
+*Boğaziçi Üniversitesi Bilgisayar Mühendisliği Bölümü*  
 
 <!-- Note:
 Sayın Jüri Üyeleri ve Değerli Hocalarım, hoş geldiniz.
-Bugün Koç Üniversitesi ve Tatilsepeti Ar-Ge Merkezi ortaklığında yürüttüğümüz, eğitim konuşmalarını yeni başlayan öğrenciler için anlık olarak erişilebilir kılmayı amaçlayan iki katmanlı yapay zekâ değerlendirme çalışmamızı sunacağız.
+Bugün Boğaziçi Üniversitesi bünyesinde yürüttüğümüz, eğitim konuşmalarını yeni başlayan öğrenciler için anlık olarak erişilebilir kılmayı amaçlayan iki katmanlı yapay zekâ değerlendirme çalışmamızı sunacağız.
 -->
 
 ---
@@ -397,13 +396,14 @@ Projenin Ar-Ge kalitesi kapsamlı bir otomatik birim test paketi ile korunmaktad
 
 <div>
 
-### 🧪 213 Kapsamlı Birim Test (%100 Başarı)
-- `test_gui_pipeline.py`: ASR/LLM boru hattı ve iptal denetimi
+### 🧪 226 Kapsamlı Birim Test (%100 Başarı)
+- `test_gui_pipeline.py`: ASR/LLM boru hattı, YouTube hata yakalama ve iptal denetimi
 - `test_gui_api.py`: REST ve WebSocket uç noktaları
 - `test_gui_learner.py`: Aralıklı tekrar formülleri ve ustalık sınırları
 - `test_gui_exam.py`: MCQ soru üretimi ve çeldirici kalitesi
 - `test_gui_launcher.py`: Port failover ve token doğrulama
 - `test_eval_kit.py`: Metrik hesaplayıcılar ve normalizasyon
+- `test_presentation.py`: Sunum slaytları, guardrail ve soru rehberi bütünlüğü
 
 </div>
 
@@ -412,6 +412,7 @@ Projenin Ar-Ge kalitesi kapsamlı bir otomatik birim test paketi ile korunmaktad
 ### 🔒 Güvenlik & Dayanıklılık Mekanizmaları
 - **Otomatik Port Bulma (Port Hunting):** Port 7860 meşgulse çökmeden 7861'e dinamik geçiş.
 - **Erişim Belirteci (Token Auth):** `0.0.0.0` dış ağ bağlantılarında otomatik 32 karakterlik güvenlik tokeni.
+- **YouTube Graceful Fallback:** Yaş/bölge kısıtlı videolarda çökmeyip yerel yükleme yönlendirmesi.
 - **Hafıza Taşması Koruması:** GPU OOM anında kural tabanlı acil durum şablonuna geri düşüş (fallback).
 
 </div>
@@ -419,7 +420,7 @@ Projenin Ar-Ge kalitesi kapsamlı bir otomatik birim test paketi ile korunmaktad
 </div>
 
 <!-- Note:
-Yazılım mühendisliği açısından projemiz 213 bağımsız birim testten geçmektedir. Port çakışmalarından harici ağ güvenlik tokenlerine ve aralıklı tekrar matematiksel sınırlarına kadar tüm senaryolar otomatik testlerle garanti altına alınmıştır.
+Yazılım mühendisliği açısından projemiz 226 bağımsız birim testten geçmektedir. Port çakışmalarından harici ağ güvenlik tokenlerine, YouTube fallback denetiminden aralıklı tekrar matematiksel sınırlarına kadar tüm senaryolar otomatik testlerle garanti altına alınmıştır.
 -->
 
 ---
@@ -465,9 +466,9 @@ Gelecek vizyonumuzda bu boru hattını Moodle ve Canvas gibi üniversite öğren
 <!-- Slayt 16: Teşekkür & Soru - Cevap -->
 # Teşekkür Ederiz
 
-### Çakıl Yılmaz · Berat Enes Dadak · Efe Batur Giritli · Yekta Said Can
+### Ali Ayhan Günder
 
-**Koç Üniversitesi Bilgisayar Mühendisliği Bölümü & Tatilsepeti Ar-Ge Merkezi**
+**Boğaziçi Üniversitesi Bilgisayar Mühendisliği Bölümü**
 
 ---
 

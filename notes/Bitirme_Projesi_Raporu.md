@@ -1,8 +1,8 @@
 # Çok Dilli Eğitim İçin Konuşma Tanıma (ASR) ve Büyük Dil Modeli (LLM) Tabanlı Terminoloji Çıkarma Sistemlerinin İki Katmanlı Değerlendirilmesi
 
 **Bitirme Projesi Raporu (Graduation Project Final Report)**  
-**Kurumlar:** Koç Üniversitesi Bilgisayar Mühendisliği Bölümü & Tatilsepeti Ar-Ge Merkezi  
-**Yazarlar:** Çakıl Yılmaz (Koç Üniversitesi); Berat Enes Dadak, Efe Batur Giritli, Yekta Said Can (Tatilsepeti Ar-Ge)  
+**Kurum:** Boğaziçi Üniversitesi Bilgisayar Mühendisliği Bölümü  
+**Yazar:** Ali Ayhan Günder (Boğaziçi Üniversitesi)  
 **Tarih:** Eylül 2026  
 
 ---
@@ -19,9 +19,10 @@ Bilimsel güvenilirliği pekiştirmek amacıyla:
 1. Yedi ders videosundan (toplam ~95 dakika) oluşan veri kümesi için hazır altyazı ve taslakların insan denetiminde terim düzeltmeleri ve noktalama revizyonlarıyla iyileştirildiği "Gold Reference" metinler oluşturulmuş; ancak bu metinlerin sıfırdan bağımsız çift-kör transkripsiyon olmadığı, dolayısıyla Whisper/altyazı stiline hafif bir biçimsel yakınlık taşıyabileceği açıkça belgelenmiştir.
 2. 115 terimlik çift-etiketleme kümesi üzerinde iki bağımsız değerlendirici ile Cohen'in kappa katsayısı ($\kappa$) hesaplanmış; bağlam uyumluluğunda $\kappa_R = 0.782$ (belirgin uyum), açıklama doğruluğunda ise $\kappa_D = 1.000$ elde edilmiştir. Ancak $D$ etiketinde 112 pozitif / 3 negatif dağılımı ve $P_e \approx 0.95$ şans eseri beklenen uyum nedeniyle asıl ayırt edici güvenilirlik göstergesinin $\kappa_R$ olduğu vurgulanmıştır.
 3. Çapraz katmanlı ablasyonda dil modeline yalnızca düşük WER'li Whisper hipotezleri verilmiş, yüksek kaliteli transkriptlerde semantik tutarlılığın korunduğu gösterilmiş ancak ASR hatalarının LLM çıktısına uçtan uca hata yayılımı sürekli bir eğri olarak ölçülmemiştir.
-4. Sistemin pratik uygulanabilirliğini ve boru hattının uçtan uca işleyişini yerel ortamda sergilemek amacıyla FastAPI tabanlı etkileşimli bir yerel demo stüdyosu (`experiments/gui/`) geliştirilmiştir (bu arayüzün canlıya alınmış bir üretim ürünü değil, yerel bir konsept kanıtlama ve demo aracı olduğu açıkça belirtilmiştir).
+4. Elde edilen semantik çıkarım katmanı, açık kaynaklı Manimator mimarisi uyarlanarak üçüncü bir **Dinamik Video Üretim Katmanına (Katman 3)** genişletilmiştir. Bu katmanda; öğrencinin ders videosunda anlamadığı bir noktayı işaretlemesiyle ("Takıldığım Yeri Öğret"), son 45 saniyelik bağlam yerel Qwen 3.5 modeline aktarılmakta; model CEFR B1 düzeyinde benzetmeli bir anlatım senaryosu ve Manim kodu üretmekte; Edge-TTS nöral seslendirmesi ve FFmpeg senkronizasyonu ile 30-90 saniyelik kişiselleştirilmiş MP4 animasyon videosuna dönüştürülmektedir. Ayrıca harici PDF ders notları için figür rehberli (Figure Walkthrough) video üretimi de sağlanmıştır.
+5. Sistemin pratik uygulanabilirliğini ve boru hattının uçtan uca işleyişini yerel ortamda sergilemek amacıyla FastAPI tabanlı etkileşimli bir yerel demo stüdyosu (`experiments/gui/`) geliştirilmiştir (bu arayüzün canlıya alınmış bir üretim ürünü değil, yerel bir konsept kanıtlama ve demo aracı olduğu açıkça belirtilmiştir).
 
-**Anahtar Kelimeler:** Otomatik Konuşma Tanıma (ASR), Büyük Dil Modelleri (LLM), Terminoloji Çıkarma, Çok Dilli Eğitim Teknolojileri, Whisper, Qwen3-ASR, Cohen's Kappa, İki Katmanlı Değerlendirme.
+**Anahtar Kelimeler:** Otomatik Konuşma Tanıma (ASR), Büyük Dil Modelleri (LLM), Terminoloji Çıkarma, Çok Dilli Eğitim Teknolojileri, Whisper, Qwen3-ASR, Manimator, Üretken Video Eğitimi, Cohen's Kappa.
 
 ---
 
@@ -73,7 +74,7 @@ Brusilovsky (2007) ve VanLehn (2011), akıllı öğretim sistemlerinin (ITS) kur
 Çalışmada incelenen sistem iki ana işleme katmanından oluşmaktadır:
 
 ```
-[ Ham Eğitim Videosu / Ses ] (16 kHz Mono WAV)
+[ Ham Eğitim Videosu / Ses veya PDF Belgesi ] (16 kHz Mono WAV)
              │
              ▼
 ┌─────────────────────────────────────────────────────────┐
@@ -81,7 +82,7 @@ Brusilovsky (2007) ve VanLehn (2011), akıllı öğretim sistemlerinin (ITS) kur
 │  Modeller: Whisper (Med/Large/Turbo), Qwen3-ASR, vb.    │
 │  Metrikler: WER, CER (Raw/Norm), Latency, RTF           │
 └─────────────────────────────────────────────────────────┘
-             │ Transkript
+             │ Transkript Metni
              ▼
 ┌─────────────────────────────────────────────────────────┐
 │            KATMAN 2: SEMANTİK ÇIKARIM (LLM)             │
@@ -89,12 +90,17 @@ Brusilovsky (2007) ve VanLehn (2011), akıllı öğretim sistemlerinin (ITS) kur
 │  Görev: Terim Tespiti + CEFR B1 Açıklama Üretimi        │
 │  Metrikler: R1% (Bağlam), D1% (Doğruluk), BLEU          │
 └─────────────────────────────────────────────────────────┘
+             │ Yapılandırılmış Çıktı (JSON)
+             ▼
+┌─────────────────────────────────────────────────────────┐
+│   KATMAN 3: MANIMATOR İLE DİNAMİK VİDEO ÜRETİM MODÜLÜ   │
+│  Bileşenler: Yerel Qwen 3.5 + Edge-TTS + Manim Community│
+│  Görev: "Takıldığım Yeri Öğret" 30-90s Animasyon Videosu│
+│  Modlar: Manim Matematik Animasyonu / Figure Walkthrough│
+└─────────────────────────────────────────────────────────┘
              │
              ▼
-[ Yapılandırılmış Çıktı: JSON {"term": ..., "explanation": ...} ]
-             │
-             ▼
-[ Etkileşimli Web Arayüzü: Video Oynatıcı + Dinamik Terim Kartları ]
+[ Etkileşimli Web Arayüzü: Video Oynatıcı + Dinamik Terim Kartları + Manimator Studio ]
 ```
 
 ### 3.1 Katman 1: Konuşma Tanıma (ASR) Boru Hattı
@@ -107,6 +113,22 @@ Brusilovsky (2007) ve VanLehn (2011), akıllı öğretim sistemlerinin (ITS) kur
 Transkript metni, sistem tarafından sabitlenmiş şu sistem yönlendirmesiyle (prompt) LLM'e iletilir:
 
 > *"You are a terminology assistant for {LANG} educational content. Step 1: From the transcript below, extract domain-specific terms (including multi-word terms). Step 2: For each term, write one short explanation at CEFR B1 level that a beginner can understand. Use only information consistent with the transcript context. Return strictly a JSON array of objects with fields 'term' and 'explanation'. Transcript: {TRANSCRIPT}"*
+
+### 3.3 Katman 3: Manimator ile Dinamik Video Üretimi ve Pedagojik Canlandırma
+Projenin semantik katmanı, açık kaynaklı Manimator mimarisi temel alınarak dinamik bir eğitimsel video üretim katmanına genişletilmiştir. Orijinal Manimator'un ücretli bulut API'lerine (Gemini, Claude, OpenAI) olan bağımlılığı kaldırılarak projenin açık ağırlıklı yerel Qwen 3.5 modeli (`Qwen/Qwen3.5-4B`) doğrudan bu boru hattına entegre edilmiştir. Bu katman iki temel modda çalışmaktadır:
+
+1. **"Takıldığım Yeri Öğret" (Ders İçi Anlık Remediye Videosu):**  
+   Öğrenci ders videosunu izlerken bir terimi veya mantığı anlamadığında tek tuşla video üretimini tetikler. Sistem, o andaki son 45 saniyelik transkript kesitini ve aktif terimleri yakalayarak yerel Qwen 3.5'e iletir. Dil modeli:
+   - Başlangıç seviyesine uygun CEFR B1 düzeyinde kilit kavramları özetler,
+   - Akılda kalıcı günlük hayattan somut bir benzetme (analogy) kurgular,
+   - 30-90 saniyelik sahne bazlı seslendirme senaryosu yazar,
+   - Bu senaryoya eşlik eden, `class ExplainerScene(Scene):` yapısında tam yürütülebilir Python Manim animasyon kodu üretir.
+2. **Paper2Video / PDF Figür Rehberliği (Figure Walkthrough Modu):**  
+   Öğrenci veya eğitmen bir ders sunumu veya akademik makale PDF'i yüklediğinde (`pypdf` / `pypdfium2`), PDF içerisindeki metinler ve şekiller taranır; slaytlar ve grafikler sırayla gösterilerek her biri için senkronize sesli rehberlik videosu derlenir.
+3. **Nöral Seslendirme ve FFmpeg Senkronizasyonu:**  
+   Yazılan Türkçe anlatım senaryoları Microsoft Edge Neural TTS motoru (`tr-TR-AhmetNeural` / `tr-TR-EmelNeural`) ile doğal tonlamayla seslendirilir. Render edilen Manim MP4 görüntüsü ve ses akışı FFmpeg ile birleştirilerek saniyesi saniyesine uyumlu altyazı zaman damgaları (.vtt) üretilir.
+4. **Kendi Kendini Onaran (Self-Healing) Kod Yürütme:**  
+   LLM'in yazdığı Manim kodunda sözdizimi, LaTeX veya nesne hatası oluşması durumunda hata çıktısı yakalanarak regex ve kural tabanlı onarıcılarla (`_heal_manim_code`) otomatik düzeltilir ve 2 deneme hakkı ile sahne başarıyla render edilir.
 
 ---
 
@@ -225,13 +247,20 @@ Altın standart referanslar üzerinde RTX 5060 Laptop GPU ortamında elde edilen
 Çalışmanın deneysel bulgularının pratik bir boru hattında nasıl çalıştığını somutlaştırmak amacıyla yerel bir etkileşimli demo stüdyosu (`experiments/gui/`, `run_gui.bat` / `python run_gui.py`) geliştirilmiştir.
 
 ### 7.1 Arayüzün Mimarisi ve Bileşenleri
-- **Arka Uç (Backend):** Python 3.12, FastAPI ve Uvicorn asenkron yerel sunucusu.
+- **Arka Uç (Backend):** Python 3.12, FastAPI ve Uvicorn asenkron yerel sunucusu (`run_gui.bat` / `run.bat`).
 - **Ses İndirme ve İşleme:** `yt-dlp` ile kullanıcı tarafından girilen YouTube bağlantısından ses akışı çekilir; `ffmpeg` ile 16 kHz mono WAV standardına dönüştürülür.
 - **Model Yürütme:** Yerel GPU üzerinde çalışan Whisper / Qwen çıkarım motorları ile transkripsiyon ve terminoloji çıkarma gerçekleştirilir.
 - **Ön Yüz (Frontend):** Modern koyu tema (dark mode), cam efektli (glassmorphism) kart tasarımı, Vanilla CSS ve modern JavaScript.
 - **Kullanıcı Deneyimi:** Canlı konsol güncellemeleri eşliğinde video oynatıcı ile senkronize çalışan terim kartları, öğrencinin videoyu izlerken terimlere tıklayıp B1 düzeyindeki açıklamaları okumasına imkan tanır.
 
-### 7.2 Mimari Sınırlar ve Jüri Notu (Ürün Değil, Yerel Demo Stüdyosu)
+### 7.2 Manimator Studio ve Uyarlanabilir Video İzleme Modülü
+Arayüze eklenen en kapsamlı yenilik, öğrencinin ders akışında zorlandığı anı anında görselleştiren **Manimator Studio** arayüzüdür:
+- **Hızlı Tetikleme Butonları:** Video kontrol çubuğunda ve Akıllı Slayt penceresinde yer alan *"🎬 Özel Video Üret (Manimator)"* butonları, aktif ders saniyesini ve o saniyedeki teknik terimleri otomatik olarak yakalar.
+- **Aşamalı İlerleme Göstergesi (Stepper):** Qwen senaryo yazımı, Edge-TTS seslendirmesi, Manim sahne çizimi ve FFmpeg birleştirme adımları canlı animasyonlu aşamalarla kullanıcıya aktarılır.
+- **Entegre Video Oynatıcı & Senkronize Altyazı:** Üretilen video modal içerisinde tam ekran, hız seçimi (1x/1.25x/1.5x) ve indirme butonlarıyla oynatılır. Konuşulan her cümle altyazı şeridinde gerçek zamanlı vurgulanır; altyazıdaki herhangi bir cümleye tıklandığında video tam o sahneye sarar.
+- **Manim Kod İnceleme ve Öğrenci Profili Entegrasyonu:** Öğrenci üretilen Python Manim kodunu inceleyip kopyalayabilir; *"Anladım! Öğrenci Profilime Ekle"* butonuna tıklayarak aralıklı tekrar algoritmasında (`learner.py`) ilgili terimi pekiştirebilir.
+
+### 7.3 Mimari Sınırlar ve Jüri Notu (Ürün Değil, Yerel Demo Stüdyosu)
 > **Jüri Sunumu ve Savunma Uyarısı (Canlı Ürün İddiasından Kaçınma):**  
 > Bu arayüz kesinlikle "canlıya alınmış / ticarileştirilmiş bir web ürünü" (deployed production product) veya bir sistem mühendisliği makalesi konusu olarak tanıtılmamalıdır. Yerel laboratuvar ortamında geliştirilmiş bir **konsept kanıtlama ve demo stüdyosu (PoC / local studio demo)** aracıdır:
 > 1. **CORS ve Ağ:** Yerel geliştirme ve test kolaylığı için kontrolsüz açık `CORS *` (`allow_origins=["*"]`) kullanılmıştır.
@@ -245,7 +274,7 @@ Altın standart referanslar üzerinde RTX 5060 Laptop GPU ortamında elde edilen
 
 ## 8. Donanım ve Çalışma Ortamı
 
-Deneysel değerlendirme ve yerel web uygulaması testi, Tatilsepeti Ar-Ge ve Koç Üniversitesi işbirliği kapsamında aşağıdaki laboratuvar donanımında yürütülmüştür:
+Deneysel değerlendirme ve yerel web uygulaması testi, Boğaziçi Üniversitesi Bilgisayar Mühendisliği Bölümü bünyesinde aşağıdaki laboratuvar donanımında yürütülmüştür:
 - **İşlemci (CPU):** Intel Core i7-14650HX (16 Çekirdek, 24 İş Parçacığı, 5.2 GHz Turbo)
 - **Grafik İşlemci (GPU):** NVIDIA GeForce RTX 5060 Laptop GPU (8 GB GDDR6 VRAM, CUDA 13.0)
 - **Sistem Belleği (RAM):** 32 GB DDR5

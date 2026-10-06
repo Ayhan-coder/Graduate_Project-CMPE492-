@@ -1,5 +1,16 @@
 # What changed in this revision (relative to the original PDF)
 
+# Pass 4 (2026-10-04 - Manimator Generative Video Layer Integration)
+
+- Genişletilen 3 Katmanlı Mimari: Mevcut iki katmanlı sistem (ASR -> LLM Semantik), açık kaynaklı Manimator mimarisi uyarlanarak üçüncü bir dinamik video üretim katmanına (ASR -> LLM Semantik -> Manimator Video Katmanı) genişletildi.
+- "Takıldığım Yeri Öğret" (On-Demand Remediation): Öğrenci ders videosunu izlerken anlamadığı kavramı işaretlediğinde, son 45 saniyelik transkript kesiti ve terimler yakalanarak yerel `Qwen/Qwen3.5-4B` modeline iletilir; model CEFR B1 düzeyinde benzetmeli (analogy) anlatım senaryosu ve yürütülebilir Python Manim animasyon kodu üretir.
+- Nöral Seslendirme ve FFmpeg Senkronizasyonu: Microsoft Edge Neural TTS (`tr-TR-AhmetNeural` / `tr-TR-EmelNeural`) ile doğal Türkçe seslendirme yapılarak senkronize altyazılı 30-90 saniyelik MP4 video derlenir.
+- Paper2Video / PDF Figure Walkthrough Modu: Ders notu veya makale PDF'leri yüklenerek metin ve şekiller üzerinden figür rehberli narrated video üretimi eklendi.
+- Telifli Bulut API Bağımsızlığı: Orijinal Manimator'un ücretli OpenAI/Claude/Gemini API bağımlılığı kaldırılarak sistem tamamen açık ağırlıklı yerel Qwen 3.5 üzerinde çalışacak şekilde uyarlandı.
+- Kendi Kendini Onaran (Self-Healing) Kod Yürütme: Manim kodundaki sözdizimi ve LaTeX hatalarını tespit edip otomatik düzelten onarıcı mekanizma eklendi.
+- Uyarlanabilir Öğrenci Profili Entegrasyonu: İzlenen remediye videoları `learner.py` profiline işlenerek öğrencinin eksik olduğu kavramlar pekiştirme havuzuna kaydedildi.
+- Proje Raporu Güncellendi: `notes/Bitirme_Projesi_Raporu.md` ve derlenen `notes/Bitirme_Projesi_Raporu.pdf` dosyalarına yeni mimari ve stüdyo yetenekleri eklendi.
+
 Pass 3 (2026-09-04) updated the refresh model set to the newest TR+EN-compatible checkpoints. No new WER/R1/κ cells. See `notes/HF_MODEL_REFRESH.md`.
 
 - ASR add: `nvidia/nemotron-3.5-asr-streaming-0.6b` (official `tr-TR` + `en-US`).

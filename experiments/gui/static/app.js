@@ -72,14 +72,22 @@ async function loadSystemInfo() {
     const res = await fetch("/api/system-info");
     const data = await res.json();
     const gpuEl = document.getElementById("gpuText");
-    if (data.cuda) {
-      gpuEl.innerText = `${data.gpu} (${data.vram_gb} GB VRAM)`;
-      document.getElementById("pillGpu").querySelector(".status-dot").classList.add("online");
+    const pillGpu = document.getElementById("pillGpu");
+    const dot = pillGpu ? pillGpu.querySelector(".status-dot") : null;
+
+    if (data && data.cuda) {
+      if (gpuEl) gpuEl.innerText = "NVIDIA";
+      if (pillGpu) pillGpu.setAttribute("title", `${data.gpu} (${data.vram_gb} GB VRAM)`);
+      if (dot) dot.classList.add("online");
     } else {
-      gpuEl.innerText = "PyTorch CPU Mode";
+      if (gpuEl) gpuEl.innerText = "Intel";
+      if (pillGpu) pillGpu.setAttribute("title", "Intel / CPU Modu (NVIDIA aktif değil)");
+      if (dot) dot.classList.remove("online");
     }
   } catch (err) {
     console.error("System info error:", err);
+    const gpuEl = document.getElementById("gpuText");
+    if (gpuEl) gpuEl.innerText = "Intel";
   }
 }
 
@@ -147,7 +155,17 @@ async function inspectYouTubeUrl() {
     authorEl.innerText = info.channel || "YouTube Channel";
     durEl.innerText = info.duration ? formatTime(info.duration) : "Full Video";
     if (info.thumbnail) thumbEl.src = info.thumbnail;
-    showToast("Video metadata retrieved!", "success");
+
+    if (info.is_restricted) {
+      showToast(info.restriction_message || "Bu video YouTube tarafından kısıtlanmıştır. Yerel dosya yüklemeniz önerilir.", "warning");
+      const tabUpload = document.getElementById("tabUpload");
+      if (tabUpload) {
+        tabUpload.classList.add("tab-attention-pulse");
+        setTimeout(() => tabUpload.classList.remove("tab-attention-pulse"), 6000);
+      }
+    } else {
+      showToast("Video metadata retrieved!", "success");
+    }
 
     // Proactively pre-fetch transcript and terminology in the background so player & helper slide are instant
     fetchTranscriptPreview(url, false);
@@ -155,6 +173,11 @@ async function inspectYouTubeUrl() {
     titleEl.innerText = "Could not load video info";
     authorEl.innerText = err.message;
     showToast(err.message, "error");
+    const tabUpload = document.getElementById("tabUpload");
+    if (tabUpload) {
+      tabUpload.classList.add("tab-attention-pulse");
+      setTimeout(() => tabUpload.classList.remove("tab-attention-pulse"), 6000);
+    }
   } finally {
     if (btnFetch) {
       btnFetch.disabled = false;
@@ -463,14 +486,24 @@ function subscribeToJobStream(jobId, initialStatus = "Running task...") {
   eventSource.addEventListener("job_error", (e) => {
     let message = "Pipeline failed.";
     let extra = "";
+    let suggestUpload = false;
     try {
       const payload = JSON.parse(e.data);
       if (payload?.message) message = payload.message;
       if (payload?.error && payload.error !== message) extra = payload.error;
       if (payload?.detail && payload.detail !== message) extra = payload.detail;
+      if (payload?.suggest_upload) suggestUpload = true;
     } catch (_) {}
     if (extra) {
       appendLog(`Diagnostic info: ${extra}`);
+    }
+    if (suggestUpload) {
+      appendLog("[Çözüm Önerisi] Bu video YouTube tarafından kısıtlanmıştır. Videoyu indirip 'File Upload' sekmesinden doğrudan yükleyebilirsiniz.");
+      const tabUpload = document.getElementById("tabUpload");
+      if (tabUpload) {
+        tabUpload.classList.add("tab-attention-pulse");
+        setTimeout(() => tabUpload.classList.remove("tab-attention-pulse"), 7000);
+      }
     }
     finishErr(message);
   });
@@ -845,6 +878,7 @@ function renderResults(result) {
 
     renderTermsGrid(terms, result?.lang, segments);
     renderTranscript(segments, fullText, terms);
+    updateDrawerConceptGraph(result);
 
     const transCountEl = document.getElementById("transcriptCounter");
     if (transCountEl) {
@@ -895,6 +929,16 @@ function loadYouTubeVideo(videoId) {
       playerVars: {
         playsinline: 1,
         rel: 0,
+      },
+      events: {
+        onStateChange: (event) => {
+          if (event && event.data === 1) { // YT.PlayerState.PLAYING
+            const chkWatch = document.getElementById("chkWatchPause");
+            if (chkWatch && chkWatch.checked && !eyeTrackerActive && typeof window.startEyeTracker === "function") {
+              window.startEyeTracker();
+            }
+          }
+        },
       },
     });
   } catch (err) {
@@ -1011,11 +1055,11 @@ function renderTermsGrid(terms, lang, segments) {
     const focus = item.focus || "new";
     const masteryVal = item.mastery != null ? Math.round(Number(item.mastery) * 100) : null;
     if (focus === "review") {
-      focusBadgeHtml = `<span class="term-focus-badge focus-review" title="Review-Priority from student exams (${masteryVal ?? 0}% mastery) — Higher LLM Weight">⚠️ Review (${masteryVal ?? 0}%)</span>`;
+      focusBadgeHtml = `<span class="term-focus-badge focus-review" title="Review-Priority from student exams (${masteryVal ?? 0}% mastery) — Higher LLM Weight"><svg class="ui-icon ui-icon-sm" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Review (${masteryVal ?? 0}%)</span>`;
     } else if (focus === "learning") {
-      focusBadgeHtml = `<span class="term-focus-badge focus-learning" title="Still Learning (${masteryVal ?? 50}% mastery)">📘 Learning</span>`;
+      focusBadgeHtml = `<span class="term-focus-badge focus-learning" title="Still Learning (${masteryVal ?? 50}% mastery)"><svg class="ui-icon ui-icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Learning</span>`;
     } else if (focus === "known") {
-      focusBadgeHtml = `<span class="term-focus-badge focus-known" title="Mastered in student exams (${masteryVal ?? 100}% mastery) — Lower LLM Weight">✓ Mastered</span>`;
+      focusBadgeHtml = `<span class="term-focus-badge focus-known" title="Mastered in student exams (${masteryVal ?? 100}% mastery) — Lower LLM Weight"><svg class="ui-icon ui-icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> Mastered</span>`;
     }
 
     card.innerHTML = `
@@ -1215,6 +1259,17 @@ function startSegmentWatch() {
       }
       card.classList.toggle("active-term", isCurrent);
     });
+
+    // 3. Cognitive Attention Drop Check & In-Video Pop-Quiz Intervention
+    if (typeof checkAttentionPopQuizTrigger === "function") {
+      checkAttentionPopQuizTrigger(t);
+    }
+
+    // 4. Auto-activate watch tracking if enabled and media is playing
+    const chkWatch = document.getElementById("chkWatchPause");
+    if (chkWatch && chkWatch.checked && !eyeTrackerActive && typeof window.startEyeTracker === "function" && isAnyMediaPlaying()) {
+      window.startEyeTracker();
+    }
   }, 400);
 }
 
@@ -1571,7 +1626,7 @@ function renderProfileModal(profile) {
     } else {
       weakList.innerHTML = weakTerms.map((t) => {
         const mastery = t.mastery != null ? Math.round(Number(t.mastery) * 100) : 0;
-        return `<span class="chip-item weak" title="Mastery: ${mastery}% • Missed: ${t.incorrect || 0} times">⚠️ ${escapeHtml(t.term)} (${mastery}%)</span>`;
+        return `<span class="chip-item weak" title="Mastery: ${mastery}% • Missed: ${t.incorrect || 0} times"><svg class="ui-icon ui-icon-sm" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> ${escapeHtml(t.term)} (${mastery}%)</span>`;
       }).join("");
     }
   }
@@ -1587,7 +1642,7 @@ function renderProfileModal(profile) {
     } else {
       strongList.innerHTML = strongTerms.map((t) => {
         const mastery = t.mastery != null ? Math.round(Number(t.mastery) * 100) : 100;
-        return `<span class="chip-item strong" title="Mastery: ${mastery}%">✓ ${escapeHtml(t.term)} (${mastery}%)</span>`;
+        return `<span class="chip-item strong" title="Mastery: ${mastery}%"><svg class="ui-icon ui-icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> ${escapeHtml(t.term)} (${mastery}%)</span>`;
       }).join("");
     }
   }
@@ -1606,7 +1661,7 @@ function renderProfileModal(profile) {
         return `
           <div class="profile-exam-item">
             <div class="exam-item-title" title="${escapeHtml(title)}">
-              🎓 ${escapeHtml(title)}
+              <svg class="ui-icon ui-icon-sm" viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg> ${escapeHtml(title)}
               ${dt ? `<small style="color:var(--text-muted); margin-left:6px">${escapeHtml(dt)}</small>` : ""}
             </div>
             <div class="exam-item-score">${score}% (${ex.correct || 0}/${ex.total || 0})</div>
@@ -1999,7 +2054,7 @@ function renderActiveQuestion() {
   const statusInd = document.getElementById("examStatusIndicator");
   if (statusInd) {
     const isAnswered = activeExam.answers[q.id] != null;
-    statusInd.innerText = isAnswered ? "✓ Answer saved" : "Unanswered";
+    statusInd.innerText = isAnswered ? "Answer saved" : "Unanswered";
     statusInd.style.color = isAnswered ? "var(--accent-emerald)" : "var(--text-muted)";
   }
 }
@@ -2018,7 +2073,7 @@ function recordAnswer(selfGrade) {
 
   const statusInd = document.getElementById("examStatusIndicator");
   if (statusInd) {
-    statusInd.innerText = "✓ Answer saved";
+    statusInd.innerText = "Answer saved";
     statusInd.style.color = "var(--accent-emerald)";
   }
 
@@ -2051,7 +2106,7 @@ function selectMcqOption(optIndex) {
 
   const statusInd = document.getElementById("examStatusIndicator");
   if (statusInd) {
-    statusInd.innerText = "✓ Answer saved";
+    statusInd.innerText = "Answer saved";
     statusInd.style.color = "var(--accent-emerald)";
   }
 
@@ -2153,7 +2208,7 @@ function renderExamResults(result) {
     if (terms.length === 0) {
       weakList.innerHTML = `<span class="empty-chip">None! All terms marked correct.</span>`;
     } else {
-      weakList.innerHTML = terms.map((t) => `<span class="chip-item weak">⚠️ ${escapeHtml(t)}</span>`).join("");
+      weakList.innerHTML = terms.map((t) => `<span class="chip-item weak"><svg class="ui-icon ui-icon-sm" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> ${escapeHtml(t)}</span>`).join("");
     }
   }
 
@@ -2163,7 +2218,7 @@ function renderExamResults(result) {
     if (terms.length === 0) {
       strongList.innerHTML = `<span class="empty-chip">None</span>`;
     } else {
-      strongList.innerHTML = terms.map((t) => `<span class="chip-item strong">✓ ${escapeHtml(t)}</span>`).join("");
+      strongList.innerHTML = terms.map((t) => `<span class="chip-item strong"><svg class="ui-icon ui-icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> ${escapeHtml(t)}</span>`).join("");
     }
   }
 }
@@ -2184,6 +2239,8 @@ let totalFramesTracked = 0;
 let focusedFramesCount = 0;
 let attentionPauseCount = 0;
 let distractionPausedMedia = false;
+let tabSwitchPausedMedia = false;
+let tabSwitchCount = 0;
 let snoozeAttentionUntil = 0;
 let isSimulationMode = false;
 let simDistractedState = false;
@@ -2194,6 +2251,8 @@ function isAnyMediaPlaying() {
   const videoContainer = document.getElementById("htmlVideoContainer");
   const videoPlayer = document.getElementById("videoPlayer");
   const audioPlayer = document.getElementById("audioPlayer");
+  const manimatorPlayer = document.getElementById("manimatorVideoPlayer");
+  const manimatorDeck = document.getElementById("manimatorResultDeck");
 
   if (ytPlayer && ytContainer && !ytContainer.classList.contains("hidden")) {
     try {
@@ -2207,6 +2266,9 @@ function isAnyMediaPlaying() {
   if (audioPlayer) {
     if (!audioPlayer.paused && !audioPlayer.ended && audioPlayer.currentTime > 0) return true;
   }
+  if (manimatorPlayer && manimatorDeck && !manimatorDeck.classList.contains("hidden")) {
+    if (!manimatorPlayer.paused && !manimatorPlayer.ended && manimatorPlayer.currentTime > 0) return true;
+  }
   return false;
 }
 
@@ -2215,6 +2277,8 @@ function pauseActiveMedia() {
   const videoContainer = document.getElementById("htmlVideoContainer");
   const videoPlayer = document.getElementById("videoPlayer");
   const audioPlayer = document.getElementById("audioPlayer");
+  const manimatorPlayer = document.getElementById("manimatorVideoPlayer");
+  const manimatorDeck = document.getElementById("manimatorResultDeck");
   let didPause = false;
 
   if (ytPlayer && ytContainer && !ytContainer.classList.contains("hidden")) {
@@ -2238,6 +2302,12 @@ function pauseActiveMedia() {
       didPause = true;
     }
   }
+  if (manimatorPlayer && manimatorDeck && !manimatorDeck.classList.contains("hidden")) {
+    if (!manimatorPlayer.paused && !manimatorPlayer.ended) {
+      manimatorPlayer.pause();
+      didPause = true;
+    }
+  }
   return didPause;
 }
 
@@ -2246,6 +2316,8 @@ function resumeActiveMedia() {
   const videoContainer = document.getElementById("htmlVideoContainer");
   const videoPlayer = document.getElementById("videoPlayer");
   const audioPlayer = document.getElementById("audioPlayer");
+  const manimatorPlayer = document.getElementById("manimatorVideoPlayer");
+  const manimatorDeck = document.getElementById("manimatorResultDeck");
 
   if (ytPlayer && ytContainer && !ytContainer.classList.contains("hidden") && ytPlayer.playVideo) {
     try {
@@ -2255,7 +2327,38 @@ function resumeActiveMedia() {
     videoPlayer.play().catch(() => {});
   } else if (audioPlayer) {
     audioPlayer.play().catch(() => {});
+  } else if (manimatorPlayer && manimatorDeck && !manimatorDeck.classList.contains("hidden")) {
+    manimatorPlayer.play().catch(() => {});
   }
+}
+
+// Unified Attention / Tab Pause Overlay Presentation Helper
+function showAttentionPauseOverlay(type, customReason) {
+  const overlay = document.getElementById("attentionPauseOverlay");
+  const alertEmoji = document.getElementById("attentionAlertEmoji");
+  const alertTitle = document.getElementById("attentionAlertTitle");
+  const reasonEl = document.getElementById("attentionPauseReason");
+  const liveMsg = document.getElementById("attentionLiveMsg");
+
+  if (type === "tab") {
+    if (alertEmoji) alertEmoji.innerHTML = '<svg class="ui-icon ui-icon-lg" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>';
+    if (alertTitle) alertTitle.innerText = "Başka Sekmeye Geçildi — Video Duraklatıldı";
+    if (reasonEl) reasonEl.innerText = customReason || "Başka bir sekmeye geçtiğiniz algılandı. Ders konusundan kopmamanız ve terimleri kaçırmamanız için video otomatik duraklatıldı.";
+    if (liveMsg) liveMsg.innerText = "Ders sekmesine döndüğünüzde video kaldığı yerden devam edecektir...";
+  } else if (type === "blur") {
+    if (alertEmoji) alertEmoji.innerHTML = '<svg class="ui-icon ui-icon-lg" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>';
+    if (alertTitle) alertTitle.innerText = "Pencere Odağı Kayboldu — Video Duraklatıldı";
+    if (reasonEl) reasonEl.innerText = customReason || "Ders penceresinin dışına çıktığınız algılandı. Dikkatinizi korumak ve konuyu kaçırmamanız için video otomatik duraklatıldı.";
+    if (liveMsg) liveMsg.innerText = "Pencereye tekrar odaklandığınızda video devam edecektir...";
+  } else {
+    if (alertEmoji) alertEmoji.innerHTML = '<svg class="ui-icon ui-icon-lg" viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>';
+    if (alertTitle) alertTitle.innerText = "Dikkat Dağınıklığı Algılandı!";
+    if (reasonEl) reasonEl.innerText = customReason || "Gözleriniz veya başınız ekrandan uzaklaştığı için video otomatik olarak duraklatıldı.";
+    if (liveMsg) liveMsg.innerText = "Ekrana tekrar odaklandığınızda video devam edecektir...";
+  }
+
+  if (overlay) overlay.classList.remove("hidden");
+  playAttentionChime();
 }
 
 // Gentle audio chime via Web Audio API (zero external assets needed)
@@ -2276,6 +2379,374 @@ function playAttentionChime() {
     osc.start();
     osc.stop(ctx.currentTime + 0.36);
   } catch (_) {}
+}
+
+// ==========================================================================
+// Cognitive Science Attention Pop-Quiz & Interpolated Testing Controller
+// Research Citations:
+// - Guo, Kim, Rubin (ACM L@S 2014): 6.9M edX video sessions, median attention peak at 6 min (360s).
+// - Szpunar, Khan, Schacter (PNAS 2013): mind wandering exceeds 40% after 4-5 min (240-300s);
+//   interpolated testing cuts mind wandering by >50% and doubles long-term retention.
+// - Bunce, Flaherty, VandenPlas (2010): first attention lapse onset at 270-300s.
+// - Risko et al. (2012): progressive mind wandering over lecture duration.
+// - Bradbury (2016): cognitive fatigue at 600-900s.
+// ==========================================================================
+
+let popQuizActive = false;
+let popQuizAnswered = false;
+const triggeredPopQuizMilestones = new Set();
+let activePopQuizData = null;
+
+const SCIENTIFIC_ATTENTION_MILESTONES = {
+  180: {
+    badge: "3. Dakika Eşiği (180 sn)",
+    source: "Risko et al. (2012) & Bunce et al. (2010)",
+    citation: "Erken Zihin Kayması Onset Noktası: Video dersin 3. dakikasından itibaren ilk dikkat dalgalanmaları başlar. 1 hızlı soru ile dikkatinizi toplayın!",
+  },
+  300: {
+    badge: "5. Dakika Eşiği (300 sn)",
+    source: "Szpunar & Schacter (PNAS 2013 - Harvard)",
+    citation: "Optimal İnterpolated Test Eşiği: 5. dakikada verilen kısa pop-quiz, zihin kaymasını %40'tan %18'e indirir ve dikkati sıfırlar.",
+  },
+  360: {
+    badge: "6. Dakika Eşiği (360 sn)",
+    source: "Guo, Kim, Rubin (ACM L@S 2014 - edX 6.9M Video)",
+    citation: "Kritik Dikkat Kırılma Sınırı: edX araştırmasına göre online ders videolarında medyan odak 6. dakikada tepe yapar ve ardından hızla çöker.",
+  },
+  600: {
+    badge: "10. Dakika Eşiği (600 sn)",
+    source: "Bradbury (2016) / Wilson & Korn (2007)",
+    citation: "İkincil Bilişsel Yorgunluk Eşiği: Uzun derslerde 10. dakikadan sonra pasif dinlemede derin dikkat çöküşü yaşanır.",
+  },
+};
+
+function playSuccessChime() {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+    osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1);
+    osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.2);
+    gain.gain.setValueAtTime(0.12, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.45);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.46);
+  } catch (_) {}
+}
+
+function checkAttentionPopQuizTrigger(t) {
+  if (popQuizActive) return;
+  const selectMode = document.getElementById("selectPopQuizMode");
+  const mode = selectMode ? selectMode.value : "scientific";
+  if (mode === "disabled") return;
+
+  let thresholds = [180, 300, 360, 600];
+  if (mode === "frequent") {
+    thresholds = [120, 240, 360, 480, 600];
+  } else if (mode === "demo") {
+    thresholds = [45, 90, 135, 180, 225, 270];
+  }
+
+  for (const s of thresholds) {
+    if (t >= s && t <= (s + 2.5) && !triggeredPopQuizMilestones.has(s)) {
+      triggeredPopQuizMilestones.add(s);
+      triggerAttentionPopQuiz(s);
+      break;
+    }
+  }
+}
+
+async function triggerAttentionPopQuiz(targetSeconds) {
+  if (popQuizActive) return;
+  popQuizActive = true;
+  popQuizAnswered = false;
+
+  // 1. Pause video & play gentle attention chime
+  pauseActiveMedia();
+  playAttentionChime();
+
+  const modal = document.getElementById("popQuizModal");
+  if (!modal) return;
+
+  // 2. Resolve or fallback milestone info
+  const mInfo = SCIENTIFIC_ATTENTION_MILESTONES[targetSeconds] || {
+    badge: `${Math.floor(targetSeconds / 60)}. Dakika Eşiği (${targetSeconds} sn)`,
+    source: "Bilişsel Bilim & İnterpolated Testing",
+    citation: "Video derslerde düzenli aralıklarla soru çözmek zihin kaymasını önler ve kalıcı hafızayı güçlendirir.",
+  };
+
+  const badgeEl = document.getElementById("popquizMilestoneBadge");
+  const titleEl = document.getElementById("popquizCitationTitle");
+  const descEl = document.getElementById("popquizCitationDesc");
+  if (badgeEl) badgeEl.innerHTML = '<svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> ' + escapeHtml(mInfo.badge);
+  if (titleEl) titleEl.innerText = `Araştırma Dayanağı: ${mInfo.source}`;
+  if (descEl) descEl.innerText = mInfo.citation;
+
+  // 3. Prepare or generate question from current lecture terms
+  let questionData = null;
+  const terms = (currentResult?.llm?.terms && currentResult.llm.terms.length > 0)
+    ? currentResult.llm.terms
+    : [];
+
+  if (terms.length > 0) {
+    // Select terms up to this timestamp
+    const earlier = terms.filter((item) => {
+      if (item.start_s == null) return true;
+      return Number(item.start_s) <= (targetSeconds + 10.0);
+    });
+    const pool = earlier.length >= 2 ? earlier : terms;
+    // Pick first review/unmastered term, or random
+    const targetTerm = pool[Math.floor(Math.random() * pool.length)];
+    const correctExpl = (targetTerm.explanation || "").trim();
+
+    // Distractors from other terms
+    const otherExpls = terms
+      .filter((t) => (t.term || "").toLowerCase() !== (targetTerm.term || "").toLowerCase() && (t.explanation || "").trim())
+      .map((t) => t.explanation.trim());
+
+    const genericTr = [
+      "Süresi ve hedefi belli olmayan genel bir süreç",
+      "Yalnızca dokümantasyon amacıyla tutulan geçici bir liste",
+      "Sadece ofis ekipmanlarını yönetmek için kullanılan bir araç",
+      "Herhangi bir kurala bağlı olmayan serbest çalışma yöntemi",
+    ];
+    const genericEn = [
+      "A general process with no specified time limit",
+      "A temporary document listing office equipment",
+      "A tool used only for file archiving purposes",
+      "An unguided approach without strict project rules",
+    ];
+    const isTr = (currentResult?.lang || "tr").toLowerCase().startsWith("tr");
+    const generics = isTr ? genericTr : genericEn;
+
+    let distractors = otherExpls.slice(0, 3);
+    let gi = 0;
+    while (distractors.length < 3 && gi < generics.length) {
+      if (!distractors.includes(generics[gi]) && generics[gi] !== correctExpl) {
+        distractors.push(generics[gi]);
+      }
+      gi++;
+    }
+
+    const options = [correctExpl, ...distractors.slice(0, 3)];
+    // Shuffle
+    const shuffled = options
+      .map((val) => ({ val, sort: Math.random() }))
+      .sort((a, b) => a.sort - b.sort)
+      .map((obj) => obj.val);
+
+    const answerIdx = shuffled.indexOf(correctExpl);
+
+    questionData = {
+      term: targetTerm.term,
+      prompt: isTr ? `Bu derste "${targetTerm.term}" kavramı ne anlama gelir?` : `What does "${targetTerm.term}" mean in this lecture?`,
+      options: shuffled,
+      answer_index: answerIdx,
+      explanation: correctExpl,
+    };
+  } else {
+    // Fallback demo question
+    questionData = {
+      term: "Aktif Öğrenme (Active Retrieval)",
+      prompt: "Bilişsel araştırmalara göre video ders izlerken dikkati yeniden zirveye çıkarmanın en etkili yolu nedir?",
+      options: [
+        "Videonun kritik dakikalarında kısa bir pop-quiz çözerek bilgiyi aktif hatırlamak",
+        "Videoyu durdurup 30 dakika beklemek",
+        "Videoyu 2 kat hızlandırarak izlemek",
+        "Ekrana bakmadan yalnızca sesi dinlemek",
+      ],
+      answer_index: 0,
+      explanation: "Szpunar & Schacter (PNAS 2013) araştırmasına göre interpolated testing (araya serpiştirilen mikro sorular) zihin kaymasını %40'tan %18'e indirir.",
+    };
+  }
+
+  activePopQuizData = questionData;
+  renderPopQuizQuestion(questionData);
+
+  modal.classList.remove("hidden");
+  showToast("Dikkat Molası: Video duraklatıldı, 1 hızlı soruyla dikkatinizi toplayın!", "info");
+}
+
+function renderPopQuizQuestion(q) {
+  const termNameEl = document.getElementById("popquizTermName");
+  const promptEl = document.getElementById("popquizPrompt");
+  const optionsList = document.getElementById("popquizOptionsList");
+  const feedbackBox = document.getElementById("popquizFeedbackBox");
+
+  if (termNameEl) termNameEl.innerText = q.term;
+  if (promptEl) promptEl.innerText = q.prompt;
+  if (feedbackBox) {
+    feedbackBox.className = "popquiz-feedback-box hidden";
+  }
+
+  if (optionsList) {
+    optionsList.innerHTML = "";
+    q.options.forEach((optText, idx) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "popquiz-option-btn";
+      btn.dataset.idx = String(idx);
+      btn.innerHTML = `
+        <span class="opt-key">${idx + 1}</span>
+        <span class="opt-text">${escapeHtml(optText)}</span>
+      `;
+      btn.addEventListener("click", () => handlePopQuizAnswer(idx));
+      optionsList.appendChild(btn);
+    });
+  }
+}
+
+async function handlePopQuizAnswer(selectedIdx) {
+  if (popQuizAnswered || !activePopQuizData) return;
+  popQuizAnswered = true;
+
+  const q = activePopQuizData;
+  const isCorrect = selectedIdx === q.answer_index;
+  const optionsList = document.getElementById("popquizOptionsList");
+  const feedbackBox = document.getElementById("popquizFeedbackBox");
+  const fbIcon = document.getElementById("popquizFbIcon");
+  const fbTitle = document.getElementById("popquizFbTitle");
+  const fbExpl = document.getElementById("popquizFbExpl");
+  const masteryTag = document.getElementById("popquizMasteryTag");
+  const masteryText = document.getElementById("popquizMasteryText");
+
+  // Highlight buttons
+  if (optionsList) {
+    const btns = optionsList.querySelectorAll(".popquiz-option-btn");
+    btns.forEach((btn, idx) => {
+      btn.disabled = true;
+      if (idx === q.answer_index) {
+        btn.classList.add("correct");
+      } else if (idx === selectedIdx && !isCorrect) {
+        btn.classList.add("wrong");
+      }
+    });
+  }
+
+  // Show feedback
+  if (feedbackBox) {
+    feedbackBox.classList.remove("hidden");
+    feedbackBox.classList.toggle("correct", isCorrect);
+    feedbackBox.classList.toggle("wrong", !isCorrect);
+  }
+
+  if (isCorrect) {
+    playSuccessChime();
+    if (fbIcon) fbIcon.innerHTML = '<svg class="ui-icon ui-icon-lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>';
+    if (fbTitle) fbTitle.innerText = "Harika! Doğru Yanıt — Dikkatiniz Yenilendi!";
+    if (masteryTag) masteryTag.classList.remove("hidden");
+    if (masteryText) masteryText.innerText = `Öğrenci Profili: "${q.term}" +30% Ustalık Eklendi`;
+  } else {
+    if (fbIcon) fbIcon.innerHTML = '<svg class="ui-icon ui-icon-lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+    if (fbTitle) fbTitle.innerText = "Doğru Açıklama:";
+    if (masteryTag) masteryTag.classList.remove("hidden");
+    if (masteryText) masteryText.innerText = `Öğrenci Profili: "${q.term}" İnceleme Önceliğine Alındı`;
+  }
+  if (fbExpl) fbExpl.innerText = q.explanation;
+
+  // Auto-focus resume button for quick Space/Enter key resumption
+  const btnResume = document.getElementById("btnResumeFromPopQuiz");
+  if (btnResume) btnResume.focus();
+
+  // Send answer to backend learner profile
+  try {
+    const videoId = currentResult?.video_meta?.id || "";
+    await fetch("/api/exam/quick-answer", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        term: q.term,
+        correct: isCorrect,
+        video_id: videoId,
+      }),
+    });
+    // Refresh student profile badge
+    loadLearnerProfile();
+  } catch (_) {}
+}
+
+function closeAttentionPopQuiz(resumePlayback = true) {
+  const modal = document.getElementById("popQuizModal");
+  if (modal) modal.classList.add("hidden");
+  popQuizActive = false;
+  activePopQuizData = null;
+
+  if (resumePlayback) {
+    resumeActiveMedia();
+    showToast("▶️ Video kaldığı yerden devam ediyor.", "success");
+  }
+}
+
+function setupAttentionPopQuiz() {
+  const btnTest = document.getElementById("btnTestPopQuiz");
+  const btnResearch = document.getElementById("btnOpenResearchModal");
+  const modalResearch = document.getElementById("attentionResearchModal");
+  const btnCloseResearch = document.getElementById("btnCloseResearchModal");
+  const btnCloseResearchBottom = document.getElementById("btnCloseResearchModalBottom");
+  const btnCloseModal = document.getElementById("btnClosePopQuizModal");
+  const btnSkip = document.getElementById("btnSkipPopQuiz");
+  const btnResume = document.getElementById("btnResumeFromPopQuiz");
+
+  if (btnTest) {
+    btnTest.addEventListener("click", () => {
+      let t = 180;
+      const ytContainer = document.getElementById("ytPlayerContainer");
+      const videoPlayer = document.getElementById("videoPlayer");
+      if (ytPlayer && typeof ytPlayer.getCurrentTime === "function" && ytContainer && !ytContainer.classList.contains("hidden")) {
+        try { t = ytPlayer.getCurrentTime() || 180; } catch (_) {}
+      } else if (videoPlayer && !videoPlayer.paused) {
+        t = videoPlayer.currentTime || 180;
+      }
+      triggerAttentionPopQuiz(Math.round(t) || 300);
+    });
+  }
+
+  if (btnResearch && modalResearch) {
+    btnResearch.addEventListener("click", () => {
+      modalResearch.classList.remove("hidden");
+    });
+  }
+
+  const closeResearch = () => {
+    if (modalResearch) modalResearch.classList.add("hidden");
+  };
+  if (btnCloseResearch) btnCloseResearch.addEventListener("click", closeResearch);
+  if (btnCloseResearchBottom) btnCloseResearchBottom.addEventListener("click", closeResearch);
+
+  if (btnCloseModal) btnCloseModal.addEventListener("click", () => closeAttentionPopQuiz(true));
+  if (btnSkip) btnSkip.addEventListener("click", () => closeAttentionPopQuiz(true));
+  if (btnResume) btnResume.addEventListener("click", () => closeAttentionPopQuiz(true));
+
+  // Keyboard navigation
+  window.addEventListener("keydown", (e) => {
+    const popModal = document.getElementById("popQuizModal");
+    if (!popModal || popModal.classList.contains("hidden")) return;
+    if (["INPUT", "TEXTAREA", "SELECT"].includes(e.target.tagName)) return;
+
+    if (e.key === "Escape") {
+      e.preventDefault();
+      closeAttentionPopQuiz(true);
+      return;
+    }
+
+    if (e.code === "Space" || e.key === "Enter") {
+      e.preventDefault();
+      closeAttentionPopQuiz(true);
+      return;
+    }
+
+    if (["1", "2", "3", "4"].includes(e.key)) {
+      e.preventDefault();
+      const idx = parseInt(e.key, 10) - 1;
+      handlePopQuizAnswer(idx);
+    }
+  });
 }
 
 // Eye Tracker Module Setup & Event Bindings
@@ -2366,6 +2837,10 @@ function setupEyeTracker() {
     }
   }
 
+  window.startEyeTracker = startEyeTracker;
+  window.stopEyeTracker = stopEyeTracker;
+  window.toggleEyeTracker = toggleEyeTracker;
+
   if (btnToggleNav) btnToggleNav.addEventListener("click", toggleEyeTracker);
   if (btnToggleToolbar) btnToggleToolbar.addEventListener("click", toggleEyeTracker);
 
@@ -2393,6 +2868,7 @@ function setupEyeTracker() {
       consecutiveDistractedMs = 0;
       resumeActiveMedia();
       distractionPausedMedia = false;
+      tabSwitchPausedMedia = false;
       showToast("Video devam ettirildi.", "success");
     });
   }
@@ -2404,6 +2880,7 @@ function setupEyeTracker() {
       consecutiveDistractedMs = 0;
       resumeActiveMedia();
       distractionPausedMedia = false;
+      tabSwitchPausedMedia = false;
       showToast("Duraklatma uyarısı 1 dakika ertelendi.", "info");
     });
   }
@@ -2647,8 +3124,13 @@ function setupEyeTracker() {
     totalFramesTracked++;
     const thresholdMs = getDistractionThresholdMs();
     const autoResumeChecked = document.getElementById("chkAutoResume")?.checked ?? true;
+    const chkWatch = document.getElementById("chkWatchPause");
+    const isWatchPauseActive = chkWatch ? chkWatch.checked : true;
 
     if (isDistracted) {
+      if (!isWatchPauseActive) {
+        return;
+      }
       consecutiveDistractedMs += deltaMs;
       consecutiveFocusedMs = 0;
 
@@ -2668,8 +3150,15 @@ function setupEyeTracker() {
               playAttentionChime();
               attentionPauseCount++;
 
+              const alertEmoji = document.getElementById("attentionAlertEmoji");
+              const alertTitle = document.getElementById("attentionAlertTitle");
               const reasonEl = document.getElementById("attentionPauseReason");
+              const liveMsg = document.getElementById("attentionLiveMsg");
+
+              if (alertEmoji) alertEmoji.innerHTML = '<svg class="ui-icon ui-icon-lg" viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>';
+              if (alertTitle) alertTitle.innerText = "Dikkat Dağınıklığı Algılandı!";
               if (reasonEl) reasonEl.innerText = `${reason}. Ders videosu odaklanmanız için otomatik duraklatıldı.`;
+              if (liveMsg) liveMsg.innerText = "Ekrana tekrar odaklandığınızda video devam edecektir...";
 
               const pauseCountEl = document.getElementById("etPauseCount");
               if (pauseCountEl) pauseCountEl.innerText = String(attentionPauseCount);
@@ -2780,6 +3269,364 @@ function getCurrentVideoTime() {
     return audioPlayer.currentTime;
   }
   return 0.0;
+}
+
+function setupManimator() {
+  const modal = document.getElementById("manimatorModal");
+  const btnNav = document.getElementById("btnNavManimator");
+  const btnOpenTrigger = document.getElementById("btnOpenManimator");
+  const btnSlideToManimator = document.getElementById("btnSlideToManimator");
+  const btnClose = document.getElementById("btnCloseManimatorModal");
+  const btnCloseFooter = document.getElementById("btnCloseManimatorFooter");
+  
+  const tabLecture = document.getElementById("tabManimatorLecture");
+  const tabPdf = document.getElementById("tabManimatorPdf");
+  const tabCustom = document.getElementById("tabManimatorCustom");
+  const panelLecture = document.getElementById("panelManimatorLecture");
+  const panelPdf = document.getElementById("panelManimatorPdf");
+  const panelCustom = document.getElementById("panelManimatorCustom");
+
+  const pdfInput = document.getElementById("manimatorPdfInput");
+  const btnSelectPdf = document.getElementById("btnSelectManimatorPdf");
+  const pdfNameBadge = document.getElementById("manimatorSelectedPdfName");
+
+  const btnGen = document.getElementById("btnTriggerManimatorGen");
+  const stepper = document.getElementById("manimatorProgressStepper");
+  const resultDeck = document.getElementById("manimatorResultDeck");
+  const videoPlayer = document.getElementById("manimatorVideoPlayer");
+  const subtitlesTimeline = document.getElementById("manimatorSubtitlesTimeline");
+  const termsContainer = document.getElementById("manimatorTermsContainer");
+  const hookText = document.getElementById("manimatorHookText");
+  const codeDisplay = document.getElementById("manimatorCodeDisplay");
+  const btnDownload = document.getElementById("btnDownloadManimVideo");
+  const btnCopyCode = document.getElementById("btnCopyManimCode");
+  const btnSaveLearner = document.getElementById("btnManimatorSaveLearner");
+
+  let currentGeneratedData = null;
+  let activeMode = "lecture";
+
+  function switchMode(mode) {
+    activeMode = mode;
+    [tabLecture, tabPdf, tabCustom].forEach((t) => {
+      if (t) t.classList.toggle("active", t.getAttribute("data-mode") === mode);
+    });
+    if (panelLecture) panelLecture.classList.toggle("hidden", mode !== "lecture");
+    if (panelPdf) panelPdf.classList.toggle("hidden", mode !== "pdf");
+    if (panelCustom) panelCustom.classList.toggle("hidden", mode !== "custom");
+  }
+
+  if (tabLecture) tabLecture.addEventListener("click", () => switchMode("lecture"));
+  if (tabPdf) tabPdf.addEventListener("click", () => switchMode("pdf"));
+  if (tabCustom) tabCustom.addEventListener("click", () => switchMode("custom"));
+
+  if (btnSelectPdf && pdfInput) {
+    btnSelectPdf.addEventListener("click", () => pdfInput.click());
+    pdfInput.addEventListener("change", () => {
+      if (pdfInput.files && pdfInput.files[0]) {
+        pdfNameBadge.textContent = pdfInput.files[0].name;
+      } else {
+        pdfNameBadge.textContent = "Dosya seçilmedi";
+      }
+    });
+  }
+
+  let activeStuckTime = 0;
+  let activeStuckConcept = "";
+  let activeStuckQuote = "";
+
+  function openManimatorModal(prefillConcept) {
+    if (!modal) return;
+    modal.classList.remove("hidden");
+
+    // Pause main lecture video while watching or generating explainer video
+    pauseActiveMedia();
+
+    // Get active playback timestamp
+    const t = getCurrentVideoTime();
+    activeStuckTime = t;
+    const tsBadge = document.getElementById("manimatorLectureTimestamp");
+    if (tsBadge) tsBadge.innerHTML = `<svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Anlık Zaman: ${escapeHtml(formatTime(t))}`;
+
+    // Get recent quote & terms
+    const asr = currentResult?.asr || {};
+    const segments = asr.segments || [];
+    const windowStart = Math.max(0, t - 45);
+    const windowEnd = t + 5;
+    const recentSegs = segments.filter(s => s.start !== undefined && s.end !== undefined && s.end >= windowStart && s.start <= windowEnd);
+    const recentText = recentSegs.length ? recentSegs.map(s => s.text).join(" ") : (asr.text || "").slice(0, 300);
+    activeStuckQuote = recentText;
+
+    const quoteEl = document.getElementById("manimatorLectureQuoteText");
+    if (quoteEl) {
+      quoteEl.textContent = recentText ? `"${recentText.slice(0, 240)}..."` : "Dersin bu anındaki içerik analiz edilerek anlatım videosu hazırlanacak.";
+    }
+
+    // Concept badge
+    let activeTerm = prefillConcept || "";
+    if (!activeTerm) {
+      const terms = currentResult?.llm?.terms || [];
+      const match = terms.find(tObj => tObj.start !== undefined && tObj.start >= windowStart && tObj.start <= windowEnd) || terms[0];
+      if (match) activeTerm = match.term;
+    }
+    activeStuckConcept = activeTerm;
+    const conceptBadge = document.getElementById("manimatorActiveConceptBadge");
+    if (conceptBadge) {
+      conceptBadge.innerHTML = `<svg class="ui-icon" viewBox="0 0 24 24"><line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg> Odak Kavram: ${escapeHtml(activeTerm || "Ders Bölümü")}`;
+    }
+    if (prefillConcept) {
+      const customInp = document.getElementById("manimatorCustomTopicInput");
+      if (customInp) customInp.value = prefillConcept;
+    }
+  }
+
+  function closeManimatorModal() {
+    if (!modal) return;
+    modal.classList.add("hidden");
+    if (videoPlayer) videoPlayer.pause();
+  }
+
+  if (btnNav) btnNav.addEventListener("click", () => openManimatorModal());
+  if (btnOpenTrigger) btnOpenTrigger.addEventListener("click", () => openManimatorModal());
+  if (btnSlideToManimator) {
+    btnSlideToManimator.addEventListener("click", () => {
+      const slideTitle = document.getElementById("slideMainTitle")?.innerText;
+      openManimatorModal(slideTitle);
+    });
+  }
+  if (btnClose) btnClose.addEventListener("click", closeManimatorModal);
+  if (btnCloseFooter) btnCloseFooter.addEventListener("click", closeManimatorModal);
+
+  // Stepper animation
+  function setStep(stepIndex) {
+    const steps = [
+      document.getElementById("stepQwen"),
+      document.getElementById("stepTts"),
+      document.getElementById("stepManim"),
+      document.getElementById("stepFfmpeg"),
+    ];
+    steps.forEach((el, idx) => {
+      if (!el) return;
+      el.classList.remove("active", "completed");
+      if (idx < stepIndex) el.classList.add("completed");
+      else if (idx === stepIndex) el.classList.add("active");
+    });
+  }
+
+  // Generation Handler
+  if (btnGen) {
+    btnGen.addEventListener("click", async () => {
+      const origText = btnGen.innerHTML;
+      btnGen.disabled = true;
+      btnGen.innerHTML = `<svg class="ui-icon spin" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> <span>Video Üretiliyor...</span>`;
+      if (stepper) stepper.classList.remove("hidden");
+      if (resultDeck) resultDeck.classList.add("hidden");
+
+      setStep(0); // Qwen script
+      const stepTimer1 = setTimeout(() => setStep(1), 2500); // TTS
+      const stepTimer2 = setTimeout(() => setStep(2), 5500); // Manim render
+      const stepTimer3 = setTimeout(() => setStep(3), 9500); // FFmpeg
+
+      try {
+        const style = document.getElementById("manimatorStyleSelect")?.value || "manim_animation";
+        const duration = parseInt(document.getElementById("manimatorDurationSelect")?.value || "50", 10);
+        const voice = document.getElementById("manimatorVoiceSelect")?.value || "tr-TR-AhmetNeural";
+        const modelMode = document.getElementById("manimatorModelSelect")?.value || "fast";
+        const useLocalQwen = (modelMode === "deep");
+
+        let responseData = null;
+
+        if (activeMode === "pdf" && pdfInput && pdfInput.files && pdfInput.files[0]) {
+          const formData = new FormData();
+          formData.append("file", pdfInput.files[0]);
+          formData.append("video_style", style);
+          formData.append("duration_s", duration.toString());
+          formData.append("voice", voice);
+          formData.append("lang", currentResult?.lang || "tr");
+
+          const res = await fetch("/api/manimator/pdf-to-video", {
+            method: "POST",
+            body: formData,
+          });
+          if (!res.ok) throw new Error(`Sunucu hatası: ${res.statusText}`);
+          responseData = await res.json();
+        } else {
+          // Lecture or Custom mode
+          let topicVal = "";
+          if (activeMode === "custom") {
+            topicVal = document.getElementById("manimatorCustomTopicInput")?.value?.trim() || "";
+          } else {
+            topicVal = activeStuckConcept || "";
+          }
+
+          const targetJobId = currentResult?.job_id || (currentVideoId ? `preview_${currentVideoId}` : null);
+          const res = await fetch("/api/manimator/generate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              job_id: targetJobId || "",
+              current_time_s: activeStuckTime || getCurrentVideoTime(),
+              topic: topicVal,
+              context: activeStuckQuote,
+              lang: currentResult?.lang || "tr",
+              video_style: style,
+              duration_s: duration,
+              voice: voice,
+              use_local_qwen: useLocalQwen,
+            }),
+          });
+          if (!res.ok) throw new Error(`Sunucu hatası: ${res.statusText}`);
+          responseData = await res.json();
+        }
+
+        clearTimeout(stepTimer1);
+        clearTimeout(stepTimer2);
+        clearTimeout(stepTimer3);
+        setStep(4); // All done!
+
+        currentGeneratedData = responseData;
+        renderManimatorResults(responseData);
+        showToast("Özel anlatım videosu başarıyla üretildi!", "success");
+      } catch (err) {
+        clearTimeout(stepTimer1);
+        clearTimeout(stepTimer2);
+        clearTimeout(stepTimer3);
+        console.error("Manimator generation error:", err);
+        showToast(`Video üretimi sırasında hata: ${err.message}`, "error");
+      } finally {
+        if (stepper) stepper.classList.add("hidden");
+        btnGen.disabled = false;
+        btnGen.innerHTML = origText;
+      }
+    });
+  }
+
+  function renderManimatorResults(data) {
+    if (!resultDeck || !data) return;
+    resultDeck.classList.remove("hidden");
+
+    // Video Player
+    if (videoPlayer && data.video_url) {
+      videoPlayer.src = data.video_url;
+      videoPlayer.load();
+      videoPlayer.play().catch(() => {});
+    }
+
+    // Duration badge
+    const durBadge = document.getElementById("manimatorVideoDurationBadge");
+    if (durBadge) durBadge.textContent = `${formatTime(data.duration_s || 0)}`;
+
+    // Hook text
+    if (hookText) hookText.textContent = data.pedagogical_hook || "Kavram pedagojik benzetmelerle modellenmiştir.";
+
+    // Terms
+    if (termsContainer) {
+      termsContainer.innerHTML = "";
+      (data.terms || []).forEach((t) => {
+        const row = document.createElement("div");
+        row.className = "manimator-term-pill-card";
+        row.innerHTML = `
+          <span class="manimator-term-name">${escapeHtml(t.term || "")}</span>
+          <span class="manimator-term-desc">${escapeHtml(t.explanation || "")}</span>
+        `;
+        termsContainer.appendChild(row);
+      });
+    }
+
+    // Manim Code
+    if (codeDisplay) {
+      codeDisplay.textContent = data.manim_code || "# Kod bulunamadı";
+    }
+
+    // Subtitles Timeline
+    if (subtitlesTimeline) {
+      subtitlesTimeline.innerHTML = "";
+      const subs = data.subtitles || [];
+      subs.forEach((cue) => {
+        const cueRow = document.createElement("div");
+        cueRow.className = "subtitle-cue-row";
+        cueRow.dataset.start = cue.start;
+        cueRow.dataset.end = cue.end;
+        cueRow.innerHTML = `
+          <span class="cue-time-badge">${formatTime(cue.start)}</span>
+          <span>${escapeHtml(cue.text || cue.title || "")}</span>
+        `;
+        cueRow.addEventListener("click", () => {
+          if (videoPlayer) {
+            videoPlayer.currentTime = cue.start;
+            videoPlayer.play().catch(() => {});
+          }
+        });
+        subtitlesTimeline.appendChild(cueRow);
+      });
+
+      // Synchronize active subtitle cue with video playback
+      if (videoPlayer) {
+        videoPlayer.ontimeupdate = () => {
+          const ct = videoPlayer.currentTime;
+          const rows = subtitlesTimeline.querySelectorAll(".subtitle-cue-row");
+          rows.forEach((r) => {
+            const st = parseFloat(r.dataset.start || "0");
+            const et = parseFloat(r.dataset.end || "999");
+            if (ct >= st && ct <= et) {
+              if (!r.classList.contains("active")) {
+                rows.forEach(x => x.classList.remove("active"));
+                r.classList.add("active");
+                r.scrollIntoView({ behavior: "smooth", block: "nearest" });
+              }
+            }
+          });
+        };
+      }
+    }
+  }
+
+  // Download & Copy Code Actions
+  if (btnDownload) {
+    btnDownload.addEventListener("click", () => {
+      if (!currentGeneratedData?.video_url) return;
+      const a = document.createElement("a");
+      a.href = currentGeneratedData.video_url;
+      a.download = `${currentGeneratedData.title || "manimator_video"}.mp4`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      showToast("Video indirmesi başlatıldı.", "success");
+    });
+  }
+
+  if (btnCopyCode) {
+    btnCopyCode.addEventListener("click", () => {
+      if (!currentGeneratedData?.manim_code) return;
+      navigator.clipboard.writeText(currentGeneratedData.manim_code).then(() => {
+        showToast("Python Manim kodu panoya kopyalandı!", "success");
+      });
+    });
+  }
+
+  if (btnSaveLearner) {
+    btnSaveLearner.addEventListener("click", async () => {
+      if (!currentGeneratedData?.terms) return;
+      try {
+        for (const t of currentGeneratedData.terms) {
+          if (t.term) {
+            await fetch("/api/popquiz/answer", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                term: t.term,
+                correct: true,
+                video_id: currentVideoId || "",
+              }),
+            });
+          }
+        }
+        await loadLearnerProfile();
+        showToast("Kavram anlaşıldı olarak profiline işlendi ve pekiştirildi!", "success");
+      } catch (e) {
+        showToast("Öğrenci profili güncellendi.", "info");
+      }
+    });
+  }
 }
 
 function setupHelperSlide() {
@@ -2955,7 +3802,9 @@ function setupHelperSlide() {
   if (btnFullscreen && windowWrapper) {
     btnFullscreen.addEventListener("click", () => {
       windowWrapper.classList.toggle("fullscreen");
-      btnFullscreen.innerText = windowWrapper.classList.contains("fullscreen") ? "✕" : "⛶";
+      btnFullscreen.innerHTML = windowWrapper.classList.contains("fullscreen")
+        ? '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>'
+        : '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>';
     });
   }
 
@@ -2986,10 +3835,10 @@ function setupHelperSlide() {
           cardEl.className = "slide-term-card";
           const title = card.title || card.term || "Kavram";
           const desc = card.desc || card.explanation || "";
-          const icon = card.icon || "📌";
+          const iconSvg = `<svg class="ui-icon ui-icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
           cardEl.innerHTML = `
             <div class="slide-term-header">
-              <span class="slide-term-name">${icon} ${escapeHtml(title)}</span>
+              <span class="slide-term-name">${iconSvg} ${escapeHtml(title)}</span>
               ${card.timestamp ? `<span class="badge-subtle" style="font-size:0.65rem">${card.timestamp}</span>` : ""}
             </div>
             <p class="slide-term-desc">${escapeHtml(desc)}</p>
@@ -3029,7 +3878,7 @@ function setupHelperSlide() {
         }).catch(() => {
           mermaidContainer.innerHTML = `
             <div style="background:rgba(255,255,255,0.03);padding:0.75rem;border-radius:6px;width:100%;font-size:0.82rem;color:var(--accent-cyan);line-height:1.6;">
-              <span style="font-weight:bold;color:#c4b5fd;">📊 Kavram Akışı:</span><br/>
+              <span style="font-weight:bold;color:#c4b5fd;">Kavram Akışı:</span><br/>
               ${escapeHtml(diagramCode.replace(/graph\s+(?:LR|TD|TB);?/gi, "").trim())}
             </div>
           `;
@@ -3089,9 +3938,9 @@ function setupHelperSlide() {
       core_takeaway: relevantTerms.length > 0
         ? `${relevantTerms[0].term}: ${relevantTerms[0].explanation || "Temel kavram anlatımı."}`
         : recentText.slice(0, 160) + "...",
-      mermaid_diagram: "graph LR\n  A[\"📅 Başlangıç & Plan\"] --> B[\"⚙️ Yürütme & Analiz\"]\n  B --> C[\"🎯 Sonuç & Kazanım\"]",
+      mermaid_diagram: "graph LR\n  A[\"Başlangıç & Plan\"] --> B[\"Yürütme & Analiz\"]\n  B --> C[\"Sonuç & Kazanım\"]",
       cards: relevantTerms.map(t => ({
-        icon: "📌",
+        icon: "",
         title: t.term,
         desc: t.explanation,
         timestamp: t.timestamp,
@@ -3137,7 +3986,7 @@ function setupHelperSlide() {
     closeDiagramLightbox();
     if (modal) modal.classList.add("hidden");
     if (windowWrapper) windowWrapper.classList.remove("fullscreen");
-    if (btnFullscreen) btnFullscreen.innerText = "⛶";
+    if (btnFullscreen) btnFullscreen.innerHTML = '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>';
   }
 
   if (btnOpen) btnOpen.addEventListener("click", openHelperSlide);
@@ -3176,9 +4025,9 @@ function setupHelperSlide() {
   // Deep AI Slide Generation with local Qwen 3.5
   if (btnDeepAI) {
     btnDeepAI.addEventListener("click", async () => {
-      const origText = btnDeepAI.innerText;
+      const origText = btnDeepAI.innerHTML;
       btnDeepAI.disabled = true;
-      btnDeepAI.innerText = "⏳ Qwen 3.5 Tasarlıyor...";
+      btnDeepAI.innerHTML = `<svg class="ui-icon spin" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Qwen 3.5 Tasarlıyor...`;
       showToast("Yerel Qwen 3.5 modeli slaytı ve kavram şemasını baştan tasarlıyor...", "info");
 
       try {
@@ -3208,7 +4057,7 @@ function setupHelperSlide() {
         showToast("Yapay zeka slayt tasarımı tamamlandı.", "info");
       } finally {
         btnDeepAI.disabled = false;
-        btnDeepAI.innerText = origText;
+        btnDeepAI.innerHTML = origText;
       }
     });
   }
@@ -3240,6 +4089,1981 @@ function setupHelperSlide() {
   });
 }
 
+// ==========================================================================
+// Smart Tab Visibility & Watch Distraction Tracker
+// Automatically pauses media when student switches tabs or looks away from video
+// ==========================================================================
+function setupTabVisibilityTracker() {
+  const chkTab = document.getElementById("chkTabPause");
+  const chkWatch = document.getElementById("chkWatchPause");
+
+  // Page Visibility API: Detect when user switches tabs or minimizes browser
+  document.addEventListener("visibilitychange", () => {
+    const isTabPauseActive = chkTab ? chkTab.checked : true;
+    const autoResumeChecked = document.getElementById("chkAutoResume")?.checked ?? true;
+    const overlay = document.getElementById("attentionPauseOverlay");
+    const tabCountEl = document.getElementById("etTabSwitchCount");
+    const pauseCountEl = document.getElementById("etPauseCount");
+
+    if (document.hidden || document.visibilityState === "hidden") {
+      // User switched away to another tab
+      if (isTabPauseActive && isAnyMediaPlaying()) {
+        tabSwitchPausedMedia = true;
+        pauseActiveMedia();
+        tabSwitchCount++;
+        attentionPauseCount++;
+        if (tabCountEl) tabCountEl.innerText = String(tabSwitchCount);
+        if (pauseCountEl) pauseCountEl.innerText = String(attentionPauseCount);
+        updateEyeTrackerStatus("DISTRACTED", "Sekme Dışında");
+        showAttentionPauseOverlay("tab");
+      }
+    } else {
+      // User returned to this tab
+      if (tabSwitchPausedMedia) {
+        if (autoResumeChecked) {
+          tabSwitchPausedMedia = false;
+          if (overlay) overlay.classList.add("hidden");
+          resumeActiveMedia();
+          updateEyeTrackerStatus("FOCUSED", "Odaklandı");
+          showToast("Sekmeye geri dönüldü: Video otomatik devam ediyor.", "success");
+        } else {
+          updateEyeTrackerStatus("WARNING", "Devam Bekleniyor");
+          showToast("Ders sekmesine geri döndünüz. Videoyu devam ettirmek için butona tıklayın.", "info");
+        }
+      }
+    }
+  });
+
+  // Window blur / focus: Detect when user clicks another application/window
+  let blurDebounce = null;
+  window.addEventListener("blur", () => {
+    // If user is interacting with an input/file dialog, do not pause
+    if (document.activeElement && (document.activeElement.tagName === "INPUT" || document.activeElement.tagName === "TEXTAREA" || document.activeElement.tagName === "SELECT")) {
+      return;
+    }
+    const isTabPauseActive = chkTab ? chkTab.checked : true;
+    if (!isTabPauseActive) return;
+
+    blurDebounce = setTimeout(() => {
+      if (isAnyMediaPlaying() && !tabSwitchPausedMedia) {
+        tabSwitchPausedMedia = true;
+        pauseActiveMedia();
+        tabSwitchCount++;
+        attentionPauseCount++;
+        const tabCountEl = document.getElementById("etTabSwitchCount");
+        const pauseCountEl = document.getElementById("etPauseCount");
+        if (tabCountEl) tabCountEl.innerText = String(tabSwitchCount);
+        if (pauseCountEl) pauseCountEl.innerText = String(attentionPauseCount);
+        updateEyeTrackerStatus("DISTRACTED", "Pencere Dışında");
+        showAttentionPauseOverlay("blur");
+      }
+    }, 450);
+  });
+
+  window.addEventListener("focus", () => {
+    if (blurDebounce) {
+      clearTimeout(blurDebounce);
+      blurDebounce = null;
+    }
+    if (tabSwitchPausedMedia) {
+      const autoResumeChecked = document.getElementById("chkAutoResume")?.checked ?? true;
+      const overlay = document.getElementById("attentionPauseOverlay");
+      if (autoResumeChecked) {
+        tabSwitchPausedMedia = false;
+        if (overlay) overlay.classList.add("hidden");
+        resumeActiveMedia();
+        updateEyeTrackerStatus("FOCUSED", "Odaklandı");
+        showToast("Ekrana geri dönüldü: Video otomatik devam ediyor.", "success");
+      }
+    }
+  });
+
+  // Watch pause checkbox listener
+  if (chkWatch) {
+    chkWatch.addEventListener("change", (e) => {
+      if (e.target.checked) {
+        if (!eyeTrackerActive && isAnyMediaPlaying() && typeof window.startEyeTracker === "function") {
+          window.startEyeTracker();
+        }
+        showToast("İzlenmeyince duraklatma (Bakış & Odak Takibi) etkinleştirildi.", "info");
+      } else {
+        showToast("İzlenmeyince duraklatma kapatıldı.", "warning");
+      }
+    });
+  }
+
+  if (chkTab) {
+    chkTab.addEventListener("change", (e) => {
+      showToast(e.target.checked ? "Sekmeden ayrılınca duraklatma aktif." : "Sekmeden ayrılınca duraklatma kapatıldı.", "info");
+    });
+  }
+
+  // Auto-activate eye tracker when HTML5 video or audio plays, if chkWatch is checked
+  const vidPlayer = document.getElementById("videoPlayer");
+  const audPlayer = document.getElementById("audioPlayer");
+  const onMediaPlayTrigger = () => {
+    const watchChk = document.getElementById("chkWatchPause");
+    if (watchChk && watchChk.checked && !eyeTrackerActive && typeof window.startEyeTracker === "function") {
+      window.startEyeTracker();
+    }
+  };
+  if (vidPlayer) vidPlayer.addEventListener("play", onMediaPlayTrigger);
+  if (audPlayer) audPlayer.addEventListener("play", onMediaPlayTrigger);
+}
+
+// ==========================================================================
+// Cornell Note-Taking Study Sheet & Export System (Walter Pauk Pedagogy)
+// ==========================================================================
+let activeCornellData = null;
+let activeCornellMarkdown = "";
+
+function setupCornellNotes() {
+  const modal = document.getElementById("cornellModal");
+  const btnOpenHeader = document.getElementById("btnNavCornell");
+  const btnOpenHub = document.getElementById("btnOpenCornellNotes");
+  const btnOpenToolbar = document.getElementById("btnOpenCornellToolbar");
+  const btnClose = document.getElementById("btnCloseCornellModal");
+  const btnCloseFooter = document.getElementById("btnCloseCornellFooter");
+  const btnPrint = document.getElementById("btnPrintCornell");
+  const btnDownloadMd = document.getElementById("btnDownloadCornellMd");
+  const btnCopyMd = document.getElementById("btnCopyCornellMd");
+
+  const openSheet = async () => {
+    await renderCornellNotesModal();
+  };
+
+  const closeSheet = () => {
+    if (modal) modal.classList.add("hidden");
+  };
+
+  if (btnOpenHeader) btnOpenHeader.addEventListener("click", openSheet);
+  if (btnOpenHub) btnOpenHub.addEventListener("click", openSheet);
+  if (btnOpenToolbar) btnOpenToolbar.addEventListener("click", openSheet);
+  if (btnClose) btnClose.addEventListener("click", closeSheet);
+  if (btnCloseFooter) btnCloseFooter.addEventListener("click", closeSheet);
+
+  if (btnPrint) {
+    btnPrint.addEventListener("click", () => {
+      window.print();
+    });
+  }
+
+  if (btnDownloadMd) {
+    btnDownloadMd.addEventListener("click", () => {
+      if (!activeCornellMarkdown) return;
+      const title = (activeCornellData?.title || "Cornell_Notes").replace(/[^\w\d\-_]/g, "_");
+      const blob = new Blob([activeCornellMarkdown], { type: "text/markdown;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${title}_Cornell_Notes.md`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast("Markdown (.md) ders notu indirildi!", "success");
+    });
+  }
+
+  if (btnCopyMd) {
+    btnCopyMd.addEventListener("click", async () => {
+      if (!activeCornellMarkdown) return;
+      try {
+        await navigator.clipboard.writeText(activeCornellMarkdown);
+        showToast("Cornell Ders Notu panoya kopyalandı! (Obsidian / Notion uyumlu)", "success");
+      } catch (err) {
+        showToast("Kopyalama başarısız oldu.", "error");
+      }
+    });
+  }
+
+  // Close on backdrop click
+  if (modal) {
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) closeSheet();
+    });
+  }
+
+  // Keyboard shortcut: Press 'C' to open Cornell sheet (when not typing)
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "c" || e.key === "C") {
+      const tag = (e.target.tagName || "").toLowerCase();
+      if (tag === "input" || tag === "textarea" || tag === "select" || e.target.isContentEditable) return;
+      if (modal && !modal.classList.contains("hidden")) {
+        closeSheet();
+      } else {
+        openSheet();
+      }
+    }
+  });
+}
+
+function generateClientSideCornellData(res) {
+  const meta = res?.video_meta || {};
+  const title = meta.title || "Ders Notu & Kavram Özeti";
+  const durSec = Number(meta.duration || res?.asr?.duration || 0);
+  const durStr = durSec > 0 ? `${Math.floor(durSec / 60).toString().padStart(2, '0')}:${Math.floor(durSec % 60).toString().padStart(2, '0')}` : "--:--";
+  const dateStr = new Date().toLocaleDateString("tr-TR");
+  const rawTerms = res?.llm?.terms || [];
+
+  const cues = [];
+  const notes = [];
+
+  rawTerms.forEach((t, idx) => {
+    const term = t.term || `Kavram ${idx + 1}`;
+    const expl = t.explanation || "Temel ders kavramı.";
+    const time = t.timestamp || "--:--";
+    const timeS = t.start != null ? Number(t.start) : null;
+    const low = (term + " " + expl).toLowerCase ? (term + " " + expl).toLowerCase() : "";
+
+    let question = `Sınav Sorusu: '${term}' kavramının temel işlevi nedir ve neden önemlidir?`;
+    if (low.includes("sapma") || low.includes("maliyet") || low.includes("variance")) {
+      question = `Hesaplama Sorusu: '${term}' formülü nedir ve negatif/pozitif çıkması neyi gösterir?`;
+    } else if (low.includes("yönetim") || low.includes("scrum") || low.includes("süreç")) {
+      question = `Süreç Sorusu: '${term}' yaklaşımının temel adımları ve hedefleri nelerdir?`;
+    }
+
+    let formula = null;
+    if (low.includes("çizelge sapması") || low.includes("schedule variance")) {
+      formula = "Formül: SV = EV - PV (SV > 0: İleride | SV < 0: Geride)";
+    } else if (low.includes("maliyet sapması") || low.includes("cost variance")) {
+      formula = "Formül: CV = EV - AC (CV > 0: Tasarruf | CV < 0: Bütçe Aşımı)";
+    } else if (low.includes("spi")) {
+      formula = "Formül: SPI = EV / PV (SPI >= 1.0: Başarılı)";
+    } else if (low.includes("cpi")) {
+      formula = "Formül: CPI = EV / AC (CPI >= 1.0: Verimli)";
+    }
+
+    let analogy = `Günlük Hayat Benzetmesi: Tıpkı bir projede hedeflenen aşamaya ulaşıp ulaşmadığınızı kontrol etmek gibidir.`;
+    if (low.includes("sapma") || low.includes("maliyet")) {
+      analogy = `Günlük Hayat Benzetmesi: Araba navigasyonunun varış saatine göre kaç dakika saptığınızı hesaplaması gibidir.`;
+    }
+
+    cues.push({
+      id: idx + 1,
+      term: term,
+      timestamp: time,
+      time_s: timeS,
+      question: question,
+      category: idx < 3 ? "Kritik Terim" : "Destekleyici Terim",
+    });
+
+    notes.push({
+      id: idx + 1,
+      term: term,
+      timestamp: time,
+      time_s: timeS,
+      explanation: expl,
+      analogy: analogy,
+      formula: formula,
+      exam_tip: `Sınav İpucu: '${term}' kavramının tanımına ve bağlantılı olduğu aşamalara dikkat edin.`,
+    });
+  });
+
+  const summary = {
+    main_takeaway: `Bu ders çalışmasında ${title} konusuna ait ${rawTerms.length} temel kavram CEFR B1 düzeyinde incelenmiştir. Kavramların neden-sonuç ilişkilerine, pratik formüllerine ve günlük hayat analojilerine odaklanarak kalıcı öğrenme sağlanmalıdır.`,
+  };
+
+  let md = `# 🎓 Cornell Ders Notu: ${title}\n**Tarih:** ${dateStr} | **Süre:** ${durStr} | **Seviye:** CEFR B1 | **Terim:** ${rawTerms.length}\n\n---\n\n`;
+  md += `| SOL SÜTUN (İPUÇLARI & SORULAR) | SAĞ SÜTUN (DERS NOTLARI & FORMÜLLER) |\n| :--- | :--- |\n`;
+  cues.forEach((c, i) => {
+    const n = notes[i] || {};
+    const left = `**${c.term}** [${c.timestamp}]<br/><br/>*❓ ${c.question}*`.replace(/\n/g, ' ');
+    let right = `**B1 Açıklama:** ${n.explanation}`;
+    if (n.formula) right += `<br/><br/>**📐 ${n.formula}**`;
+    if (n.analogy) right += `<br/><br/>*💡 ${n.analogy}*`;
+    right = right.replace(/\n/g, ' ');
+    md += `| ${left} | ${right} |\n`;
+  });
+  md += `\n---\n\n## 📌 BİLİŞSEL SENTEZ & ÖZET\n> ${summary.main_takeaway}\n\n*EduTerm AI — Cornell Study System*`;
+
+  return {
+    title: title,
+    date: dateStr,
+    duration: durStr,
+    total_terms: rawTerms.length,
+    cues: cues,
+    notes: notes,
+    summary: summary,
+    markdown: md,
+  };
+}
+
+async function renderCornellNotesModal() {
+  const modal = document.getElementById("cornellModal");
+  if (!modal) return;
+
+  const targetJobId = currentResult?.job_id || (currentVideoId ? `preview_${currentVideoId}` : "demo_evm");
+  const lectureTitle = currentResult?.video_meta?.title || "Ders Notu & Bilişsel Çıkarım";
+
+  modal.classList.remove("hidden");
+
+  let sheetData = null;
+
+  try {
+    const res = await fetch("/api/cornell-notes", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        job_id: targetJobId,
+        custom_title: lectureTitle,
+      }),
+    });
+    if (res.ok) {
+      sheetData = await res.json();
+    }
+  } catch (err) {
+    console.warn("Server Cornell fetch notice:", err);
+  }
+
+  if (!sheetData) {
+    sheetData = generateClientSideCornellData(currentResult);
+  }
+
+  activeCornellData = sheetData;
+  activeCornellMarkdown = sheetData.markdown || "";
+
+  // Populate DOM elements
+  const titleEl = document.getElementById("cornellDocTitle");
+  const dateEl = document.getElementById("cornellDocDate");
+  const durEl = document.getElementById("cornellDocDuration");
+  const countEl = document.getElementById("cornellDocTermCount");
+  const cuesContent = document.getElementById("cornellCuesContent");
+  const notesContent = document.getElementById("cornellNotesContent");
+  const summaryText = document.getElementById("cornellSummaryText");
+
+  if (titleEl) titleEl.innerText = sheetData.title || lectureTitle;
+  if (dateEl) dateEl.innerText = sheetData.date || new Date().toLocaleDateString("tr-TR");
+  if (durEl) durEl.innerText = sheetData.duration || "--:--";
+  if (countEl) countEl.innerText = `${sheetData.total_terms || 0} Terim`;
+
+  // Render Cues Column (Left)
+  if (cuesContent) {
+    cuesContent.innerHTML = "";
+    (sheetData.cues || []).forEach((c) => {
+      const card = document.createElement("div");
+      card.className = "cornell-cue-card";
+      card.innerHTML = `
+        <div class="cornell-cue-top">
+          <span class="cornell-cue-term">${escapeHtml(c.term)}</span>
+          ${c.timestamp && c.timestamp !== "--:--" ? `<span class="cornell-cue-time" title="Videoda bu ana sar">${escapeHtml(c.timestamp)}</span>` : ""}
+        </div>
+        <div class="cornell-cue-question">❓ ${escapeHtml(c.question)}</div>
+      `;
+      const timeBtn = card.querySelector(".cornell-cue-time");
+      if (timeBtn && c.time_s != null) {
+        timeBtn.addEventListener("click", () => {
+          seekPlayerTo(Number(c.time_s));
+          showToast(`Videoda ${c.timestamp} saniyesine sarıldı.`, "info");
+        });
+      }
+      cuesContent.appendChild(card);
+    });
+  }
+
+  // Render Notes Column (Right)
+  if (notesContent) {
+    notesContent.innerHTML = "";
+    (sheetData.notes || []).forEach((n) => {
+      const card = document.createElement("div");
+      card.className = "cornell-note-card";
+      let formulaHtml = n.formula ? `<div class="cornell-note-formula">📐 ${escapeHtml(n.formula)}</div>` : "";
+      let analogyHtml = n.analogy ? `<div class="cornell-note-analogy">💡 ${escapeHtml(n.analogy)}</div>` : "";
+      let tipHtml = n.exam_tip ? `<div class="cornell-note-examtip">⭐ ${escapeHtml(n.exam_tip)}</div>` : "";
+
+      card.innerHTML = `
+        <div class="cornell-note-term-title">
+          <svg class="ui-icon ui-icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span>${escapeHtml(n.term)}</span>
+        </div>
+        <div class="cornell-note-expl">${escapeHtml(n.explanation)}</div>
+        ${formulaHtml}
+        ${analogyHtml}
+        ${tipHtml}
+      `;
+      notesContent.appendChild(card);
+    });
+  }
+
+  // Render Summary & Synthesis (Bottom)
+  if (summaryText) {
+    summaryText.innerText = sheetData.summary?.main_takeaway || "Bu dersin temel kavramları B1 düzeyinde sadeleştirilmiş ve sınav hazırlığı için yapılandırılmıştır.";
+  }
+}
+
+/* ==========================================================================
+   INTERACTIVE CONCEPT KNOWLEDGE GRAPH (AUSUBEL MEANINGFUL LEARNING ENGINE)
+   ========================================================================== */
+
+let activeConceptGraphData = null;
+let conceptGraphState = {
+  canvas: null,
+  ctx: null,
+  nodes: [],
+  edges: [],
+  nodeMap: new Map(),
+  selectedNode: null,
+  hoveredNode: null,
+  panX: 0,
+  panY: 0,
+  zoom: 1.0,
+  isDragging: false,
+  draggedNode: null,
+  isPanning: false,
+  panStartX: 0,
+  panStartY: 0,
+  physicsActive: true,
+  filterCategory: "all",
+  searchQuery: "",
+  animId: null,
+  width: 0,
+  height: 0,
+  dpr: 1,
+};
+
+function generateClientSideConceptGraph(result) {
+  const meta = result?.video_meta || {};
+  const lectureTitle = meta.title || "Ders Kavram Ağı";
+  const lang = result?.lang || "tr";
+  const rawTerms = Array.isArray(result?.llm?.terms) && result.llm.terms.length > 0
+    ? result.llm.terms
+    : [
+        { term: "Kazanılmış Değer Yönetimi", explanation: "Projenin kapsam, maliyet ve zaman çizelgesi performansını bütünleştiren yöntem (EVM)." },
+        { term: "Kazanılmış Değer", explanation: "Tamamlanan işin onaylanmış bütçe karşılığı (EV)." },
+        { term: "Planlanmış Değer", explanation: "Belirli bir tarihe kadar yapılması planlanan bütçe (PV)." },
+        { term: "Gerçekleşen Maliyet", explanation: "Tamamlanan iş için fiilen harcanan toplam para (AC)." },
+        { term: "Maliyet Sapması", explanation: "EV ile AC arasındaki fark (CV = EV - AC). Negatif olması bütçe aşımını gösterir." },
+        { term: "Çizelge Sapması", explanation: "EV ile PV arasındaki fark (SV = EV - PV). Takvim ilerlemesini gösterir." },
+        { term: "Maliyet Performans İndeksi", explanation: "Kazanılmış Değerin Gerçekleşen Maliyete oranı (CPI = EV / AC)." },
+        { term: "Çizelge Performans İndeksi", explanation: "Kazanılmış Değerin Planlanmış Değere oranı (SPI = EV / PV)." },
+        { term: "Temel Çizgi", explanation: "Performans ölçümü için referans alınan başlangıç planı (Baseline)." },
+        { term: "İş Kırılım Yapısı", explanation: "Hedefi yönetilebilir iş paketlerine bölen hiyerarşik yapı (WBS)." },
+        { term: "İzleme", explanation: "Proje performans verilerinin düzenli olarak toplanması ve raporlanması." },
+        { term: "Kontrol", explanation: "Sapmaların belirlenip düzeltici önlemlerin devreye sokulması." },
+        { term: "Düzeltici Eylemler", explanation: "Sapmaları giderip projeyi plana döndürmek için yapılan müdahaleler." }
+      ];
+
+  const segments = Array.isArray(result?.asr?.segments) ? result.asr.segments : [];
+
+  const nodes = [];
+  const nodeMap = new Map();
+
+  rawTerms.forEach((item, idx) => {
+    const name = (item.term || "").trim();
+    if (!name) return;
+    const nameLow = name.toLowerCase();
+    const id = nameLow.replace(/[^\w\-]+/g, "_").replace(/^_+|_+$/g, "") || `node_${idx}`;
+
+    // Find all occurrences across segments
+    let occurrences = [];
+    if (Array.isArray(item.occurrences) && item.occurrences.length > 0) {
+      occurrences = item.occurrences;
+    } else {
+      const words = nameLow.split(/\s+/).filter(w => w.length >= 3);
+      const seenTimes = new Set();
+      segments.forEach(seg => {
+        const segTxt = (seg.text || "").trim();
+        const segLow = segTxt.toLowerCase();
+        let match = false;
+        if (segLow.includes(nameLow)) {
+          match = true;
+        } else if (words.length >= 2 && words.every(w => segLow.includes(w))) {
+          match = true;
+        } else if (words.length === 1 && segLow.includes(words[0])) {
+          match = true;
+        }
+        if (match && seg.start != null) {
+          const s = Math.floor(Number(seg.start));
+          if (!seenTimes.has(s)) {
+            seenTimes.add(s);
+            const m = Math.floor(s / 60);
+            const remS = s % 60;
+            occurrences.push({
+              start_s: Number(seg.start),
+              end_s: seg.end != null ? Number(seg.end) : Number(seg.start) + 4,
+              timestamp: `${String(m).padStart(2, '0')}:${String(remS).padStart(2, '0')}`,
+              snippet: segTxt
+            });
+          }
+        }
+      });
+    }
+
+    // Determine category
+    let category = "concept";
+    let categoryLabel = "Kavram";
+    const explLow = (item.explanation || "").toLowerCase();
+    if (nameLow.includes("yönetim") || nameLow.includes("evm") || explLow.includes("metodoloji") || explLow.includes("bütünleştiren")) {
+      category = "core";
+      categoryLabel = "Kök Kavram";
+    } else if (nameLow.includes("değer") || nameLow.includes("sapma") || nameLow.includes("indeks") || nameLow.includes("maliyet") || nameLow.includes("çizelge") || nameLow.includes("cpi") || nameLow.includes("spi")) {
+      category = "metric";
+      categoryLabel = "Metrik & Formül";
+    } else if (nameLow.includes("izleme") || nameLow.includes("kontrol") || nameLow.includes("eylem") || nameLow.includes("süreç")) {
+      category = "process";
+      categoryLabel = "Süreç & Eylem";
+    } else if (nameLow.includes("plan") || nameLow.includes("çizgi") || nameLow.includes("yapı") || nameLow.includes("şema") || nameLow.includes("wbs")) {
+      category = "artifact";
+      categoryLabel = "Belge & Yapı";
+    }
+
+    // Detect formula
+    let formula = null;
+    if (nameLow.includes("maliyet sapması") || nameLow.includes("cv")) {
+      formula = "CV = EV - AC (CV > 0: Tasarruf | CV < 0: Bütçe Aşımı)";
+    } else if (nameLow.includes("çizelge sapması") || nameLow.includes("sv")) {
+      formula = "SV = EV - PV (SV > 0: Takvimden Hızlı | SV < 0: Gecikme)";
+    } else if (nameLow.includes("maliyet performans") || nameLow.includes("cpi")) {
+      formula = "CPI = EV / AC (CPI >= 1.0: Verimli)";
+    } else if (nameLow.includes("çizelge performans") || nameLow.includes("spi")) {
+      formula = "SPI = EV / PV (SPI >= 1.0: İlerleme Hızlı)";
+    }
+
+    let analogy = "Günlük Hayat Benzetmesi: Bir hedefe giderken yol haritasında konumunuzu kontrol etmeye benzer.";
+    if (category === "metric") {
+      analogy = "Günlük Hayat Benzetmesi: Arabanın hız ve yakıt göstergesi gibi projenin sağlığını anlık bildirir.";
+    } else if (category === "process") {
+      analogy = "Günlük Hayat Benzetmesi: Trafikte sapma görünce navigasyonun rotayı yeniden hesaplaması gibidir.";
+    }
+
+    const nodeObj = {
+      id: id,
+      label: name,
+      category: category,
+      category_label: categoryLabel,
+      explanation: item.explanation || "Bu ders konusunun temel teknik kavramı.",
+      analogy: analogy,
+      formula: formula,
+      occurrences: occurrences,
+      occurrences_count: occurrences.length,
+      first_timestamp: occurrences.length > 0 ? occurrences[0].timestamp : (item.timestamp || "--:--"),
+      first_start_s: occurrences.length > 0 ? occurrences[0].start_s : (item.start_s || 0),
+    };
+
+    nodes.push(nodeObj);
+    nodeMap.set(id, nodeObj);
+  });
+
+  // Relationships
+  const edges = [];
+  const edgeKeys = new Set();
+  function addEdge(u, v, rel, type, desc) {
+    if (u === v || !nodeMap.has(u) || !nodeMap.has(v)) return;
+    const key = `${u}->${v}`;
+    if (edgeKeys.has(key)) return;
+    edgeKeys.add(key);
+    edges.push({ source: u, target: v, relation: rel, type: type, description: desc });
+  }
+
+  // Pre-mapped Curated Triples
+  const triples = [
+    ["kazanılmış değer yönetimi", "kazanılmış değer", "bileşenidir", "part_whole", "Kazanılmış Değer, EVM analizinin temel taşıdır."],
+    ["kazanılmış değer yönetimi", "planlanmış değer", "bileşenidir", "part_whole", "Planlanmış Değer, EVM analizinin bütçesel temelidir."],
+    ["kazanılmış değer yönetimi", "gerçekleşen maliyet", "bileşenidir", "part_whole", "Gerçekleşen Maliyet, EVM'in fiili harcama ayağıdır."],
+    ["kazanılmış değer", "maliyet sapması", "hesaplar", "calculates", "CV = EV - AC formülü ile maliyet sapması türetilir."],
+    ["gerçekleşen maliyet", "maliyet sapması", "belirler", "calculates", "Harcama tutarı maliyet sapmasını etkiler."],
+    ["kazanılmış değer", "çizelge sapması", "hesaplar", "calculates", "SV = EV - PV formülü ile takvim sapması türetilir."],
+    ["planlanmış değer", "çizelge sapması", "belirler", "calculates", "Hedeflenen iş takvim sapmasının karşılaştırma bazıdır."],
+    ["kazanılmış değer", "maliyet performans indeksi", "oranlar", "calculates", "CPI = EV / AC bütçe verimliliğini verir."],
+    ["gerçekleşen maliyet", "maliyet performans indeksi", "oranlar", "calculates", "AC paydada yer alarak CPI katsayısını belirler."],
+    ["kazanılmış değer", "çizelge performans indeksi", "oranlar", "calculates", "SPI = EV / PV takvim ilerleme verimini verir."],
+    ["planlanmış değer", "çizelge performans indeksi", "oranlar", "calculates", "PV paydada yer alarak SPI katsayısını belirler."],
+    ["izleme", "kontrol", "besler", "causal", "İzleme verisi sapma kontrol sürecine girdi sağlar."],
+    ["maliyet sapması", "düzeltici eylemler", "tetikler", "causal", "Bütçe aşımı düzeltici müdahaleyi gerektirir."],
+    ["çizelge sapması", "düzeltici eylemler", "tetikler", "causal", "Zaman gecikmesi toparlanma tedbirlerini başlatır."],
+    ["temel çizgi", "izleme", "referans alır", "prerequisite", "İzleme süreci performansı onaylı temel çizgiyle kıyaslar."],
+    ["proje yönetimi", "kazanılmış değer yönetimi", "metodudur", "part_whole", "EVM, proje kontrolünde uygulanan ana analitik yöntemdir."],
+    ["proje yönetimi", "proje yönetim planı", "oluşturur", "prerequisite", "Planlama tüm süreçlerin başlangıç rehberidir."],
+    ["proje yönetim planı", "temel çizgi", "belirler", "part_whole", "Yönetim planı performans temel çizgisini kapsar."],
+    ["proje yönetim planı", "iş kırılım yapısı", "ayrıştırır", "part_whole", "Plan, işleri hiyerarşik WBS parçalarına böler."]
+  ];
+
+  triples.forEach(([sPat, tPat, rel, type, desc]) => {
+    let src = null, tgt = null;
+    nodes.forEach(n => {
+      const l = n.label.toLowerCase();
+      if (l.includes(sPat) || sPat.includes(l)) src = n.id;
+      if (l.includes(tPat) || tPat.includes(l)) tgt = n.id;
+    });
+    if (src && tgt && src !== tgt) addEdge(src, tgt, rel, type, desc);
+  });
+
+  // Semantic textual linking
+  nodes.forEach((na, i) => {
+    const explA = (na.explanation || "").toLowerCase();
+    nodes.forEach((nb, j) => {
+      if (i === j) return;
+      const lb = nb.label.toLowerCase();
+      if (lb.length >= 4 && explA.includes(lb)) {
+        let rLbl = "ile ilişkilidir", rType = "correlates";
+        if (explA.includes("bileşen") || explA.includes("parça") || explA.includes("içerir")) {
+          rLbl = "bileşenidir"; rType = "part_whole";
+        } else if (explA.includes("hesap") || explA.includes("oran") || explA.includes("fark")) {
+          rLbl = "hesaplar"; rType = "calculates";
+        } else if (explA.includes("neden") || explA.includes("etki") || explA.includes("tetikler")) {
+          rLbl = "etkiler"; rType = "causal";
+        }
+        addEdge(na.id, nb.id, rLbl, rType, `${na.label} ile ${nb.label} derste bağlantılıdır.`);
+      }
+    });
+  });
+
+  // Guarantee connected topology
+  const hub = nodes.find(n => n.category === "core") || nodes[0];
+  if (hub) {
+    const connectedNodes = new Set();
+    edges.forEach(e => { connectedNodes.add(e.source); connectedNodes.add(e.target); });
+    nodes.forEach(n => {
+      if (!connectedNodes.has(n.id) && n.id !== hub.id) {
+        addEdge(hub.id, n.id, "kapsar", "part_whole", `${hub.label} ders çerçevesinde ${n.label} kavramını kapsar.`);
+      }
+    });
+  }
+
+  return {
+    title: lectureTitle,
+    lang: lang,
+    nodes: nodes,
+    edges: edges,
+    pedagogical_meta: {
+      theory: "Ausubel'in Anlamlı Öğrenme Teorisi (Cognitive Mapping)",
+      total_nodes: nodes.length,
+      total_edges: edges.length,
+    }
+  };
+}
+
+async function openConceptKnowledgeGraph() {
+  const modal = document.getElementById("conceptGraphModal");
+  if (!modal) return;
+  modal.classList.remove("hidden");
+
+  let graphData = null;
+  const targetJobId = currentResult?.job_id || (currentVideoId ? `preview_${currentVideoId}` : "demo_evm");
+  const lectureTitle = currentResult?.video_meta?.title || "Ders Kavram Ağı";
+
+  try {
+    const res = await fetch("/api/concept-graph", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        job_id: targetJobId,
+        custom_title: lectureTitle,
+        lang: currentResult?.lang || "tr",
+      }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.graph) {
+        graphData = data.graph;
+      }
+    }
+  } catch (err) {
+    console.warn("Server concept graph fetch fallback:", err);
+  }
+
+  if (!graphData || !graphData.nodes || graphData.nodes.length === 0) {
+    graphData = generateClientSideConceptGraph(currentResult);
+  }
+
+  activeConceptGraphData = graphData;
+
+  // Update Counters
+  const nodeCountEl = document.getElementById("graphNodeCount");
+  const edgeCountEl = document.getElementById("graphEdgeCount");
+  const modalTitleEl = document.getElementById("conceptGraphModalTitle");
+
+  if (nodeCountEl) nodeCountEl.innerText = graphData.nodes.length;
+  if (edgeCountEl) edgeCountEl.innerText = graphData.edges.length;
+  if (modalTitleEl && graphData.title) modalTitleEl.innerText = `${graphData.title} • Kavram Ağı`;
+
+  // Init Engine
+  initConceptGraphEngine(graphData);
+
+  // Auto-select first central node
+  const hub = graphData.nodes.find(n => n.category === "core") || graphData.nodes[0];
+  if (hub) {
+    selectConceptGraphNode(hub);
+  }
+}
+
+function initConceptGraphEngine(graphData) {
+  const container = document.getElementById("graphCanvasContainer");
+  const canvas = document.getElementById("conceptGraphCanvas");
+  if (!container || !canvas) return;
+
+  stopConceptGraphAnimation();
+
+  const dpr = window.devicePixelRatio || 1;
+  const rect = container.getBoundingClientRect();
+  const w = rect.width || 800;
+  const h = rect.height || 600;
+
+  canvas.width = w * dpr;
+  canvas.height = h * dpr;
+  canvas.style.width = `${w}px`;
+  canvas.style.height = `${h}px`;
+
+  const ctx = canvas.getContext("2d");
+  ctx.scale(dpr, dpr);
+
+  conceptGraphState.canvas = canvas;
+  conceptGraphState.ctx = ctx;
+  conceptGraphState.width = w;
+  conceptGraphState.height = h;
+  conceptGraphState.dpr = dpr;
+  conceptGraphState.panX = 0;
+  conceptGraphState.panY = 0;
+  conceptGraphState.zoom = 1.0;
+  conceptGraphState.physicsActive = true;
+  conceptGraphState.hoveredNode = null;
+  conceptGraphState.selectedNode = null;
+  conceptGraphState.nodeMap = new Map();
+
+  // Position nodes in radial concentric orbits
+  const n = graphData.nodes.length;
+  const centerX = w / 2;
+  const centerY = h / 2;
+  const radius = Math.min(w, h) * 0.35;
+
+  const nodes = graphData.nodes.map((node, i) => {
+    let angle = (i / n) * Math.PI * 2;
+    let r = radius;
+    if (node.category === "core") {
+      r = radius * 0.25;
+    } else if (node.category === "metric") {
+      r = radius * 0.65;
+    }
+    const x = centerX + Math.cos(angle) * r + (Math.random() - 0.5) * 40;
+    const y = centerY + Math.sin(angle) * r + (Math.random() - 0.5) * 40;
+
+    let nodeRadius = 22;
+    if (node.category === "core") nodeRadius = 28;
+    else if (node.category === "metric") nodeRadius = 24;
+
+    const nodeObj = {
+      ...node,
+      x: x,
+      y: y,
+      vx: 0,
+      vy: 0,
+      radius: nodeRadius,
+    };
+    conceptGraphState.nodeMap.set(node.id, nodeObj);
+    return nodeObj;
+  });
+
+  const edges = graphData.edges.map(e => ({
+    ...e,
+    sourceNode: conceptGraphState.nodeMap.get(e.source),
+    targetNode: conceptGraphState.nodeMap.get(e.target),
+  })).filter(e => e.sourceNode && e.targetNode);
+
+  conceptGraphState.nodes = nodes;
+  conceptGraphState.edges = edges;
+
+  // Bind Canvas Interaction Events
+  setupCanvasEvents(canvas);
+
+  // Start Animation
+  startConceptGraphAnimation();
+}
+
+function setupCanvasEvents(canvas) {
+  // Remove prior cloned listeners
+  const newCanvas = canvas.cloneNode(true);
+  canvas.parentNode.replaceChild(newCanvas, canvas);
+  conceptGraphState.canvas = newCanvas;
+  conceptGraphState.ctx = newCanvas.getContext("2d");
+  conceptGraphState.ctx.scale(conceptGraphState.dpr, conceptGraphState.dpr);
+
+  function getMousePos(e) {
+    const rect = newCanvas.getBoundingClientRect();
+    const clientX = e.clientX ?? (e.touches && e.touches[0]?.clientX) ?? 0;
+    const clientY = e.clientY ?? (e.touches && e.touches[0]?.clientY) ?? 0;
+    const screenX = clientX - rect.left;
+    const screenY = clientY - rect.top;
+    // Invert pan and zoom to get world coordinates
+    const worldX = (screenX - conceptGraphState.panX) / conceptGraphState.zoom;
+    const worldY = (screenY - conceptGraphState.panY) / conceptGraphState.zoom;
+    return { screenX, screenY, worldX, worldY };
+  }
+
+  function findNodeUnder(worldX, worldY) {
+    for (let i = conceptGraphState.nodes.length - 1; i >= 0; i--) {
+      const node = conceptGraphState.nodes[i];
+      if (!isNodeVisible(node)) continue;
+      const dx = worldX - node.x;
+      const dy = worldY - node.y;
+      if (dx * dx + dy * dy <= (node.radius + 6) * (node.radius + 6)) {
+        return node;
+      }
+    }
+    return null;
+  }
+
+  newCanvas.addEventListener("pointerdown", (e) => {
+    const pos = getMousePos(e);
+    const hitNode = findNodeUnder(pos.worldX, pos.worldY);
+    if (hitNode) {
+      conceptGraphState.isDragging = true;
+      conceptGraphState.draggedNode = hitNode;
+      hitNode.vx = 0;
+      hitNode.vy = 0;
+    } else {
+      conceptGraphState.isPanning = true;
+      conceptGraphState.panStartX = pos.screenX - conceptGraphState.panX;
+      conceptGraphState.panStartY = pos.screenY - conceptGraphState.panY;
+      newCanvas.style.cursor = "grabbing";
+    }
+  });
+
+  window.addEventListener("pointermove", (e) => {
+    if (!conceptGraphState.canvas) return;
+    const pos = getMousePos(e);
+
+    if (conceptGraphState.isDragging && conceptGraphState.draggedNode) {
+      conceptGraphState.draggedNode.x = pos.worldX;
+      conceptGraphState.draggedNode.y = pos.worldY;
+      conceptGraphState.draggedNode.vx = 0;
+      conceptGraphState.draggedNode.vy = 0;
+      drawConceptGraph();
+      return;
+    }
+
+    if (conceptGraphState.isPanning) {
+      conceptGraphState.panX = pos.screenX - conceptGraphState.panStartX;
+      conceptGraphState.panY = pos.screenY - conceptGraphState.panStartY;
+      drawConceptGraph();
+      return;
+    }
+
+    // Hover detection
+    const hitNode = findNodeUnder(pos.worldX, pos.worldY);
+    if (hitNode !== conceptGraphState.hoveredNode) {
+      conceptGraphState.hoveredNode = hitNode;
+      newCanvas.style.cursor = hitNode ? "pointer" : "grab";
+      drawConceptGraph();
+    }
+  });
+
+  window.addEventListener("pointerup", (e) => {
+    if (conceptGraphState.isDragging && conceptGraphState.draggedNode) {
+      const pos = getMousePos(e);
+      const hitNode = findNodeUnder(pos.worldX, pos.worldY);
+      if (hitNode && hitNode === conceptGraphState.draggedNode) {
+        selectConceptGraphNode(hitNode);
+      }
+    }
+    conceptGraphState.isDragging = false;
+    conceptGraphState.draggedNode = null;
+    conceptGraphState.isPanning = false;
+    if (newCanvas) newCanvas.style.cursor = "grab";
+  });
+
+  newCanvas.addEventListener("wheel", (e) => {
+    e.preventDefault();
+    const pos = getMousePos(e);
+    const zoomFactor = e.deltaY < 0 ? 1.12 : 0.89;
+    const newZoom = Math.max(0.35, Math.min(2.8, conceptGraphState.zoom * zoomFactor));
+
+    // Zoom towards mouse
+    conceptGraphState.panX = pos.screenX - (pos.screenX - conceptGraphState.panX) * (newZoom / conceptGraphState.zoom);
+    conceptGraphState.panY = pos.screenY - (pos.screenY - conceptGraphState.panY) * (newZoom / conceptGraphState.zoom);
+    conceptGraphState.zoom = newZoom;
+    drawConceptGraph();
+  }, { passive: false });
+}
+
+function isNodeVisible(node) {
+  if (conceptGraphState.filterCategory !== "all") {
+    if (node.category !== conceptGraphState.filterCategory) return false;
+  }
+  return true;
+}
+
+function startConceptGraphAnimation() {
+  if (conceptGraphState.animId) cancelAnimationFrame(conceptGraphState.animId);
+
+  let stepCount = 0;
+
+  function loop() {
+    if (conceptGraphState.physicsActive) {
+      updateConceptGraphPhysics();
+    }
+    drawConceptGraph();
+    stepCount++;
+    // Continue running while modal is open
+    const modal = document.getElementById("conceptGraphModal");
+    if (modal && !modal.classList.contains("hidden")) {
+      conceptGraphState.animId = requestAnimationFrame(loop);
+    }
+  }
+
+  conceptGraphState.animId = requestAnimationFrame(loop);
+}
+
+function stopConceptGraphAnimation() {
+  if (conceptGraphState.animId) {
+    cancelAnimationFrame(conceptGraphState.animId);
+    conceptGraphState.animId = null;
+  }
+}
+
+function updateConceptGraphPhysics() {
+  const nodes = conceptGraphState.nodes;
+  const edges = conceptGraphState.edges;
+  const centerX = conceptGraphState.width / 2;
+  const centerY = conceptGraphState.height / 2;
+
+  // 1. Coulomb Repulsion
+  for (let i = 0; i < nodes.length; i++) {
+    const na = nodes[i];
+    for (let j = i + 1; j < nodes.length; j++) {
+      const nb = nodes[j];
+      const dx = nb.x - na.x;
+      const dy = nb.y - na.y;
+      const distSq = dx * dx + dy * dy + 1;
+      const dist = Math.sqrt(distSq);
+
+      if (dist < 400) {
+        const force = 1800 / distSq;
+        const fx = (dx / dist) * force;
+        const fy = (dy / dist) * force;
+
+        if (na !== conceptGraphState.draggedNode) {
+          na.vx -= fx;
+          na.vy -= fy;
+        }
+        if (nb !== conceptGraphState.draggedNode) {
+          nb.vx += fx;
+          nb.vy += fy;
+        }
+      }
+    }
+  }
+
+  // 2. Hooke's Law Spring Attraction along Edges
+  const restLength = 140;
+  const springK = 0.04;
+  for (let i = 0; i < edges.length; i++) {
+    const edge = edges[i];
+    const na = edge.sourceNode;
+    const nb = edge.targetNode;
+    if (!na || !nb) continue;
+
+    const dx = nb.x - na.x;
+    const dy = nb.y - na.y;
+    const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+    const displacement = dist - restLength;
+    const force = displacement * springK;
+    const fx = (dx / dist) * force;
+    const fy = (dy / dist) * force;
+
+    if (na !== conceptGraphState.draggedNode) {
+      na.vx += fx;
+      na.vy += fy;
+    }
+    if (nb !== conceptGraphState.draggedNode) {
+      nb.vx -= fx;
+      nb.vy -= fy;
+    }
+  }
+
+  // 3. Center Gravity Pull
+  const gravityK = 0.012;
+  for (let i = 0; i < nodes.length; i++) {
+    const node = nodes[i];
+    if (node === conceptGraphState.draggedNode) continue;
+    const dx = centerX - node.x;
+    const dy = centerY - node.y;
+    node.vx += dx * gravityK;
+    node.vy += dy * gravityK;
+
+    // Apply damping
+    node.vx *= 0.86;
+    node.vy *= 0.86;
+
+    node.x += node.vx;
+    node.y += node.vy;
+  }
+}
+
+function drawConceptGraph() {
+  const ctx = conceptGraphState.ctx;
+  if (!ctx || !conceptGraphState.canvas) return;
+
+  const w = conceptGraphState.width;
+  const h = conceptGraphState.height;
+
+  ctx.clearRect(0, 0, w, h);
+
+  ctx.save();
+  ctx.translate(conceptGraphState.panX, conceptGraphState.panY);
+  ctx.scale(conceptGraphState.zoom, conceptGraphState.zoom);
+
+  const selected = conceptGraphState.selectedNode;
+  const hovered = conceptGraphState.hoveredNode;
+  const search = conceptGraphState.searchQuery;
+
+  // Draw Edges
+  conceptGraphState.edges.forEach((edge) => {
+    const na = edge.sourceNode;
+    const nb = edge.targetNode;
+    if (!na || !nb) return;
+
+    const isConnectedToFocus = (selected && (na.id === selected.id || nb.id === selected.id)) ||
+                               (hovered && (na.id === hovered.id || nb.id === hovered.id));
+
+    const isDimmed = (selected || hovered) && !isConnectedToFocus;
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(na.x, na.y);
+    ctx.lineTo(nb.x, nb.y);
+
+    if (isConnectedToFocus) {
+      ctx.strokeStyle = "#818cf8";
+      ctx.lineWidth = 2.8;
+      ctx.globalAlpha = 1.0;
+    } else if (isDimmed) {
+      ctx.strokeStyle = "rgba(148, 163, 184, 0.15)";
+      ctx.lineWidth = 1;
+      ctx.globalAlpha = 0.15;
+    } else {
+      ctx.strokeStyle = "rgba(148, 163, 184, 0.4)";
+      ctx.lineWidth = 1.5;
+      ctx.globalAlpha = 0.6;
+    }
+    ctx.stroke();
+
+    // Draw Arrowhead pointing to target
+    const angle = Math.atan2(nb.y - na.y, nb.x - na.x);
+    const arrowDist = nb.radius + 4;
+    const arrowX = nb.x - Math.cos(angle) * arrowDist;
+    const arrowY = nb.y - Math.sin(angle) * arrowDist;
+
+    ctx.fillStyle = ctx.strokeStyle;
+    ctx.beginPath();
+    ctx.moveTo(arrowX, arrowY);
+    ctx.lineTo(arrowX - 8 * Math.cos(angle - Math.PI / 6), arrowY - 8 * Math.sin(angle - Math.PI / 6));
+    ctx.lineTo(arrowX - 8 * Math.cos(angle + Math.PI / 6), arrowY - 8 * Math.sin(angle + Math.PI / 6));
+    ctx.closePath();
+    ctx.fill();
+
+    // Draw Relation Label Pill along Edge if connected or zoomed in
+    if ((isConnectedToFocus || conceptGraphState.zoom >= 0.9) && !isDimmed) {
+      const midX = (na.x + nb.x) / 2;
+      const midY = (na.y + nb.y) / 2;
+      const relText = edge.relation || "";
+      ctx.font = "bold 9px 'Inter', system-ui, sans-serif";
+      const metrics = ctx.measureText(relText);
+      const pad = 4;
+
+      ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
+      ctx.beginPath();
+      ctx.roundRect(midX - metrics.width / 2 - pad, midY - 7 - pad / 2, metrics.width + pad * 2, 14 + pad, 4);
+      ctx.fill();
+      ctx.strokeStyle = isConnectedToFocus ? "#818cf8" : "rgba(255, 255, 255, 0.15)";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      ctx.fillStyle = isConnectedToFocus ? "#c7d2fe" : "#94a3b8";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(relText, midX, midY);
+    }
+
+    ctx.restore();
+  });
+
+  // Category Color Map
+  const colorMap = {
+    core: { fill: "#8b5cf6", border: "#a78bfa", glow: "rgba(139, 92, 246, 0.5)" },
+    metric: { fill: "#10b981", border: "#34d399", glow: "rgba(16, 185, 129, 0.5)" },
+    process: { fill: "#f59e0b", border: "#fbbf24", glow: "rgba(245, 158, 11, 0.5)" },
+    artifact: { fill: "#06b6d4", border: "#22d3ee", glow: "rgba(6, 182, 212, 0.5)" },
+    concept: { fill: "#6366f1", border: "#818cf8", glow: "rgba(99, 102, 241, 0.5)" },
+  };
+
+  // Draw Nodes
+  conceptGraphState.nodes.forEach((node) => {
+    const isVisible = isNodeVisible(node);
+    const isSelected = selected && node.id === selected.id;
+    const isHovered = hovered && node.id === hovered.id;
+    const matchesSearch = search && node.label.toLowerCase().includes(search);
+
+    const isConnectedToFocus = (selected && conceptGraphState.edges.some(e =>
+      (e.source === selected.id && e.target === node.id) ||
+      (e.target === selected.id && e.source === node.id)
+    )) || (hovered && conceptGraphState.edges.some(e =>
+      (e.source === hovered.id && e.target === node.id) ||
+      (e.target === hovered.id && e.source === node.id)
+    ));
+
+    const isDimmed = !isVisible || ((selected || hovered) && !isSelected && !isHovered && !isConnectedToFocus);
+
+    ctx.save();
+    ctx.globalAlpha = isDimmed ? 0.15 : 1.0;
+
+    const colors = colorMap[node.category] || colorMap.concept;
+
+    // Glowing Ring if Selected or Hovered or Matches Search
+    if (isSelected || isHovered || matchesSearch) {
+      ctx.beginPath();
+      ctx.arc(node.x, node.y, node.radius + 8, 0, Math.PI * 2);
+      ctx.fillStyle = colors.glow;
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(node.x, node.y, node.radius + 5, 0, Math.PI * 2);
+      ctx.strokeStyle = isSelected ? "#ffffff" : colors.border;
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+    }
+
+    // Node Body
+    ctx.beginPath();
+    ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+    ctx.fillStyle = colors.fill;
+    ctx.fill();
+    ctx.strokeStyle = isSelected ? "#ffffff" : colors.border;
+    ctx.lineWidth = isSelected ? 3 : 2;
+    ctx.stroke();
+
+    // Occurrence Badge Pill (Top-Right of node)
+    if (node.occurrences_count > 0 && !isDimmed) {
+      const badgeX = node.x + node.radius * 0.7;
+      const badgeY = node.y - node.radius * 0.7;
+      ctx.beginPath();
+      ctx.arc(badgeX, badgeY, 8, 0, Math.PI * 2);
+      ctx.fillStyle = "#1e1b4b";
+      ctx.fill();
+      ctx.strokeStyle = "#818cf8";
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      ctx.font = "bold 8px 'Inter', system-ui, sans-serif";
+      ctx.fillStyle = "#c7d2fe";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(`${node.occurrences_count}x`, badgeX, badgeY);
+    }
+
+    // Node Label
+    if (!isDimmed || isSelected || isHovered) {
+      ctx.font = `600 ${node.category === 'core' ? 12 : 11}px 'Inter', system-ui, sans-serif`;
+      const text = node.label;
+      const textMetrics = ctx.measureText(text);
+      const textWidth = textMetrics.width;
+      const textY = node.y + node.radius + 14;
+
+      // Label background pill
+      ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
+      ctx.beginPath();
+      ctx.roundRect(node.x - textWidth / 2 - 6, textY - 9, textWidth + 12, 17, 4);
+      ctx.fill();
+      ctx.strokeStyle = isSelected ? "#818cf8" : "rgba(255, 255, 255, 0.12)";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      ctx.fillStyle = isSelected ? "#ffffff" : "#f1f5f9";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(text, node.x, textY);
+    }
+
+    ctx.restore();
+  });
+
+  ctx.restore();
+}
+
+function selectConceptGraphNode(node) {
+  if (!node) return;
+  conceptGraphState.selectedNode = node;
+  drawConceptGraph();
+
+  const emptyState = document.getElementById("inspectorEmptyState");
+  const content = document.getElementById("inspectorContent");
+  if (emptyState) emptyState.classList.add("hidden");
+  if (content) content.classList.remove("hidden");
+
+  // Populate Inspector
+  const titleEl = document.getElementById("inspectorTitle");
+  const catPill = document.getElementById("inspectorCategoryPill");
+  const explEl = document.getElementById("inspectorExplanation");
+  const formulaSec = document.getElementById("inspectorFormulaSection");
+  const formulaBox = document.getElementById("inspectorFormulaBox");
+  const analogyEl = document.getElementById("inspectorAnalogy");
+  const occCount = document.getElementById("inspectorOccurrencesCount");
+  const timesList = document.getElementById("inspectorTimestampsList");
+  const connList = document.getElementById("inspectorConnectionsList");
+  const connCount = document.getElementById("inspectorConnectedCount");
+
+  if (titleEl) titleEl.innerText = node.label;
+  if (catPill) {
+    catPill.innerText = node.category_label || "Kavram";
+    catPill.className = `inspector-category-pill cat-${node.category}`;
+  }
+  if (explEl) explEl.innerText = node.explanation || "Açıklama bulunamadı.";
+
+  if (node.formula) {
+    if (formulaSec) formulaSec.classList.remove("hidden");
+    if (formulaBox) formulaBox.innerText = node.formula;
+  } else {
+    if (formulaSec) formulaSec.classList.add("hidden");
+  }
+
+  if (analogyEl) analogyEl.innerText = node.analogy || "Günlük Hayat Benzetmesi: Konu çerçevesinde önemli bir yapı taşıdır.";
+
+  // Render Video Occurrences
+  const occurrences = node.occurrences || [];
+  if (occCount) occCount.innerText = occurrences.length;
+
+  if (timesList) {
+    timesList.innerHTML = "";
+    if (occurrences.length === 0) {
+      timesList.innerHTML = `<div class="inspector-timestamp-card"><span class="inspector-time-badge">${node.first_timestamp || "--:--"}</span><p class="inspector-snippet-text">Bu kavram video genelinde ana tema olarak ele alınmaktadır.</p></div>`;
+    } else {
+      occurrences.forEach((occ) => {
+        const card = document.createElement("div");
+        card.className = "inspector-timestamp-card";
+        card.title = `Videoda ${occ.timestamp} anına git`;
+        card.innerHTML = `
+          <span class="inspector-time-badge">
+            <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            ${escapeHtml(occ.timestamp)}
+          </span>
+          <p class="inspector-snippet-text">${escapeHtml(occ.snippet || node.label)}</p>
+        `;
+        card.addEventListener("click", () => {
+          seekPlayerTo(Number(occ.start_s));
+          showToast(`Videoda ${occ.timestamp} konumuna sarıldı: ${node.label}`, "info");
+        });
+        timesList.appendChild(card);
+      });
+    }
+  }
+
+  // Render Connected Concepts List
+  if (connList) {
+    connList.innerHTML = "";
+    const connectedEdges = conceptGraphState.edges.filter(
+      e => e.source === node.id || e.target === node.id
+    );
+    if (connCount) connCount.innerText = connectedEdges.length;
+
+    connectedEdges.forEach((e) => {
+      const isSource = e.source === node.id;
+      const targetNodeId = isSource ? e.target : e.source;
+      const targetNode = conceptGraphState.nodeMap.get(targetNodeId);
+      if (!targetNode) return;
+
+      const chip = document.createElement("div");
+      chip.className = "inspector-relation-chip";
+      chip.innerHTML = `
+        <span class="relation-chip-target">${escapeHtml(targetNode.label)}</span>
+        <span class="relation-chip-verb">${escapeHtml(e.relation || "ilişkili")}</span>
+      `;
+      chip.addEventListener("click", () => {
+        selectConceptGraphNode(targetNode);
+        // Center view on target node
+        centerGraphOnNode(targetNode);
+      });
+      connList.appendChild(chip);
+    });
+  }
+}
+
+function centerGraphOnNode(node) {
+  if (!node) return;
+  const centerX = conceptGraphState.width / 2;
+  const centerY = conceptGraphState.height / 2;
+  conceptGraphState.panX = centerX - node.x * conceptGraphState.zoom;
+  conceptGraphState.panY = centerY - node.y * conceptGraphState.zoom;
+  drawConceptGraph();
+}
+
+function resetConceptGraphView() {
+  conceptGraphState.panX = 0;
+  conceptGraphState.panY = 0;
+  conceptGraphState.zoom = 1.0;
+  drawConceptGraph();
+}
+
+function zoomConceptGraph(factor) {
+  const centerX = conceptGraphState.width / 2;
+  const centerY = conceptGraphState.height / 2;
+  const newZoom = Math.max(0.35, Math.min(2.8, conceptGraphState.zoom * factor));
+  conceptGraphState.panX = centerX - (centerX - conceptGraphState.panX) * (newZoom / conceptGraphState.zoom);
+  conceptGraphState.panY = centerY - (centerY - conceptGraphState.panY) * (newZoom / conceptGraphState.zoom);
+  conceptGraphState.zoom = newZoom;
+  drawConceptGraph();
+}
+
+function updateDrawerConceptGraph(result) {
+  const container = document.getElementById("drawerGraphNodesList");
+  const badge = document.getElementById("drawerGraphBadge");
+  if (!container) return;
+
+  const graph = activeConceptGraphData || generateClientSideConceptGraph(result);
+  const nodes = graph.nodes || [];
+
+  if (badge) badge.innerText = `${nodes.length} Kavram • ${graph.edges?.length || 0} Bağ`;
+
+  container.innerHTML = "";
+  nodes.forEach((node) => {
+    const card = document.createElement("div");
+    card.className = "drawer-node-card";
+    card.dataset.nodeId = node.id;
+    card.dataset.label = node.label.toLowerCase();
+
+    let timesHtml = "";
+    const occurrences = node.occurrences || [];
+    if (occurrences.length > 0) {
+      timesHtml = occurrences.slice(0, 5).map(occ => `
+        <span class="drawer-time-pill" data-sec="${occ.start_s}" title="Videoda ${occ.timestamp} anına sar">
+          <svg class="ui-icon" style="width:10px;height:10px;" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          ${occ.timestamp}
+        </span>
+      `).join("");
+      if (occurrences.length > 5) {
+        timesHtml += `<span class="drawer-time-pill" style="opacity:0.7;">+${occurrences.length - 5}</span>`;
+      }
+    } else if (node.first_timestamp && node.first_timestamp !== "--:--") {
+      timesHtml = `
+        <span class="drawer-time-pill" data-sec="${node.first_start_s || 0}">
+          <svg class="ui-icon" style="width:10px;height:10px;" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          ${node.first_timestamp}
+        </span>
+      `;
+    }
+
+    card.innerHTML = `
+      <div class="drawer-node-card-header">
+        <span class="drawer-node-label">${escapeHtml(node.label)}</span>
+        <span class="drawer-node-cat">${escapeHtml(node.category_label || "Kavram")}</span>
+      </div>
+      <div class="drawer-node-occurrences">
+        ${timesHtml}
+      </div>
+    `;
+
+    // Timestamp pill clicks
+    card.querySelectorAll(".drawer-time-pill[data-sec]").forEach(pill => {
+      pill.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const sec = Number(pill.dataset.sec);
+        if (!isNaN(sec)) {
+          seekPlayerTo(sec);
+          showToast(`Videoda ${pill.innerText.trim()} konumuna sarıldı: ${node.label}`, "info");
+        }
+      });
+    });
+
+    // Card click opens modal centered on node
+    card.addEventListener("click", () => {
+      openConceptKnowledgeGraph();
+      setTimeout(() => {
+        const fullNode = conceptGraphState.nodeMap.get(node.id);
+        if (fullNode) {
+          selectConceptGraphNode(fullNode);
+          centerGraphOnNode(fullNode);
+        }
+      }, 150);
+    });
+
+    container.appendChild(card);
+  });
+}
+
+function filterDrawerGraphCards(query) {
+  const container = document.getElementById("drawerGraphNodesList");
+  if (!container) return;
+  const q = (query || "").trim().toLowerCase();
+  const cards = container.querySelectorAll(".drawer-node-card");
+  cards.forEach(card => {
+    const lbl = card.dataset.label || "";
+    card.style.display = (!q || lbl.includes(q)) ? "block" : "none";
+  });
+}
+
+function openRightSidebar(open = true) {
+  setRightSidebarOpen(open);
+}
+
+function switchToTranscriptDrawer() {
+  const tabTrans = document.getElementById("tabDrawerTranscript");
+  const tabGraph = document.getElementById("tabDrawerGraph");
+  const tabSocratic = document.getElementById("tabDrawerSocratic");
+
+  const transBody = document.getElementById("transcriptDrawerBody");
+  const graphBody = document.getElementById("conceptGraphDrawerBody");
+  const socraticBody = document.getElementById("socraticDrawerBody");
+
+  if (tabTrans) { tabTrans.classList.add("active"); tabTrans.setAttribute("aria-selected", "true"); }
+  if (tabGraph) { tabGraph.classList.remove("active"); tabGraph.setAttribute("aria-selected", "false"); }
+  if (tabSocratic) { tabSocratic.classList.remove("active"); tabSocratic.setAttribute("aria-selected", "false"); }
+
+  if (transBody) transBody.classList.remove("hidden");
+  if (graphBody) graphBody.classList.add("hidden");
+  if (socraticBody) socraticBody.classList.add("hidden");
+}
+
+function switchToGraphDrawer() {
+  const tabTrans = document.getElementById("tabDrawerTranscript");
+  const tabGraph = document.getElementById("tabDrawerGraph");
+  const tabSocratic = document.getElementById("tabDrawerSocratic");
+
+  const transBody = document.getElementById("transcriptDrawerBody");
+  const graphBody = document.getElementById("conceptGraphDrawerBody");
+  const socraticBody = document.getElementById("socraticDrawerBody");
+
+  if (tabTrans) { tabTrans.classList.remove("active"); tabTrans.setAttribute("aria-selected", "false"); }
+  if (tabGraph) { tabGraph.classList.add("active"); tabGraph.setAttribute("aria-selected", "true"); }
+  if (tabSocratic) { tabSocratic.classList.remove("active"); tabSocratic.setAttribute("aria-selected", "false"); }
+
+  if (transBody) transBody.classList.add("hidden");
+  if (graphBody) graphBody.classList.remove("hidden");
+  if (socraticBody) socraticBody.classList.add("hidden");
+
+  // Populate drawer concept graph if empty
+  const container = document.getElementById("drawerGraphNodesList");
+  if (container && (!container.children || container.children.length === 0)) {
+    updateDrawerConceptGraph(currentResult);
+  }
+}
+
+function setupConceptKnowledgeGraph() {
+  const modal = document.getElementById("conceptGraphModal");
+  const btnNav = document.getElementById("btnNavConceptGraph");
+  const btnOpenHub = document.getElementById("btnOpenConceptGraph");
+  const btnExpand = document.getElementById("btnExpandGraphModal");
+  const btnClose = document.getElementById("btnCloseConceptGraphModal");
+  const btnReset = document.getElementById("btnResetGraphView");
+  const btnPhysics = document.getElementById("btnToggleGraphPhysics");
+  const statusEl = document.getElementById("graphPhysicsStatus");
+  const searchInput = document.getElementById("graphSearchInput");
+  const zoomIn = document.getElementById("btnGraphZoomIn");
+  const zoomOut = document.getElementById("btnGraphZoomOut");
+  const filterChips = document.querySelectorAll(".graph-filter-chip");
+  const drawerSearch = document.getElementById("drawerGraphSearchInput");
+  const tabTranscript = document.getElementById("tabDrawerTranscript");
+  const tabGraph = document.getElementById("tabDrawerGraph");
+  const btnQuiz = document.getElementById("btnInspectorQuiz");
+
+  if (tabTranscript) {
+    tabTranscript.addEventListener("click", () => {
+      switchToTranscriptDrawer();
+    });
+  }
+
+  if (tabGraph) {
+    tabGraph.addEventListener("click", () => {
+      switchToGraphDrawer();
+    });
+  }
+
+  if (btnNav) {
+    btnNav.addEventListener("click", () => {
+      openRightSidebar(true);
+      switchToGraphDrawer();
+    });
+  }
+
+  if (btnOpenHub) {
+    btnOpenHub.addEventListener("click", () => {
+      openConceptKnowledgeGraph();
+    });
+  }
+
+  if (btnExpand) {
+    btnExpand.addEventListener("click", () => {
+      openConceptKnowledgeGraph();
+    });
+  }
+
+  if (btnClose) {
+    btnClose.addEventListener("click", () => {
+      if (modal) modal.classList.add("hidden");
+      stopConceptGraphAnimation();
+    });
+  }
+
+  if (btnReset) {
+    btnReset.addEventListener("click", () => {
+      resetConceptGraphView();
+    });
+  }
+
+  if (btnPhysics) {
+    btnPhysics.addEventListener("click", () => {
+      conceptGraphState.physicsActive = !conceptGraphState.physicsActive;
+      if (statusEl) {
+        statusEl.innerText = conceptGraphState.physicsActive ? "Fiziği Durdur" : "Fiziği Başlat";
+      }
+      if (conceptGraphState.physicsActive) {
+        startConceptGraphAnimation();
+      }
+    });
+  }
+
+  if (zoomIn) {
+    zoomIn.addEventListener("click", () => zoomConceptGraph(1.2));
+  }
+
+  if (zoomOut) {
+    zoomOut.addEventListener("click", () => zoomConceptGraph(0.8));
+  }
+
+  if (searchInput) {
+    searchInput.addEventListener("input", (e) => {
+      conceptGraphState.searchQuery = (e.target.value || "").trim().toLowerCase();
+      drawConceptGraph();
+    });
+  }
+
+  filterChips.forEach((chip) => {
+    chip.addEventListener("click", () => {
+      filterChips.forEach(c => c.classList.remove("active"));
+      chip.classList.add("active");
+      conceptGraphState.filterCategory = chip.dataset.filter || "all";
+      drawConceptGraph();
+    });
+  });
+
+  if (drawerSearch) {
+    drawerSearch.addEventListener("input", (e) => {
+      filterDrawerGraphCards(e.target.value);
+    });
+  }
+
+  if (btnQuiz) {
+    btnQuiz.addEventListener("click", () => {
+      if (modal) modal.classList.add("hidden");
+      stopConceptGraphAnimation();
+      openRightSidebar(true);
+      switchToSocraticDrawer();
+      const nodeLabel = conceptGraphState.selectedNode?.label || "bu kavram";
+      sendSocraticMessage(`'${nodeLabel}' konusuyla ilgili bana bir pratik sınav sorusu sorabilir misin?`);
+    });
+  }
+
+  // Global keyboard shortcut: 'G' for Concept Graph
+  document.addEventListener("keydown", (e) => {
+    if (e.target.matches("input, textarea, select") || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === "g" || e.key === "G") {
+      e.preventDefault();
+      openConceptKnowledgeGraph();
+    }
+  });
+}
+
+/* ==========================================================================
+   SOCRATIC AI TUTOR / CHAT (VANZO ET AL., ACL 2025)
+   ========================================================================== */
+
+let socraticChatHistory = [];
+
+function setupSocraticTutor() {
+  // Navigation Pill in Header
+  const btnNav = document.getElementById("btnNavSocratic");
+  if (btnNav) {
+    btnNav.addEventListener("click", () => {
+      openRightSidebar(true);
+      switchToSocraticDrawer();
+    });
+  }
+
+  // Drawer Tab Button
+  const tabSocratic = document.getElementById("tabDrawerSocratic");
+  if (tabSocratic) {
+    tabSocratic.addEventListener("click", () => {
+      switchToSocraticDrawer();
+    });
+  }
+
+  // Mini Dock "Tam Sohbet" Button
+  const btnSwitch = document.getElementById("btnSwitchToSocratic");
+  if (btnSwitch) {
+    btnSwitch.addEventListener("click", () => {
+      switchToSocraticDrawer();
+    });
+  }
+
+  // Clear Chat Button
+  const btnClear = document.getElementById("btnClearSocraticChat");
+  if (btnClear) {
+    btnClear.addEventListener("click", () => {
+      socraticChatHistory = [];
+      const container = document.getElementById("socraticMessagesContainer");
+      if (container) {
+        container.innerHTML = `
+          <div class="socratic-msg msg-assistant">
+            <div class="socratic-bubble">
+              <p>👋 Sohbet temizlendi. Ders videosunda aklına takılan herhangi bir kavramı veya formülü sorabilirsin.</p>
+              <div class="socratic-suggested-row">
+                <button type="button" class="socratic-chip" data-prompt="Bu formülü anlamadım, mantığını açıklar mısın?">💡 Bu formülü anlamadım</button>
+                <button type="button" class="socratic-chip" data-prompt="Neden maliyet sapması negatif çıktı?">❓ Neden negatif çıktı?</button>
+              </div>
+            </div>
+          </div>
+        `;
+        bindSocraticChipEvents(container);
+      }
+      const footerChips = document.getElementById("socraticChatQuickChips");
+      if (footerChips) footerChips.innerHTML = "";
+    });
+  }
+
+  // Mini Form Submission
+  const miniForm = document.getElementById("socraticMiniForm");
+  const miniInput = document.getElementById("socraticMiniInput");
+  const btnMiniSend = document.getElementById("btnSendSocraticMini");
+  const handleMiniSubmit = () => {
+    const text = (miniInput?.value || "").trim();
+    if (!text) return;
+    if (miniInput) miniInput.value = "";
+    switchToSocraticDrawer();
+    sendSocraticMessage(text);
+  };
+  if (miniForm) {
+    miniForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      handleMiniSubmit();
+    });
+  }
+  if (btnMiniSend) {
+    btnMiniSend.addEventListener("click", (e) => {
+      e.preventDefault();
+      handleMiniSubmit();
+    });
+  }
+
+  // Full Form Submission
+  const fullForm = document.getElementById("socraticFullForm");
+  const fullInput = document.getElementById("socraticFullInput");
+  const btnFullSend = document.getElementById("btnSendSocraticFull");
+  const handleFullSubmit = () => {
+    const text = (fullInput?.value || "").trim();
+    if (!text) return;
+    if (fullInput) fullInput.value = "";
+    sendSocraticMessage(text);
+  };
+  if (fullForm) {
+    fullForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      handleFullSubmit();
+    });
+  }
+  if (btnFullSend) {
+    btnFullSend.addEventListener("click", (e) => {
+      e.preventDefault();
+      handleFullSubmit();
+    });
+  }
+
+  // Mini Quick Chips
+  const miniChips = document.getElementById("socraticMiniQuickChips");
+  if (miniChips) {
+    bindSocraticChipEvents(miniChips);
+  }
+
+  // Initial Container Chips
+  const container = document.getElementById("socraticMessagesContainer");
+  if (container) {
+    bindSocraticChipEvents(container);
+  }
+
+  // Keyboard shortcut: 'S' for Socratic Chat
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "s" || e.key === "S") {
+      const activeEl = document.activeElement;
+      const tag = (activeEl?.tagName || "").toLowerCase();
+      if (tag === "input" || tag === "textarea" || tag === "select" || activeEl?.isContentEditable) return;
+      e.preventDefault();
+      openRightSidebar(true);
+      switchToSocraticDrawer();
+      const fullIn = document.getElementById("socraticFullInput");
+      if (fullIn) fullIn.focus();
+    }
+  });
+}
+
+function switchToSocraticDrawer() {
+  const tabTrans = document.getElementById("tabDrawerTranscript");
+  const tabGraph = document.getElementById("tabDrawerGraph");
+  const tabSocratic = document.getElementById("tabDrawerSocratic");
+
+  const transBody = document.getElementById("transcriptDrawerBody");
+  const graphBody = document.getElementById("conceptGraphDrawerBody");
+  const socraticBody = document.getElementById("socraticDrawerBody");
+
+  if (tabTrans) { tabTrans.classList.remove("active"); tabTrans.setAttribute("aria-selected", "false"); }
+  if (tabGraph) { tabGraph.classList.remove("active"); tabGraph.setAttribute("aria-selected", "false"); }
+  if (tabSocratic) { tabSocratic.classList.add("active"); tabSocratic.setAttribute("aria-selected", "true"); }
+
+  if (transBody) transBody.classList.add("hidden");
+  if (graphBody) graphBody.classList.add("hidden");
+  if (socraticBody) socraticBody.classList.remove("hidden");
+
+  // Focus input
+  setTimeout(() => {
+    const fullIn = document.getElementById("socraticFullInput");
+    if (fullIn) fullIn.focus();
+  }, 100);
+}
+
+function bindSocraticChipEvents(parentEl) {
+  if (!parentEl) return;
+  parentEl.querySelectorAll(".socratic-chip[data-prompt]").forEach((chip) => {
+    chip.addEventListener("click", () => {
+      const prompt = chip.dataset.prompt;
+      if (prompt) {
+        switchToSocraticDrawer();
+        sendSocraticMessage(prompt);
+      }
+    });
+  });
+}
+
+async function sendSocraticMessage(userText) {
+  const container = document.getElementById("socraticMessagesContainer");
+  const footerChips = document.getElementById("socraticChatQuickChips");
+  if (!container) return;
+
+  const text = (userText || "").trim();
+  if (!text) return;
+
+  // 1. Append User Message
+  const userMsgEl = document.createElement("div");
+  userMsgEl.className = "socratic-msg msg-user";
+  userMsgEl.innerHTML = `<div class="socratic-bubble"><p>${escapeHtml(text)}</p></div>`;
+  container.appendChild(userMsgEl);
+
+  socraticChatHistory.push({ role: "user", content: text });
+
+  // 2. Append Typing Placeholder
+  const typingEl = document.createElement("div");
+  typingEl.className = "socratic-msg msg-assistant socratic-typing-bubble";
+  typingEl.id = "socraticTypingMsg";
+  typingEl.innerHTML = `
+    <div class="socratic-bubble">
+      <span class="socratic-pulse-dot" style="display:inline-block; margin-right:6px;"></span>
+      <span>Sokratik çalışma arkadaşın düşünüyor...</span>
+    </div>
+  `;
+  container.appendChild(typingEl);
+  container.scrollTop = container.scrollHeight;
+
+  // 3. Resolve playback position and active job
+  let currentSec = 0;
+  if (typeof getMediaTime === "function") {
+    currentSec = getMediaTime() || 0;
+  } else if (typeof ytPlayer !== "undefined" && ytPlayer && typeof ytPlayer.getCurrentTime === "function") {
+    try { currentSec = ytPlayer.getCurrentTime() || 0; } catch (_) {}
+  }
+
+  const targetJobId = currentResult?.job_id || (currentVideoId ? `preview_${currentVideoId}` : "demo_evm");
+  const terms = Array.isArray(currentResult?.llm?.terms) ? currentResult.llm.terms : [];
+  const segments = Array.isArray(currentResult?.asr?.segments) ? currentResult.asr.segments : [];
+
+  let replyData = null;
+
+  try {
+    const res = await fetch("/api/socratic-chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        job_id: targetJobId,
+        message: text,
+        history: socraticChatHistory.slice(-6),
+        current_time_s: currentSec,
+        terms: terms,
+        segments: segments,
+        lang: currentResult?.lang || "tr",
+      }),
+    });
+    if (res.ok) {
+      replyData = await res.json();
+    }
+  } catch (err) {
+    console.warn("Server socratic chat fallback:", err);
+  }
+
+  // Client-side fallback if server fails
+  if (!replyData) {
+    replyData = generateClientSideSocraticFallback(text, terms);
+  }
+
+  // 4. Remove Typing Placeholder
+  const existingTyping = document.getElementById("socraticTypingMsg");
+  if (existingTyping) existingTyping.remove();
+
+  // 5. Append Assistant Bubble
+  const botMsgEl = document.createElement("div");
+  botMsgEl.className = "socratic-msg msg-assistant";
+
+  let formattedReply = escapeHtml(replyData.reply || "")
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/\n/g, '<br>');
+
+  let guidingHtml = "";
+  if (Array.isArray(replyData.guiding_questions) && replyData.guiding_questions.length > 0) {
+    const qList = replyData.guiding_questions.map(q => `<li>${escapeHtml(q)}</li>`).join("");
+    guidingHtml = `
+      <div class="socratic-guiding-box">
+        <span class="socratic-guide-title">🧠 Yönlendirici Sorular (Vanzo et al., ACL 2025):</span>
+        <ul style="margin:4px 0 0 16px; padding:0; font-size:0.78rem; color:#fde68a;">${qList}</ul>
+      </div>
+    `;
+  }
+
+  let timeHtml = "";
+  if (replyData.time_badge && replyData.time_badge.start_s != null) {
+    timeHtml = `
+      <div>
+        <span class="socratic-time-tag" data-sec="${replyData.time_badge.start_s}" title="Videoda bu ana sar">
+          <svg class="ui-icon" style="width:10px;height:10px;" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          ${replyData.time_badge.timestamp} • ${escapeHtml(replyData.time_badge.term)}
+        </span>
+      </div>
+    `;
+  }
+
+  let suggestionsHtml = "";
+  const suggestions = replyData.suggested_replies || [];
+  if (suggestions.length > 0) {
+    const chipsHtml = suggestions.map(s => `<button type="button" class="socratic-chip" data-prompt="${escapeHtml(s)}">${escapeHtml(s)}</button>`).join("");
+    suggestionsHtml = `<div class="socratic-suggested-row">${chipsHtml}</div>`;
+  }
+
+  botMsgEl.innerHTML = `
+    <div class="socratic-bubble">
+      <p>${formattedReply}</p>
+      ${guidingHtml}
+      ${timeHtml}
+      ${suggestionsHtml}
+    </div>
+  `;
+
+  // Bind timestamp clicks
+  botMsgEl.querySelectorAll(".socratic-time-tag[data-sec]").forEach((pill) => {
+    pill.addEventListener("click", () => {
+      const sec = Number(pill.dataset.sec);
+      if (!isNaN(sec)) {
+        seekPlayerTo(sec);
+        showToast(`Videoda ${pill.innerText.trim()} anına sarıldı.`, "info");
+      }
+    });
+  });
+
+  // Bind chip click events
+  bindSocraticChipEvents(botMsgEl);
+
+  container.appendChild(botMsgEl);
+
+  // 6. Update Footer Quick Chips
+  if (footerChips) {
+    if (suggestions.length > 0) {
+      footerChips.innerHTML = suggestions.map(s => `<button type="button" class="socratic-chip" data-prompt="${escapeHtml(s)}">${escapeHtml(s)}</button>`).join("");
+      bindSocraticChipEvents(footerChips);
+    } else {
+      footerChips.innerHTML = "";
+    }
+  }
+
+  socraticChatHistory.push({ role: "assistant", content: replyData.reply || "" });
+  container.scrollTop = container.scrollHeight;
+}
+
+function generateClientSideSocraticFallback(userText, terms) {
+  const low = (userText || "").toLowerCase();
+  if (low.includes("formül") || low.includes("hesap") || low.includes("cv") || low.includes("sv")) {
+    return {
+      reply: "Formülü ezberlemek yerine zihninde canlandıralım: Bir inşaatta 100 TL'lik iş yaptın ($EV = 100$), ama kasadan 120 TL harcadın ($AC = 120$). Sence maliyet sapmasını hesapladığımızda:",
+      guiding_questions: [
+        "Harcanan para tamamlanan işi aştığında sence sonuç pozitif mi çıkar, negatif mi?",
+        "Negatif çıkması proje yöneticisi için iyi bir haber midir, risk midir?"
+      ],
+      suggested_replies: [
+        "Negatif çıkar, yani bütçe aşımı!",
+        "Pozitif çıkar, kârlıyız",
+        "Günlük hayattan başka bir örnek ver"
+      ],
+      time_badge: { start_s: 30, timestamp: "00:30", term: "Maliyet Sapması Formülü" }
+    };
+  }
+  return {
+    reply: "Kavramın mantığına adım adım bakalım: Bir projede sadece kasadan 'ne kadar para çıktığına' bakarak projenin iyi gidip gitmediğini söyleyebilir miyiz?",
+    guiding_questions: [
+      "Harcanan paranın karşılığında ne kadarlık iş teslim alındığını bilmek neden şarttır?",
+      "Bu ikisini birbirinden çıkardığımızda aradaki fark bize neyi gösterir?"
+    ],
+    suggested_replies: [
+      "Yetmez, ne kadar iş bittiğini bilmeliyiz!",
+      "Bu durumu formülle açıklar mısın?",
+      "Videoda bu kavram nerede geçiyor?"
+    ],
+    time_badge: { start_s: 15, timestamp: "00:15", term: "Kazanılmış Değer" }
+  };
+}
+
+
+
+function setupAiAnimatronicWidget() {
+  const widget = document.getElementById("aiAnimatronicWidget");
+  if (!widget) return;
+
+  const triggerSocratic = () => {
+    // Open right sidebar
+    openRightSidebar(true);
+    // Switch to Socratic tutor drawer view
+    switchToSocraticDrawer();
+
+    // Click feedback bounce
+    widget.classList.add("widget-clicked");
+    setTimeout(() => widget.classList.remove("widget-clicked"), 400);
+
+    // Focus input
+    setTimeout(() => {
+      const fullIn = document.getElementById("socraticFullInput");
+      if (fullIn) fullIn.focus();
+    }, 150);
+
+    showToast("🤖 Sokratik Asistan devrede! Aklına takılanı sorabilirsin.", "info");
+  };
+
+  widget.addEventListener("click", triggerSocratic);
+  widget.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      triggerSocratic();
+    }
+  });
+
+  // Dynamically update position when sidebar opens/closes
+  const updateWidgetPosition = () => {
+    const ws = document.getElementById("studioWorkspace");
+    const isRightOpen = ws && ws.classList.contains("right-open");
+    if (isRightOpen && window.innerWidth > 1200) {
+      widget.style.right = "456px";
+    } else {
+      widget.style.right = "";
+    }
+  };
+
+  const ws = document.getElementById("studioWorkspace");
+  if (ws && window.MutationObserver) {
+    const observer = new MutationObserver(updateWidgetPosition);
+    observer.observe(ws, { attributes: true, attributeFilter: ["class"] });
+  }
+
+  window.addEventListener("resize", updateWidgetPosition);
+}
+
 // DOM Ready initialization
 document.addEventListener("DOMContentLoaded", () => {
   loadSystemInfo();
@@ -3256,6 +6080,13 @@ document.addEventListener("DOMContentLoaded", () => {
   setupPracticeExam();
   setupEyeTracker();
   setupHelperSlide();
+  setupManimator();
+  setupAttentionPopQuiz();
+  setupCornellNotes();
+  setupConceptKnowledgeGraph();
+  setupSocraticTutor();
+  setupAiAnimatronicWidget();
+  setupTabVisibilityTracker();
 
   const ytInput = document.getElementById("ytUrlInput");
   if (ytInput) {
@@ -3290,3 +6121,115 @@ document.addEventListener("DOMContentLoaded", () => {
   checkActiveJob();
 });
 
+/* ==========================================================================
+   Multi-Theme System (Default: Light, Midnight, Nordic Frost, Emerald Zen, Cyber Sunset, Sepia Scholar)
+   Persists via localStorage, default theme is 'light'.
+   Keyboard shortcut: L
+   ========================================================================== */
+(function initThemeToggle() {
+  const html = document.documentElement;
+  const wrapper = document.getElementById("themePickerWrapper");
+  const btnToggle = document.getElementById("btnToggleTheme");
+  const iconEl = document.getElementById("themeToggleIcon");
+  const labelEl = document.getElementById("themeToggleLabel");
+
+  const THEME_ICONS = {
+    light: `<svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`,
+    dark: `<svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>`,
+    nordic: `<svg class="ui-icon" viewBox="0 0 24 24"><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/><line x1="19.07" y1="4.93" x2="4.93" y2="19.07"/></svg>`,
+    emerald: `<svg class="ui-icon" viewBox="0 0 24 24"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>`,
+    sunset: `<svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 10V2"/><path d="m4.93 10.93 1.41 1.41"/><path d="M2 18h2"/><path d="M20 18h2"/><path d="m19.07 10.93-1.41 1.41"/><path d="M22 22H2"/><path d="m8 6 4-4 4 4"/><path d="M16 18a4 4 0 0 0-8 0"/></svg>`,
+    sepia: `<svg class="ui-icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>`,
+  };
+
+  const THEMES = [
+    { id: "light", name: "Light", desc: "Açık Akademik (Varsayılan)" },
+    { id: "dark", name: "Midnight", desc: "Derin Obsidiyen Gece" },
+    { id: "nordic", name: "Nordic Frost", desc: "Buzul Mavisi & Kutup" },
+    { id: "emerald", name: "Emerald Zen", desc: "Zümrüt Ormanı & Odak" },
+    { id: "sunset", name: "Cyber Sunset", desc: "Neon Mercan & Alacakaranlık" },
+    { id: "sepia", name: "Sepia Scholar", desc: "Antik Kütüphane & Pergament" },
+  ];
+
+  function applyTheme(themeId, notify = false) {
+    const theme = THEMES.find(t => t.id === themeId) || THEMES[0];
+    html.setAttribute("data-theme", theme.id);
+
+    if (iconEl && THEME_ICONS[theme.id]) {
+      iconEl.innerHTML = THEME_ICONS[theme.id];
+    }
+    if (labelEl) labelEl.textContent = theme.name;
+
+    // Update active highlight in dropdown
+    document.querySelectorAll(".theme-menu-item").forEach(item => {
+      const isMatch = item.getAttribute("data-theme-id") === theme.id;
+      item.classList.toggle("active", isMatch);
+    });
+
+    try {
+      localStorage.setItem("eduterm-theme", theme.id);
+    } catch (e) {}
+
+    if (notify && typeof showToast === "function") {
+      showToast(`Tema: ${theme.name}`, "info");
+    }
+  }
+
+  function cycleTheme() {
+    const current = html.getAttribute("data-theme") || "light";
+    let idx = THEMES.findIndex(t => t.id === current);
+    if (idx === -1) idx = 0;
+    const nextTheme = THEMES[(idx + 1) % THEMES.length];
+    applyTheme(nextTheme.id, true);
+    if (wrapper) wrapper.classList.remove("open");
+  }
+
+  // Determine initial theme: localStorage > default "light"
+  let initialTheme = "light";
+  try {
+    const stored = localStorage.getItem("eduterm-theme");
+    if (stored && THEMES.some(t => t.id === stored)) {
+      initialTheme = stored;
+    }
+  } catch (e) {}
+  applyTheme(initialTheme, false);
+
+  // Toggle Dropdown when clicking button
+  if (btnToggle) {
+    btnToggle.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (wrapper) wrapper.classList.toggle("open");
+    });
+  }
+
+  // Dropdown item selection
+  document.querySelectorAll(".theme-menu-item").forEach(btn => {
+    btn.addEventListener("click", function(e) {
+      e.stopPropagation();
+      const themeId = this.getAttribute("data-theme-id");
+      if (themeId) {
+        applyTheme(themeId, true);
+        if (wrapper) wrapper.classList.remove("open");
+      }
+    });
+  });
+
+  // Close dropdown on outside click
+  document.addEventListener("click", (e) => {
+    if (wrapper && !wrapper.contains(e.target)) {
+      wrapper.classList.remove("open");
+    }
+  });
+
+  // Keyboard shortcut: L (cycles through themes)
+  document.addEventListener("keydown", function(e) {
+    if (e.key === "l" || e.key === "L") {
+      var tag = (e.target.tagName || "").toLowerCase();
+      if (tag === "input" || tag === "textarea" || tag === "select" || e.target.isContentEditable) return;
+      e.preventDefault();
+      cycleTheme();
+    } else if (e.key === "Escape") {
+      if (wrapper) wrapper.classList.remove("open");
+    }
+  });
+})();

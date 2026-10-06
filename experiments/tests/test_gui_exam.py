@@ -427,5 +427,45 @@ class PublicQuestionsAndScoringTests(unittest.TestCase):
         self.assertIn("Machine Learning", text_weak)
 
 
+class AttentionResearchAndPopQuizTests(unittest.TestCase):
+    def test_milestones_and_research_metadata(self):
+        self.assertIn("sources", exam.ATTENTION_RESEARCH_INFO)
+        sources = exam.ATTENTION_RESEARCH_INFO["sources"]
+        self.assertGreaterEqual(len(sources), 4)
+
+        # Confirm empirical research citations exist
+        keys = [s["id"] for s in sources]
+        self.assertIn("guo_2014", keys)
+        self.assertIn("szpunar_2013", keys)
+        self.assertIn("bunce_2010", keys)
+        self.assertIn("risko_2012", keys)
+
+        # Confirm default threshold seconds match literature
+        self.assertEqual(exam.ATTENTION_RESEARCH_INFO["default_thresholds_s"], [180, 300, 360, 600])
+
+    def test_make_popquiz_question_generation(self):
+        terms = [
+            {"term": "Sprint", "explanation": "A time-boxed period to complete work.", "start_s": 30.0},
+            {"term": "Backlog", "explanation": "A prioritized list of deliverables.", "start_s": 120.0},
+            {"term": "Scrum Master", "explanation": "The facilitator for an agile team.", "start_s": 240.0},
+            {"term": "Burndown Chart", "explanation": "Graphical representation of work left to do.", "start_s": 350.0},
+        ]
+
+        # At 180s, question should pick from terms up to 180s (Sprint or Backlog)
+        pq = exam.make_popquiz_question(terms, current_time_s=180.0, lang="tr")
+        self.assertIsNotNone(pq)
+        self.assertIn("question", pq)
+        q = pq["question"]
+        self.assertEqual(q["type"], "mcq")
+        self.assertEqual(len(q["options"]), 4)
+        self.assertIn(q["answer_index"], [0, 1, 2, 3])
+        self.assertIsNotNone(pq["milestone"])
+        self.assertEqual(pq["milestone"]["seconds"], 180)
+
+        # Empty terms returns None
+        self.assertIsNone(exam.make_popquiz_question([], current_time_s=180.0))
+
+
 if __name__ == "__main__":
     unittest.main()
+
