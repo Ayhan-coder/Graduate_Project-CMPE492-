@@ -51,43 +51,43 @@ def generate_pipeline_diagram():
     ax.add_patch(arr2)
     
     # Headers
-    ax.text(0.16, 0.83, "KATMAN 1: KONUŞMA TANIMA (ASR)", ha='center', va='center', fontsize=9, fontweight='bold', color=c_blue)
-    ax.text(0.16, 0.75, "16 kHz Mono Ses $\\to$ Transkript", ha='center', va='center', fontsize=8, color='#5A5F66')
+    ax.text(0.16, 0.83, "LAYER 1: SPEECH RECOGNITION (ASR)", ha='center', va='center', fontsize=8.5, fontweight='bold', color=c_blue)
+    ax.text(0.16, 0.75, "16 kHz Mono Audio $\\to$ Transcript", ha='center', va='center', fontsize=8, color='#5A5F66')
     
-    ax.text(0.50, 0.83, "KATMAN 2: SEMANTİK ÇIKARIM", ha='center', va='center', fontsize=9, fontweight='bold', color=c_teal)
-    ax.text(0.50, 0.75, "LLM Tabanlı Terim Çıkarımı", ha='center', va='center', fontsize=8, color='#5A5F66')
+    ax.text(0.50, 0.83, "LAYER 2: SEMANTIC EXTRACTION", ha='center', va='center', fontsize=8.5, fontweight='bold', color=c_teal)
+    ax.text(0.50, 0.75, "LLM-Based Terminology Extraction", ha='center', va='center', fontsize=8, color='#5A5F66')
     
-    ax.text(0.84, 0.83, "AŞAĞI AKIŞ: PEDAGOJİK ŞEMA", ha='center', va='center', fontsize=9, fontweight='bold', color=c_amber)
-    ax.text(0.84, 0.75, "Kavram Önkoşul DAG & Bloom", ha='center', va='center', fontsize=8, color='#5A5F66')
+    ax.text(0.84, 0.83, "DOWNSTREAM: PEDAGOGICAL SCHEMA", ha='center', va='center', fontsize=8.5, fontweight='bold', color=c_amber)
+    ax.text(0.84, 0.75, "Concept Prerequisite DAG & Bloom", ha='center', va='center', fontsize=8, color='#5A5F66')
     
     # Content bullets
     l1_text = (
-        "• Modeller: Whisper Large-v3/Turbo,\n"
+        "• Models: Whisper Large-v3/Turbo,\n"
         "  Qwen3-ASR (0.6B/1.7B), Nemotron\n"
-        "• Sabit 30s Pencereli Kod Çözme\n"
-        "• TR WER: %2.1 (Large-v3), %3.7 (Turbo)\n"
-        "• EN WER: %1.0 (Large-v3), %1.1 (Turbo)\n"
-        "• Hız (RTF): 0.025-0.044 (Turbo 23-40×)"
+        "• Fixed 30s Windowed Decoding\n"
+        "• TR WER: 2.1% (Large-v3), 3.7% (Turbo)\n"
+        "• EN WER: 1.0% (Large-v3), 1.1% (Turbo)\n"
+        "• Speed (RTF): 0.025-0.044 (Turbo 23-40×)"
     )
     ax.text(0.04, 0.45, l1_text, ha='left', va='center', fontsize=7.5, color='#2C3E50', linespacing=1.4)
     
     l2_text = (
-        "• Modeller: Qwen 3.5 (4B/9B) +\n"
-        "  EVREN Millî YZ Platformu (H200)\n"
-        "• İstem: Zero-Shot vs Chain-of-Thought\n"
-        "• Kapalı Altın Liste: TR-1 / EN-1 (N=32)\n"
-        "• Çift Etiketli IAA: $\\kappa_R=0.782, \\kappa_D=1.000$\n"
-        "• Okunabilirlik: Ateşman (TR) & Flesch (EN)"
+        "• Models: Qwen 3.5 (4B/9B) +\n"
+        "  EVREN National AI Platform (H200)\n"
+        "• Prompting: Zero-Shot vs CoT\n"
+        "• Closed Gold List: TR-1 / EN-1 (N=32)\n"
+        "• Dual-Annotated IAA: $\\kappa_R=0.782, \\kappa_D=1.000$\n"
+        "• Readability: Ateşman (TR) & Flesch (EN)"
     )
     ax.text(0.38, 0.45, l2_text, ha='left', va='center', fontsize=7.5, color='#2C3E50', linespacing=1.4)
     
     l3_text = (
-        "• Zaman Damgalı Terim Eşleme\n"
-        "• 4 Katmanlı Açıklama (B1 Analoji,\n"
-        "  Akademik Tanım, Asansör, Sınav İpucu)\n"
-        "• Bloom Taksonomisi (1-6 Seviye)\n"
-        "• Yönlü Çevrimsiz Önkoşul Grafiği (DAG)\n"
-        "• Topolojik Sıralama ile Ders Yolu"
+        "• Timestamped Terminology Mapping\n"
+        "• 4-Tier Explanations (B1 Analogy,\n"
+        "  Formal Def., Elevator, Exam Tip)\n"
+        "• Bloom's Taxonomy (Levels 1–6)\n"
+        "• Directed Acyclic Graph (DAG)\n"
+        "• Learning Path via Topological Sort"
     )
     ax.text(0.72, 0.45, l3_text, ha='left', va='center', fontsize=7.5, color='#2C3E50', linespacing=1.4)
     
@@ -95,6 +95,14 @@ def generate_pipeline_diagram():
     out_path = IMG_DIR / "pipeline_architecture.png"
     plt.savefig(out_path, dpi=300, bbox_inches='tight')
     plt.close()
+    
+    # Mirror to notes/figures and Boğaziçi_report_template/figures
+    import shutil
+    for fig_dir in [Path(__file__).resolve().parent / "figures", Path(__file__).resolve().parent.parent / "Boğaziçi_report_template" / "figures"]:
+        if fig_dir.exists():
+            shutil.copy2(out_path, fig_dir / "pipeline_architecture.png")
+            print(f"Copied to {fig_dir / 'pipeline_architecture.png'}")
+            
     print(f"Generated {out_path}")
 
 def generate_concept_dag():
