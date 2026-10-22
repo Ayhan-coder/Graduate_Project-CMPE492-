@@ -344,11 +344,32 @@ The system models knowledge entities, relationships, and streaming tokens throug
 
 \begin{figure}[h!]
 \centering
-\begin{tikzpicture}[scale=0.8, every node/.style={transform shape}]
+\begin{tikzpicture}[scale=0.82, every node/.style={transform shape}]
+  \tikzset{
+    entity/.style={
+      draw=black!75,
+      rounded corners=3pt,
+      line width=0.8pt,
+      inner sep=7pt,
+      font=\footnotesize,
+      align=left
+    },
+    rel/.style={
+      thick,
+      draw=black!85
+    },
+    card/.style={
+      font=\footnotesize\bfseries,
+      fill=white,
+      inner sep=2pt,
+      rounded corners=1pt
+    }
+  }
+
   % Lecture Entity
-  \node[draw, rectangle, fill=blue!10, text width=3.4cm, minimum height=2.2cm, align=left] (lecture) at (0, 4) {
-    \textbf{LECTURE}\\
-    \rule{3.2cm}{0.4pt}\\
+  \node[entity, fill=blue!10, text width=4.4cm] (lecture) at (0, 4.0) {
+    \textbf{\normalsize LECTURE}\\[-2pt]
+    \rule{\linewidth}{0.5pt}\\[2pt]
     \underline{lecture\_id} : UUID\\
     title : VARCHAR\\
     language : ENUM(TR, EN)\\
@@ -357,9 +378,9 @@ The system models knowledge entities, relationships, and streaming tokens throug
   };
 
   % Transcript Segment Entity
-  \node[draw, rectangle, fill=blue!10, text width=3.4cm, minimum height=2.4cm, align=left] (segment) at (5.5, 4) {
-    \textbf{SEGMENT}\\
-    \rule{3.2cm}{0.4pt}\\
+  \node[entity, fill=blue!10, text width=4.4cm] (segment) at (5.8, 4.0) {
+    \textbf{\normalsize SEGMENT}\\[-2pt]
+    \rule{\linewidth}{0.5pt}\\[2pt]
     \underline{segment\_id} : UUID\\
     \textit{lecture\_id} : UUID\\
     start\_time : FLOAT\\
@@ -368,9 +389,9 @@ The system models knowledge entities, relationships, and streaming tokens throug
   };
 
   % Term Entity
-  \node[draw, rectangle, fill=green!10, text width=3.6cm, minimum height=2.6cm, align=left] (term) at (11.2, 4) {
-    \textbf{TERMINOLOGY}\\
-    \rule{3.4cm}{0.4pt}\\
+  \node[entity, fill=green!12, text width=4.6cm] (term) at (11.8, 4.0) {
+    \textbf{\normalsize TERMINOLOGY}\\[-2pt]
+    \rule{\linewidth}{0.5pt}\\[2pt]
     \underline{term\_id} : UUID\\
     canonical : VARCHAR\\
     cefr\_explanation : TEXT\\
@@ -379,20 +400,10 @@ The system models knowledge entities, relationships, and streaming tokens throug
     rag\_verified : BOOL
   };
 
-  % Concept DAG Entity
-  \node[draw, rectangle, fill=orange!10, text width=3.6cm, minimum height=2.2cm, align=left] (dag) at (11.2, 0) {
-    \textbf{CONCEPT\_DAG}\\
-    \rule{3.4cm}{0.4pt}\\
-    \underline{edge\_id} : UUID\\
-    \textit{prereq\_id} : UUID\\
-    \textit{target\_id} : UUID\\
-    weight : FLOAT
-  };
-
   % Animation Entity
-  \node[draw, rectangle, fill=purple!10, text width=3.4cm, minimum height=2.4cm, align=left] (anim) at (5.5, 0) {
-    \textbf{ANIMATION}\\
-    \rule{3.2cm}{0.4pt}\\
+  \node[entity, fill=purple!10, text width=4.4cm] (anim) at (5.8, -2.4) {
+    \textbf{\normalsize ANIMATION}\\[-2pt]
+    \rule{\linewidth}{0.5pt}\\[2pt]
     \underline{clip\_id} : UUID\\
     \textit{term\_id} : UUID\\
     duration\_sec : FLOAT\\
@@ -400,11 +411,21 @@ The system models knowledge entities, relationships, and streaming tokens throug
     video\_path : VARCHAR
   };
 
+  % Concept DAG Entity
+  \node[entity, fill=orange!12, text width=4.6cm] (dag) at (11.8, -2.4) {
+    \textbf{\normalsize CONCEPT\_DAG}\\[-2pt]
+    \rule{\linewidth}{0.5pt}\\[2pt]
+    \underline{edge\_id} : UUID\\
+    \textit{prereq\_id} : UUID\\
+    \textit{target\_id} : UUID\\
+    weight : FLOAT
+  };
+
   % Relationships
-  \draw[thick] (lecture) -- node[above, font=\footnotesize] {1 : N} (segment);
-  \draw[thick] (segment) -- node[above, font=\footnotesize] {N : M} (term);
-  \draw[thick] (term) -- node[right, font=\footnotesize] {1 : N} (dag);
-  \draw[thick] (term) -- node[above, font=\footnotesize] {1 : N} (anim);
+  \draw[rel] (lecture.east) -- node[card] {1 : N} (segment.west);
+  \draw[rel] (segment.east) -- node[card] {N : M} (term.west);
+  \draw[rel] (term.south) -- node[card] {1 : N} (dag.north);
+  \draw[rel] (term.south west) -- node[midway, card] {1 : N} (anim.north east);
 \end{tikzpicture}
 \caption{Entity-Relationship (ER) Schema for the Multimodal Scaffolding Platform.}
 \label{fig:er_diagram}
