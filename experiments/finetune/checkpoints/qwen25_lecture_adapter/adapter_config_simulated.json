@@ -1,0 +1,26 @@
+{
+  "status": "DRY_RUN_PASSED",
+  "model_id": "Qwen/Qwen2.5-0.5B-Instruct",
+  "train_samples": 8,
+  "val_samples": 2,
+  "train_source_mix": {
+    "local": 8
+  },
+  "epochs": 3,
+  "batch_size": 2,
+  "learning_rate": 0.0002,
+  "lora_r": 16,
+  "lora_alpha": 32,
+  "target_modules": [
+    "q_proj",
+    "k_proj",
+    "v_proj",
+    "o_proj",
+    "gate_proj",
+    "up_proj",
+    "down_proj"
+  ],
+  "estimated_vram_gb": 1.2,
+  "gpu_hardware": "NVIDIA GeForce RTX 5060 Laptop (8GB VRAM)",
+  "sample_prompt_preview": "<|im_start|>system\nSen ders notlarını ve eğitim konuşmalarını analiz eden, teknik terimleri tespit edip CEFR B1 düzeyinde sade açıklamalar üreten ve Bloom taksonomi seviyesini atayan uzman bir asistansın.<|im_end|>\n<|im_start|>user\nAşağıdaki Elektrik ve Elektronik Mühendisliği ders notu ve transkrip..."
+}

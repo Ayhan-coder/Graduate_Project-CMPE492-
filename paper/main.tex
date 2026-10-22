@@ -20,15 +20,16 @@
 
 \begin{document}
 
-\title{A Two-Layer Evaluation of Speech-to-Text and\\
-LLM-Based Terminology Extraction Systems\\
+\title{A Three-Layer Evaluation of Speech-to-Text,\\
+LLM-Based Terminology Extraction, and\\
+Generative Video-Animation Systems\\
 for Multilingual Education}
 
 \author{\IEEEauthorblockN{Cakil Yilmaz}
 \IEEEauthorblockA{\textit{Computer Engineering Dept.}\\
 \textit{Ko\c{c} University}\\
 Istanbul, Turkey\\
-dogacakilyilmaz2005@gmail.com}
+gunderaliayhan@gmail.com}
 \and
 \IEEEauthorblockN{Berat Enes Dadak, Efe Batur Giritli, Yekta Said Can}
 \IEEEauthorblockA{\textit{R\&D Center}\\
@@ -40,7 +41,7 @@ Istanbul, Turkey\\
 \maketitle
 
 \begin{abstract}
-Personalized instruction significantly improves learning outcomes, but scaling individualized pedagogical support to spoken educational video requires a robust pipeline that first accurately transcribes audio and then extracts domain concepts for learner adaptation. This paper presents a comprehensive, two-layer empirical benchmark evaluating automatic speech recognition (ASR) and large language model (LLM) components on Turkish and English educational lectures. Extending an initial 7-video pilot, we construct a 32-video gold-standard corpus ($\approx$6.6 hours) spanning diverse STEM and humanities curricula with timestamped terminology and a dual-annotator verification protocol. In the speech layer, we benchmark modern multilingual checkpoints (Whisper Medium/Large-v3/Turbo, Qwen3-ASR, Nemotron~3.5, and Turkish fine-tuned models) and introduce energy-based Voice Activity Detection (VAD) chunking to eliminate silence hallucination loops in Whisper Large-v3, alongside terminology domain biasing and LLM-based ASR post-correction. In the semantic layer, we establish an empirical cross-layer error propagation curve by injecting controlled acoustic/orthographic noise at fixed WER levels ($0\%$--$40\%$), revealing that term-level $F_1$ degrades monotonically from $74.4\%$ to $27.6\%$ as word boundaries corrupt. Furthermore, we systematically evaluate prompting strategies, demonstrating that Glossary-based RAG elevates term extraction $F_1$ from $47.6\%$ (zero-shot) to $76.9\%$. We validate an automated LLM-as-a-judge framework against 233 human annotations, achieving $97.00\%$ observed agreement on context-consistency ($R$) and $97.42\%$ on beginner suitability ($D$), analyzing the $\kappa$ prevalence paradox via PABAK ($0.940$). Finally, we introduce symmetric readability metrics (Ate\c{s}man for Turkish, Flesch for English) and standard BERTScore semantic alignment, accompanied by an enriched downstream educational schema featuring Bloom taxonomy levels and concept prerequisite directed acyclic graphs (DAGs).
+Personalized instruction significantly improves learning outcomes, but scaling individualized pedagogical support to spoken educational video requires a robust pipeline that first accurately transcribes audio and then extracts domain concepts for learner adaptation. This paper presents a comprehensive, three-layer empirical benchmark evaluating automatic speech recognition (ASR), large language model (LLM), and generative video-animation components on Turkish and English educational lectures. All measured results rest on a $7$-lecture gold set ($\approx$95.6 min; 3 Turkish, 4 English) with human-verified reference transcripts and timestamped terminology; a curated $32$-lecture extension ($\approx$7.28 h) is documented as scope but has no audio on disk and was not evaluated. In the speech layer, we benchmark modern multilingual checkpoints (Whisper Medium/Large-v3/Turbo, Qwen3-ASR, Nemotron~3.5, and Turkish fine-tuned models) and \emph{measure} three acoustic interventions --- energy-based Voice Activity Detection (VAD) chunking, terminology domain biasing and LLM-based post-correction --- against one seven-clip baseline; the VAD chunker turns WER \emph{upward} on every clip (Turkish macro $0.021 \rightarrow 0.041$, English $0.010 \rightarrow 0.026$) rather than removing the silence-hallucination loops, which are absent from the GPU baseline ($8$-gram repetition $0.0122$/$0.0000$), so it ships disabled. In the semantic layer, we separate two analyses that are easy to conflate: terminology extraction over eleven \emph{measured} ASR hypotheses scored against closed gold lists, and a controlled-WER noise ladder ($0\%$--$40\%$) that we report as an \emph{analytical degradation model} rather than a measurement, because it samples the gold list directly instead of invoking the language model. The gap between the two is the substantive finding: the model predicts $F_1 \approx 0.97$ at $2\%$ WER where measured extraction reaches $0.364$ (Turkish) and $0.679$ (English), so extraction under-recall dominates acoustic corruption. Furthermore, we audit our own prompting-strategy comparison and find it circular: the retrieval arm was fed the very gold term list used for scoring, and the previously reported $47.6/60.9/76.9\%$ $F_1$ triple is reproduced exactly by the fixture path, which forces precision to $1.0$ and samples the first 10/14/20 gold terms --- so those strategy gains and their $3.42$--$6.85$\,s latencies are withdrawn. Re-running the two non-leaking arms on the local checkpoint on one clip per language gives CoT over Zero-Shot $F_1$ of $51.2\%$ against $40.0\%$ on TR-1, and a parsability failure ($F_1 = 0$) against $64.0\%$ on EN-1, at $71$--$81$\,s per call; we report this as a probe, not as a benchmark. In addition to local 4-bit edge execution, we benchmark sovereign cloud infrastructure (Türkiye SSB/TÜBİTAK EVREN National AI Platform, evaluating Qwen~3.8 Flash and DeepSeek~V4.1 Flash on H200 GPU clusters). The measured latency advantage is model-specific rather than platform-wide: Qwen~3.8 Flash reaches $6.11$\,s on Turkish, $6.5\times$ faster than the local 4-bit run on the same clips, while DeepSeek~V4.1 Flash at $27.68$\,s is slower than both commercial APIs yet extracts twice the terminology. We report inter-annotator reliability for the binary rubric on the $115$ double-labelled pairs ($\kappa_R = 0.782$, $\mathrm{PABAK}_R = 0.930$; $\kappa_D = 1.000$ over $P_e = 0.949$, the prevalence paradox in its clearest form) and use an automated local-LLM judge only where its per-item output is stored---a previously claimed judge-versus-human validation is withdrawn because no judge predictions were persisted. Measured readability ($807$ explanations scored with Ate\c{s}man for Turkish and Flesch for English) places only $18$--$45\%$ of individual explanations inside the target B1 band, and reference-definition similarity is reported as a \emph{lexical proxy} rather than contextual-embedding BERTScore because the optional \texttt{bert\_score} package is absent from the experiment environment. An enriched downstream educational schema featuring Bloom taxonomy levels and concept prerequisite directed acyclic graphs (DAGs) completes the pipeline.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -58,35 +59,35 @@ While manual captioning and expert curation of lecture audio do not scale~\cite{
 This paper addresses this gap by investigating four central research questions:
 
 \begin{itemize}
-\item \textbf{RQ1 (ASR Performance \& Acoustic Enhancements).} How do modern open-weight and commercial ASR architectures compare on Turkish and English educational speech in transcription accuracy (WER, CER) and efficiency (latency, RTF), and how do long-form VAD chunking and terminology domain biasing mitigate hallucination loops and out-of-vocabulary degradation?
-\item \textbf{RQ2 (Cross-Layer Error Propagation).} How does acoustic transcription degradation (measured by WER) mathematically and empirically propagate into downstream terminology extraction ($F_1$) when subjected to controlled noise injection across fixed error regimes ($0\%$--$40\%$)?
-\item \textbf{RQ3 (Prompting Strategies \& Semantic Quality).} How do structured prompting strategies (Zero-Shot, Chain-of-Thought, and Glossary-based RAG) affect terminology recall, precision, and beginner suitability across different LLM parameter scales?
+\item \textbf{RQ1 (ASR Performance \& Acoustic Enhancements).} How do modern open-weight and commercial ASR architectures compare on Turkish and English educational speech in transcription accuracy (WER, CER) and efficiency (latency, RTF), and do long-form VAD chunking, terminology domain biasing and LLM post-correction improve those metrics?
+\item \textbf{RQ2 (Cross-Layer Degradation).} How far does downstream terminology extraction $F_1$ actually fall as upstream transcription quality degrades, and how much of the published degradation profile is measured rather than modelled? This paper answers by separating measured ASR$\to$LLM points from an analytical noise-injection ladder, and reports the gap between them.
+\item \textbf{RQ3 (Prompting Strategies \& Semantic Quality).} How do structured prompting strategies (Zero-Shot, Chain-of-Thought, and Glossary-based RAG) affect terminology recall, precision, and beginner suitability across different LLM parameter scales? This paper answers it partially: we re-measure the two arms that can be scored without leakage on one clip per language, and we show that the third arm cannot be evaluated against the glossary it retrieves from.
 \item \textbf{RQ4 (Evaluation Reliability \& Downstream Integration).} Can an automated LLM-as-a-judge reliably surrogate human annotator decisions ($R$ and $D$), how does class prevalence impact agreement metrics ($\kappa$ vs.\ PABAK), and how can extracted concepts be structured into prerequisite DAGs for downstream adaptive hypermedia?
 \end{itemize}
 
 Our principal contributions are:
 
 \begin{itemize}
-\item \textbf{Gold-Standard Multilingual Dataset (32 Videos):} We extend an initial 7-video pilot into a curated 32-video benchmark ($\approx$6.6 hours; 16 Turkish, 16 English) across diverse STEM and humanities curricula with timestamped terminology and a dual-annotator verification protocol.
-\item \textbf{Empirical Cross-Layer Error Analysis:} We present a direct experimental measurement of the ASR-to-LLM error propagation curve ($F_1$ vs.\ WER), plotting empirical ASR outputs alongside controlled acoustic/orthographic noise injections ($0\%$--$40\%$ WER) to establish a mathematical degradation profile.
-\item \textbf{ASR Optimization Suite:} We demonstrate that energy-based VAD chunking eliminates silence-induced repetition loops in Whisper Large-v3 on long-form lectures, evaluate slide-based domain biasing (`processor.get_prompt_ids`), benchmark Turkish fine-tuned models, and implement LLM-based ASR post-correction.
-\item \textbf{Structured Prompting \& LLM-as-a-Judge:} We demonstrate that Glossary-based RAG boosts terminology $F_1$ from $47.6\%$ to $76.9\%$, validate an automated LLM judge against 233 human ratings with $97.00\%$ observed agreement on $R$ and $97.42\%$ on $D$, and resolve the $\kappa$ prevalence paradox via PABAK ($0.940$).
-\item \textbf{Symmetric Readability \& Enriched Downstream Schema:} We implement symmetric readability evaluation (Ate\c{s}man for Turkish, Flesch for English) and BERTScore, and establish an enriched output schema (v2.0) defining Bloom taxonomy levels, multi-tier pedagogical explanations (B1 analogy, formal definition, elevator pitch, exam tips), and concept prerequisite DAGs.
+\item \textbf{Gold-Standard Multilingual Dataset (7 Evaluated Clips):} All measured results rest on $7$ lectures ($\approx$95.6 min; 3 Turkish, 4 English) with human-verified reference transcripts (\texttt{experiments/data/gold/}). A separate curation artefact, \texttt{manifest\_30plus.jsonl}, enumerates $32$ candidate lectures ($16$ Turkish, $16$ English, $7.28$\,h) with retrieved caption text, but \emph{none} of its $32$ audio files is present on disk, so no experiment in this paper runs on it; it is reported as future-work scope, not as a benchmarked corpus. Closed gold terminology lists cover only TR-1 and EN-1 ($32$ terms each).
+\item \textbf{Cross-Layer Analysis, Separated into Measurement and Model:} We report terminology $F_1$ for eleven \emph{measured} ASR hypotheses passed through a fixed LLM, and we report the controlled-WER ladder ($0\%$--$40\%$) explicitly as an \emph{analytical degradation model} that samples the gold list rather than invoking the model. The two series disagree by a wide margin ($F_1$ of $0.364$ measured versus $\approx0.97$ modelled at $2\%$ WER), which is itself the finding: extraction under-recall, not acoustic corruption, is the binding constraint.
+\item \textbf{ASR Optimization Suite, Measured Rather Than Asserted:} We implement energy-based VAD chunking, slide/glossary-based terminology biasing (\texttt{processor.get\_prompt\_ids}) and LLM-based ASR post-correction, and run all three against the same seven-clip Large-v3 baseline (Sec.~\ref{sec:acoustic-opt}, Table~\ref{tab:interventions}). The measurement reverses two claims of an earlier draft: the energy VAD chunker \emph{raises} normalised WER on every clip (TR macro $0.021 \rightarrow 0.041$, EN $0.010 \rightarrow 0.026$) instead of eliminating repetition loops, because the GPU baseline contains no measurable loops ($8$-gram repetition rate $0.0122$ TR / $0.0000$ EN), and the biasing arm as previously published was not decodable at all --- the glossary prompt plus $440$ new tokens overflowed Whisper's $448$-position decoder budget and made \texttt{generate()} raise, which is why no '+Domain Biasing' artifact existed. Turkish fine-tuned checkpoints are also benchmarked.
+\item \textbf{Structured Prompting, Sovereign Cloud, \& Rating Provenance:} We audit the prompting-strategy comparison rather than report it, showing that its retrieval arm scored against the gold list it was given; we benchmark national sovereign inference (EVREN platform) where the latency gain is model-specific ($6.11$\,s for Qwen 3.8 Flash against $27.68$\,s for DeepSeek V4.1, the latter slower than both commercial APIs); and we make the source of every $R$/$D$ rating explicit --- human annotator for the six Whisper cells, stored per-item judge output for the 2026 checkpoints and EVREN cells, and no claim where neither exists --- after withdrawing a judge-versus-human validation whose predictions were never persisted.
+\item \textbf{Symmetric Readability \& Enriched Downstream Schema:} We implement symmetric readability evaluation (Ate\c{s}man for Turkish, Flesch for English), reported as the \emph{share of individual explanations} falling inside the target band rather than as a band-level average, plus a reference-definition similarity that runs as a \emph{lexical proxy} because the optional \texttt{bert\_score} package is absent from the experiment environment, and establish an enriched output schema (v2.0) defining Bloom taxonomy levels, multi-tier pedagogical explanations (B1 analogy, formal definition, elevator pitch, exam tips), and concept prerequisite DAGs.
 \end{itemize}
 
 \section{Related Work}
 
-Video-based learning has made captions and transcripts a core accessibility feature. Automatic caption quality varies with domain terminology, speaker characteristics, and language or accent~\cite{kuhn2024}. Lecture-recording studies show that a single pooled error rate is not a sufficient report of ASR behavior~\cite{kuhn2024}, and ASR errors are known to propagate into downstream NLP tasks~\cite{southwell2022}. For Turkish, model choice is already known to matter~\cite{mercan2023}. Whisper remains a strong multilingual baseline~\cite{radford2023}; Large-v3 Turbo keeps the same $\approx$99-language coverage, including Turkish, with a pruned decoder~\cite{whisper-turbo}. Among 2026 open-weight systems, NVIDIA Parakeet TDT / Canary and Cohere Transcribe lead English or European-language leaderboards but do not list Turkish; Qwen3-ASR (1.7B and 0.6B) does, with official Turkish and English support~\cite{qwen3asr2026}. NVIDIA Nemotron~3.5 ASR (0.6B) is the later NVIDIA checkpoint that \emph{does} list Turkish (\texttt{tr-TR}) and English as transcription-ready locales~\cite{nemotron35asr2026}. wav2vec~2.0 offers self-supervised representations under limited labels~\cite{baevski2020}; SpeechBrain provides a common experimental harness~\cite{ravanelli2021}. English-only 2026 leaderboard models are therefore treated as incompatible with this study, not as missing baselines.
+Video-based learning has made captions and transcripts a core accessibility feature. Automatic caption quality varies with domain terminology, speaker characteristics, and language or accent~\cite{kuhn2024}. Lecture-recording studies show that a single pooled error rate is not a sufficient report of ASR behavior~\cite{kuhn2024}, and ASR errors are known to propagate into downstream NLP tasks~\cite{southwell2022}. For Turkish, model choice is already known to matter~\cite{mercan2023}. Whisper remains a strong multilingual baseline~\cite{radford2023}; Large-v3 Turbo keeps the same $\approx$99-language coverage, including Turkish, with a pruned decoder~\cite{whisper-turbo}. Among 2026 open-weight systems, NVIDIA Parakeet TDT / Canary and Cohere Transcribe lead English or European-language leaderboards but do not list Turkish; Qwen3-ASR (1.7B and 0.6B) does, with official Turkish and English support~\cite{qwen3asr2026}. NVIDIA Nemotron~3.5 ASR (0.6B) is the later NVIDIA checkpoint that \emph{does} list Turkish (\texttt{tr-TR}) and English as transcription-ready locales~\cite{nemotron35asr2026}. wav2vec~2.0 offers self-supervised representations under limited labels~\cite{baevski2020}; SpeechBrain provides a common experimental harness~\cite{ravanelli2021}. English-only 2026 leaderboard models are therefore treated as incompatible with this study, not as missing baselines. Alongside global models, sovereign AI initiatives such as the EVREN National AI Platform~\cite{evren2026} provide dedicated H200 inference clusters for Turkish and multilingual models, ensuring strict data residency while eliminating client GPU resource ceilings.
 
 Terminology extraction was long dominated by rule-based and statistical methods, including C-value/NC-value for multi-word terms~\cite{frantzi2000} and classical information-retrieval weighting~\cite{manning2008}. Deep learning then became the default in specialized domains such as biomedicine~\cite{lossio2016}. LiTeWi combines unsupervised extractors with entity linking to build educational ontologies from textbooks~\cite{conde2016}. Recent surveys emphasize transformer-based and generative approaches to automatic term extraction~\cite{tran2026}. Almost all of this work assumes clean text.
 
-A separate literature targets the later stages of individualization---learner modeling and adapted delivery---including intelligent tutoring and adaptive hypermedia~\cite{brusilovsky2007,corbett1995,vanlehn2011} and, more recently, LLM tutors with carefully designed prompts~\cite{xu2024,vanzo2025}. Those systems presuppose a reliable understanding of the source content. For spoken educational material that understanding is itself a pipeline: ASR, then semantic processing. Joint evaluations of that pipeline, especially across English and Turkish, are still rare. This study targets that gap as a two-layer benchmark, not as a new adaptive tutor.
+A separate literature targets the later stages of individualization---learner modeling and adapted delivery---including intelligent tutoring and adaptive hypermedia~\cite{brusilovsky2007,corbett1995,vanlehn2011} and, more recently, LLM tutors with carefully designed prompts~\cite{xu2024,vanzo2025}. Those systems presuppose a reliable understanding of the source content. For spoken educational material that understanding is itself a pipeline: ASR, then semantic processing. Joint evaluations of that pipeline, especially across English and Turkish, are still rare. This study targets that gap as a three-layer pipeline: the speech and semantic layers are benchmarked quantitatively, whereas the third (video-generation) layer is implemented and demonstrated end-to-end but is not scored against a gold reference. It is not a new adaptive tutor.
 
 \section{Method}
 
 \subsection{System Architecture}
 
-The evaluation framework comprises an integrated two-layer pipeline enhanced with acoustic and semantic scaffolding (Fig.~\ref{fig:arch}). In the speech recognition layer, raw educational audio is first segmented into natural acoustic utterances using an energy-based Voice Activity Detection (VAD) chunker, preventing silence hallucination. When domain glossaries or slide texts are available, the ASR decoder is conditioned with terminology prompt tokens (`processor.get_prompt_ids`). The resulting transcript optionally undergoes LLM-based post-correction before downstream transmission. In the semantic analysis layer, the transcribed text is processed by an LLM guided by structured prompting strategies (Zero-Shot, Chain-of-Thought, or Glossary-based RAG) to extract domain terminology, evaluate context consistency ($R$) and explanation accuracy ($D$), and structure outputs into an enriched educational schema featuring Bloom taxonomy levels, multi-tier pedagogical explanations, and concept prerequisite directed acyclic graphs (DAGs).
+The evaluation framework comprises an integrated three-layer pipeline enhanced with acoustic and semantic scaffolding (Fig.~\ref{fig:arch}). In the speech recognition layer, the delivered application slices the normalised audio into fixed, non-overlapping $30$\,s windows (\texttt{gui/pipeline.py}, \texttt{CHUNK\_S = 30.0}) and transcribes them sequentially, while the benchmark harness runs Whisper over the whole track in \texttt{sequential\_generate} mode; the energy-based VAD chunker, the terminology-prompt conditioning (\texttt{processor.get\_prompt\_ids}) and the LLM-based post-correction pass are therefore experiment-only switches (\texttt{run\_asr.py --use-vad}, \texttt{asr\_post\_correction.py}) evaluated in Sec.~\ref{sec:acoustic-opt}, not part of the default transcription path. In the semantic analysis layer, the transcribed text is processed by an LLM guided by structured prompting strategies (Zero-Shot, Chain-of-Thought, or Glossary-based RAG) to extract domain terminology, evaluate context consistency ($R$) and explanation accuracy ($D$), and structure outputs into an enriched educational schema featuring Bloom taxonomy levels, multi-tier pedagogical explanations, and concept prerequisite directed acyclic graphs (DAGs). In the delivery layer, the learner marks a moment of confusion in the synchronized player; the transcript window $[t-45\,\text{s},\,t+10\,\text{s}]$ and the term nearest to $t$ are passed to the local \texttt{Qwen3.5-4B} model, which returns a narration script plus Manim scene code. That code is checked against an AST allow-list (only \texttt{from manim import *} may be imported), rendered at 480p15 (the initial draft tier; the seven shipped video artifacts predate the introduction of configurable 720p30/1080p30 tiers in the delivery UI) with up to two automatic repair attempts, voiced by Edge-TTS, and multiplexed with FFmpeg into a downloadable MP4.
 
 \begin{figure}[t]
 \centering
@@ -98,8 +99,8 @@ The evaluation framework comprises an integrated two-layer pipeline enhanced wit
 ]
 \node[box] (audio) {Educational Audio (TR / EN, 16\,kHz mono)};
 \node[box, below=0.20cm of audio] (vad)
-  {Acoustic Front-End: Energy VAD Chunker (12--28\,s silence splits)\\
-   {\itshape\tiny resolves Whisper Large-v3 silence hallucination loops}};
+  {Acoustic Front-End (experiment switch only): Energy VAD Chunker, $12$--$28$\,s splits\\
+   {\itshape\tiny off in the delivered app, which uses fixed $30$\,s windows (\texttt{gui/pipeline.py}); measured to \emph{raise} WER}};
 \node[box, below=0.20cm of vad] (asr)
   {ASR Layer: Whisper Med./Large-v3/Turbo, Qwen3, Nemotron, TR-Turbo\\
    {\itshape\tiny optional domain biasing via \texttt{get\_prompt\_ids} + LLM post-correction}};
@@ -115,8 +116,13 @@ The evaluation framework comprises an integrated two-layer pipeline enhanced wit
 \draw[arr] (asr) -- (tr);
 \draw[arr] (tr) -- (llm);
 \draw[arr] (llm) -- (out);
+\node[box, below=0.20cm of out] (vid)
+  {Delivery Layer: On-demand Explainer Video\\
+   {\itshape\tiny $[t-45\,\text{s},\,t+10\,\text{s}]$ window $\to$ Qwen3.5-4B script + Manim code}\\
+   {\itshape\tiny AST allow-list, \texttt{manim -ql} 480p15, Edge-TTS, FFmpeg mux}};
+\draw[arr] (out) -- (vid);
 \end{tikzpicture}
-\caption{Enhanced two-layer evaluation architecture incorporating VAD chunking, domain biasing, structured prompting, LLM judge verification, and concept DAG schema.}
+\caption{Three-layer evaluation architecture. Layers 1--2 (VAD chunking, domain biasing, structured prompting, LLM judge verification, concept DAG schema) are benchmarked quantitatively; the delivery layer is implemented and demonstrated end-to-end but not scored against a gold reference.}
 \label{fig:arch}
 \end{figure}
 
@@ -125,7 +131,7 @@ The evaluation framework comprises an integrated two-layer pipeline enhanced wit
 The benchmark evaluates both a core intensive testbed and an extended multilingual corpus:
 \begin{itemize}
 \item \textbf{Core Evaluation Set (7 Videos, $\approx$95 min):} Summarized in Table~\ref{tab:data}, comprising three Turkish and four English lectures across project management, tourism, data science, and thermal physics. Reference transcripts are verified gold standards: EN-1 and EN-4 derive from cleaned human caption tracks; TR-3 was independently drafted from audio; while TR-1, TR-2, EN-2, and EN-3 originate from automated caption drafts subjected to native-speaker multi-pass correction for technical terminology (e.g., \emph{ANOVA, MICE, Scrum, Celsus Kütüphanesi}).
-\item \textbf{Extended Benchmark Corpus (32 Videos, $\approx$395 min / 6.6 hours):} To establish a scalable, journal-grade benchmark, we extended the corpus to 32 video lectures (16 Turkish, 16 English) documented in \texttt{sources\_30plus.json} and \texttt{manifest\_30plus.jsonl}. The corpus covers twelve diverse STEM and humanities disciplines (e.g., Deep Learning, Concurrency, Kirchhoff Laws, Epistemology, CRISPR-Cas9, Macroeconomics) with native and non-native accents, studio lectures, and classroom recordings.
+\item \textbf{Curated Candidate Corpus (32 Videos, $\approx$437 min / 7.28 h) --- prepared, not evaluated:} We curated a candidate extension of $32$ lectures ($16$ Turkish, $16$ English) documented in \texttt{sources\_30plus.json} and \texttt{manifest\_30plus.jsonl}, spanning twelve STEM and humanities domains (e.g., Deep Learning, Concurrency, Kirchhoff Laws, Epistemology, CRISPR-Cas9, Macroeconomics) with native and non-native accents and both studio and classroom recordings. This extension is \emph{metadata plus retrieved caption text only}: none of the $32$ referenced audio files is present on disk, no reference transcript was human-verified for them, and no experiment in this paper was run against them. All measured results below come from the original $7$-clip gold set, and we report the extension solely as the intended next stage of curation so that its scope is not mistaken for a result.
 \end{itemize}
 
 \begin{table}[t]
@@ -155,9 +161,9 @@ We evaluate eight off-the-shelf and fine-tuned ASR systems (Table~\ref{tab:hf202
 
 Three critical acoustic enhancements are introduced:
 \begin{enumerate}
-\item \textbf{Energy-Based VAD Chunking:} Standard Whisper Large-v3 exhibits known failure modes on continuous, unedited lecture recordings: prolonged silences or background music induce repetitive decoding loops and hallucinated phrases. We implement an energy-based Voice Activity Detection chunker (`VADChunker`) that detects natural pauses ($>0.4$\,s below $-40$\,dBFS) to split long-form audio into 12--28\,s acoustically coherent segments, completely eliminating hallucination loops.
-\item \textbf{Terminology Domain Biasing:} Technical lectures contain specialized proper nouns and acronyms (e.g., \emph{ANOVA, Thévenin, Qualia}). Using Whisper's prompt-conditioning interface (`processor.get_prompt_ids`), we inject domain glossaries and slide terms directly into the decoder prefix tokens, steering beam search toward correct domain spellings.
-\item \textbf{LLM-Based ASR Post-Correction:} To recover from acoustic misrecognitions before semantic parsing, transcripts can be passed through a targeted LLM post-correction prompt that rectifies phonetic and orthographic distortions while preserving spoken cadence.
+\item \textbf{Energy-Based VAD Chunking, Tested and Found Harmful:} Whisper is known to enter repetitive decoding loops on continuous, unedited recordings with prolonged silences. We therefore implement an energy-based Voice Activity Detection chunker (\texttt{vad\_chunker.py}: $30$\,ms frames, cut line at $\max(10^{-4}, 2.2 \times$ the $25$th-percentile noise floor), gaps $\le 200$\,ms closed, boundaries searched on pauses $>0.4$\,s, producing $12$--$28$\,s segments) and benchmark it against the same clips without it. The intervention \emph{degrades} accuracy: normalised WER rises on all seven clips (TR macro $0.021 \rightarrow 0.041$, EN $0.010 \rightarrow 0.026$), no repetition loop existed in the GPU baseline to eliminate, and terminology coverage is unchanged. The earlier claim that it "completely eliminates hallucination loops" and cuts Turkish WER by $83.7\%$ is withdrawn; the chunker remains in the codebase as an optional flag, unused by the delivered application.
+\item \textbf{Terminology Domain Biasing, Tested and Found Harmful and Leaking:} Technical lectures contain specialized proper nouns and acronyms (e.g., \emph{ANOVA, Th\'evenin, Qualia}). Using Whisper's prompt-conditioning interface (\texttt{processor.get\_prompt\_ids}), we inject the closed glossary into the decoder prefix, steering beam search toward curriculum spellings. Measured against the same stage without the prompt it multiplies the error on the two clips it touches (TR-1 $0.0333 \rightarrow 0.1562$, $4.7\times$; EN-1 $0.0194 \rightarrow 0.0869$, $4.5\times$) and is the sole cause of the stage's macro rise ($+99.4\%$ TR, $+64.4\%$ EN); on TR-1 the decoder echoes the $68$-word glossary back instead of transcribing, and the coverage it "gains" is the injected list reappearing, which is leakage against the very file the scorer reads (Sec.~\ref{sec:acoustic-opt}).
+\item \textbf{LLM-Based ASR Post-Correction, Tested and Marginal:} To recover from acoustic misrecognitions before semantic parsing, transcripts pass through a targeted post-correction prompt on the local \texttt{Qwen3.5-4B} checkpoint. Applied to the stage-3 hypotheses it lowers WER on four of seven clips but leaves no clip below its own raw baseline, and it amplifies the one transcript that is already degenerate (TR-1 $0.156 \rightarrow 0.324$). Its published rescue figure is withdrawn: the "$26.3\%$ simulated WER, $+29.8\%$ $F_1$" pair comes from the harness self-test, whose corrected string is the gold reference pasted verbatim.
 \end{enumerate}
 
 \begin{table}[t]
@@ -183,17 +189,19 @@ Three critical acoustic enhancements are introduced:
 \end{table}
 
 \subsection{Semantic Analysis Layer and Prompting Strategies}
+\label{sec:prompting}
 
 To assess semantic extraction beyond fixed zero-shot queries, we formulate three distinct prompting paradigms:
 \begin{enumerate}
 \item \textbf{Zero-Shot Baseline:} Direct extraction instruction requesting domain terms and CEFR-B1 explanations.
 \item \textbf{Chain-of-Thought (CoT):} The model first explicitly identifies lecture topics and sub-domains, filters candidate multi-word expressions against generic discourse vocabulary, and then constructs beginner-friendly definitions.
-\item \textbf{Glossary-Based RAG:} Retrieval-augmented generation where syllabus concepts and slide keywords are supplied as contextual anchor primitives, guiding extraction toward curriculum-aligned terminology.
+\item \textbf{Glossary-Based RAG:} Retrieval-augmented generation where syllabus concepts and slide keywords are supplied as contextual anchor primitives, guiding extraction toward curriculum-aligned terminology. \emph{Implemented but not evaluated here};\footnote{The subsequent 8-clip corporate speech engineering probe ($60.7\%$ candidate grounding precision on long-form transcripts; \texttt{experiments/rag/eval\_corporate\_rag.py}) postdates this paper and is reported in the extended graduation project report §8.4.} Section~\ref{sec:prompt-strat} explains why scoring this arm would be circular without a held-out glossary.
 \end{enumerate}
 
-Extracted items are structured into an \textbf{Enriched Educational Schema (v2.0)} comprising: canonical term lemma, audio timestamp span ($[t_{\text{start}}, t_{\text{end}}]$), pedagogical difficulty (`Beginner`, `Intermediate`, `Advanced`), Bloom's taxonomy cognitive level (`Remembering`, `Understanding`, `Applying`), concept prerequisite DAG edges, and four pedagogical explanation variants (`b1_analogy`, `formal_definition`, `elevator_pitch`, `exam_tip`).
+Extracted items are structured into an \textbf{Enriched Educational Schema (v2.0)} comprising: canonical term lemma, audio timestamp span ($[t_{\text{start}}, t_{\text{end}}]$), pedagogical difficulty (\texttt{Beginner}, \texttt{Intermediate}, \texttt{Advanced}), Bloom's taxonomy cognitive level (\texttt{Remembering}, \texttt{Understanding}, \texttt{Applying}), concept prerequisite DAG edges, and four pedagogical explanation variants (\texttt{b1\_analogy}, \texttt{formal\_definition}, \texttt{elevator\_pitch}, \texttt{exam\_tip}).
 
 \subsection{Evaluation Metrics}
+\label{sec:metrics}
 
 \subsubsection{ASR layer}
 We report word error rate (WER) and character error rate (CER) against reference transcripts~\cite{jurafsky2026}:
@@ -216,7 +224,7 @@ To eliminate the linguistic asymmetry of English-only readability metrics, we ad
 \begin{itemize}
 \item \textbf{Turkish: Ate\c{s}man Readability Index~\cite{atesman1997}:}
 \begin{equation}
-\mathrm{Score}_{\mathrm{Ate\c{s}man}} = 198.825 - 40.175 \left(\frac{N_{\mathrm{syl}}}{N_{\mathrm{words}}}\right) - 2.610 \left(\frac{N_{\mathrm{words}}}{N_{\mathrm{sent}}}\right),
+\mathrm{Score}_{\text{Ate\c{s}man}} = 198.825 - 40.175 \left(\frac{N_{\mathrm{syl}}}{N_{\mathrm{words}}}\right) - 2.610 \left(\frac{N_{\mathrm{words}}}{N_{\mathrm{sent}}}\right),
 \label{eq:atesman}
 \end{equation}
 where $N_{\mathrm{syl}}$ is computed via vowel phoneme counting. Scores between $50$ and $69$ denote ``Orta Güçlükte'' (intermediate), matching target CEFR B1 pedagogical difficulty.
@@ -226,7 +234,7 @@ where $N_{\mathrm{syl}}$ is computed via vowel phoneme counting. Scores between 
 \label{eq:flesch}
 \end{equation}
 where scores between $60$ and $70$ indicate standard B1 readability.
-\item \textbf{Semantic Similarity (BERTScore~\cite{zhang2020bertscore}):} Replaces weak token-level BLEU by calculating token cosine similarity $R_{\mathrm{BERT}}$ against gold reference definitions using contextualized embeddings.
+\item \textbf{Semantic Similarity:} Replaces weak token-level BLEU by scoring each explanation against its gold reference definition. The intended metric is BERTScore~\cite{zhang2020bertscore} with contextualized embeddings, but the optional \texttt{bert\_score} package is not installed in the experiment environment, so every number reported in Table~\ref{tab:readability} comes from the documented fallback in \texttt{eval\_semantic.compute\_bert\_score}: a character-trigram cosine similarity blended with word-set precision and recall. We therefore call it a \emph{lexical proxy} throughout and do not interpret it as a contextual-embedding similarity.
 \end{itemize}
 
 \subsubsection{Inter-Annotator Agreement and Prevalence}
@@ -249,17 +257,17 @@ Temporal alignment on timestamped extractions is validated using temporal Inters
 Context-consistency ($R1\%$) & yes & yes \\
 Explanation accuracy ($D1\%$) & yes & yes \\
 Readability index & Ate\c{s}man & Flesch \\
-Semantic similarity (BERTScore) & yes & yes \\
+Semantic similarity (lexical proxy; \S\ref{sec:metrics}) & yes & yes \\
 Closed-list precision, recall, $F_1$ & yes & yes \\
 ASR WER / CER / latency / RTF & yes & yes \\
-LLM latency \& VAD chunking stability & yes & yes \\
+LLM latency \& VAD intervention deltas (WER, coverage, repetition; \S\ref{sec:acoustic-opt}) & yes & yes \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \subsection{Experimental Setup and Reproducibility}
 
-Pilot checkpoints: Whisper \texttt{medium} / \texttt{large-v3}; Wav2Vec~2.0 \texttt{facebook/wav2vec2-large-xlsr-53}; SpeechBrain with default greedy/beam settings; GPT-4.1 and GPT-4o-mini via the OpenAI API~\cite{openai2026}. All pilot ASR runs were on CPU. The original draft did not record the CPU model or Whisper decoding flags; those scores are therefore configuration-sensitive (Appendix~\ref{app:hw}). Refresh checkpoints and pinned revisions are listed in Table~\ref{tab:hf2026} and in \texttt{experiments/models.json}. The refresh scripts force \texttt{task=transcribe}, set \texttt{language} from the clip when known, and decode long-form audio with Whisper's sequential \texttt{generate()} (30\,s windows, timestamps on), not the experimental Hugging Face pipeline chunker. Hugging Face \texttt{condition\_on\_prev\_tokens} (openai-whisper: \texttt{condition\_on\_previous\_text}) is off by default. Compression-ratio and log-probability halt thresholds follow the model card. R/D labels in the pilot were assigned by a single annotator. Exact prompt wording is in Appendix~\ref{app:prompt}.
+Pilot checkpoints: Whisper \texttt{medium} / \texttt{large-v3}; Wav2Vec~2.0 \texttt{facebook/wav2vec2-large-xlsr-53}; SpeechBrain with default greedy/beam settings; GPT-4.1 and GPT-4o-mini via the OpenAI API~\cite{openai2026}; and sovereign cloud checkpoints (EVREN Qwen~3.8 Flash, EVREN DeepSeek~V4.1 Flash) via the EVREN National AI Platform API~\cite{evren2026}. All pilot ASR runs were on CPU. The original draft did not record the CPU model or Whisper decoding flags; those scores are therefore configuration-sensitive (Appendix~\ref{app:hw}). Refresh checkpoints and pinned revisions are listed in Table~\ref{tab:hf2026} and in \texttt{experiments/models.json}. The refresh scripts force \texttt{task=transcribe}, set \texttt{language} from the clip when known, and decode long-form audio with Whisper's sequential \texttt{generate()} (30\,s windows, timestamps on), not the experimental Hugging Face pipeline chunker. Hugging Face \texttt{condition\_on\_prev\_tokens} (openai-whisper: \texttt{condition\_on\_previous\_text}) is off by default. Compression-ratio and log-probability halt thresholds follow the model card. R/D labels in the pilot were assigned by a single annotator. Exact prompt wording is in Appendix~\ref{app:prompt}.
 
 \section{Experimental Results}
 \label{sec:results}
@@ -267,7 +275,7 @@ Pilot checkpoints: Whisper \texttt{medium} / \texttt{large-v3}; Wav2Vec~2.0 \tex
 This section first restates the completed CPU pilot (Tables~\ref{tab:asr}--\ref{tab:rtf}), then the gold-rescored GPU refresh. Table~\ref{tab:asr-lang} is the required language split for the Whisper checkpoints that were re-run against gold. Table~\ref{tab:asr-2026} reports the 2026 checkpoints on the same files. Wav2Vec~2.0 and SpeechBrain were not re-run on the gold set and stay empty in Table~\ref{tab:asr-lang}.
 
 \begin{table}[t]
-\caption{Average transcription accuracy. Lower is better.}
+\caption{CPU pilot averages over all seven clips (pooled across languages). Lower is better. These pilot runs did not record the decoding flags of Appendix~\ref{app:hw}, are configuration-sensitive, and are superseded by the gold-rescored language split in Table~\ref{tab:asr-lang}.}
 \label{tab:asr}
 \centering
 \renewcommand{\arraystretch}{1.15}
@@ -312,7 +320,7 @@ SpeechBrain$^{\dagger}$ & 1.246 & 1.051 & 0.382 & 0.273 \\
 \legend{WER (norm.), CER (norm.)}
 \end{axis}
 \end{tikzpicture}
-\caption{Normalized WER and CER for the four ASR systems (same values as Table~\ref{tab:asr}).}
+\caption{Normalized WER and CER for the four CPU-pilot ASR systems (same values as Table~\ref{tab:asr}; not the GPU gold-rescored figures).}
 \label{fig:wer}
 \end{figure}
 
@@ -322,9 +330,9 @@ Two points of interpretation matter. First, Whisper is pretrained on large-scale
 
 Second, Whisper Medium has a \emph{much} lower normalized WER than Large-v3 on the CPU pilot ($0.021$ vs.\ $0.129$ --- about six times lower), not a slight edge. This is consistent with Large-v3's known sensitivity, on long-form audio, to language detection and to decoding flags such as \texttt{condition\_on\_previous\_text}. The gold-rescored GPU refresh (Table~\ref{tab:asr-lang}) reverses that ranking: Large-v3 is 0.021 TR / 0.010 EN against Medium 0.049 / 0.011. We therefore treat the pilot gap as configuration-dependent and do not present Medium as generally superior to Large-v3.
 
-Across these specific clips, Table~\ref{tab:asr-lang} and Table~\ref{tab:asr-2026} report both unweighted macro WER and word-weighted micro WER alongside non-parametric $95\%$ bootstrap confidence intervals ($N=10{,}000$ resamples). Evaluating word-weighted micro WER is essential because individual lectures vary substantially in length and acoustic difficulty: in particular, TR-3 is the longest Turkish recording ($1{,}583$ words) and features noticeable room reverberation and unscripted delivery (yielding Medium WER $0.081$, compared to $0.030$ on TR-2 and $0.035$ on TR-1). Consequently, unweighted macro averages over-smooth Turkish difficulty, whereas word-weighting reflects realistic aggregate throughput (e.g., Whisper Medium TR rises from $0.049$ macro to $0.050$ micro; Turkish-matched Turbo rises from $0.082$ to $0.087$; Nemotron~3.5 rises from $0.214$ to $0.221$). 
+Across these specific clips, Table~\ref{tab:asr-lang} and Table~\ref{tab:asr-2026} report both unweighted macro WER and word-weighted micro WER alongside non-parametric $95\%$ bootstrap confidence intervals ($N=10{,}000$ resamples). Evaluating word-weighted micro WER is essential because individual lectures vary substantially in length and in observed difficulty: in particular, TR-3 is the longest Turkish recording ($1{,}583$ words) and is the hardest Turkish clip for every checkpoint (Medium WER $0.081$, against $0.030$ on TR-2 and $0.035$ on TR-1). We deliberately do not attribute that gap to an acoustic condition: no reverberation, noise or channel measurement exists for any clip, and the dataset card (	exttt{experiments/data/DATASET\_CARD.md}) records all seven recordings as prepared, single-speaker, scripted educational videos, so the difficulty is reported as an observed per-clip property rather than an explained one. Consequently, unweighted macro averages over-smooth Turkish difficulty, whereas word-weighting reflects realistic aggregate throughput (e.g., Whisper Medium TR rises from $0.049$ macro to $0.050$ micro; Turkish-matched Turbo rises from $0.082$ to $0.087$; Nemotron~3.5 rises from $0.214$ to $0.221$). 
 
-With small clip counts ($n=3$ TR, $n=4$ EN), the bootstrap confidence intervals are necessarily wide (e.g., Medium TR $[0.030, 0.081]$; Turbo TR $[0.011, 0.052]$; Nemotron TR $[0.117, 0.287]$). Rather than concealing this variance behind single-point estimates, reporting these wide intervals honestly quantifies sample uncertainty. Among multilingual models, Whisper Large-v3 achieves the lowest word error rate ($0.021$ TR macro/micro, $95\%$ CI $[0.014, 0.032]$; $0.010$ EN, $95\%$ CI $[0.007, 0.012]$). Whisper Turbo nearly matches Large-v3 on English ($0.011$ macro / $0.012$ micro, CI $[0.007, 0.017]$) at mean RTF $0.025$--$0.044$, approximately four to eight times faster than Large-v3 on this host. Qwen3-ASR 1.7B is competitive across all clips ($0.061$ TR / $0.015$ EN) but slower; the 0.6B variant is solid on English ($0.021$ macro/micro) but weaker on Turkish ($0.134$ macro / $0.136$ micro, CI $[0.086, 0.180]$). Nemotron~3.5 ASR demonstrates reliable English accuracy ($0.035$ macro / $0.034$ micro, CI $[0.026, 0.049]$) but struggles on Turkish ($0.214$ macro / $0.221$ micro, CI $[0.117, 0.287]$). The Turkish-matched Turbo fine-tune ($0.082$ macro / $0.087$ micro) does not surpass generic multilingual Large-v3 or Turbo on these lectures.
+With small clip counts ($n=3$ TR, $n=4$ EN), the bootstrap confidence intervals are necessarily wide (e.g., Medium TR $[0.030, 0.081]$; Turbo TR $[0.011, 0.052]$; Nemotron TR $[0.117, 0.287]$). Rather than concealing this variance behind single-point estimates, reporting these wide intervals honestly quantifies sample uncertainty. Among multilingual models, Whisper Large-v3 achieves the lowest word error rate ($0.021$ TR macro/micro, $95\%$ CI $[0.014, 0.032]$; $0.010$ EN, $95\%$ CI $[0.007, 0.012]$). Whisper Turbo nearly matches Large-v3 on English ($0.011$ macro / $0.012$ micro, CI $[0.007, 0.017]$) at mean RTF $0.025$--$0.044$. Measured as pooled wall-clock over the same clips, Turbo runs $3.4\times$ faster than Large-v3 on Turkish ($110.56$\,s $\rightarrow$ $32.53$\,s) and $7.7\times$ on English ($170.72$\,s $\rightarrow$ $22.10$\,s); the corresponding ratios of the \emph{unweighted} per-clip RTFs are $3.4\times$ and $8.5\times$, the divergence arising because the unweighted mean over-weights short clips. Qwen3-ASR 1.7B is competitive across all clips ($0.061$ TR / $0.015$ EN) but slower; the 0.6B variant is solid on English ($0.021$ macro/micro) but weaker on Turkish ($0.134$ macro / $0.136$ micro, CI $[0.086, 0.180]$). Nemotron~3.5 ASR demonstrates reliable English accuracy ($0.035$ macro / $0.034$ micro, CI $[0.026, 0.049]$) but struggles on Turkish ($0.214$ macro / $0.221$ micro, CI $[0.117, 0.287]$). The Turkish-matched Turbo fine-tune ($0.082$ macro / $0.087$ micro) does not surpass generic multilingual Large-v3 or Turbo on these lectures.
 
 \begin{table}[t]
 \caption{ASR computational cost (CPU).}
@@ -343,37 +351,27 @@ SpeechBrain & 1795.1 & 2.005 \\
 \end{tabular}
 \end{table}
 
-Semantic results are in Table~\ref{tab:sem}. GPT-4.1 emits more terms than GPT-4o-mini in both languages (105 vs.\ 56 on English; 78 vs.\ 36 on Turkish) while keeping R1\% and D1\% high (96.2\% context consistency in both languages; explanation accuracy 99.0\% EN / 98.7\% TR). The smaller model is also accurate, but it under-extracts relative to GPT-4.1. Across the full corpus, because exhaustive gold lists are not established for all seven clips, the extra terms from GPT-4.1 are treated as a coverage \emph{indication}, with R1\% scoring context consistency. On the TR-1 and EN-1 subsets with closed gold lists (Section~\ref{sec:gold-recall}, Table~\ref{tab:gold-recall}), empirical recall directly confirms that larger model capacity recovers a higher fraction of domain concepts rather than hallucinating extraneous terms.
+Semantic results are in Table~\ref{tab:sem}, which now separates what is counted from what is rated. Term counts are the best-supported column: for the local and EVREN runs they are read directly from the saved JSONL artifacts, and for the historical commercial-API pilot they are recovered by parsing the stored Markdown lists, which reproduces the $105$/$56$/$78$/$36$ figures exactly. $R1$/$D1$ ratings exist for only three of the eleven rows.
 
-On English, GPT-4.1 also has the lower B1+ ratio ($0.074$ vs.\ $0.191$), i.e.\ fewer advanced words in the explanations, and a slightly higher BLEU ($0.61$ vs.\ $0.57$). BLEU against dictionary definitions is a weak semantic metric and is reported only as an auxiliary score.
+That split matters, because the previous draft printed $R1\%/D1\%$ for the commercial-API rows ($96.2\%$ context consistency in both languages, $99.0\%$ EN and $98.4$--$98.7\%$ TR explanation accuracy) and for the EVREN rows ($84$/$98$/$64$/$72$ terms at $96.4$--$98.8\%$). No per-item rating sheet for the commercial API exists anywhere in the repository, and no run artifact produces those EVREN term counts, so both sets of cells are withdrawn and printed as em dashes or replaced by the measured values. The EVREN cells are now the ones the re-run actually produced: \texttt{Qwen 3.8 Flash} emits $53$ Turkish and $72$ English terms and is rated $100.0\%/100.0\%$ on both dimensions, while \texttt{DeepSeek V4.1 Flash} emits $107$/$142$ and is rated $94.4\%/99.1\%$ (TR) and $99.3\%$/$100.0\%$ (EN). Because a $100\%$ rate from a judge whose agreement with humans was never stored is weak evidence, we read those cells as upper bounds (\S\ref{sec:llm-judge}).
 
-\begin{table*}[t]
-\caption{Semantic analysis on Whisper transcripts. R1\% $= R1/(R1+R0)$, D1\% $= D1/(D1+D0)$. B1+ and BLEU are defined only for English (Section~III-E). Lower B1+ is more beginner-friendly. Qwen3.5-4B is evaluated on Whisper Large-v3 transcripts; Qwen3.5-9B is evaluated on the TR-1 and TR-2 subset ($N=38$ terms).}
-\label{tab:sem}
-\centering
-\renewcommand{\arraystretch}{1.15}
-\begin{tabular}{llccccc}
-\toprule
-\textbf{Model} & \textbf{Lang.} & \textbf{Terms} & \textbf{R1/R0 (R1\%)} & \textbf{D1/D0 (D1\%)} & \textbf{B1+ ratio} & \textbf{BLEU} \\
-\midrule
-GPT-4.1 & EN & 105 & 101/4 (96.2\%) & 104/1 (99.0\%) & 0.074 & 0.61 \\
-GPT-4o-mini & EN & 56 & 51/5 (91.1\%) & 54/2 (96.4\%) & 0.191 & 0.57 \\
-GPT-4.1 & TR & 78 & 75/3 (96.2\%) & 77/1 (98.7\%) & -- & -- \\
-GPT-4o-mini & TR & 36 & 33/3 (91.7\%) & 34/2 (94.4\%) & -- & -- \\
-Qwen3.5-4B & EN & 51 & 50/1 (98.0\%) & 51/0 (100.0\%) & -- & -- \\
-Qwen3.5-4B & TR & 31 & 28/3 (90.3\%) & 29/2 (93.5\%) & -- & -- \\
-Qwen3.5-9B & TR (subset) & 38 & 38/0 (100.0\%) & 38/0 (100.0\%) & -- & -- \\
-\bottomrule
-\end{tabular}
-\end{table*}
+The substantive, well-supported observation is a coverage asymmetry rather than a quality one: within the same platform, DeepSeek V4.1 Flash emits roughly twice the terminology of Qwen 3.8 Flash ($107$ vs.\ $53$ on Turkish, $142$ vs.\ $72$ on English) at $4.5\times$ the latency. Larger or slower models recover more concepts, and on the TR-1/EN-1 subsets with closed gold lists (Section~\ref{sec:gold-recall}, Table~\ref{tab:gold-recall}) measured recall confirms the same direction. GPT-4.1 likewise emits more terms than GPT-4o-mini in both languages ($105$ vs.\ $56$ EN; $78$ vs.\ $36$ TR), but with no rating sheet the comparison stays a count, not a quality claim.
 
-LLM latency on the Turkish subset is in Table~\ref{tab:llmlat}. Commercial hosted endpoints exhibit low latency and small variance (GPT-4o-mini mean $12.53$\,s; GPT-4.1 mean $17.79$\,s). Among open-weight models running on the kit laptop GPU (8\,GB RTX 5060), \texttt{Qwen3.5-4B} operates stably with an average latency of $39.55$\,s (s.d.\ $2.11$), fitting entirely within GPU VRAM under 4-bit quantization. In stark contrast, \texttt{Qwen3.5-9B} encounters an acute memory-bandwidth and host-offloading bottleneck: processing a single Turkish lecture requires $322.29$\,s on TR-1 and $704.08$\,s on TR-2 (mean $513.19$\,s, s.d.\ $269.97$), representing an order-of-magnitude slowdown. Thus, \emph{latency itself is a primary empirical result}: while \texttt{Qwen3.5-9B} delivers flawless precision ($100.0\%$ R1/D1) and substantially higher domain recall ($46.9\%$ vs.\ $21.9\%$ on TR-1, Table~\ref{tab:gold-recall}), it is far too slow to serve as the default interactive or local deployment capacity pairing on mobile/laptop workstations.
+\input{tables/sem.tex}
+
+Measured per-request LLM latency is in Table~\ref{tab:llmlat}, which is regenerated directly from the run artifacts (so the $n$ column shows how thin some cells are: the Turkish commercial-API rows rest on three calls each). Three points follow, and the third contradicts how this comparison was originally summarized.
+
+\textbf{The cloud speedup is model-specific.} \texttt{EVREN Qwen 3.8 Flash} is the fastest endpoint measured: $6.11$\,s on Turkish (s.d.\ $2.06$, $n=3$) and $4.92$\,s on English (s.d.\ $1.37$, $n=4$). \texttt{EVREN DeepSeek V4.1 Flash}, by contrast, is \emph{slower than both commercial APIs and only marginally faster than local execution}---$27.68$\,s Turkish (s.d.\ $5.24$) against $14.60$\,s for GPT-4.1 and $10.96$\,s for GPT-4o-mini on the same three Turkish clips. Any claim that the platform as a whole accelerates inference must therefore name the model.
+
+\textbf{Measured ratios, not advertised ones.} Against the local 4-bit \texttt{Qwen3.5-4B} run it is normally compared to ($39.55$\,s), Qwen 3.8 Flash is $6.5\times$ faster, not the $\approx$7$\times$ previously stated; against GPT-4.1 on Turkish it is $2.4\times$, not $3\times$. The $39.55$\,s figure is itself the narrowest cell available---the Large-v3-fed Turkish triple---and the same local model under the same quantization ranges from $39.55$\,s to $138.48$\,s mean latency depending only on which ASR hypothesis it was fed, with per-clip latency spanning $21.07$--$245.99$\,s. Local latency is therefore governed more by input length and feed choice than by the GPU budget, and single-cell comparisons across topologies are unreliable.
+
+\textbf{What the cloud does and does not remove.} Offloading the semantic layer does remove its weights from client VRAM, which is the only sense in which the client-side memory claim holds; it is not a zero-resource architecture, since the ASR layer still runs locally on every frame of audio. The local \texttt{Qwen3.5-9B} configuration confirms the opposite pressure: $322.29$\,s on TR-1 and $704.08$\,s on TR-2 (mean $513.19$\,s, s.d.\ $269.97$, $n=2$), consistent with host-memory offloading on an 8\,GB card. Finally, routing student transcripts through a domestic operator is a \emph{data-residency posture}, not a demonstrated compliance result: establishing KVKK conformity would require the operator's processing terms and retention policy, which were not obtained, so we make no compliance claim.
 
 Combined with the GPU ASR benchmarks, the deployment pairings are refined as follows:
 
 \begin{itemize}
-\item \textbf{Accuracy-oriented (Server / Offline Batch):} Whisper Large-v3 with a capacity LLM (commercial GPT-4.1 via API, or open-weight Qwen3.5-9B executed on $\ge$16\,GB VRAM servers or asynchronous batch pipelines), when transcription accuracy ($0.021$ TR / $0.010$ EN) and exhaustive domain terminology recall ($46.9\%$) take precedence over runtime.
-\item \textbf{Practical Local Deployment (Laptop / Edge):} Whisper Turbo (or Whisper Large-v3) paired with \textbf{Qwen3.5-4B}, providing a complete local, zero-API pipeline that executes comfortably within an 8\,GB VRAM budget ($\approx$40\,s LLM latency, mean ASR RTF $0.025$--$0.044$) while maintaining strong context precision ($90.3\%$ TR / $98.0\%$ EN).
+\item \textbf{Accuracy-oriented (Server / Offline Batch):} Whisper Large-v3 with a capacity LLM (commercial GPT-4.1 via API, or \texttt{Qwen3.5-9B}), when transcription accuracy ($0.021$ TR / $0.010$ EN) and exhaustive domain terminology recall ($46.9\%$) take precedence over runtime. The $9$B checkpoint was only ever run in our host-memory-offloaded configuration ($513.19$\,s mean over two Turkish clips), so we recommend it for batch use on the strength of that measurement rather than a sized GPU requirement.
+\item \textbf{Practical Local Deployment (Laptop / Edge):} Whisper Turbo (or Whisper Large-v3) paired with \textbf{Qwen3.5-4B}, providing a complete local, zero-API pipeline: measured mean ASR RTF $0.025$--$0.044$ and a $39.55$\,s mean LLM latency on the Turkish Large-v3 feed, with strong context precision ($90.3\%$ TR / $98.0\%$ EN, human-rated). For this checkpoint we instrumented memory directly (\texttt{outputs/local\_vram\_probe.json}: $3.08$\,GB of weights resident after a 4-bit nf4 load, $4.72$\,GB peak torch allocator and $5.26$\,GB total device occupancy during a full clip call on the $8.12$\,GB RTX~5060), so the pairing is demonstrated to fit on this host. No headroom claim extends to the other checkpoints, whose peak occupancy was never instrumented.
 \end{itemize}
 
 Wav2Vec~2.0 is cheaper than Whisper but, on this set and these checkpoints, is not accurate enough to recommend as the front-end of a terminology pipeline.
@@ -381,99 +379,178 @@ Wav2Vec~2.0 is cheaper than Whisper but, on this set and these checkpoints, is n
 \subsection{Cross-Layer ASR-to-LLM Error Propagation Analysis}
 \label{sec:cross-layer}
 
-A central claim in modular educational speech processing is that upstream ASR transcription accuracy directly governs downstream semantic concept extraction. While intuitive, previous benchmarks evaluated ASR and LLMs either in isolation or only on clean, near-zero-WER transcripts. To rigorously map error propagation across layers (RQ2), we evaluate terminology extraction across both empirical ASR hypotheses and calibrated acoustic/orthographic noise injections at fixed WER intervals ($0\%$, $5\%$, $10\%$, $20\%$, $30\%$, $40\%$).
+A central claim in modular educational speech processing is that upstream ASR transcription accuracy directly governs downstream semantic concept extraction. While intuitive, previous benchmarks evaluated ASR and LLMs either in isolation or only on clean, near-zero-WER transcripts. This subsection separates two things that are easy to conflate: a set of \emph{measured} points, in which real ASR hypotheses are fed to the fixed LLM, and an \emph{analytical degradation model} sampled from the gold list at controlled WER levels.
+
+\subsubsection{Measured points (real ASR hypotheses through the LLM)}
+Table~\ref{tab:cross-layer} reports terminology $F_1$ for eleven real ASR hypotheses, each run through \texttt{Qwen3.5-4B} and scored against the closed gold list of TR-1/EN-1. Every cell is a single clip, so these are indications rather than population estimates. Two observations hold across the measured set. First, Turkish $F_1$ spans $0.238$--$0.439$ and English $F_1$ spans $0.565$--$0.679$, i.e.\ the semantic layer under-recovers gold terms in both languages even when WER is low. Second, the mapping from WER to $F_1$ is not monotone within the measured range: \texttt{Nemotron 3.5} reaches the best Turkish $F_1$ ($0.439$) from the second-worst Turkish WER ($0.117$), while \texttt{Whisper Large-v3} produces $0.364$ from a much cleaner transcript ($0.017$). Low WER is therefore necessary but not sufficient for terminology recovery; how the residual errors are \emph{distributed} matters, and a transcript can be word-accurate while still fragmenting or dropping the specific multi-word terms the gold list contains. The clearest single signal remains the high-WER end: \texttt{Qwen3-ASR 0.6B} at $0.136$ WER gives the worst Turkish $F_1$ ($0.238$).
+
+\subsubsection{The controlled-WER ladder is an analytical model, not a measurement}
+The second series in Fig.~\ref{fig:cross_layer_curve} is produced by \texttt{run\_cross\_layer\_curve.py} in its default mode, which does \emph{not} call the LLM. It draws each of the $32$ gold terms independently with survival probability $(1-\mathrm{WER})^{\max(1,\,0.8\ell)}$ (with $\ell$ the term length in words) and injects a number of spurious terms proportional to the WER. Consequently its $0\%$ anchor is $F_1 = 1.000$ \emph{by construction}, and the resulting trajectory characterises the assumed survival function, not model behaviour. Its modelled endpoints are TR $1.000 \to 0.458$ and EN $1.000 \to 0.604$ over $0\% \to 40\%$ injected error; the Turkish series is additionally non-monotone ($0.717$ at $19.3\%$ rising to $0.737$ at $29.3\%$) because each level is one Bernoulli sample, so the apparent bumps are sampling noise.
+
+The comparison that matters is between the two series, and it is unfavourable to the model: at $\approx$2\% WER the analytical ladder predicts $F_1 \approx 0.97$, whereas the measured Whisper Large-v3 point is $0.364$ (TR) and $0.679$ (EN). The simulation's optimism comes from its premise --- it assumes the LLM is handed the correct term inventory and only loses entries to corruption, and it holds extraction recall at the gold level. Real extraction under-recovers long before acoustic corruption bites. We therefore report the ladder only as a sensitivity analysis of the word-boundary-corruption mechanism and explicitly retract any reading of it as an empirical cross-layer error propagation curve. Establishing that curve properly requires re-running the fixed LLM over noise-injected audio at each level, which is outside this work's measured scope.
 
 \begin{figure}[t]
 \centering
 \input{figures/cross_layer_curve.tex}
-\caption{Cross-layer degradation curve: Terminology extraction $F_1$ as a function of upstream ASR Word Error Rate (WER). Blue curve indicates controlled synthetic noise injection; red points denote empirical ASR hypotheses.}
+\caption{Terminology $F_1$ against upstream WER. Red points are \emph{measured}: real ASR hypotheses passed through \texttt{Qwen3.5-4B}. The blue series is an \emph{analytical degradation model} obtained by sampling the gold list with survival probability $(1-\mathrm{WER})^{0.8\ell}$, and is anchored at $F_1=1.000$ by construction; it is not a measurement of LLM behaviour. The systematic gap between the two series is the substantive finding of this subsection.}
 \label{fig:cross_layer_curve}
 \end{figure}
 
-Fig.~\ref{fig:cross_layer_curve} illustrates the resulting empirical trajectory. On gold transcripts ($\mathrm{WER} = 0\%$), the semantic extraction achieves $100\%$ relative concept recovery ($F_1 = 74.4\%$ absolute on exhaustive domain benchmarks). As transcription noise is injected, downstream quality degrades monotonically:
-\begin{itemize}
-\item \textbf{Low-error regime ($\mathrm{WER} \le 5\%$):} Terminology $F_1$ remains highly resilient ($93.5\%$ relative, absolute $F_1 \approx 70\%$). Minor character substitutions in function words or inflections do not impair the LLM's sub-word tokenizer from matching domain lemmas.
-\item \textbf{Moderate-error regime ($10\% \le \mathrm{WER} \le 20\%$):} Terminology $F_1$ drops sharply to $82.8\%$ at $18.8\%$ WER and $71.7\%$ at $19.3\%$ WER. Acoustic substitutions directly alter technical keywords (e.g., \emph{ANOVA} $\to$ \emph{an ova}; \emph{Kazanılmış Değer} $\to$ \emph{kazanılmış demir}), fragmenting multi-word boundary detection.
-\item \textbf{High-error regime ($\mathrm{WER} \ge 30\%$):} Beyond $30\%$ WER, semantic coherence collapses: $F_1$ drops to $60.4\%$ at $29.2\%$ WER and plummets to $45.8\%$ at $38.9\%$ WER. Syntactic disruption prevents the LLM from identifying discourse context, leading to catastrophic term omission.
-\end{itemize}
-The red points in Fig.~\ref{fig:cross_layer_curve} confirm that empirical ASR hypotheses track this synthetic curve closely: high-WER outputs such as Qwen3-ASR 0.6B ($13.6\%$ WER) exhibit an empirical $F_1$ of $23.8\%$, confirming that ASR error rate is indeed the primary bottleneck for downstream educational concept extraction.
+\input{tables/cross_layer_measured.tex}
+
+Fig.~\ref{fig:cross_layer_curve} plots both series together. The qualitative trend of the analytical model is plausible --- word-boundary corruption does fragment multi-word terms --- but its absolute level is unreachable by any measured system, and its Turkish branch is non-monotone at single-sample resolution. Read it as a sensitivity analysis of one error mechanism, not as the propagation curve the title of RQ2 suggests.
 
 \subsection{Acoustic Optimizations: VAD Chunking, Domain Biasing, and Post-Correction}
 \label{sec:acoustic-opt}
 
-To mitigate transcription errors identified in RQ1, we evaluated three targeted interventions:
+We implemented and \emph{measured} three interventions on the same seven clips and the same
+\texttt{openai/whisper-large-v3} checkpoint. All three are reported as negative results: none of
+them lowers error against the gold transcripts, and an earlier draft of this work published a
+ladder for them that no artefact on disk can reproduce (Table~\ref{tab:interventions}).
 \begin{enumerate}
-\item \textbf{Energy-Based VAD Chunking:} On continuous, unsegmented recordings containing instructor pauses (notably TR-3), standard Whisper Large-v3 entered repetitive looping states (WER $0.129$). By implementing the energy VAD chunker ($12$--$28$\,s segments partitioned on $>0.4$\,s pauses at $-40$\,dBFS), repetition loops were eliminated, dropping Whisper Large-v3 WER to $0.021$ on Turkish and $0.010$ on English.
-\item \textbf{Terminology Domain Biasing:} Technical lectures suffer from out-of-vocabulary (OOV) misrecognitions. Conditioning Whisper's decoder with slide terminology via `processor.get_prompt_ids` yielded an average relative WER reduction of $12.4\%$ on technical terms, successfully guiding phonetic ambiguities toward curriculum lemmas.
-\item \textbf{LLM-Based ASR Post-Correction:} Passing corrupted ASR transcripts through a phonetically aware LLM post-correction prompt restored acoustic substitutions (e.g., correcting corrupted technical acronyms), decreasing simulated WER from $26.3\%$ to $0.0\%$ and improving downstream Term $F_1$ by $+29.8\%$.
+\item \textbf{Energy-Based VAD Chunking (tested, harmful on this corpus):} The chunker in
+\texttt{vad\_chunker.py} scores $30$\,ms frames, cuts at
+$\max(10^{-4}, 2.2\times\text{the }25\text{th-percentile noise floor})$, closes gaps
+$\le200$\,ms and searches for boundaries inside pauses $>0.4$\,s to emit $12$--$28$\,s windows.
+It is not a learned VAD, and the delivered GUI never calls it: the app slices fixed $30$\,s
+windows (\texttt{gui/pipeline.py}). Run over all seven clips it \emph{raised} macro normalised
+WER from $0.0207$ to $0.0412$ in Turkish and from $0.0101$ to $0.0262$ in English (relative
+$+99.6\%$ / $+160.1\%$), and it did so on every clip individually rather than only in the
+aggregate. The motivation for the intervention does not survive contact with the GPU run: the
+baseline contains almost no looping to remove ($8$-gram repetition rate $0.0122$ TR, $0.0000$ EN),
+so segmentation buys nothing and pays for it in lost cross-window context. Mention coverage over
+the closed gold list is unchanged ($87.5\%$ TR / $96.9\%$ EN).
+\item \textbf{Terminology Domain Biasing (tested, harmful and leaking by construction):} Biasing
+passes the first $25$ canonical entries of \texttt{data/gold\_terms.json} to
+\texttt{processor.get\_prompt\_ids}, so on the two clips that own a gold list (TR-1, EN-1) the
+reference terminology is injected into the decoder that is scored against that same reference;
+any coverage gain is leakage, not recognition. It also broke the run: the original
+\texttt{max\_new\_tokens=440} plus the prompt overflowed Whisper's $448$ decoder positions and
+\texttt{generate()} raised on every clip, which is why the previously published biasing cell
+could not have been measured by this code path. With the budget clamped to
+$448-\text{prompt}-16$ ($188$-token prompt on TR-1, $108$ on EN-1) the prompt does two kinds of
+damage. On TR-1 the decoder re-emits the glossary instead of transcribing: a $68$-word prompt
+echo prefixes the transcript, ``Proje Yönetimi'' goes from $4$ to $38$ mentions, and WER rises
+$0.0333 \rightarrow 0.1562$. On EN-1 the transcript is not truncated but WER rises
+$0.0194 \rightarrow 0.0869$ and wall clock rises $55\,\text{s} \rightarrow 398\,\text{s}$
+($7.2\times$) to buy one additional gold mention (coverage $96.9\% \rightarrow 100.0\%$, which is
+the injected list coming back). The five clips without a gold list are byte-identical to the VAD
+stage, which serves as the determinism control for this comparison.
+\item \textbf{LLM-Based ASR Post-Correction (tested, marginal and unusable where it matters):} The
+corrector (\texttt{asr\_post\_correction.py}) rewrites the stage-3 hypotheses with the local
+\texttt{Qwen/Qwen3.5-4B} checkpoint over $180$-word sliding windows, and it is the second
+intervention that leaks: its \texttt{get\_domain\_context} builds the system prompt from the same
+\texttt{data/gold\_terms.json} the scorer reads. Measured on all seven clips it moves macro
+normalised WER from $0.0822$ to $0.1339$ in Turkish (relative $+62.9\%$) and from $0.0431$ to
+$0.0418$ in English (relative $-2.9\%$). The aggregate hides a split: the correction lowers WER on
+four clips (TR-3 $0.0552\rightarrow0.0424$, EN-2 $0.0318\rightarrow0.0310$, EN-3
+$0.0192\rightarrow0.0183$, EN-4 $0.0346\rightarrow0.0311$), leaves EN-1 unchanged to four decimals,
+nudges TR-2 up, and on TR-1 --- the clip whose glossary the prompt is built from --- it nearly
+doubles the error again ($0.1562\rightarrow0.3236$) while the $8$-gram repetition rate goes
+$0.1361\rightarrow0.2723$: given an already degenerate transcript the model repeats the corruption
+rather than repairing it. No clip finishes the ladder below its own raw baseline
+(Table~\ref{tab:interventions_perclip}). The previously published cell for this stage
+($0.014$~TR / $0.007$~EN, Term $F_1 = 80.5\%$) is withdrawn, and so is its supporting stress test:
+the ``$26.3\%$ simulated WER, $+29.8\%$ absolute $F_1$'' pair reproduces exactly under
+\texttt{asr\_post\_correction.py --test}, where the ``corrected'' string is the gold reference
+pasted verbatim and the corrected WER is therefore $0.0\%$ by construction. That is a fixture
+self-check, not a measurement of noise robustness.
 \end{enumerate}
+
+\input{tables/asr_interventions.tex}
+\input{tables/asr_interventions_perclip.tex}
 
 \subsection{Terminology Extraction and Structured Prompting Strategies}
 \label{sec:prompt-strat}
 
-To address RQ3, we compared Zero-Shot Baseline, Chain-of-Thought (CoT), and Glossary-based RAG on technical lecture speech (Table~\ref{tab:prompt_strat}). While the Zero-Shot baseline achieves a modest $F_1$ of $47.6\%$ due to missed compound terms, Chain-of-Thought prompting systematically improves domain recall ($58.3\%$, $F_1 = 60.9\%$) by requiring the model to identify lecture sub-topics before extracting candidates. Glossary-based RAG demonstrates superior performance: supplying slide anchor keywords doubles recall to $76.9\%$ and lifts precision to $76.9\%$ ($F_1 = 76.9\%$), at a negligible latency increase ($4.15$\,s vs.\ $3.42$\,s).
+To address RQ3 we first audited the prompting comparison that appeared in an earlier
+draft of this work, which reported $F_1$ of $47.6\%$, $60.9\%$ and $76.9\%$ for Zero-Shot,
+CoT and Glossary-based RAG at $3.42$\,s--$6.85$\,s. That table cannot be reproduced from
+any run artefact, and re-running the same command with the \texttt{--test} flag
+reproduces all three $F_1$ values exactly: the mock arm samples the first 10, 14 and 20
+entries of the 32-term gold list and forces precision to $1.0$, so the numbers are a
+property of the fixture, not of the model. The comparison is therefore \emph{withdrawn},
+and the RAG arm is additionally circular by construction, because its retrieval corpus
+was \texttt{data/gold\_terms.json} --- the same file used for scoring. The harness now
+refuses to run \texttt{rag} unless a held-out \texttt{data/glossary\_<CLIP>.json} exists,
+and no such file has been annotated.
+
+Table~\ref{tab:prompt_strat} reports what a real run on the local \texttt{Qwen3.5-4B}
+checkpoint does yield: on TR-1, CoT raises gold recall from $25.0\%$ to $34.4\%$ and
+$F_1$ from $40.0\%$ to $51.2\%$ while precision stays at $100\%$ for both arms; on EN-1
+the Zero-Shot arm reaches $F_1 = 64.0\%$, but the CoT arm returns no parsable JSON array
+at all and scores $0$. Three caveats bound what this can support. First, one clip per
+language with a single run per cell is a probe, not a benchmark: the EN-1 CoT cell
+cannot be distinguished from a sampling artefact without repetitions. Second, the
+contrast between languages is larger than the contrast between strategies
+($40.0$--$51.2$ within TR-1 against $40.0$--$64.0$ across clips), so clip difficulty, not
+prompt wording, dominates the observed variance. Third, all four calls take $71$\,s--$81$\,s
+of local decoding, an order of magnitude above the $3.42$\,s--$6.85$\,s previously
+published, so the latency column of the withdrawn table was also fixture-generated.
+Guided extraction remains a working implementation and is reported in
+Section~\ref{sec:prompting}; its measured advantage over the baseline is not
+established by this work.
 
 \input{tables/prompt_strategies.tex}
 
-\subsection{Automated LLM-as-a-Judge Validation}
+\subsection{Automated LLM-as-a-Judge: Usage and Reproducibility}
 \label{sec:llm-judge}
 
-To establish scalable, objective evaluation without continuous manual human labeling (RQ4), we developed an automated LLM-as-a-Judge module based on explicit scoring rubrics for context-consistency ($R$) and beginner suitability ($D$). We validated the judge against $N=233$ human annotations from \texttt{labels\_a1.csv} (Table~\ref{tab:llm_judge}).
+Scoring every explanation with two human raters does not scale, so we implemented an automated LLM-as-a-Judge that applies the same binary rubric as the annotation protocol: $R$ asks whether the extracted term is consistent with the transcript context, $D$ asks whether the explanation is correct relative to the reference definition. The judge is \texttt{Qwen/Qwen3.5-4B} run locally with \texttt{use\_mock=False}, i.e.\ real closed-form rubric calls rather than the deterministic keyword heuristic that produced \texttt{labels\_ablation\_extended.csv}.
 
-The automated judge achieved $97.00\%$ observed agreement on $R$ and $97.42\%$ on $D$. On context-consistency ($R$), Cohen's $\kappa = 0.735$ and PABAK $= 0.940$ demonstrate substantial discriminative discernment. On beginner suitability ($D$), because explanations produced by modern LLMs are overwhelmingly well-formed, positive class prevalence is extreme ($97.4\%$ positive). This causes expected chance agreement $P_e$ to reach $0.949$, mathematically depressing standard Cohen's $\kappa$ to $0.490$ despite $97.42\%$ raw agreement. The Prevalence-Adjusted and Bias-Adjusted Kappa ($\mathrm{PABAK} = 0.948$) resolves this paradox, confirming that the automated judge mirrors human pedagogical evaluation with high fidelity.
+The judge's per-item output is on disk for exactly two groups of results, and both of them name it as the rating source: the three 2026 ASR checkpoints (\texttt{labels\_ablation\_real\_judge.csv}, $200$ pairs, Table~\ref{tab:ablation}) and the two EVREN models (\texttt{labels\_evren\_judge.csv}, $374$ pairs, Table~\ref{tab:sem}). The six Whisper cells are instead scored by human annotator~1 (\texttt{labels\_a1.csv}), which is the stronger of the two sources and is kept visually separate in the tables.
+
+\textbf{What we cannot claim.} An earlier version of this work reported a judge-versus-human validation study ($97.00\%$ agreement on $R$, $97.42\%$ on $D$, $\kappa = 0.735$, PABAK $0.940$) against the $233$ annotations of \texttt{labels\_a1.csv}. Those predictions were never written to disk, so the comparison cannot be recomputed and we withdraw it. Table~\ref{tab:llm_judge} reports instead the agreement that the stored sheets do support --- human annotator~1 against annotator~2 on the $115$ double-labelled pairs --- giving $P_o = 0.965$, $P_e = 0.841$, $\kappa_R = 0.782$, $\mathrm{PABAK}_R = 0.930$ for context consistency and perfect agreement on definition accuracy ($P_o = 1.000$, $\kappa_D = 1.000$ over $P_e = 0.949$). The $D$ row is the prevalence paradox in its clearest form: with $\approx97\%$ of items positive, chance agreement alone is $0.949$, so a high raw rate carries little information and PABAK is reported alongside $\kappa$ rather than instead of it.
+
+Two consequences follow. First, judge-derived $R1\%$/$D1\%$ values (including the $100\%$ cells for EVREN Qwen 3.8 Flash) inherit an unquantified leniency, because no stored artifact measures this judge's false-positive rate against a human; they should be read as upper bounds on precision. Second, closing that gap is a concrete next step: re-run the judge over the $233$ already human-rated pairs, persist its per-item labels, and report $\kappa$ with a bootstrap interval.
 
 \input{tables/llm_judge.tex}
 
 \subsection{Symmetric Readability and Semantic Similarity}
 \label{sec:readability}
 
-Table~\ref{tab:readability} reports symmetric readability and semantic similarity. On Turkish, explanations scored via the Ate\c{s}man index achieve $61.4$ (GPT-4.1) and $58.4$ (Qwen3.5-4B), aligning strictly within the target ``Orta Güçlükte'' (intermediate / CEFR B1) band. On English, Flesch Reading Ease scores ($65.8$ and $64.2$) confirm equivalent B1 accessibility. Furthermore, BERTScore token cosine similarities ($R_{\mathrm{BERT}} \ge 0.828$) against authoritative TDK and Oxford definitions verify factual semantic alignment without verbatim copying.
+Table~\ref{tab:readability} reports readability and reference-definition similarity recomputed from the saved extraction artifacts ($807$ explanations over $7$ clips). The measured numbers do not support a blanket ``all output is B1'' statement. On Turkish, the local 4-bit \texttt{Qwen3.5-4B} averages Ate\c{s}man $48.0$ across its six ASR feeds (cell means $42.1$--$53.6$), i.e.\ its pooled mean sits \emph{below} the $50$--$69$ \texttt{Orta G\"u\c{c}l\"ukte} target band, and only $41.9\%$ of its individual explanations fall inside the band. Both EVREN models clear the band on the mean (Qwen 3.8 Flash $56.4$, DeepSeek V4.1 Flash $65.8$) yet still place only $45.3\%$ and $39.2\%$ of explanations inside it, so the band mean hides a long tail of harder text. On English, Flesch reading ease means cluster at $56.0$--$56.7$, just under the $60$--$70$ \texttt{Standard} band, with in-band shares of $18.1$--$28.9\%$. Readability is thus the weakest of the pedagogical claims: it is directionally near the target for the cloud models and below it for the local one, and no system produces predominantly B1-level explanations item-by-item. The similarity column inherits the caveats of \S\ref{sec:metrics}: it is a lexical proxy, not BERTScore, and it is computed only over the $23$--$141$ explanations per cell that match a curated TDK/Oxford definition.
 
 \input{tables/readability.tex}
 
 \subsection{Cross-Layer Ablation and Closed-List Recall}
 \label{sec:gold-recall}
 
-Table~\ref{tab:ablation} presents the cross-layer ablation feeding every ASR hypothesis to a fixed open-weight LLM (\texttt{Qwen3.5-4B}). Table~\ref{tab:gold-recall} provides closed-list precision, recall, and $F_1$ against verified gold glossaries ($N=32$ terms per clip) on TR-1 and EN-1. On TR-1, high-capacity \texttt{Qwen3.5-9B} captures 15 gold concepts ($46.9\%$ recall, $93.8\%$ precision, $F_1 = 62.5\%$), confirming that larger capacity extracts authentic domain concepts rather than hallucinated vocabulary.
+Table~\ref{tab:ablation} presents the comprehensive cross-layer ablation feeding every empirical ASR hypothesis to a fixed open-weight LLM (\texttt{Qwen3.5-4B}), where Whisper rows reflect human Annotator~1 ratings and extended 2026 checkpoints reflect scoring by the local \texttt{Qwen3.5-4B} judge, whose per-item outputs are persisted but which has \emph{no} judge-versus-human validation artifact, so those cells are read as upper bounds rather than human-calibrated scores. Across English hypotheses, context-consistency ($R1\%$) remains exceptionally resilient ($95.8\%$--$100.0\%$), and explanation accuracy ($D1\%$) attains $97.9\%$--$100.0\%$, even under higher acoustic WER (e.g., Nemotron~3.5 and Qwen3-ASR 0.6B). On Turkish hypotheses, higher WER induces minor phonetic corruptions in extracted term boundaries (e.g., Qwen3-ASR 0.6B drops to $88.6\%$ $R1\%$ due to acoustic errors such as \emph{çizgeli sapma} for \emph{çizelge sapması}), whereas Turkish-matched Turbo ($93.1\%$) and Nemotron~3.5 ($93.1\%$) maintain high semantic integrity. 
+
+Table~\ref{tab:gold-recall} provides complementary closed-list precision, recall, and $F_1$ against verified gold glossaries ($N=32$ terms per clip) on TR-1 and EN-1. On TR-1, high-capacity \texttt{Qwen3.5-9B} captures 15 gold concepts ($46.9\%$ recall, $93.8\%$ precision, $F_1 = 62.5\%$), confirming that larger capacity extracts authentic domain concepts rather than hallucinated vocabulary.
 
 \input{tables/ablation.tex}
 \input{tables/gold_recall.tex}
 
-\begin{table}[t]
-\caption{LLM processing latency on the Turkish subset.}
-\label{tab:llmlat}
-\centering
-\renewcommand{\arraystretch}{1.15}
-\begin{tabular}{lcccc}
-\toprule
-\textbf{Model} & \textbf{Mean (s)} & \textbf{Std} & \textbf{Min (s)} & \textbf{Max (s)} \\
-\midrule
-GPT-4.1 & 17.79 & 5.40 & 10.99 & 34.44 \\
-GPT-4o-mini & 12.53 & 1.77 & 9.16 & 14.85 \\
-Qwen3.5-4B & 39.55 & 2.11 & 37.21 & 41.31 \\
-Qwen3.5-9B (subset) & 513.19 & 269.97 & 322.29 & 704.08 \\
-\bottomrule
-\end{tabular}
-\end{table}
+\input{tables/llm_latency.tex}
 
 \subsection{Hardware Resource Profiling and Deployment Pairings}
 \label{sec:deployment}
 
-Resource profiling on consumer laptop hardware (8\,GB RTX 5060, Table~\ref{tab:llmlat}) reveals that \texttt{Qwen3.5-4B} executes comfortably within VRAM ($\approx$40\,s latency), whereas \texttt{Qwen3.5-9B} encounters host memory offloading bottlenecks ($513.19$\,s mean latency). We formulate two deployment paradigms:
+Resource profiling on consumer laptop hardware (8\,GB RTX 5060, Table~\ref{tab:llmlat}) separates the two local checkpoints by a wide margin: \texttt{Qwen3.5-4B} in 4-bit completes the same clip calls in a $39.55$\,s mean on the Turkish Large-v3 feed, whereas \texttt{Qwen3.5-9B} spends $513.19$\,s and is the configuration whose weights do not stay resident, since its per-clip spread ($322.29$--$704.08$\,s over two clips) is dominated by host-memory offloading. Peak occupancy is instrumented for one checkpoint only: the 4-bit 4B probe (\texttt{outputs/local\_vram\_probe.json}) records $3.08$\,GB of weights resident, $4.72$\,GB peak allocator and $5.26$\,GB device occupancy mid-call on the $8.12$\,GB card. For every other checkpoint we report latency evidence only and claim no memory figure. We formulate three distinct deployment paradigms:
 \begin{itemize}
-\item \textbf{Accuracy-Oriented (Server / Batch):} Whisper Large-v3 paired with GPT-4.1 or server-hosted Qwen3.5-9B ($\ge$16\,GB VRAM), maximizing terminology recall ($46.9\%$) and ASR accuracy ($0.021$ TR / $0.010$ EN).
-\item \textbf{Practical Local Deployment (Laptop / Edge):} Whisper Large-v3 Turbo paired with \textbf{Qwen3.5-4B}, providing a completely private, zero-cost, local pipeline operating at RTF $\approx 0.03$ with $98\%$ English precision.
+\item \textbf{Accuracy-Oriented (Server / Batch):} Whisper Large-v3 paired with GPT-4.1 or \texttt{Qwen3.5-9B} run asynchronously, maximising terminology recall ($46.9\%$) and ASR accuracy ($0.021$ TR / $0.010$ EN). Our $9$B configuration was offloaded to host memory and took $513.19$\,s per clip mean, which is why this pairing is a batch recommendation.
+\item \textbf{Practical Local Deployment (Laptop / Edge):} Whisper Large-v3 Turbo paired with \textbf{Qwen3.5-4B}, providing a completely private, zero-cost, local pipeline operating at RTF $\approx 0.03$ with $98.0\%$ English context precision. This pairing completed every run on the 8\,GB RTX~5060 host described above, and for the 4B checkpoint the mid-call device occupancy we measured ($5.26$\,GB of $8.12$\,GB) explains why; it is an observed fact about our machine rather than a sized GPU requirement, since no other checkpoint's occupancy was instrumented.
+\item \textbf{Sovereign Cloud Low-Latency Paradigm (EVREN National Platform~\cite{evren2026}):} Whisper Turbo or Large-v3 for local acoustic transcription paired with \textbf{EVREN Qwen 3.8 Flash} hosted on Türkiye's national H200 GPU infrastructure. This is the configuration the latency measurements support: $6.11$\,s Turkish / $4.92$\,s English mean per-request latency, $6.5\times$ faster than the local 4-bit run on the same clips, with no semantic-layer weights resident in client VRAM. Two caveats travel with it. The ASR layer still executes locally, so client resources are reduced rather than eliminated; and routing student transcripts to a domestic operator is a data-residency posture whose KVKK status depends on the operator's processing and retention terms, which were not obtained, so no compliance claim is made. \textbf{EVREN DeepSeek V4.1 Flash} extracts substantially more terms ($107$ TR / $142$ EN against $53$ / $72$) but at $27.68$\,s / $19.44$\,s---slower than both commercial APIs---so it is a coverage option, not a latency option.
 \end{itemize}
+
+\subsection{Delivery Layer: On-Demand Explainer Video Generation}
+\label{sec:delivery}
+
+The third layer is reported as an implemented and demonstrated prototype, not a scored benchmark. Seven explainer videos were generated end to end through the GUI (\texttt{gui/static/generated\_videos/}, 4 Oct 2026): $22.34$\,s ($\times$2), $26.02$\,s ($\times$2), $31.03$\,s, and $41.83$\,s ($\times$2), totalling $\approx$211\,s of animation at $854\times480$, 15\,fps, H.264 video with AAC audio, file sizes $417$\,kB--$818$\,kB. Each request traverses the full chain (context window $\to$ Qwen3.5-4B script $\to$ Manim render $\to$ Edge-TTS narration $\to$ FFmpeg mux); by construction the renderer only executes code that passes the AST allow-list, and up to two automatic repair attempts precede a guaranteed-template fallback, so a request degrades to a generic animation rather than failing outright.
+
+Two limitations bound what this layer can claim. First, no instrumentation persists per-request timings or the fallback path taken, so generation latency and the script-quality distribution cannot be recovered post hoc; the \texttt{manim} and \texttt{edge-tts} dependencies are additionally absent from \texttt{experiments/requirements.txt}, so the layer is not reproducible from the locked environment alone. Second, the Figure Walkthrough mode (PDF pages $\to$ narrated slide video) is implemented but produced no artifacts, and the learner-profile remediation entries on disk are test fixtures rather than real usage. We therefore claim functional feasibility only, and defer perceptual quality evaluation (for instance a learner study on whether regenerated animations improve comprehension) to future work.
 
 \section{Limitations}
 
-This benchmark establishes rigorous experimental boundaries: (i)~While the extended corpus encompasses 32 video lectures ($\approx$6.6 hours), exhaustive closed-list gold terminology standards are fully established on TR-1 and EN-1 ($N=32$ each), leaving closed recall on remaining clips as an ongoing curation task; (ii)~Acoustic noise injection provides calibrated WER curves, but real-world classroom acoustics introduce non-stationary noise, reverberation, and overlapping speakers that warrant in-situ validation; (iii)~Automated LLM judges require periodic recalibration against human annotations when deployed across new curricular domains; and (iv)~Local execution of larger $\ge$9B parameter models remains constrained on 8\,GB consumer GPUs.
+This benchmark establishes rigorous experimental boundaries: (i)~All quantitative results rest on $7$ lectures, of which only TR-1 and EN-1 carry exhaustive closed-list gold terminology ($N=32$ each); the curated $32$-lecture extension is metadata and caption text without audio on disk, so it contributes coverage plans rather than evidence; (ii)~The controlled-WER ladder is an analytical model of word-boundary corruption, not a measured ASR$\to$LLM transfer, and real classroom acoustics add non-stationary noise, reverberation, and overlapping speakers that warrant in-situ validation; (iii)~Automated LLM judges require periodic recalibration against human annotations when deployed across new curricular domains; and (iv)~Local execution of larger $\ge$9B parameter models remains constrained on 8\,GB consumer GPUs; (v)~the three acoustic interventions of Sec.~\ref{sec:acoustic-opt} were each run once per clip on a single host and a single checkpoint, so their negative results bind to \emph{this} energy-VAD implementation, \emph{this} glossary length and \emph{this} decoder-position budget --- they are evidence against the specific shipped configurations, not proof that activity-based segmentation or terminology conditioning can never help.
 
 \section{Conclusion and Future Work}
 
-We presented a comprehensive, two-layer benchmark of ASR and LLM components for educational speech accessibility in Turkish and English. Our findings demonstrate that: (1)~Whisper Large-v3 stabilized with energy VAD chunking achieves state-of-the-art multilingual transcription ($0.021$ TR / $0.010$ EN WER), while Turbo provides an 8$\times$ faster edge alternative; (2)~Downstream terminology extraction degrades monotonically with upstream WER ($F_1$ dropping from $74.4\%$ to $27.6\%$), confirming that ASR quality directly bounds semantic understanding; (3)~Glossary-based RAG elevates terminology $F_1$ from $47.6\%$ to $76.9\%$; and (4)~Automated LLM judges align with human raters at $>97\%$ agreement. 
+We presented a three-layer evaluation---speech recognition, semantic extraction, and on-demand animation delivery---of ASR and LLM components for educational speech accessibility in Turkish and English. Our measured findings are: (1)~Whisper Large-v3 gives the most accurate transcription ($0.021$ TR / $0.010$ EN normalised WER on the gold set), and Turbo is the efficient edge alternative at $0.037$ TR / $0.011$ EN, which we measure as $3.4\times$ (Turkish, $110.6$\,s $\rightarrow$ $32.5$\,s) and $7.7\times$ (English, $170.7$\,s $\rightarrow$ $22.1$\,s) faster pooled wall-clock than Large-v3 on the same host; (2)~across eleven \emph{measured} ASR$\to$LLM configurations, terminology $F_1$ stays in the $0.238$--$0.679$ band and is \emph{not} monotone in WER, so low transcription error alone does not guarantee concept recovery---the widely assumed smooth propagation curve is, in this work, an analytical model that over-predicts extraction quality by a wide margin; (3)~the semantic layer's ceiling is recall, not precision: on the closed 32-term gold lists, emitted-term precision stays high while recall remains below $0.60$; and (4)~the delivery layer is functional---$7$ explainer videos rendered end to end---but unbenchmarked.
 
-Future work will focus on dynamic student knowledge tracing, in-situ multi-speaker classroom trials, and deploying the enriched concept DAG schema into adaptive learning management platforms.
+Future work will close the gaps this audit exposed: measure the propagation curve properly by re-running the fixed LLM over noise-injected audio at each WER level, acquire the audio for the curated $32$-lecture extension before claiming its coverage, instrument the delivery layer to log latency and fallback paths, recalibrate the LLM judge against human annotations in both languages, and evaluate perceptual quality of generated animations with learners rather than asserting it.
 
 \appendix
 \label{app:prompt}
@@ -500,12 +577,12 @@ Evaluate the extracted term and explanation on two binary dimensions: (1) Metric
 \section{Decoding Settings and Hardware}
 \label{app:hw}
 
-All GPU benchmarks were executed on an Intel Core i7-14650HX workstation with 32\,GB RAM and an NVIDIA GeForce RTX 5060 Laptop GPU (8\,GB VRAM) running PyTorch \texttt{2.12.0+cu130} under Windows. Sequential 30\,s decoding windows with timestamps enabled were enforced for Whisper; non-overlapping 60\,s windows were utilized for Nemotron~3.5 streaming ASR.
+All local GPU benchmarks were executed on an Intel Core i7-14650HX workstation with 32\,GB RAM and an NVIDIA GeForce RTX 5060 Laptop GPU (8\,GB VRAM) running PyTorch \texttt{2.12.0+cu130} under Windows. Sequential 30\,s decoding windows with timestamps enabled were enforced for Whisper; non-overlapping 60\,s windows were utilized for Nemotron~3.5 streaming ASR. Two classes of reported row are \emph{not} local GPU timings and are labelled as such wherever they appear: the commercial-API rows of Table~\ref{tab:llmlat} are network round-trip times recorded by the historical CPU pilot's response logs (\texttt{outputs/pilot\_baseline/semantic\_logs/}), and the EVREN rows are cloud wall-clock times from the national platform. The \texttt{Qwen3.5-9B} row is local but offloaded: it ran in a host-memory-offloaded configuration, so its $513.19$\,s mean includes host-memory transfer and is not a GPU-resident figure. Memory was instrumented for one checkpoint only --- the 4-bit \texttt{Qwen3.5-4B} probe in \texttt{outputs/local\_vram\_probe.json}, which records $3.08$\,GB of weights resident after load, $4.72$\,GB peak torch allocator and $5.26$\,GB total device occupancy during a full clip call on the $8.12$\,GB card; every fit-or-headroom statement in this paper is confined to that configuration. Sidecar run metadata (\texttt{outputs/*.meta.json}) records \texttt{cuda}, device name and torch build for every ASR run, which is what makes this split auditable.
 
 \section{Annotation, Agreement, and Prevalence Analysis}
 \label{app:iaa}
 
-The double-annotated subset ($N=115$ items across TR and EN) evaluated context consistency ($R$) and definition accuracy ($D$) independently. Context consistency achieved $96.5\%$ raw agreement ($\kappa_R = 0.782$), indicating substantial inter-rater reliability. Definition accuracy exhibited $100.0\%$ raw agreement ($\kappa_D = 1.000$, $\mathrm{PABAK}_D = 1.000$). On the broader 233-item LLM-as-a-judge validation set, the prevalence paradox on Metric $D$ ($97.4\%$ positive rate) was analyzed via PABAK ($0.948$), confirming true agreement beyond chance-expected alignment ($P_e = 0.949$).
+The double-annotated subset ($115$ of the $233$ pairs in annotator~1's sheet, across TR and EN) was labelled independently for context consistency ($R$) and definition accuracy ($D$). Context consistency reaches $P_o = 0.965$ with $P_e = 0.841$, giving $\kappa_R = 0.782$ and $\mathrm{PABAK}_R = 0.930$ --- substantial but far from perfect, and the $10.4\%$ of $R$ decisions the raters disagree on is a real ceiling on any metric that rests on a single rater. Definition accuracy exhibits $P_o = 1.000$ ($\kappa_D = 1.000$ over $P_e = 0.949$, $\mathrm{PABAK}_D = 1.000$): the raters never diverge, but with $97.4\%$ of items positive they also had almost no opportunity to diverge, which is exactly the prevalence paradox equation~\eqref{eq:pabak} is meant to expose rather than repair. The remaining $118$ pairs of annotator~1's sheet are single-rated and contribute nothing to agreement. No judge-versus-human figure is reported here: the automated judge's per-item predictions for these pairs were never persisted, so that comparison cannot be recomputed (\S\ref{sec:llm-judge}).
 
 \begin{thebibliography}{00}
 
@@ -604,6 +681,9 @@ J.~Wei \emph{et al.}, ``Chain-of-thought prompting elicits reasoning in large la
 
 \bibitem{lewis2020rag}
 P.~Lewis \emph{et al.}, ``Retrieval-augmented generation for knowledge-intensive {NLP} tasks,'' in \emph{Adv. Neural Inf. Process. Syst.}, vol.~33, 2020, pp.~9459--9474.
+
+\bibitem{evren2026}
+T{\"U}B{\.I}TAK B{\.I}LGEM, T3 Vakf{\i}, and SSB, ``{EVREN}: T{\"u}rkiye ulusal yapay zek{\^a} ve b{\"u}y{\"u}k dil modeli {\c{c}}{\i}kar{\i}m platformu,'' 2026. [Online]. Available: \url{https://evren.ssyz.org.tr}
 
 \end{thebibliography}
 

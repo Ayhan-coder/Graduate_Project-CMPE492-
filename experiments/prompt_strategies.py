@@ -131,9 +131,21 @@ def evaluate_prompt_strategies(
             pass
 
     domain = gold_spec.get("domain", "Educational Lecture")
-    glossary = [t["canonical"] for t in gold_spec.get("terms", [])]
+    # The glossary arm must NOT receive the gold answer list: doing so makes its recall a
+    # copy task and makes the strategy comparison circular. When a held-out source exists
+    # it is used; otherwise the arm is skipped rather than run with leaked labels.
+    leaked_gold_glossary = [t["canonical"] for t in gold_spec.get("terms", [])]
+    external = (ROOT / "data" / f"glossary_{clip_id}.json")
+    if external.exists():
+        glossary = json.loads(external.read_text(encoding="utf-8"))
+        glossary_source = f"external:{external.name}"
+    else:
+        glossary = []
+        glossary_source = "none"
 
-    strategies = ["zero_shot", "cot", "rag"]
+    strategies = ["zero_shot", "cot"]
+    if glossary or use_mock:
+        strategies.append("rag")
     results = []
 
     for strat in strategies:
@@ -141,15 +153,12 @@ def evaluate_prompt_strategies(
 
         t0 = time.perf_counter()
         if use_mock:
-            # Deterministic simulation for tests
-            if strat == "zero_shot":
-                terms = [{"term": t, "explanation": "Expl"} for t in glossary[:10]]
-            elif strat == "cot":
-                # CoT filters noise and captures high precision
-                terms = [{"term": t, "explanation": "Detailed B1 Expl"} for t in glossary[:14]]
-            else:
-                # RAG anchors ensure highest domain coverage
-                terms = [{"term": t, "explanation": "Grounded Expl"} for t in glossary[:20]]
+            # Deterministic simulation for tests only. The term lists are slices of the gold
+            # answer key, so these numbers measure nothing; rows are tagged so they cannot be
+            # mistaken for a run.
+            pool = [t["canonical"] for t in gold_spec.get("terms", [])] or ["placeholder"]
+            sizes = {"zero_shot": 10, "cot": 14, "rag": 20}
+            terms = [{"term": t, "explanation": "Simulated"} for t in pool[: sizes.get(strat, 10)]]
             elapsed = 0.05
         else:
             if "gpt" in model_id.lower():
@@ -166,7 +175,9 @@ def evaluate_prompt_strategies(
             "lang": lang.upper(),
             "model": model_id,
             "strategy": strat,
+            "glossary_source": glossary_source,
             "strategy_label": {"zero_shot": "Zero-Shot Baseline", "cot": "Chain-of-Thought (CoT)", "rag": "Glossary-based RAG"}[strat],
+            "simulated": bool(use_mock),
             "latency_s": round(elapsed, 2),
             "n_terms": len(terms),
             "gold_count": eval_res["gold_count"],
@@ -181,37 +192,62 @@ def evaluate_prompt_strategies(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Evaluate prompting strategies for terminology extraction")
-    parser.add_argument("--clip", default="TR-1", help="Clip ID (e.g. TR-1 or EN-1)")
+    parser.add_argument("--clip", default="TR-1", help="Clip ID (e.g. TR-1 or EN-1), or 'all' for every clip in data/gold_terms.json")
     parser.add_argument("--model", default="Qwen/Qwen3.5-4B", help="LLM checkpoint")
     parser.add_argument("--test", action="store_true", help="Run quick simulation test")
+    parser.add_argument(
+        "--out",
+        type=Path,
+        default=None,
+        help="write the result rows to this JSONL file (required for a citable run)",
+    )
     args = parser.parse_args()
 
     manifest_path = ROOT / "data" / "manifest.jsonl"
-    transcript = "Proje yönetimi kapsamında kazanılmış değer ve maliyet sapması temel göstergelerdir."
-    lang = "tr" if args.clip.startswith("TR") else "en"
-
-    if manifest_path.exists() and not args.test:
+    fallback = {
+        "TR-1": ("Proje yönetimi kapsamında kazanılmış değer ve maliyet sapması temel göstergelerdir.", "tr"),
+    }
+    transcripts = {}
+    if manifest_path.exists():
         for line in manifest_path.read_text(encoding="utf-8").splitlines():
             if not line.strip():
                 continue
             item = json.loads(line)
-            if item.get("id") == args.clip:
-                transcript = item.get("reference", transcript)
-                lang = item.get("lang", lang)
-                break
+            if item.get("id") and item.get("reference"):
+                transcripts[item["id"]] = (item["reference"], item.get("lang", "en"))
 
-    print(f"Comparing Prompting Strategies on {args.clip} (Lang: {lang.upper()}) using {args.model}...")
-    res = evaluate_prompt_strategies(args.clip, transcript, lang=lang, model_id=args.model, use_mock=args.test)
+    gold_path = ROOT / "data" / "gold_terms.json"
+    gold_ids = list(json.loads(gold_path.read_text(encoding="utf-8")).keys()) if gold_path.exists() else []
+    clips = gold_ids if args.clip == "all" else [args.clip]
 
-    print("\n" + "=" * 95)
-    print(f"{'Strategy':<26} {'Terms':<7} {'Gold':<6} {'TP':<5} {'P (%)':<8} {'R (%)':<8} {'F1 (%)':<8} {'Latency (s)':<10}")
-    print("-" * 95)
-    for r in res:
-        print(
-            f"{r['strategy_label']:<26} {r['n_terms']:<7} {r['gold_count']:<6} {r['tp']:<5} "
-            f"{r['precision']:<8.1f} {r['recall']:<8.1f} {r['f1']:<8.1f} {r['latency_s']:<10.2f}"
-        )
-    print("=" * 95)
+    all_rows = []
+    for clip_id in clips:
+        transcript, lang = transcripts.get(clip_id, fallback.get(clip_id, ("", "en")))
+        if not transcript:
+            print(f"SKIP {clip_id}: no reference transcript in data/manifest.jsonl")
+            continue
+        print(f"Comparing Prompting Strategies on {clip_id} (Lang: {lang.upper()}) using {args.model}...")
+        res = evaluate_prompt_strategies(clip_id, transcript, lang=lang, model_id=args.model, use_mock=args.test)
+        all_rows.extend(res)
+
+        print("\n" + "=" * 95)
+        print(f"{'Strategy':<26} {'Terms':<7} {'Gold':<6} {'TP':<5} {'P (%)':<8} {'R (%)':<8} {'F1 (%)':<8} {'Latency (s)':<10}")
+        print("-" * 95)
+        for r in res:
+            print(
+                f"{r['strategy_label']:<26} {r['n_terms']:<7} {r['gold_count']:<6} {r['tp']:<5} "
+                f"{r['precision']:<8.1f} {r['recall']:<8.1f} {r['f1']:<8.1f} {r['latency_s']:<10.2f}"
+            )
+        print("=" * 95)
+
+    if args.out:
+        if not all_rows:
+            raise SystemExit("no rows produced; refusing to write an empty artifact")
+        args.out.parent.mkdir(parents=True, exist_ok=True)
+        with args.out.open("w", encoding="utf-8") as f:
+            for r in all_rows:
+                f.write(json.dumps(r, ensure_ascii=False) + "\n")
+        print(f"wrote {len(all_rows)} rows to {args.out}")
 
 
 if __name__ == "__main__":

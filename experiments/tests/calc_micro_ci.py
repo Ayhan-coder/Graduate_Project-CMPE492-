@@ -3,18 +3,20 @@ import statistics
 from pathlib import Path
 import numpy as np
 
+ROOT = Path(__file__).resolve().parent.parent
+
 # Manifest word counts and durations
-manifest_file = Path("data/manifest.jsonl")
+manifest_file = ROOT / "data" / "manifest.jsonl"
 m_rows = [json.loads(line) for line in manifest_file.read_text(encoding="utf-8").splitlines() if line.strip()]
 clip_info = {r["id"]: {"words": len(r["reference"].split()), "duration": float(r["duration_s"]), "lang": r["lang"]} for r in m_rows}
 
 # Load all rescored ASR files
 asr_files = [
-    Path("outputs/asr-whisper-combined.rescored.jsonl"),
-    Path("outputs/asr-qwen3-0.6b.rescored.jsonl"),
-    Path("outputs/asr-qwen3-1.7b.rescored.jsonl"),
-    Path("outputs/asr-selimc-turbo.rescored.jsonl"),
-    Path("outputs/asr-nemotron.rescored.jsonl"),
+    ROOT / "outputs" / "asr-whisper-combined.rescored.jsonl",
+    ROOT / "outputs" / "asr-qwen3-0.6b.rescored.jsonl",
+    ROOT / "outputs" / "asr-qwen3-1.7b.rescored.jsonl",
+    ROOT / "outputs" / "asr-selimc-turbo.rescored.jsonl",
+    ROOT / "outputs" / "asr-nemotron.rescored.jsonl",
 ]
 
 all_rows = []

@@ -189,17 +189,17 @@ def build_pdf():
             Paragraph("TO:", memo_hdr_label),
             Paragraph("Academic Evaluation Committee &amp; Thesis Advisory Board", memo_hdr_val),
             Paragraph("DATE:", memo_hdr_label),
-            Paragraph("September 24, 2026", memo_hdr_val),
+            Paragraph("October 12, 2026 (rev. 2)", memo_hdr_val),
         ],
         [
             Paragraph("FROM:", memo_hdr_label),
-            Paragraph("Senior Graduation Project Research Group (Bitirme Projesi)", memo_hdr_val),
+            Paragraph("Ali Ayhan Günder &mdash; Undergraduate Researcher (Bitirme Projesi 2026)", memo_hdr_val),
             Paragraph("INSTITUTIONS:", memo_hdr_label),
-            Paragraph("Koç University &amp; Tatilsepeti R&amp;D Center", memo_hdr_val),
+            Paragraph("Boğaziçi University, Computer Engineering", memo_hdr_val),
         ],
         [
             Paragraph("SUBJECT:", memo_hdr_label),
-            Paragraph("Empirical Benchmark: Multilingual ASR, Error Propagation, Evaluation Kit &amp; Interactive Studio", memo_hdr_val),
+            Paragraph("Empirical Benchmark: Multilingual ASR, Fixed-LLM Cross-Front-End Ablation, Evaluation Kit &amp; Interactive Studio", memo_hdr_val),
             Paragraph("HARDWARE:", memo_hdr_label),
             Paragraph("RTX 5060 Laptop GPU (8 GB) / CUDA 13.0", memo_hdr_val),
         ],
@@ -226,17 +226,17 @@ def build_pdf():
             [
                 Paragraph("SPEED &amp; EDGE FIT", kpi_title_style),
                 Paragraph("Whisper Turbo + 4B", kpi_val_style),
-                Paragraph("0.025 RTF; 39.6 s in 8 GB VRAM", kpi_sub_style),
+                Paragraph("Turbo RTF 0.025 EN / 0.044 TR; 4B peaks 5.3 GB", kpi_sub_style),
             ],
             [
-                Paragraph("ERROR INFLECTION POINT", kpi_title_style),
-                Paragraph("Critical WER &le; 20%", kpi_val_style),
-                Paragraph("F1 &gt; 0.72; drops at &gt;25% WER", kpi_sub_style),
+                Paragraph("MEASURED INTERVENTION LADDER", kpi_title_style),
+                Paragraph("0 / 7 clips improved", kpi_val_style),
+                Paragraph("VAD + biasing + correction raised TR WER 0.021 &rarr; 0.134", kpi_sub_style),
             ],
             [
-                Paragraph("HUMAN &amp; JUDGE METRICS", kpi_title_style),
+                Paragraph("HUMAN AGREEMENT (RATING R)", kpi_title_style),
                 Paragraph("Cohen's &kappa; = 0.782", kpi_val_style),
-                Paragraph("Substantial Agreement (N=115)", kpi_sub_style),
+                Paragraph("Two human raters, N=115; no judge-vs-human test exists", kpi_sub_style),
             ],
         ]
     ]
@@ -257,13 +257,14 @@ def build_pdf():
     # Section 1: Executive Overview
     story.append(Paragraph("1. Executive Summary &amp; Experimental Scope", sec_header))
     story.append(Paragraph(
-        "This project evaluates a two-layer automated architecture—pairing Automatic Speech Recognition (ASR) with Large Language Models (LLMs)—"
-        "to transcribe multilingual university lectures and extract CEFR-B1 technical glossaries. The corpus comprises 7 authentic recordings "
-        "(~95 min total, 13,599 words; 3 Turkish, 4 English) with human-verified gold references. All scientific evaluation criteria are met: "
+        "This project evaluates a three-layer architecture—Automatic Speech Recognition (ASR), Large Language Model (LLM) terminology extraction "
+        "and on-demand Manim animation (layer 3 is demonstrated as a working pipeline; it is not benchmarked)—built to transcribe multilingual university lectures and extract CEFR-B1-targeted glossaries. The corpus comprises 7 authentic recordings "
+        "(~95 min total, 13,467 words; 3 Turkish, 4 English) with human-corrected gold references. What the evaluation kit covers: "
         "(a) 10,000-resample bootstrap confidence intervals and word-weighted micro-WER; (b) closed gold terminology recall (<i>N</i> = 32 concepts each for TR-1 and EN-1); "
-        "(c) continuous cross-layer acoustic error propagation (0% to 40% WER sweep) quantifying semantic decay; "
-        "(d) automated LLM-as-a-judge validation aligned with human annotators (&kappa; = 0.782) alongside reference BLEU scoring; "
-        "(e) hardware latency profiling on consumer laptop hardware (RTX 5060, 8 GB VRAM); and (f) an interactive local demo studio (<code>run_gui.py</code>) "
+        "(c) an <i>analytical</i> word-boundary corruption model (0% to 40% WER sweep) offered as a sensitivity analysis, explicitly not a measured ASR-to-LLM transfer; "
+        "(d) double-annotated <i>human</i> agreement (&kappa;<sub>R</sub> = 0.782 substantial; &kappa;<sub>D</sub> = 1.000 is a prevalence artefact of a 112/3 class balance); the LLM judge itself has no stored human comparison, so judge-derived cells read as upper bounds; "
+        "(e) hardware latency and VRAM profiling on consumer laptop hardware (RTX 5060, 8 GB VRAM); (f) a <i>measured</i> four-stage acoustic intervention ladder "
+        "(raw &rarr; energy VAD &rarr; terminology biasing &rarr; LLM post-correction) over all seven clips, reported as a negative result; and (g) an interactive local demo studio (<code>run_gui.py</code>) "
         "featuring dynamic CEFR-B1 glossary cards, Bloom-aligned learner mastery tracking, and automated MCQ exam generation.",
         body_text
     ))
@@ -272,8 +273,10 @@ def build_pdf():
     # Section 2: ASR Layer Benchmark Table
     story.append(Paragraph("2. ASR Layer: Accuracy, Micro-Weighting &amp; Honest Confidence Bounds", sec_header))
     story.append(Paragraph(
-        "Because lecture durations and acoustic environments vary widely (TR-3 is 1,583 words with noticeable reverberation vs. clean scripted TR-2), "
-        "word-weighted micro-WER reflects realistic operational volume. Non-parametric bootstrap intervals (10,000 resamples) honestly quantify sample variance:",
+        "Because the clips differ widely in length and per-clip difficulty (TR-3 is the longest Turkish recording at 1,583 gold words and the hardest one "
+        "for every checkpoint: Whisper Medium 0.081 there against 0.030 on TR-2), word-weighted micro-WER reflects realistic operational volume. "
+        "No acoustic property of the recordings was measured, so this spread is reported as an observed per-clip difference, not an explained one. "
+        "Non-parametric bootstrap intervals (10,000 resamples) honestly quantify sample variance:",
         body_text
     ))
     story.append(Spacer(1, 1.5))
@@ -349,14 +352,22 @@ def build_pdf():
     story.append(asr_tab)
     story.append(Spacer(1, 2.0))
 
-    # Section 3: Semantic Layer, Closed Gold Recall & Error Propagation
-    story.append(Paragraph("3. Semantic Extraction, Error Propagation &amp; Closed Gold Recall", sec_header))
+    # Section 3: Semantic Layer, Fixed-LLM Cross-Front-End Ablation & Closed Gold Recall
+    story.append(Paragraph("3. Semantic Extraction, Fixed-LLM Cross-Front-End Ablation &amp; Closed Gold Recall", sec_header))
     story.append(Paragraph(
         "To verify whether larger term counts represent authentic domain coverage, curated closed gold glossaries (<i>N</i> = 32 concepts) "
-        "were evaluated on TR-1 (<i>EVM / Project Mgmt</i>) and EN-1 (<i>Agile / Scrum</i>). The continuous error propagation curve reveals an inflection threshold: "
-        "at WER &le; 10%, downstream extraction remains robust (F1 &ge; 0.86, Recall &ge; 78%); at 20% WER, F1 holds at 0.72--0.83; but beyond 25% WER, "
-        "recall degrades sharply, collapsing at 40% WER to 34.4% (TR) / 50.0% (EN). Concurrently, automated LLM-as-a-judge validation achieves "
-        "&gt;96% agreement (&kappa; = 0.782) with human experts, and ASR post-correction repairs phonetic domain slips:",
+        "were evaluated on TR-1 (<i>EVM / Project Mgmt</i>) and EN-1 (<i>Agile / Scrum</i>). Closed-gold recall stays low for every logged front-end and is "
+        "<i>not</i> monotone in WER: on the cleanest Turkish hypothesis (Large-v3, 0.016) the same 4B reader reaches only 25.0% recall (F1 36.4%), while the "
+        "noisiest logged one (Nemotron, 0.117) reaches 28.1% (F1 43.9%). English is easier: 56.2% recall / 67.9% F1 on Large-v3. The one higher Turkish cell "
+        "(46.9% / 62.5%) comes from a <code>Qwen3.5-9B</code> run whose input transcript was never logged, so it cannot be read as a front-end effect. "
+        "The bottleneck of the semantic layer is coverage, not precision. Separately, a <b>0--40% WER sweep is published as an analytical corruption model</b> (its F1 "
+        "&ge; 0.86 at &le; 10% WER is computed from a closed-form degradation formula, not observed); the measured cross-front-end ablation varies with "
+        "the ASR source but is not monotone in WER. Human agreement is &kappa;<sub>R</sub> = 0.782 between two <i>human</i> annotators; the LLM judge was "
+        "never compared against human ratings, so judge-derived cells are upper bounds. Finally, the three acoustic interventions (energy VAD, glossary "
+        "biasing, LLM post-correction) were re-run on all seven clips with the same Large-v3 weights and none lowered normalised WER: the Turkish macro ladder "
+        "measures 0.0207 &rarr; 0.0412 &rarr; 0.0822 &rarr; 0.1339 and the English one 0.0101 &rarr; 0.0262 &rarr; 0.0431 &rarr; 0.0418 "
+        "(<code>outputs/interventions_summary.json</code>); no clip finishes below its own raw baseline, and the biasing stage leaks the gold term list. "
+        "The table below reproduces the fixed-LLM cross-front-end ablation:",
         body_text
     ))
     story.append(Spacer(1, 1.5))
@@ -419,15 +430,15 @@ def build_pdf():
             Paragraph("<font color='#92400E'><b>0.136 (Degraded)</b></font>", table_cell),
         ],
         [
-            Paragraph("Gold Reference", table_cell_bold),
+            Paragraph("Input not logged", table_cell_bold),
             Paragraph("Qwen3.5-9B", table_cell),
             Paragraph("TR-1 (Proj. Mgmt)", table_cell),
             Paragraph("16", table_cell),
             Paragraph("15", table_cell),
             Paragraph("<font color='#065F46'><b>93.8%</b></font>", table_cell),
-            Paragraph("<font color='#065F46'><b>46.9% (Top Recall)</b></font>", table_cell),
+            Paragraph("<font color='#065F46'><b>46.9% (top, input unknown)</b></font>", table_cell),
             Paragraph("<font color='#065F46'><b>62.5%</b></font>", table_cell),
-            Paragraph("0.000 (Gold Reference)", table_cell),
+            Paragraph("not recorded in <code>llm-20260913-210556.jsonl</code>", table_cell),
         ],
         [
             Paragraph("Whisper Large-v3", table_cell_bold),
@@ -467,9 +478,11 @@ def build_pdf():
     # Section 4: Hardware Latency & Deployment Realities
     story.append(Paragraph("4. Hardware Latency Bottleneck &amp; Refined Architectural Pairings", sec_header))
     story.append(Paragraph(
-        "<b>Latency and memory dictate deployment:</b> On NVIDIA RTX 5060 (8 GB VRAM), <code>Qwen3.5-4B</code> executes in <b>39.55 s</b> (NF4), "
-        "residing entirely in VRAM. While <code>Qwen3.5-9B</code> delivers superior recall (46.9% TR-1), long-context allocation exceeds 8 GB headroom, "
-        "forcing host RAM paging and inflating latency to <b>513.19 s (~8.6 min per clip)</b>. We define three validated production architectures:",
+        "<b>Latency and memory dominate the pairing choice:</b> On NVIDIA RTX 5060 (8 GB VRAM), <code>Qwen3.5-4B</code> (NF4) completes a Turkish clip in "
+        "<b>39.55 s</b> on average and stays inside the card (measured peak 5.3 GB device occupancy). The <code>Qwen3.5-9B</code> run scores higher on the "
+        "closed gold list (46.9% recall, TR-1) but offloads to host RAM and averages <b>513.19 s (~8.6 min) over its two logged Turkish clips</b>, "
+        "and its input transcript was never logged, so it is not evidence of a front-end gain. On that evidence we sketch "
+        "<b>three candidate pipeline pairings</b>; none has been deployed or load-tested beyond the single-GPU measurements reported here:",
         body_text
     ))
     story.append(Spacer(1, 1.5))
@@ -485,13 +498,13 @@ def build_pdf():
         [
             Paragraph("<b>Practical Local / Edge</b><br/>(Consumer Laptops)", table_cell_bold),
             Paragraph("<b>Whisper Turbo</b><br/>+ <b>Qwen3.5-4B</b>", table_cell_bold),
-            Paragraph("Latency 40--70 s; mean ASR RTF 0.025--0.044; 90.3% TR / 98.0% EN R1% consistency; zero API cost; strict 8 GB VRAM budget.", bullet_text),
+            Paragraph("Mean 4B latency on the Turbo feed: 62.9 s TR / 94.6 s EN per clip; mean ASR RTF 0.025--0.044; Turbo-fed R1% 96.3 TR / 95.8 EN (human sheet); zero API cost; 8 GB VRAM budget.", bullet_text),
             Paragraph("Interactive student study tools, live lecture transcription &amp; local instant glossary generation.", bullet_text),
         ],
         [
             Paragraph("<b>Archival / High-Capacity</b><br/>(Server / Cloud Batch)", table_cell_bold),
             Paragraph("<b>Whisper Large-v3</b><br/>+ <b>GPT-4.1 / Qwen 9B</b>", table_cell_bold),
-            Paragraph("Lowest WER (0.021 TR / 0.010 EN); top recall (46.9% TR / 56.2% EN); requires &ge;16 GB VRAM server hardware or async queue.", bullet_text),
+            Paragraph("Lowest WER (0.021 TR / 0.010 EN); top recall (46.9% TR / 56.2% EN); the 9B variant paged into host RAM on our 8 GB card, so a larger-VRAM or batch queue target is inferred, not measured.", bullet_text),
             Paragraph("Institution-wide curriculum indexing, official syllabus creation &amp; high-accuracy digital archiving.", bullet_text),
         ],
         [
@@ -525,7 +538,7 @@ def build_pdf():
         alignment=1,
     )
     story.append(Paragraph(
-        "Bitirme Projesi (2026) &bull; Koç University &amp; Tatilsepeti R&amp;D &bull; Verified Research Artifact &bull; Codebase, Evaluation Kit &amp; Web Studio in <code>experiments/</code>",
+        "Bitirme Projesi (2026) &bull; Boğaziçi University, Computer Engineering &bull; Verified Research Artifact &bull; Codebase, Evaluation Kit &amp; Web Studio in <code>experiments/</code>",
         signoff_text
     ))
 

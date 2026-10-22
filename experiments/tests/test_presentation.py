@@ -4,10 +4,12 @@ from __future__ import annotations
 
 import re
 import socket
+import sys
 import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(ROOT))
 PRESENTATION_DIR = ROOT / "presentation"
 
 
@@ -22,11 +24,16 @@ class TestPresentationPackage(unittest.TestCase):
         self.assertTrue((PRESENTATION_DIR / "serve_presentation.py").exists(), "serve_presentation.py must exist")
         self.assertTrue((ROOT / "run_presentation.bat").exists(), "run_presentation.bat must exist")
 
-    def test_index_html_has_all_16_slides(self):
-        """Ensure index.html contains exactly 16 slides."""
+    def test_index_html_has_all_17_slides(self):
+        """Ensure index.html contains exactly 17 slides with 1:1 speaker metadata."""
         html_content = (PRESENTATION_DIR / "index.html").read_text(encoding="utf-8")
         slide_matches = re.findall(r'<section class="slide', html_content)
-        self.assertEqual(len(slide_matches), 16, f"Expected 16 slides in index.html, found {len(slide_matches)}")
+        self.assertEqual(len(slide_matches), 17, f"Expected 17 slides in index.html, found {len(slide_matches)}")
+        metadata_block = html_content.split("const SLIDE_METADATA", 1)[-1].split("];", 1)[0]
+        self.assertEqual(
+            metadata_block.count("notes:"), 17,
+            "SLIDE_METADATA must carry exactly one notes/qa pair per slide",
+        )
 
     def test_index_html_has_scientific_guardrails(self):
         """Ensure critical scientific guardrails are present in index.html."""
@@ -51,10 +58,10 @@ class TestPresentationPackage(unittest.TestCase):
         # Cohen's Kappa
         self.assertIn("0.782", html_content)
         self.assertIn("1.000", html_content)
-        # PABAK
-        self.assertIn("0.948", html_content)
-        # 226 unit tests
-        self.assertIn("226", html_content)
+        # PABAK over the human-vs-human sheet (outputs/rater_agreement.json)
+        self.assertIn("0.930", html_content)
+        # Unit-test count reported by `python -m unittest discover -s experiments/tests`
+        self.assertIn("254", html_content)
 
     def test_slides_md_marp_frontmatter_and_slides(self):
         """Verify slides.md has valid Marp structure and 16 slide sections."""

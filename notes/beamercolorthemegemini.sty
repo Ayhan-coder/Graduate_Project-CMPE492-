@@ -1,0 +1,54 @@
+% Gemini Color Theme - Deep Navy Academic Palette matching User's Template
+
+\ProvidesPackage{beamercolorthemegemini}
+
+% ====================
+% Color Definitions
+% ====================
+
+\definecolor{deepnavy}{RGB}{13, 35, 58}       % #0D233A - Header & Block Title Navy
+\definecolor{accentteal}{RGB}{26, 138, 162}    % #1A8AA2 - AIM Box Accent
+\definecolor{aimbg}{RGB}{235, 248, 250}       % Pale cyan tinted background for AIM box
+\definecolor{aimborder}{RGB}{44, 165, 185}    % Border for AIM box
+\definecolor{darkink}{RGB}{30, 30, 30}        % High contrast dark body text
+\definecolor{slategrey}{RGB}{90, 95, 102}     % Secondary text
+\definecolor{boxbg}{RGB}{255, 255, 255}       % Card background
+\definecolor{canvasbg}{RGB}{246, 248, 251}   % Light grey canvas
+\definecolor{subheading}{RGB}{20, 80, 140}    % Blue subheadings
+
+% ====================
+% Theme Mappings
+% ====================
+
+\setbeamercolor{palette primary}{fg=darkink,bg=canvasbg}
+\setbeamercolor{palette secondary}{fg=darkink,bg=boxbg}
+\setbeamercolor{palette tertiary}{bg=deepnavy,fg=white}
+\setbeamercolor{palette quaternary}{fg=darkink,bg=boxbg}
+\setbeamercolor{structure}{fg=deepnavy}
+
+% Headline & Footer
+\setbeamercolor{headline}{fg=white,bg=deepnavy}
+\setbeamercolor{headline title}{fg=white}
+\setbeamercolor{headline author}{fg=white}
+\setbeamercolor{headline institute}{fg=white!85}
+\setbeamercolor{headline rule}{bg=accentteal}
+
+% Standard Block
+\setbeamercolor{block title}{fg=white,bg=deepnavy}
+\setbeamercolor{block separator}{bg=deepnavy}
+\setbeamercolor{block body}{fg=darkink,bg=boxbg}
+
+% Example / AIM Box (Cyan Tinted)
+\setbeamercolor{block example title}{fg=deepnavy,bg=aimborder!25}
+\setbeamercolor{block example separator}{bg=aimborder}
+\setbeamercolor{block example body}{fg=darkink,bg=aimbg}
+
+% Alert Block
+\setbeamercolor{block alerted title}{fg=white,bg=deepnavy}
+\setbeamercolor{block alerted separator}{bg=deepnavy}
+\setbeamercolor{block alerted body}{fg=darkink,bg=boxbg}
+
+% Headings & Items
+\setbeamercolor{heading}{fg=subheading}
+\setbeamercolor{item}{fg=deepnavy}
+\setbeamercolor{footline}{fg=white,bg=deepnavy}

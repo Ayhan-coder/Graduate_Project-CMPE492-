@@ -1,0 +1,199 @@
+% Gemini theme for Beamerposter - Matched to User's Poster Template
+% https://github.com/latexstudio/A0-Poster-Template & SciFig Navy Theme
+
+\ProvidesPackage{beamerthemegemini}
+
+% ====================
+% Dependencies
+% ====================
+
+\RequirePackage{exscale}
+\RequirePackage{ragged2e}
+\RequirePackage{changepage}
+\RequirePackage{fontspec}
+\RequirePackage{calc}
+
+% ====================
+% Fonts
+% ====================
+
+\setsansfont{Arial}[
+  BoldFont=Arial Bold,
+  ItalicFont=Arial Italic,
+  BoldItalicFont=Arial Bold Italic
+]
+
+\setbeamerfont{headline}{series=\bfseries}
+\setbeamerfont{headline title}{size=\Huge, series=\bfseries}
+\setbeamerfont{headline author}{size=\Large, series=\bfseries}
+\setbeamerfont{headline institute}{size=\normalsize}
+\setbeamerfont{block title}{size=\large, series=\bfseries}
+\setbeamerfont{block body}{size=\normalsize}
+\setbeamerfont{heading}{size=\normalsize, series=\bfseries}
+\setbeamerfont{caption}{size=\footnotesize}
+\setbeamerfont{footline}{size=\normalsize}
+
+% ====================
+% Macros
+% ====================
+
+\newcommand{\samelineand}{\qquad}
+
+% ====================
+% Elements
+% ====================
+
+\makeatletter
+\def\@listi{\leftmargin\leftmarginii
+\topsep 0.2ex
+\parsep 0\p@ \@plus\p@
+\itemsep 0.15ex}
+\makeatother
+
+\setbeamertemplate{itemize item}{\raise0.3ex\hbox{\vrule width 0.5ex height 0.5ex}}
+\setbeamertemplate{itemize subitem}{\raise0.25ex\hbox{\vrule width 0.35ex height 0.35ex}}
+\setbeamertemplate{itemize subsubitem}{\raise0.2ex\hbox{\vrule width 0.25ex height 0.25ex}}
+
+\setbeamertemplate{enumerate item}{\insertenumlabel.}
+\setbeamertemplate{enumerate subitem}{\insertsubenumlabel.}
+\setbeamertemplate{enumerate subsubitem}{\insertsubsubenumlabel.}
+
+\setlength\belowdisplayshortskip{0.3ex}
+
+\setbeamertemplate{caption}[numbered]
+\setbeamertemplate{caption label separator}{:\ }
+\setlength{\abovecaptionskip}{0.3ex}
+\setlength{\belowcaptionskip}{0.2ex}
+
+\setbeamertemplate{bibliography item}[text]
+\beamertemplatenavigationsymbolsempty
+
+% ====================
+% Components
+% ====================
+
+\newcommand\heading[1]{%
+  \par\smallskip
+  {\usebeamerfont{heading}\usebeamercolor[fg]{heading}#1}\par\smallskip
+}
+
+% Headline with Title on Left/Center and Logo on Right
+\newcommand{\headerlogo}[1]{\def\insertheaderlogo{#1}}
+
+% Disable default Beamer logo and sidebars that place logos in slide canvas
+\setbeamertemplate{sidebar right}{}
+\setbeamertemplate{sidebar left}{}
+\setbeamertemplate{logo}{}
+
+\setbeamertemplate{headline}
+{
+  \begin{beamercolorbox}[wd=\paperwidth]{headline}
+    \vskip0.9ex
+    \centering
+    \begin{minipage}{0.96\paperwidth}
+      \begin{columns}[c]
+        \begin{column}{0.86\linewidth}
+          \centering
+          {\usebeamerfont{headline title}\usebeamercolor[fg]{headline title}\inserttitle\par}
+          \vskip0.6ex
+          {\usebeamerfont{headline author}\usebeamercolor[fg]{headline author}\insertauthor\par}
+          \vskip0.3ex
+          {\usebeamerfont{headline institute}\usebeamercolor[fg]{headline institute}\insertinstitute\par}
+        \end{column}
+        \begin{column}{0.12\linewidth}
+          \centering
+          \ifdefined\insertheaderlogo
+            \insertheaderlogo
+          \fi
+        \end{column}
+      \end{columns}
+    \end{minipage}
+    \vskip0.9ex
+    \ifbeamercolorempty[bg]{headline rule}{}{%
+      \begin{beamercolorbox}[wd=\paperwidth,colsep=0.3ex]{headline rule}\end{beamercolorbox}%
+    }
+  \end{beamercolorbox}
+  \vskip0.4ex
+}
+
+% Standard Block: Solid dark navy rectangular banner with white bold uppercase title
+\setbeamertemplate{block begin}
+{
+  \begin{beamercolorbox}[colsep*=0.8ex,dp=0.6ex,center]{block title}
+    \vskip-0.2ex
+    \usebeamerfont{block title}\insertblocktitle
+    \vskip-0.2ex
+  \end{beamercolorbox}
+  {\parskip0pt\par}
+  \usebeamerfont{block body}
+  \vskip-0.2ex
+  \begin{beamercolorbox}[colsep*=0.8ex]{block body}
+  \justifying
+  \setlength{\parskip}{0.3ex}
+}
+\setbeamertemplate{block end}
+{
+  \end{beamercolorbox}
+  \vskip0.8ex
+}
+
+% Example / Tinted Box (e.g. AIM box with cyan border & tinted background)
+\setbeamertemplate{block example begin}
+{
+  \begin{beamercolorbox}[colsep*=0.8ex,dp=0.6ex,center]{block example title}
+    \vskip-0.2ex
+    \usebeamerfont{block title}\insertblocktitle
+    \vskip-0.2ex
+  \end{beamercolorbox}
+  {\parskip0pt\par}
+  \usebeamerfont{block body}
+  \vskip-0.2ex
+  \begin{beamercolorbox}[colsep*=0.8ex]{block example body}
+  \justifying
+  \setlength{\parskip}{0.3ex}
+}
+\setbeamertemplate{block example end}
+{
+  \end{beamercolorbox}
+  \vskip0.8ex
+}
+
+% Alert Block
+\setbeamertemplate{block alerted begin}
+{
+  \begin{beamercolorbox}[colsep*=0.8ex,dp=0.6ex,center]{block alerted title}
+    \vskip-0.2ex
+    \usebeamerfont{block title}\insertblocktitle
+    \vskip-0.2ex
+  \end{beamercolorbox}
+  {\parskip0pt\par}
+  \usebeamerfont{block body}
+  \vskip-0.2ex
+  \begin{beamercolorbox}[colsep*=0.8ex]{block alerted body}
+  \justifying
+  \setlength{\parskip}{0.3ex}
+}
+\setbeamertemplate{block alerted end}
+{
+  \end{beamercolorbox}
+  \vskip0.8ex
+}
+
+% Footer: Matching dark navy bar with Contact on Left and Affiliation on Right
+\newcommand{\footercontent}[1]{\def\insertfootercontent{#1}}
+
+\setbeamertemplate{footline}{
+  \ifdefined\insertfootercontent
+  \vfill
+  \begin{beamercolorbox}[wd=\paperwidth]{headline}
+    \vskip0.8ex
+    \hspace{0.02\paperwidth}%
+    \begin{minipage}{0.96\paperwidth}
+      \usebeamerfont{footline}\usebeamercolor[fg]{headline}
+      \insertfootercontent
+    \end{minipage}%
+    \hspace{0.02\paperwidth}%
+    \vskip0.8ex
+  \end{beamercolorbox}
+  \else\fi
+}

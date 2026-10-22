@@ -3421,17 +3421,21 @@ function setupManimator() {
       if (stepper) stepper.classList.remove("hidden");
       if (resultDeck) resultDeck.classList.add("hidden");
 
-      setStep(0); // Qwen script
-      const stepTimer1 = setTimeout(() => setStep(1), 2500); // TTS
-      const stepTimer2 = setTimeout(() => setStep(2), 5500); // Manim render
-      const stepTimer3 = setTimeout(() => setStep(3), 9500); // FFmpeg
+      setStep(0); // EVREN script
+      // The request is synchronous, so these timers only provide approximate progress.
+      const stepTimer1 = setTimeout(() => setStep(1), 5000); // TTS
+      const stepTimer2 = setTimeout(() => setStep(2), 12000); // Manim render
+      const stepTimer3 = setTimeout(() => setStep(3), 45000); // FFmpeg
 
       try {
         const style = document.getElementById("manimatorStyleSelect")?.value || "manim_animation";
         const duration = parseInt(document.getElementById("manimatorDurationSelect")?.value || "50", 10);
         const voice = document.getElementById("manimatorVoiceSelect")?.value || "tr-TR-AhmetNeural";
-        const modelMode = document.getElementById("manimatorModelSelect")?.value || "fast";
-        const useLocalQwen = (modelMode === "deep");
+        const modelChoice = document.getElementById("manimatorModelSelect")?.value || "evren:qwen3.8-flash-next";
+        const isEvren = modelChoice.startsWith("evren:");
+        const llmBackend = isEvren ? "evren" : modelChoice;
+        const evrenModel = isEvren ? modelChoice.slice("evren:".length) : "";
+        const videoQuality = document.getElementById("manimatorQualitySelect")?.value || "standard";
 
         let responseData = null;
 
@@ -3442,6 +3446,9 @@ function setupManimator() {
           formData.append("duration_s", duration.toString());
           formData.append("voice", voice);
           formData.append("lang", currentResult?.lang || "tr");
+          formData.append("llm_backend", llmBackend);
+          if (evrenModel) formData.append("evren_model", evrenModel);
+          formData.append("video_quality", videoQuality);
 
           const res = await fetch("/api/manimator/pdf-to-video", {
             method: "POST",
@@ -3471,7 +3478,9 @@ function setupManimator() {
               video_style: style,
               duration_s: duration,
               voice: voice,
-              use_local_qwen: useLocalQwen,
+              llm_backend: llmBackend,
+              evren_model: evrenModel || "qwen3.8-flash-next",
+              video_quality: videoQuality,
             }),
           });
           if (!res.ok) throw new Error(`Sunucu hatası: ${res.statusText}`);
@@ -3485,7 +3494,11 @@ function setupManimator() {
 
         currentGeneratedData = responseData;
         renderManimatorResults(responseData);
-        showToast("Özel anlatım videosu başarıyla üretildi!", "success");
+        if (responseData.script_backend_error) {
+          showToast(`Video şablonla üretildi; seçilen LLM yanıt vermedi: ${responseData.script_backend_error}`, "warning");
+        } else {
+          showToast("Özel anlatım videosu başarıyla üretildi!", "success");
+        }
       } catch (err) {
         clearTimeout(stepTimer1);
         clearTimeout(stepTimer2);
@@ -3511,9 +3524,19 @@ function setupManimator() {
       videoPlayer.play().catch(() => {});
     }
 
-    // Duration badge
+    // Duration + provenance badge: which engine authored the script, at what resolution
     const durBadge = document.getElementById("manimatorVideoDurationBadge");
-    if (durBadge) durBadge.textContent = `${formatTime(data.duration_s || 0)}`;
+    if (durBadge) {
+      const backendLabel = { evren: "EVREN", local: "Yerel Qwen", heuristic: "Şablon" }[data.script_backend] || "?";
+      const qualityLabel = data.resolution ? ` · ${data.resolution}@${data.fps}fps` : "";
+      // Only the neural voice is named in the selector, so a substituted offline
+      // voice has to be visible here rather than silently passed off as that voice.
+      const voiceLabel = data.narration_engine && data.narration_engine !== "edge-tts"
+        ? ` · Ses: ${data.narration_voice || data.narration_engine}`
+        : "";
+      durBadge.textContent = `${formatTime(data.duration_s || 0)} · ${backendLabel}${qualityLabel}${voiceLabel}`;
+      durBadge.title = data.script_backend_error || "";
+    }
 
     // Hook text
     if (hookText) hookText.textContent = data.pedagogical_hook || "Kavram pedagojik benzetmelerle modellenmiştir.";

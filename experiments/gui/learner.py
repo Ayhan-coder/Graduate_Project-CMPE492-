@@ -91,12 +91,37 @@ def classify_mastery(mastery: Optional[float], seen: int = 0) -> str:
     return "learning"
 
 
+def get_term_record(profile: dict, term: str) -> Optional[dict]:
+    terms = profile.get("terms") or {}
+    key = normalize_term(term)
+    if key in terms and isinstance(terms[key], dict):
+        return terms[key]
+    # Turkish dotless/dotted I handling (I->ı, İ->i)
+    raw = (term or "").strip()
+    tr_key = " ".join(raw.replace("I", "ı").replace("İ", "i").lower().split())
+    if tr_key in terms and isinstance(terms[tr_key], dict):
+        return terms[tr_key]
+    # Tolerant search across dotted/dotless I variants
+    key_flat = key.replace("ı", "i")
+    for k, v in terms.items():
+        if isinstance(v, dict) and k.replace("ı", "i") == key_flat:
+            return v
+    return None
+
+
 def update_mastery(profile: dict, term: str, correct: bool, video_id: str = "") -> dict:
     """Update one term record in-place and return it."""
     key = normalize_term(term)
     if not key:
         return {}
-    rec = profile.setdefault("terms", {}).get(key) or {
+    terms_dict = profile.setdefault("terms", {})
+    existing_rec = get_term_record(profile, term)
+    if existing_rec:
+        for k, v in terms_dict.items():
+            if v is existing_rec:
+                key = k
+                break
+    rec = terms_dict.get(key) or {
         "term": (term or "").strip() or key,
         "seen": 0,
         "correct": 0,
@@ -168,10 +193,6 @@ def record_exam(profile: dict, exam_result: dict) -> dict:
     _recompute_stats(profile)
     return profile
 
-
-def get_term_record(profile: dict, term: str) -> Optional[dict]:
-    rec = (profile.get("terms") or {}).get(normalize_term(term))
-    return rec if isinstance(rec, dict) else None
 
 
 def annotate_terms(terms: list[dict], profile: dict) -> list[dict]:

@@ -1,0 +1,98 @@
+{
+  "generated_utc": "2026-10-17T21:37:07Z",
+  "generator": "experiments/finetune/prepare_external_datasets.py",
+  "seed": 20261017,
+  "wallclock_s": 101.7,
+  "intended_mix": {
+    "general": 0.7,
+    "term": 0.3
+  },
+  "sources": {
+    "turkish_llm_v10": {
+      "dataset": "ogulcanaydogan/Turkish-LLM-v10-Training",
+      "licence": "apache-2.0",
+      "role": "Katman 2 general instruction pairs"
+    },
+    "turklink": {
+      "dataset": "yakdas/turklink-corpus",
+      "licence": "cc-by-sa-4.0",
+      "role": "Katman 2 Wikidata-grounded term rows"
+    },
+    "commonvoice": {
+      "dataset": "ysdede/commonvoice_17_tr_fixed",
+      "licence": "cc0-1.0",
+      "role": "Katman 1 read speech"
+    },
+    "khanacademy": {
+      "dataset": "ysdede/khanacademy-turkish",
+      "licence": "cc-by-sa-3.0",
+      "role": "Katman 1 lecture-domain speech"
+    }
+  },
+  "katman2": {
+    "general_requested": 1400,
+    "general_produced": 1400,
+    "term_requested": 600,
+    "term_produced": 600,
+    "train_rows": 1800,
+    "val_rows": 200,
+    "general_share_of_kept": 0.7,
+    "term_share_of_kept": 0.3,
+    "dropped": {
+      "too_short": 744,
+      "general_leak": 0,
+      "term_title": 6,
+      "term_lead": 1367,
+      "term_not_definitional": 202,
+      "term_is_eval_answer": 0,
+      "term_leak": 0,
+      "term_no_id": 0,
+      "audio_leak": 0,
+      "undecodable": 0
+    }
+  },
+  "katman1": {
+    "per_source": {
+      "commonvoice": {
+        "clips": 826,
+        "hours": 0.7515,
+        "seconds": 2705.5,
+        "wallclock_s": 19.9,
+        "dropped": {
+          "audio_leak": 2,
+          "undecodable": 0,
+          "length_out_of_range": 0
+        }
+      },
+      "khanacademy": {
+        "clips": 256,
+        "hours": 0.7517,
+        "seconds": 2706.0,
+        "wallclock_s": 20.7,
+        "dropped": {
+          "audio_leak": 0,
+          "undecodable": 1,
+          "length_out_of_range": 1
+        }
+      }
+    },
+    "validation_clips": 54,
+    "skipped": false,
+    "manifest": "experiments\\finetune\\data\\external\\asr_manifest.jsonl",
+    "preserved_from_previous_build": "2026-10-17T20:51:54Z"
+  },
+  "leakage_guard": {
+    "gold_clips": [
+      "TR-1",
+      "EN-1"
+    ],
+    "eval_term_aliases": 179,
+    "gold_ngrams": 13372,
+    "ngram_size": 8
+  },
+  "files": {
+    "train": "experiments\\finetune\\data\\external\\train_external_mixed.jsonl",
+    "validation": "experiments\\finetune\\data\\external\\val_external_mixed.jsonl"
+  },
+  "note": "Term definitions are Turkish Wikipedia lead sentences, not hand-checked B1 glosses; they teach schema and Wikidata grounding. B1 simplification targets still come only from the locally distilled set."
+}

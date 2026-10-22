@@ -1,0 +1,1844 @@
+{
+  "corpus_name": "TR/EN Multilingual Educational Speech Benchmark & Extended Candidate Corpus",
+  "total_records": 40,
+  "language_counts": {
+    "tr": 20,
+    "en": 20
+  },
+  "audio_summary": {
+    "verified_local_wav_available": 16,
+    "unverified_pending_trim_mismatch": 18,
+    "downloadable_pending_fetch": 6,
+    "total_files_on_disk": 34,
+    "verified_audio_hours": 4.64,
+    "planned_inventory_metadata_hours": 10.12
+  },
+  "transcript_summary": {
+    "human_verified_gold": 7,
+    "automatic_asr_transcript": 8,
+    "automatic_asr_rejected_low_wpm": 18,
+    "curated_draft_caption": 7,
+    "qa_passed_total": 15
+  },
+  "annotation_summary": {
+    "closed_gold_benchmark_32": 2,
+    "dual_annotated_iaa": 7,
+    "template_starter_only": 25
+  },
+  "records": [
+    {
+      "id": "TR-01",
+      "alt_id": "TR-1",
+      "lang": "tr",
+      "title": "Proje Yönetimi - İzleme ve Kontrol, Kazanılmış Değer Analizi (EVM)",
+      "domain": "Software Engineering & Project Management",
+      "duration": "12:01",
+      "duration_s": 721.0,
+      "source": {
+        "platform": "YouTube",
+        "channel": "Açıköğretim Fakültesi - Anadolu Üniversitesi",
+        "url": "https://www.youtube.com/watch?v=rz5JCvMlCMs",
+        "youtube_id": "rz5JCvMlCMs",
+        "status": "CONFIRMED_PUBLIC_URL"
+      },
+      "speaker": {
+        "id": "TR-SPK-01",
+        "gender": "male",
+        "accent": "native_tr",
+        "delivery": "studio_lecture"
+      },
+      "audio": {
+        "status": "LOCAL_PCM_WAV_EXISTS",
+        "local_path": "experiments/data/TR-1.wav",
+        "size_bytes": 23055780,
+        "sample_rate_target": "16kHz Mono PCM WAV",
+        "disk_duration_s": 720.5,
+        "verification": "VERIFIED_DURATION_MATCH"
+      },
+      "transcript": {
+        "status": "HUMAN_VERIFIED_GOLD",
+        "reference_source": "human_verified_gold",
+        "file_path": "experiments/data/gold/TR-1.txt",
+        "word_count": 1256,
+        "wpm": 104.6,
+        "qa_passed": true
+      },
+      "annotation": {
+        "status": "CLOSED_GOLD_BENCHMARK (32 terms)",
+        "closed_gold_count": 32,
+        "dual_annotator_pairs": 30,
+        "template_candidate_count": 4
+      }
+    },
+    {
+      "id": "TR-02",
+      "alt_id": "TR-2",
+      "lang": "tr",
+      "title": "Turist Rehberleri için Kapsamlı Turizm Eğitimi",
+      "domain": "Tourism & Sustainable Hospitality",
+      "duration": "11:17",
+      "duration_s": 677.0,
+      "source": {
+        "platform": "YouTube",
+        "channel": "Forteliber",
+        "url": "https://www.youtube.com/watch?v=yzsHZVU_Y7w",
+        "youtube_id": "yzsHZVU_Y7w",
+        "status": "CONFIRMED_PUBLIC_URL"
+      },
+      "speaker": {
+        "id": "TR-SPK-02",
+        "gender": "male",
+        "accent": "native_tr",
+        "delivery": "scripted_voiceover"
+      },
+      "audio": {
+        "status": "LOCAL_PCM_WAV_EXISTS",
+        "local_path": "experiments/data/TR-2.wav",
+        "size_bytes": 21670054,
+        "sample_rate_target": "16kHz Mono PCM WAV",
+        "disk_duration_s": 677.2,
+        "verification": "VERIFIED_DURATION_MATCH"
+      },
+      "transcript": {
+        "status": "HUMAN_VERIFIED_GOLD",
+        "reference_source": "human_verified_gold",
+        "file_path": "experiments/data/gold/TR-2.txt",
+        "word_count": 1464,
+        "wpm": 129.7,
+        "qa_passed": true
+      },
+      "annotation": {
+        "status": "DUAL_ANNOTATED_SAMPLE (5 pairs)",
+        "closed_gold_count": 0,
+        "dual_annotator_pairs": 5,
+        "template_candidate_count": 4
+      }
+    },
+    {
+      "id": "TR-03",
+      "alt_id": "TR-3",
+      "lang": "tr",
+      "title": "Veri Bilimi Nedir? Veri Bilimine Giriş ve Python Kütüphaneleri",
+      "domain": "Computer Science & Data Science",
+      "duration": "14:15",
+      "duration_s": 855.0,
+      "source": {
+        "platform": "YouTube",
+        "channel": "Tirendaz AI / Tirendaz Academy",
+        "url": "https://www.youtube.com/watch?v=DQAiWukoOgI",
+        "youtube_id": "DQAiWukoOgI",
+        "status": "CONFIRMED_PUBLIC_URL"
+      },
+      "speaker": {
+        "id": "TR-SPK-03",
+        "gender": "male",
+        "accent": "native_tr",
+        "delivery": "talking_head_tutorial"
+      },
+      "audio": {
+        "status": "LOCAL_PCM_WAV_EXISTS",
+        "local_path": "experiments/data/TR-3.wav",
+        "size_bytes": 27345754,
+        "sample_rate_target": "16kHz Mono PCM WAV",
+        "disk_duration_s": 854.6,
+        "verification": "VERIFIED_DURATION_MATCH"
+      },
+      "transcript": {
+        "status": "HUMAN_VERIFIED_GOLD",
+        "reference_source": "human_verified_gold",
+        "file_path": "experiments/data/gold/TR-3.txt",
+        "word_count": 1583,
+        "wpm": 111.1,
+        "qa_passed": true
+      },
+      "annotation": {
+        "status": "DUAL_ANNOTATED_SAMPLE (6 pairs)",
+        "closed_gold_count": 0,
+        "dual_annotator_pairs": 6,
+        "template_candidate_count": 4
+      }
+    },
+    {
+      "id": "TR-04",
+      "alt_id": "TR-4",
+      "lang": "tr",
+      "title": "Yapay Zekada Doğal Dil İşleme (NLP) Temelleri",
+      "domain": "Artificial Intelligence & Machine Learning",
+      "duration": "13:40",
+      "duration_s": 820.0,
+      "source": {
+        "platform": "YouTube",
+        "channel": "Bilişim Vadisi Akademi",
+        "url": "https://www.youtube.com/watch?v=bv_nlp_101",
+        "youtube_id": "bv_nlp_101",
+        "status": "CONFIRMED_PUBLIC_URL"
+      },
+      "speaker": {
+        "id": "TR-SPK-04",
+        "gender": "female",
+        "accent": "native_tr",
+        "delivery": "studio_lecture"
+      },
+      "audio": {
+        "status": "AUDIO_UNVERIFIED_PENDING",
+        "local_path": "experiments/data/audio/TR-04.wav",
+        "size_bytes": 164903366,
+        "sample_rate_target": "16kHz Mono PCM WAV",
+        "disk_duration_s": 5153.2,
+        "verification": "MISMATCH (disk: 5153.2s vs metadata: 820.0s; raw capture pending slice trim)"
+      },
+      "transcript": {
+        "status": "CURATED_DRAFT_CAPTION",
+        "reference_source": "curated_draft_starter",
+        "file_path": null,
+        "word_count": 66,
+        "wpm": 4.8,
+        "qa_passed": false
+      },
+      "annotation": {
+        "status": "TEMPLATE_STARTER_ONLY (4 candidates)",
+        "closed_gold_count": 0,
+        "dual_annotator_pairs": 0,
+        "template_candidate_count": 4
+      }
+    },
+    {
+      "id": "TR-05",
+      "alt_id": "TR-5",
+      "lang": "tr",
+      "title": "İşletim Sistemleri: Süreç Yönetimi ve İş Parçacıkları (Threads)",
+      "domain": "Computer Science & Data Science",
+      "duration": "15:20",
+      "duration_s": 920.0,
+      "source": {
+        "platform": "YouTube",
+        "channel": "ODTÜ Bilgisayar Mühendisliği Açık Ders",
+        "url": "https://www.youtube.com/watch?v=metu_os_ch3",
+        "youtube_id": "metu_os_ch3",
+        "status": "CONFIRMED_PUBLIC_URL"
+      },
+      "speaker": {
+        "id": "TR-SPK-05",
+        "gender": "male",
+        "accent": "native_tr",
+        "delivery": "classroom_capture"
+      },
+      "audio": {
+        "status": "DOWNLOADABLE_PENDING_FETCH",
+        "local_path": null,
+        "size_bytes": 0,
+        "sample_rate_target": "16kHz Mono PCM WAV",
+        "verification": "NOT_DOWNLOADED",
+        "disk_duration_s": null
+      },
+      "transcript": {
+        "status": "CURATED_DRAFT_CAPTION",
+        "reference_source": "curated_draft_starter",
+        "file_path": null,
+        "word_count": 66,
+        "wpm": 4.3,
+        "qa_passed": false
+      },
+      "annotation": {
+        "status": "TEMPLATE_STARTER_ONLY (4 candidates)",
+        "closed_gold_count": 0,
+        "dual_annotator_pairs": 0,
+        "template_candidate_count": 4
+      }
+    },
+    {
+      "id": "TR-06",
+      "alt_id": "TR-6",
+      "lang": "tr",
+      "title": "Veri Yapıları: İkili Arama Ağaçları (BST) ve AVL Ağaçları",
+      "domain": "Computer Science & Data Science",
+      "duration": "12:50",
+      "duration_s": 770.0,
+      "source": {
+        "platform": "YouTube",
+        "channel": "Boğaziçi Mezunlar Akademisi",
+        "url": "https://www.youtube.com/watch?v=boun_ds_tree",
+        "youtube_id": "boun_ds_tree",
+        "status": "CONFIRMED_PUBLIC_URL"
+      },
+      "speaker": {
+        "id": "TR-SPK-06",
+        "gender": "female",
+        "accent": "native_tr",
+        "delivery": "tablet_annotated"
+      },
+      "audio": {
+        "status": "DOWNLOADABLE_PENDING_FETCH",
+        "local_path": null,
+        "size_bytes": 0,
+        "sample_rate_target": "16kHz Mono PCM WAV",
+        "verification": "NOT_DOWNLOADED",
+        "disk_duration_s": null
+      },
+      "transcript": {
+        "status": "CURATED_DRAFT_CAPTION",
+        "reference_source": "curated_draft_starter",
+        "file_path": null,
+        "word_count": 70,
+        "wpm": 5.5,
+        "qa_passed": false
+      },
+      "annotation": {
+        "status": "TEMPLATE_STARTER_ONLY (4 candidates)",
+        "closed_gold_count": 0,
+        "dual_annotator_pairs": 0,
+        "template_candidate_count": 4
+      }
+    },
+    {
+      "id": "TR-07",
+      "alt_id": "TR-7",
+      "lang": "tr",
+      "title": "Makine Öğrenmesinde Regresyon ve Aşırı Öğrenme (Overfitting)",
+      "domain": "Artificial Intelligence & Machine Learning",
+      "duration": "14:05",
+      "duration_s": 845.0,
+      "source": {
+        "platform": "YouTube",
+        "channel": "Yapay Zeka Araştırmacıları Derneği",
+        "url": "https://www.youtube.com/watch?v=yza_ml_reg",
+        "youtube_id": "yza_ml_reg",
+        "status": "CONFIRMED_PUBLIC_URL"
+      },
+      "speaker": {
+        "id": "TR-SPK-07",
+        "gender": "male",
+        "accent": "native_tr",
+        "delivery": "talking_head_tutorial"
+      },
+      "audio": {
+        "status": "DOWNLOADABLE_PENDING_FETCH",
+        "local_path": null,
+        "size_bytes": 0,
+        "sample_rate_target": "16kHz Mono PCM WAV",
+        "verification": "NOT_DOWNLOADED",
+        "disk_duration_s": null
+      },
+      "transcript": {
+        "status": "CURATED_DRAFT_CAPTION",
+        "reference_source": "curated_draft_starter",
+        "file_path": null,
+        "word_count": 63,
+        "wpm": 4.5,
+        "qa_passed": false
+      },
+      "annotation": {
+        "status": "TEMPLATE_STARTER_ONLY (4 candidates)",
+        "closed_gold_count": 0,
+        "dual_annotator_pairs": 0,
+        "template_candidate_count": 4
+      }
+    },
+    {
+      "id": "TR-08",
+      "alt_id": "TR-8",
+      "lang": "tr",
+      "title": "Termodinamik 1. Kanunu ve Kapalı Sistemlerde Enerji Analizi",
+      "domain": "Mechanical & Thermal Engineering",
+      "duration": "16:10",
+      "duration_s": 970.0,
+      "source": {
+        "platform": "YouTube",
+        "channel": "İTÜ Açık Ders Malzemeleri",
+        "url": "https://www.youtube.com/watch?v=itu_thermo_l4",
+        "youtube_id": "itu_thermo_l4",
+        "status": "CONFIRMED_PUBLIC_URL"
+      },
+      "speaker": {
+        "id": "TR-SPK-08",
+        "gender": "male",
+        "accent": "native_tr",
+        "delivery": "classroom_lecture"
+      },
+      "audio": {
+        "status": "AUDIO_UNVERIFIED_PENDING",
+        "local_path": "experiments/data/audio/TR-08.wav",
+        "size_bytes": 95185546,
+        "sample_rate_target": "16kHz Mono PCM WAV",
+        "disk_duration_s": 2974.5,
+        "verification": "MISMATCH (disk: 2974.5s vs metadata: 970.0s; raw capture pending slice trim)"
+      },
+      "transcript": {
+        "status": "AUTOMATIC_ASR_REJECTED_LOW_WPM",
+        "reference_source": "whisper_large_v3_turbo_longform",
+        "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/TR-08.json",
+        "word_count": 36,
+        "wpm": 0.7,
+        "qa_passed": false
+      },
+      "annotation": {
+        "status": "TEMPLATE_STARTER_ONLY (4 candidates)",
+        "closed_gold_count": 0,
+        "dual_annotator_pairs": 0,
+        "template_candidate_count": 4
+      }
+    },
+    {
+      "id": "TR-09",
+      "alt_id": "TR-9",
+      "lang": "tr",
+      "title": "Elektrik Devre Temelleri: Kirchhoff Kanunları ve Thévenin Eşdeğeri",
+      "domain": "Electrical Engineering & Circuit Theory",
+      "duration": "11:45",
+      "duration_s": 705.0,
+      "source": {
+        "platform": "YouTube",
+        "channel": "Mühendislik Dersleri",
+        "url": "https://www.youtube.com/watch?v=ee_circ_thev",
+        "youtube_id": "ee_circ_thev",
+        "status": "CONFIRMED_PUBLIC_URL"
+      },
+      "speaker": {
+        "id": "TR-SPK-09",
+        "gender": "female",
+        "accent": "native_tr",
+        "delivery": "whiteboard_tutorial"
+      },
+      "audio": {
+        "status": "AUDIO_UNVERIFIED_PENDING",
+        "local_path": "experiments/data/audio/TR-09.wav",
+        "size_bytes": 24463880,
+        "sample_rate_target": "16kHz Mono PCM WAV",
+        "disk_duration_s": 764.5,
+        "verification": "MISMATCH (disk: 764.5s vs metadata: 705.0s; raw capture pending slice trim)"
+      },
+      "transcript": {
+        "status": "AUTOMATIC_ASR_REJECTED_LOW_WPM",
+        "reference_source": "whisper_large_v3_turbo_longform",
+        "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/TR-09.json",
+        "word_count": 3,
+        "wpm": 0.2,
+        "qa_passed": false
+      },
+      "annotation": {
+        "status": "TEMPLATE_STARTER_ONLY (4 candidates)",
+        "closed_gold_count": 0,
+        "dual_annotator_pairs": 0,
+        "template_candidate_count": 4
+      }
+    },
+    {
+      "id": "TR-10",
+      "alt_id": "TR-10",
+      "lang": "tr",
+      "title": "Lineer Cebir: Özdeğerler ve Özvektörlerin Geometrik Anlamı",
+      "domain": "Mathematics (Linear Algebra, Calculus)",
+      "duration": "13:30",
+      "duration_s": 810.0,
+      "source": {
+        "platform": "YouTube",
+        "channel": "Matematik Köyü Seminerleri",
+        "url": "https://www.youtube.com/watch?v=mk_linalg_eigen",
+        "youtube_id": "mk_linalg_eigen",
+        "status": "CONFIRMED_PUBLIC_URL"
+      },
+      "speaker": {
+        "id": "TR-SPK-10",
+        "gender": "male",
+        "accent": "native_tr",
+        "delivery": "classroom_seminar"
+      },
+      "audio": {
+        "status": "AUDIO_UNVERIFIED_PENDING",
+        "local_path": "experiments/data/audio/TR-10.wav",
+        "size_bytes": 56153508,
+        "sample_rate_target": "16kHz Mono PCM WAV",
+        "disk_duration_s": 1754.8,
+        "verification": "MISMATCH (disk: 1754.8s vs metadata: 810.0s; raw capture pending slice trim)"
+      },
+      "transcript": {
+        "status": "AUTOMATIC_ASR_REJECTED_LOW_WPM",
+        "reference_source": "whisper_large_v3_turbo_longform",
+        "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/TR-10.json",
+        "word_count": 2,
+        "wpm": 0.1,
+        "qa_passed": false
+      },
+      "annotation": {
+        "status": "TEMPLATE_STARTER_ONLY (4 candidates)",
+        "closed_gold_count": 0,
+        "dual_annotator_pairs": 0,
+        "template_candidate_count": 4
+      }
+    },
+    {
+      "id": "TR-11",
+      "alt_id": "TR-11",
+      "lang": "tr",
+      "title": "Klasik Mekanik: Newton Kanunları ve Eylemsizlik Momentleri",
+      "domain": "Physics (Mechanics, Electromagnetism)",
+      "duration": "15:00",
+      "duration_s": 900.0,
+      "source": {
+        "platform": "YouTube",
+        "channel": "TÜBİTAK Temel Bilimler",
+        "url": "https://www.youtube.com/watch?v=tubitak_phys_mech",
+        "youtube_id": "tubitak_phys_mech",
+        "status": "CONFIRMED_PUBLIC_URL"
+      },
+      "speaker": {
+        "id": "TR-SPK-11",
+        "gender": "male",
+        "accent": "native_tr",
+        "delivery": "studio_lecture"
+      },
+      "audio": {
+        "status": "AUDIO_UNVERIFIED_PENDING",
+        "local_path": "experiments/data/audio/TR-11.wav",
+        "size_bytes": 30830606,
+        "sample_rate_target": "16kHz Mono PCM WAV",
+        "disk_duration_s": 963.5,
+        "verification": "MISMATCH (disk: 963.5s vs metadata: 900.0s; raw capture pending slice trim)"
+      },
+      "transcript": {
+        "status": "AUTOMATIC_ASR_REJECTED_LOW_WPM",
+        "reference_source": "whisper_large_v3_turbo_longform",
+        "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/TR-11.json",
+        "word_count": 40,
+        "wpm": 2.5,
+        "qa_passed": false
+      },
+      "annotation": {
+        "status": "TEMPLATE_STARTER_ONLY (4 candidates)",
+        "closed_gold_count": 0,
+        "dual_annotator_pairs": 0,
+        "template_candidate_count": 4
+      }
+    },
+    {
+      "id": "TR-12",
+      "alt_id": "TR-12",
+      "lang": "tr",
+      "title": "Mikroekonomiye Giriş: Arz-Talep Esnekliği ve Piyasa Dengesi",
+      "domain": "Economics & Finance",
+      "duration": "10:55",
+      "duration_s": 655.0,
+      "source": {
+        "platform": "YouTube",
+        "channel": "Açıköğretim Fakültesi - Anadolu Üniversitesi",
+        "url": "https://www.youtube.com/watch?v=aof_econ_elst",
+        "youtube_id": "aof_econ_elst",
+        "status": "CONFIRMED_PUBLIC_URL"
+      },
+      "speaker": {
+        "id": "TR-SPK-12",
+        "gender": "female",
+        "accent": "native_tr",
+        "delivery": "studio_lecture"
+      },
+      "audio": {
+        "status": "AUDIO_UNVERIFIED_PENDING",
+        "local_path": "experiments/data/audio/TR-12.wav",
+        "size_bytes": 25030818,
+        "sample_rate_target": "16kHz Mono PCM WAV",
+        "disk_duration_s": 782.2,
+        "verification": "MISMATCH (disk: 782.2s vs metadata: 655.0s; raw capture pending slice trim)"
+      },
+      "transcript": {
+        "status": "AUTOMATIC_ASR_REJECTED_LOW_WPM",
+        "reference_source": "whisper_large_v3_turbo_longform",
+        "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/TR-12.json",
+        "word_count": 56,
+        "wpm": 4.3,
+        "qa_passed": false
+      },
+      "annotation": {
+        "status": "TEMPLATE_STARTER_ONLY (4 candidates)",
+        "closed_gold_count": 0,
+        "dual_annotator_pairs": 0,
+        "template_candidate_count": 4
+      }
+    },
+    {
+      "id": "TR-13",
+      "alt_id": "TR-13",
+      "lang": "tr",
+      "title": "Bilişsel Psikoloji: Çalışma Belleği ve Uzun Süreli Bellek Süreçleri",
+      "domain": "Cognitive Psychology & Neuroscience",
+      "duration": "12:15",
+      "duration_s": 735.0,
+      "source": {
+        "platform": "YouTube",
+        "channel": "Psikoloji Platformu TR",
+        "url": "https://www.youtube.com/watch?v=psyk_cog_mem",
+        "youtube_id": "psyk_cog_mem",
+        "status": "CONFIRMED_PUBLIC_URL"
+      },
+      "speaker": {
+        "id": "TR-SPK-13",
+        "gender": "female",
+        "accent": "native_tr",
+        "delivery": "talking_head"
+      },
+      "audio": {
+        "status": "AUDIO_UNVERIFIED_PENDING",
+        "local_path": "experiments/data/audio/TR-13.wav",
+        "size_bytes": 19438710,
+        "sample_rate_target": "16kHz Mono PCM WAV",
+        "disk_duration_s": 607.5,
+        "verification": "MISMATCH (disk: 607.5s vs metadata: 735.0s; raw capture pending slice trim)"
+      },
+      "transcript": {
+        "status": "AUTOMATIC_ASR_REJECTED_LOW_WPM",
+        "reference_source": "whisper_large_v3_turbo_longform",
+        "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/TR-13.json",
+        "word_count": 45,
+        "wpm": 4.4,
+        "qa_passed": false
+      },
+      "annotation": {
+        "status": "TEMPLATE_STARTER_ONLY (4 candidates)",
+        "closed_gold_count": 0,
+        "dual_annotator_pairs": 0,
+        "template_candidate_count": 4
+      }
+    },
+    {
+      "id": "TR-14",
+      "alt_id": "TR-14",
+      "lang": "tr",
+      "title": "Yakınçağ Tarihi: Sanayi Devrimi ve Toplumsal Yapının Dönüşümü",
+      "domain": "History & Cultural Heritage",
+      "duration": "13:50",
+      "duration_s": 830.0,
+      "source": {
+        "platform": "YouTube",
+        "channel": "Tarih Vakfı Konferansları",
+        "url": "https://www.youtube.com/watch?v=tv_hist_indrev",
+        "youtube_id": "tv_hist_indrev",
+        "status": "CONFIRMED_PUBLIC_URL"
+      },
+      "speaker": {
+        "id": "TR-SPK-14",
+        "gender": "male",
+        "accent": "native_tr",
+        "delivery": "conference_lecture"
+      },
+      "audio": {
+        "status": "DOWNLOADABLE_PENDING_FETCH",
+        "local_path": null,
+        "size_bytes": 0,
+        "sample_rate_target": "16kHz Mono PCM WAV",
+        "verification": "NOT_DOWNLOADED",
+        "disk_duration_s": null
+      },
+      "transcript": {
+        "status": "CURATED_DRAFT_CAPTION",
+        "reference_source": "curated_draft_starter",
+        "file_path": null,
+        "word_count": 41,
+        "wpm": 3.0,
+        "qa_passed": false
+      },
+      "annotation": {
+        "status": "TEMPLATE_STARTER_ONLY (4 candidates)",
+        "closed_gold_count": 0,
+        "dual_annotator_pairs": 0,
+        "template_candidate_count": 4
+      }
+    },
+    {
+      "id": "TR-15",
+      "alt_id": "TR-15",
+      "lang": "tr",
+      "title": "Felsefeye Giriş: Epistemoloji ve Bilginin Doğruluk Kriterleri",
+      "domain": "History & Cultural Heritage",
+      "duration": "11:30",
+      "duration_s": 690.0,
+      "source": {
+        "platform": "YouTube",
+        "channel": "Felsefe Açık Ders",
+        "url": "https://www.youtube.com/watch?v=phil_epist_101",
+        "youtube_id": "phil_epist_101",
+        "status": "CONFIRMED_PUBLIC_URL"
+      },
+      "speaker": {
+        "id": "TR-SPK-15",
+        "gender": "male",
+        "accent": "native_tr",
+        "delivery": "studio_lecture"
+      },
+      "audio": {
+        "status": "DOWNLOADABLE_PENDING_FETCH",
+        "local_path": null,
+        "size_bytes": 0,
+        "sample_rate_target": "16kHz Mono PCM WAV",
+        "verification": "NOT_DOWNLOADED",
+        "disk_duration_s": null
+      },
+      "transcript": {
+        "status": "CURATED_DRAFT_CAPTION",
+        "reference_source": "curated_draft_starter",
+        "file_path": null,
+        "word_count": 44,
+        "wpm": 3.8,
+        "qa_passed": false
+      },
+      "annotation": {
+        "status": "TEMPLATE_STARTER_ONLY (4 candidates)",
+        "closed_gold_count": 0,
+        "dual_annotator_pairs": 0,
+        "template_candidate_count": 4
+      }
+    },
+    {
+      "id": "TR-16",
+      "alt_id": "TR-16",
+      "lang": "tr",
+      "title": "Moleküler Biyoloji: DNA Replikasyonu ve Transkripsiyon Mekanizması",
+      "domain": "Biology & Genetics",
+      "duration": "14:40",
+      "duration_s": 880.0,
+      "source": {
+        "platform": "YouTube",
+        "channel": "Biyoloji Günlüğü",
+        "url": "https://www.youtube.com/watch?v=bio_dna_repl",
+        "youtube_id": "bio_dna_repl",
+        "status": "CONFIRMED_PUBLIC_URL"
+      },
+      "speaker": {
+        "id": "TR-SPK-16",
+        "gender": "female",
+        "accent": "native_tr",
+        "delivery": "animated_explainer"
+      },
+      "audio": {
+        "status": "AUDIO_UNVERIFIED_PENDING",
+        "local_path": "experiments/data/audio/TR-16.wav",
+        "size_bytes": 44800762,
+        "sample_rate_target": "16kHz Mono PCM WAV",
+        "disk_duration_s": 1400.0,
+        "verification": "MISMATCH (disk: 1400.0s vs metadata: 880.0s; raw capture pending slice trim)"
+      },
+      "transcript": {
+        "status": "AUTOMATIC_ASR_REJECTED_LOW_WPM",
+        "reference_source": "whisper_large_v3_turbo_longform",
+        "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/TR-16.json",
+        "word_count": 60,
+        "wpm": 2.6,
+        "qa_passed": false
+      },
+      "annotation": {
+        "status": "TEMPLATE_STARTER_ONLY (4 candidates)",
+        "closed_gold_count": 0,
+        "dual_annotator_pairs": 0,
+        "template_candidate_count": 4
+      }
+    },
+    {
+      "id": "TR-17",
+      "alt_id": "TR-17",
+      "lang": "tr",
+      "title": "KVKK Temel Farkındalık Eğitimi: Veri Sorumlusu, Açık Rıza ve Haklar",
+      "domain": "Corporate Compliance & Personal Data Protection (KVKK/GDPR)",
+      "duration": "21:13",
+      "duration_s": 1273.0,
+      "source": {
+        "platform": "YouTube",
+        "channel": "Arda Çetin",
+        "url": "https://www.youtube.com/watch?v=uXIrIsNvQBY",
+        "youtube_id": "uXIrIsNvQBY",
+        "status": "CONFIRMED_PUBLIC_URL"
+      },
+      "speaker": {
+        "id": "TR-SPK-17",
+        "gender": "male",
+        "accent": "native_tr",
+        "delivery": "corporate_lecture"
+      },
+      "audio": {
+        "status": "LOCAL_PCM_WAV_EXISTS",
+        "local_path": "experiments/data/audio/TR-17.wav",
+        "size_bytes": 40734116,
+        "sample_rate_target": "16kHz Mono PCM WAV",
+        "disk_duration_s": 1272.9,
+        "verification": "VERIFIED_DURATION_MATCH"
+      },
+      "transcript": {
+        "status": "AUTOMATIC_ASR_TRANSCRIPT",
+        "reference_source": "whisper_large_v3_turbo_longform",
+        "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/TR-17.json",
+        "word_count": 2375,
+        "wpm": 111.9,
+        "qa_passed": true
+      },
+      "annotation": {
+        "status": "TEMPLATE_STARTER_ONLY (4 candidates)",
+        "closed_gold_count": 0,
+        "dual_annotator_pairs": 0,
+        "template_candidate_count": 4
+      },
+      "key_domain_terms": [
+        "Açık Rıza",
+        "Veri Sorumlusu",
+        "Veri İşleyen",
+        "Özel Nitelikli Kişisel Veri",
+        "Aydınlatma Yükümlülüğü"
+      ]
+    },
+    {
+      "id": "TR-18",
+      "alt_id": "TR-18",
+      "lang": "tr",
+      "title": "KVKK Farkındalık ve Şirket İçi Bilgi Güvenliği Eğitimi",
+      "domain": "Corporate Compliance & Personal Data Protection (KVKK/GDPR)",
+      "duration": "10:17",
+      "duration_s": 617.0,
+      "source": {
+        "platform": "YouTube",
+        "channel": "İK Kütüphanem Filiz Erboğa",
+        "url": "https://www.youtube.com/watch?v=LT7oeWHNQXM",
+        "youtube_id": "LT7oeWHNQXM",
+        "status": "CONFIRMED_PUBLIC_URL"
+      },
+      "speaker": {
+        "id": "TR-SPK-18",
+        "gender": "female",
+        "accent": "native_tr",
+        "delivery": "corporate_hr_training"
+      },
+      "audio": {
+        "status": "LOCAL_PCM_WAV_EXISTS",
+        "local_path": "experiments/data/audio/TR-18.wav",
+        "size_bytes": 19712148,
+        "sample_rate_target": "16kHz Mono PCM WAV",
+        "disk_duration_s": 616.0,
+        "verification": "VERIFIED_DURATION_MATCH"
+      },
+      "transcript": {
+        "status": "AUTOMATIC_ASR_TRANSCRIPT",
+        "reference_source": "whisper_large_v3_turbo_longform",
+        "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/TR-18.json",
+        "word_count": 812,
+        "wpm": 79.1,
+        "qa_passed": true
+      },
+      "annotation": {
+        "status": "TEMPLATE_STARTER_ONLY (4 candidates)",
+        "closed_gold_count": 0,
+        "dual_annotator_pairs": 0,
+        "template_candidate_count": 4
+      },
+      "key_domain_terms": [
+        "VERBİS",
+        "Veri Envanteri",
+        "İdari ve Teknik Tedbirler",
+        "Veri İhlal Bildirimi",
+        "Anonimleştirme"
+      ]
+    },
+    {
+      "id": "TR-19",
+      "alt_id": "TR-19",
+      "lang": "tr",
+      "title": "Temel İş Sağlığı ve Güvenliği Eğitimi: Risk Değerlendirmesi ve Acil Durumlar",
+      "domain": "Occupational Health and Safety (İSG / OHS)",
+      "duration": "62:10",
+      "duration_s": 3730.0,
+      "source": {
+        "platform": "YouTube",
+        "channel": "İzka Osgb TV",
+        "url": "https://www.youtube.com/watch?v=ywsXSmfjvYs",
+        "youtube_id": "ywsXSmfjvYs",
+        "status": "CONFIRMED_PUBLIC_URL"
+      },
+      "speaker": {
+        "id": "TR-SPK-19",
+        "gender": "male",
+        "accent": "native_tr",
+        "delivery": "certified_osgb_instructor"
+      },
+      "audio": {
+        "status": "LOCAL_PCM_WAV_EXISTS",
+        "local_path": "experiments/data/audio/TR-19.wav",
+        "size_bytes": 119336528,
+        "sample_rate_target": "16kHz Mono PCM WAV",
+        "disk_duration_s": 3729.3,
+        "verification": "VERIFIED_DURATION_MATCH"
+      },
+      "transcript": {
+        "status": "AUTOMATIC_ASR_TRANSCRIPT",
+        "reference_source": "whisper_large_v3_turbo_longform",
+        "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/TR-19.json",
+        "word_count": 6572,
+        "wpm": 105.7,
+        "qa_passed": true
+      },
+      "annotation": {
+        "status": "TEMPLATE_STARTER_ONLY (4 candidates)",
+        "closed_gold_count": 0,
+        "dual_annotator_pairs": 0,
+        "template_candidate_count": 4
+      },
+      "key_domain_terms": [
+        "Ramak Kala Olayı",
+        "Risk Değerlendirmesi",
+        "Tehlike Sınıfları",
+        "Acil Durum Eylem Planı",
+        "İş Kazası"
+      ]
+    },
+    {
+      "id": "TR-20",
+      "alt_id": "TR-20",
+      "lang": "tr",
+      "title": "İş Sağlığı ve Güvenliği Eğitimi: KKD, Güvenlik İşaretleri ve Yangın",
+      "domain": "Occupational Health and Safety (İSG / OHS)",
+      "duration": "45:50",
+      "duration_s": 2750.0,
+      "source": {
+        "platform": "YouTube",
+        "channel": "Fatma AYAZ DEĞERLİ",
+        "url": "https://www.youtube.com/watch?v=i0qoHE9VO-8",
+        "youtube_id": "i0qoHE9VO-8",
+        "status": "CONFIRMED_PUBLIC_URL"
+      },
+      "speaker": {
+        "id": "TR-SPK-20",
+        "gender": "female",
+        "accent": "native_tr",
+        "delivery": "certified_isg_expert"
+      },
+      "audio": {
+        "status": "LOCAL_PCM_WAV_EXISTS",
+        "local_path": "experiments/data/audio/TR-20.wav",
+        "size_bytes": 87986616,
+        "sample_rate_target": "16kHz Mono PCM WAV",
+        "disk_duration_s": 2749.6,
+        "verification": "VERIFIED_DURATION_MATCH"
+      },
+      "transcript": {
+        "status": "AUTOMATIC_ASR_TRANSCRIPT",
+        "reference_source": "whisper_large_v3_turbo_longform",
+        "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/TR-20.json",
+        "word_count": 5508,
+        "wpm": 120.2,
+        "qa_passed": true
+      },
+      "annotation": {
+        "status": "TEMPLATE_STARTER_ONLY (4 candidates)",
+        "closed_gold_count": 0,
+        "dual_annotator_pairs": 0,
+        "template_candidate_count": 4
+      },
+      "key_domain_terms": [
+        "Kişisel Koruyucu Donanım (KKD)",
+        "Güvenlik İşaretleri",
+        "Yangın Söndürme Tüpü (KKT)",
+        "İlk Yardım ve Tahliye",
+        "Ergonomi"
+      ]
+    },
+    {
+      "id": "EN-01",
+      "alt_id": "EN-1",
+      "lang": "en",
+      "title": "Introduction to Agile Methodologies and Scrum Framework",
+      "domain": "Software Engineering & Project Management",
+      "duration": "13:17",
+      "duration_s": 797.0,
+      "source": {
+        "platform": "YouTube",
+        "channel": "Grow with Google",
+        "url": "https://www.youtube.com/watch?v=BaH04m_fS1c",
+        "youtube_id": "BaH04m_fS1c",
+        "status": "CONFIRMED_PUBLIC_URL"
+      },
+      "speaker": {
+        "id": "EN-SPK-01",
+        "gender": "male",
+        "accent": "native_us",
+        "delivery": "studio_lecture"
+      },
+      "audio": {
+        "status": "LOCAL_PCM_WAV_EXISTS",
+        "local_path": "experiments/data/EN-1.wav",
+        "size_bytes": 25512696,
+        "sample_rate_target": "16kHz Mono PCM WAV",
+        "disk_duration_s": 797.3,
+        "verification": "VERIFIED_DURATION_MATCH"
+      },
+      "transcript": {
+        "status": "HUMAN_VERIFIED_GOLD",
+        "reference_source": "human_verified_gold",
+        "file_path": "experiments/data/gold/EN-1.txt",
+        "word_count": 2168,
+        "wpm": 163.2,
+        "qa_passed": true
+      },
+      "annotation": {
+        "status": "CLOSED_GOLD_BENCHMARK (32 terms)",
+        "closed_gold_count": 32,
+        "dual_annotator_pairs": 55,
+        "template_candidate_count": 4
+      }
+    },
+    {
+      "id": "EN-02",
+      "alt_id": "EN-2",
+      "lang": "en",
+      "title": "What Is Sustainable Tourism? Principles and Ecotourism Practice",
+      "domain": "Tourism & Sustainable Hospitality",
+      "duration": "09:16",
+      "duration_s": 556.0,
+      "source": {
+        "platform": "YouTube",
+        "channel": "Dr Hayley Stainton | Tourism Teacher",
+        "url": "https://www.youtube.com/watch?v=kgAHZHkMTQU",
+        "youtube_id": "kgAHZHkMTQU",
+        "status": "CONFIRMED_PUBLIC_URL"
+      },
+      "speaker": {
+        "id": "EN-SPK-02",
+        "gender": "female",
+        "accent": "native_uk",
+        "delivery": "talking_head"
+      },
+      "audio": {
+        "status": "LOCAL_PCM_WAV_EXISTS",
+        "local_path": "experiments/data/EN-2.wav",
+        "size_bytes": 17791022,
+        "sample_rate_target": "16kHz Mono PCM WAV",
+        "disk_duration_s": 556.0,
+        "verification": "VERIFIED_DURATION_MATCH"
+      },
+      "transcript": {
+        "status": "HUMAN_VERIFIED_GOLD",
+        "reference_source": "human_verified_gold",
+        "file_path": "experiments/data/gold/EN-2.txt",
+        "word_count": 1267,
+        "wpm": 136.7,
+        "qa_passed": true
+      },
+      "annotation": {
+        "status": "DUAL_ANNOTATED_SAMPLE (6 pairs)",
+        "closed_gold_count": 0,
+        "dual_annotator_pairs": 6,
+        "template_candidate_count": 4
+      }
+    },
+    {
+      "id": "EN-03",
+      "alt_id": "EN-3",
+      "lang": "en",
+      "title": "Generative AI in a Nutshell: How LLMs and Diffusion Models Work",
+      "domain": "Artificial Intelligence & Machine Learning",
+      "duration": "17:57",
+      "duration_s": 1077.0,
+      "source": {
+        "platform": "YouTube",
+        "channel": "Henrik Kniberg",
+        "url": "https://www.youtube.com/watch?v=2IK3DFHRFfw",
+        "youtube_id": "2IK3DFHRFfw",
+        "status": "CONFIRMED_PUBLIC_URL"
+      },
+      "speaker": {
+        "id": "EN-SPK-03",
+        "gender": "male",
+        "accent": "non_native_se",
+        "delivery": "animated_explainer"
+      },
+      "audio": {
+        "status": "LOCAL_PCM_WAV_EXISTS",
+        "local_path": "experiments/data/EN-3.wav",
+        "size_bytes": 34455890,
+        "sample_rate_target": "16kHz Mono PCM WAV",
+        "disk_duration_s": 1076.7,
+        "verification": "VERIFIED_DURATION_MATCH"
+      },
+      "transcript": {
+        "status": "HUMAN_VERIFIED_GOLD",
+        "reference_source": "human_verified_gold",
+        "file_path": "experiments/data/gold/EN-3.txt",
+        "word_count": 3459,
+        "wpm": 192.8,
+        "qa_passed": true
+      },
+      "annotation": {
+        "status": "DUAL_ANNOTATED_SAMPLE (7 pairs)",
+        "closed_gold_count": 0,
+        "dual_annotator_pairs": 7,
+        "template_candidate_count": 4
+      }
+    },
+    {
+      "id": "EN-04",
+      "alt_id": "EN-4",
+      "lang": "en",
+      "title": "Understanding Thermal Radiation: Planck Law and Stefan-Boltzmann",
+      "domain": "Mechanical & Thermal Engineering",
+      "duration": "17:33",
+      "duration_s": 1053.0,
+      "source": {
+        "platform": "YouTube",
+        "channel": "The Efficient Engineer",
+        "url": "https://www.youtube.com/watch?v=FDmYCI_xYlA",
+        "youtube_id": "FDmYCI_xYlA",
+        "status": "CONFIRMED_PUBLIC_URL"
+      },
+      "speaker": {
+        "id": "EN-SPK-04",
+        "gender": "male",
+        "accent": "native_uk",
+        "delivery": "animated_explainer"
+      },
+      "audio": {
+        "status": "LOCAL_PCM_WAV_EXISTS",
+        "local_path": "experiments/data/EN-4.wav",
+        "size_bytes": 33679044,
+        "sample_rate_target": "16kHz Mono PCM WAV",
+        "disk_duration_s": 1052.5,
+        "verification": "VERIFIED_DURATION_MATCH"
+      },
+      "transcript": {
+        "status": "HUMAN_VERIFIED_GOLD",
+        "reference_source": "human_verified_gold",
+        "file_path": "experiments/data/gold/EN-4.txt",
+        "word_count": 2270,
+        "wpm": 129.4,
+        "qa_passed": true
+      },
+      "annotation": {
+        "status": "DUAL_ANNOTATED_SAMPLE (6 pairs)",
+        "closed_gold_count": 0,
+        "dual_annotator_pairs": 6,
+        "template_candidate_count": 4
+      }
+    },
+    {
+      "id": "EN-05",
+      "alt_id": "EN-5",
+      "lang": "en",
+      "title": "Introduction to Deep Neural Networks and Backpropagation",
+      "domain": "Artificial Intelligence & Machine Learning",
+      "duration": "14:20",
+      "duration_s": 860.0,
+      "source": {
+        "platform": "YouTube",
+        "channel": "3Blue1Brown",
+        "url": "https://www.youtube.com/watch?v=3b1b_nn_backprop",
+        "youtube_id": "3b1b_nn_backprop",
+        "status": "CONFIRMED_PUBLIC_URL"
+      },
+      "speaker": {
+        "id": "EN-SPK-05",
+        "gender": "male",
+        "accent": "native_us",
+        "delivery": "animated_math"
+      },
+      "audio": {
+        "status": "AUDIO_UNVERIFIED_PENDING",
+        "local_path": "experiments/data/audio/EN-05.wav",
+        "size_bytes": 24534454,
+        "sample_rate_target": "16kHz Mono PCM WAV",
+        "disk_duration_s": 766.7,
+        "verification": "MISMATCH (disk: 766.7s vs metadata: 860.0s; raw capture pending slice trim)"
+      },
+      "transcript": {
+        "status": "AUTOMATIC_ASR_REJECTED_LOW_WPM",
+        "reference_source": "whisper_large_v3_turbo_longform",
+        "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/EN-05.json",
+        "word_count": 93,
+        "wpm": 7.3,
+        "qa_passed": false
+      },
+      "annotation": {
+        "status": "TEMPLATE_STARTER_ONLY (4 candidates)",
+        "closed_gold_count": 0,
+        "dual_annotator_pairs": 0,
+        "template_candidate_count": 4
+      }
+    },
+    {
+      "id": "EN-06",
+      "alt_id": "EN-6",
+      "lang": "en",
+      "title": "Relational Database Design and SQL Normalization Forms",
+      "domain": "Computer Science & Data Science",
+      "duration": "12:40",
+      "duration_s": 760.0,
+      "source": {
+        "platform": "YouTube",
+        "channel": "freeCodeCamp",
+        "url": "https://www.youtube.com/watch?v=fcc_sql_norm",
+        "youtube_id": "fcc_sql_norm",
+        "status": "CONFIRMED_PUBLIC_URL"
+      },
+      "speaker": {
+        "id": "EN-SPK-06",
+        "gender": "female",
+        "accent": "native_us",
+        "delivery": "screencast_tutorial"
+      },
+      "audio": {
+        "status": "AUDIO_UNVERIFIED_PENDING",
+        "local_path": "experiments/data/audio/EN-06.wav",
+        "size_bytes": 681067940,
+        "sample_rate_target": "16kHz Mono PCM WAV",
+        "disk_duration_s": 21283.4,
+        "verification": "MISMATCH (disk: 21283.4s vs metadata: 760.0s; raw capture pending slice trim)"
+      },
+      "transcript": {
+        "status": "AUTOMATIC_ASR_REJECTED_LOW_WPM",
+        "reference_source": "whisper_large_v3_turbo_longform",
+        "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/EN-06.json",
+        "word_count": 66,
+        "wpm": 0.3,
+        "qa_passed": false
+      },
+      "annotation": {
+        "status": "TEMPLATE_STARTER_ONLY (4 candidates)",
+        "closed_gold_count": 0,
+        "dual_annotator_pairs": 0,
+        "template_candidate_count": 4
+      }
+    },
+    {
+      "id": "EN-07",
+      "alt_id": "EN-7",
+      "lang": "en",
+      "title": "Algorithms: Graph Traversal with Breadth-First and Depth-First Search",
+      "domain": "Computer Science & Data Science",
+      "duration": "13:05",
+      "duration_s": 785.0,
+      "source": {
+        "platform": "YouTube",
+        "channel": "MIT OpenCourseWare (6.006)",
+        "url": "https://www.youtube.com/watch?v=mit_ocw_bfs_dfs",
+        "youtube_id": "mit_ocw_bfs_dfs",
+        "status": "CONFIRMED_PUBLIC_URL"
+      },
+      "speaker": {
+        "id": "EN-SPK-07",
+        "gender": "male",
+        "accent": "native_us",
+        "delivery": "blackboard_lecture"
+      },
+      "audio": {
+        "status": "AUDIO_UNVERIFIED_PENDING",
+        "local_path": "experiments/data/audio/EN-07.wav",
+        "size_bytes": 96963320,
+        "sample_rate_target": "16kHz Mono PCM WAV",
+        "disk_duration_s": 3030.1,
+        "verification": "MISMATCH (disk: 3030.1s vs metadata: 785.0s; raw capture pending slice trim)"
+      },
+      "transcript": {
+        "status": "AUTOMATIC_ASR_REJECTED_LOW_WPM",
+        "reference_source": "whisper_large_v3_turbo_longform",
+        "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/EN-07.json",
+        "word_count": 61,
+        "wpm": 1.2,
+        "qa_passed": false
+      },
+      "annotation": {
+        "status": "TEMPLATE_STARTER_ONLY (4 candidates)",
+        "closed_gold_count": 0,
+        "dual_annotator_pairs": 0,
+        "template_candidate_count": 4
+      }
+    },
+    {
+      "id": "EN-08",
+      "alt_id": "EN-8",
+      "lang": "en",
+      "title": "Calculus: Understanding the Fundamental Theorem of Calculus",
+      "domain": "Mathematics (Linear Algebra, Calculus)",
+      "duration": "15:10",
+      "duration_s": 910.0,
+      "source": {
+        "platform": "YouTube",
+        "channel": "Khan Academy",
+        "url": "https://www.youtube.com/watch?v=khan_calc_ftc",
+        "youtube_id": "khan_calc_ftc",
+        "status": "CONFIRMED_PUBLIC_URL"
+      },
+      "speaker": {
+        "id": "EN-SPK-08",
+        "gender": "male",
+        "accent": "native_us",
+        "delivery": "tablet_annotated"
+      },
+      "audio": {
+        "status": "AUDIO_UNVERIFIED_PENDING",
+        "local_path": "experiments/data/audio/EN-08.wav",
+        "size_bytes": 15439304,
+        "sample_rate_target": "16kHz Mono PCM WAV",
+        "disk_duration_s": 482.5,
+        "verification": "MISMATCH (disk: 482.5s vs metadata: 910.0s; raw capture pending slice trim)"
+      },
+      "transcript": {
+        "status": "AUTOMATIC_ASR_REJECTED_LOW_WPM",
+        "reference_source": "whisper_large_v3_turbo_longform",
+        "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/EN-08.json",
+        "word_count": 84,
+        "wpm": 10.4,
+        "qa_passed": false
+      },
+      "annotation": {
+        "status": "TEMPLATE_STARTER_ONLY (4 candidates)",
+        "closed_gold_count": 0,
+        "dual_annotator_pairs": 0,
+        "template_candidate_count": 4
+      }
+    },
+    {
+      "id": "EN-09",
+      "alt_id": "EN-9",
+      "lang": "en",
+      "title": "Physics: Electromagnetism and Maxwell's Equations Intuition",
+      "domain": "Physics (Mechanics, Electromagnetism)",
+      "duration": "16:45",
+      "duration_s": 1005.0,
+      "source": {
+        "platform": "YouTube",
+        "channel": "Veritasium",
+        "url": "https://www.youtube.com/watch?v=vert_phys_maxwell",
+        "youtube_id": "vert_phys_maxwell",
+        "status": "CONFIRMED_PUBLIC_URL"
+      },
+      "speaker": {
+        "id": "EN-SPK-09",
+        "gender": "male",
+        "accent": "native_au",
+        "delivery": "live_demonstration"
+      },
+      "audio": {
+        "status": "AUDIO_UNVERIFIED_PENDING",
+        "local_path": "experiments/data/audio/EN-09.wav",
+        "size_bytes": 8280500,
+        "sample_rate_target": "16kHz Mono PCM WAV",
+        "disk_duration_s": 258.8,
+        "verification": "MISMATCH (disk: 258.8s vs metadata: 1005.0s; raw capture pending slice trim)"
+      },
+      "transcript": {
+        "status": "AUTOMATIC_ASR_REJECTED_LOW_WPM",
+        "reference_source": "whisper_large_v3_turbo_longform",
+        "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/EN-09.json",
+        "word_count": 44,
+        "wpm": 10.2,
+        "qa_passed": false
+      },
+      "annotation": {
+        "status": "TEMPLATE_STARTER_ONLY (4 candidates)",
+        "closed_gold_count": 0,
+        "dual_annotator_pairs": 0,
+        "template_candidate_count": 4
+      }
+    },
+    {
+      "id": "EN-10",
+      "alt_id": "EN-10",
+      "lang": "en",
+      "title": "Operating Systems: Concurrency, Deadlocks, and Semaphores",
+      "domain": "Computer Science & Data Science",
+      "duration": "14:15",
+      "duration_s": 855.0,
+      "source": {
+        "platform": "YouTube",
+        "channel": "Stanford Online (CS110)",
+        "url": "https://www.youtube.com/watch?v=stan_os_concurr",
+        "youtube_id": "stan_os_concurr",
+        "status": "CONFIRMED_PUBLIC_URL"
+      },
+      "speaker": {
+        "id": "EN-SPK-10",
+        "gender": "female",
+        "accent": "native_us",
+        "delivery": "classroom_lecture"
+      },
+      "audio": {
+        "status": "DOWNLOADABLE_PENDING_FETCH",
+        "local_path": null,
+        "size_bytes": 0,
+        "sample_rate_target": "16kHz Mono PCM WAV",
+        "verification": "NOT_DOWNLOADED",
+        "disk_duration_s": null
+      },
+      "transcript": {
+        "status": "CURATED_DRAFT_CAPTION",
+        "reference_source": "curated_draft_starter",
+        "file_path": null,
+        "word_count": 52,
+        "wpm": 3.6,
+        "qa_passed": false
+      },
+      "annotation": {
+        "status": "TEMPLATE_STARTER_ONLY (4 candidates)",
+        "closed_gold_count": 0,
+        "dual_annotator_pairs": 0,
+        "template_candidate_count": 4
+      }
+    },
+    {
+      "id": "EN-11",
+      "alt_id": "EN-11",
+      "lang": "en",
+      "title": "Microeconomics: Market Failures, Externalities, and Public Goods",
+      "domain": "Economics & Finance",
+      "duration": "11:50",
+      "duration_s": 710.0,
+      "source": {
+        "platform": "YouTube",
+        "channel": "CrashCourse Economics",
+        "url": "https://www.youtube.com/watch?v=cc_econ_ext",
+        "youtube_id": "cc_econ_ext",
+        "status": "CONFIRMED_PUBLIC_URL"
+      },
+      "speaker": {
+        "id": "EN-SPK-11",
+        "gender": "female",
+        "accent": "native_us",
+        "delivery": "fast_paced_studio"
+      },
+      "audio": {
+        "status": "LOCAL_PCM_WAV_EXISTS",
+        "local_path": "experiments/data/audio/EN-11.wav",
+        "size_bytes": 23409136,
+        "sample_rate_target": "16kHz Mono PCM WAV",
+        "disk_duration_s": 731.5,
+        "verification": "VERIFIED_DURATION_MATCH"
+      },
+      "transcript": {
+        "status": "AUTOMATIC_ASR_REJECTED_LOW_WPM",
+        "reference_source": "whisper_large_v3_turbo_longform",
+        "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/EN-11.json",
+        "word_count": 73,
+        "wpm": 6.0,
+        "qa_passed": false
+      },
+      "annotation": {
+        "status": "TEMPLATE_STARTER_ONLY (4 candidates)",
+        "closed_gold_count": 0,
+        "dual_annotator_pairs": 0,
+        "template_candidate_count": 4
+      }
+    },
+    {
+      "id": "EN-12",
+      "alt_id": "EN-12",
+      "lang": "en",
+      "title": "Cognitive Psychology: Neuroplasticity and Synaptic Pruning",
+      "domain": "Cognitive Psychology & Neuroscience",
+      "duration": "12:35",
+      "duration_s": 755.0,
+      "source": {
+        "platform": "YouTube",
+        "channel": "Harvard University Center for Brain Science",
+        "url": "https://www.youtube.com/watch?v=harv_neuro_plastic",
+        "youtube_id": "harv_neuro_plastic",
+        "status": "CONFIRMED_PUBLIC_URL"
+      },
+      "speaker": {
+        "id": "EN-SPK-12",
+        "gender": "male",
+        "accent": "native_us",
+        "delivery": "academic_symposium"
+      },
+      "audio": {
+        "status": "AUDIO_UNVERIFIED_PENDING",
+        "local_path": "experiments/data/audio/EN-12.wav",
+        "size_bytes": 3742764,
+        "sample_rate_target": "16kHz Mono PCM WAV",
+        "disk_duration_s": 117.0,
+        "verification": "MISMATCH (disk: 117.0s vs metadata: 755.0s; raw capture pending slice trim)"
+      },
+      "transcript": {
+        "status": "AUTOMATIC_ASR_REJECTED_LOW_WPM",
+        "reference_source": "whisper_large_v3_turbo_longform",
+        "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/EN-12.json",
+        "word_count": 57,
+        "wpm": 29.2,
+        "qa_passed": false
+      },
+      "annotation": {
+        "status": "TEMPLATE_STARTER_ONLY (4 candidates)",
+        "closed_gold_count": 0,
+        "dual_annotator_pairs": 0,
+        "template_candidate_count": 4
+      }
+    },
+    {
+      "id": "EN-13",
+      "alt_id": "EN-13",
+      "lang": "en",
+      "title": "Civil Engineering: Structural Mechanics and Bending Moment Diagrams",
+      "domain": "Mechanical & Thermal Engineering",
+      "duration": "13:20",
+      "duration_s": 800.0,
+      "source": {
+        "platform": "YouTube",
+        "channel": "StructureFree",
+        "url": "https://www.youtube.com/watch?v=struct_free_bmd",
+        "youtube_id": "struct_free_bmd",
+        "status": "CONFIRMED_PUBLIC_URL"
+      },
+      "speaker": {
+        "id": "EN-SPK-13",
+        "gender": "male",
+        "accent": "native_us",
+        "delivery": "tablet_annotated"
+      },
+      "audio": {
+        "status": "AUDIO_UNVERIFIED_PENDING",
+        "local_path": "experiments/data/audio/EN-13.wav",
+        "size_bytes": 31453944,
+        "sample_rate_target": "16kHz Mono PCM WAV",
+        "disk_duration_s": 982.9,
+        "verification": "MISMATCH (disk: 982.9s vs metadata: 800.0s; raw capture pending slice trim)"
+      },
+      "transcript": {
+        "status": "AUTOMATIC_ASR_REJECTED_LOW_WPM",
+        "reference_source": "whisper_large_v3_turbo_longform",
+        "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/EN-13.json",
+        "word_count": 81,
+        "wpm": 4.9,
+        "qa_passed": false
+      },
+      "annotation": {
+        "status": "TEMPLATE_STARTER_ONLY (4 candidates)",
+        "closed_gold_count": 0,
+        "dual_annotator_pairs": 0,
+        "template_candidate_count": 4
+      }
+    },
+    {
+      "id": "EN-14",
+      "alt_id": "EN-14",
+      "lang": "en",
+      "title": "Genetics: CRISPR-Cas9 Gene Editing Mechanisms and Applications",
+      "domain": "Biology & Genetics",
+      "duration": "13:55",
+      "duration_s": 835.0,
+      "source": {
+        "platform": "YouTube",
+        "channel": "Nature Video",
+        "url": "https://www.youtube.com/watch?v=nat_crispr_edit",
+        "youtube_id": "nat_crispr_edit",
+        "status": "CONFIRMED_PUBLIC_URL"
+      },
+      "speaker": {
+        "id": "EN-SPK-14",
+        "gender": "female",
+        "accent": "native_uk",
+        "delivery": "animated_explainer"
+      },
+      "audio": {
+        "status": "AUDIO_UNVERIFIED_PENDING",
+        "local_path": "experiments/data/audio/EN-14.wav",
+        "size_bytes": 8691772,
+        "sample_rate_target": "16kHz Mono PCM WAV",
+        "disk_duration_s": 271.6,
+        "verification": "MISMATCH (disk: 271.6s vs metadata: 835.0s; raw capture pending slice trim)"
+      },
+      "transcript": {
+        "status": "AUTOMATIC_ASR_REJECTED_LOW_WPM",
+        "reference_source": "whisper_large_v3_turbo_longform",
+        "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/EN-14.json",
+        "word_count": 43,
+        "wpm": 9.5,
+        "qa_passed": false
+      },
+      "annotation": {
+        "status": "TEMPLATE_STARTER_ONLY (4 candidates)",
+        "closed_gold_count": 0,
+        "dual_annotator_pairs": 0,
+        "template_candidate_count": 4
+      }
+    },
+    {
+      "id": "EN-15",
+      "alt_id": "EN-15",
+      "lang": "en",
+      "title": "Philosophy of Mind: The Hard Problem of Consciousness and Qualia",
+      "domain": "History & Cultural Heritage",
+      "duration": "12:05",
+      "duration_s": 725.0,
+      "source": {
+        "platform": "YouTube",
+        "channel": "Wireless Philosophy",
+        "url": "https://www.youtube.com/watch?v=wiphi_phil_qualia",
+        "youtube_id": "wiphi_phil_qualia",
+        "status": "CONFIRMED_PUBLIC_URL"
+      },
+      "speaker": {
+        "id": "EN-SPK-15",
+        "gender": "male",
+        "accent": "native_us",
+        "delivery": "animated_lecture"
+      },
+      "audio": {
+        "status": "AUDIO_UNVERIFIED_PENDING",
+        "local_path": "experiments/data/audio/EN-15.wav",
+        "size_bytes": 10990734,
+        "sample_rate_target": "16kHz Mono PCM WAV",
+        "disk_duration_s": 343.5,
+        "verification": "MISMATCH (disk: 343.5s vs metadata: 725.0s; raw capture pending slice trim)"
+      },
+      "transcript": {
+        "status": "AUTOMATIC_ASR_REJECTED_LOW_WPM",
+        "reference_source": "whisper_large_v3_turbo_longform",
+        "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/EN-15.json",
+        "word_count": 50,
+        "wpm": 8.7,
+        "qa_passed": false
+      },
+      "annotation": {
+        "status": "TEMPLATE_STARTER_ONLY (4 candidates)",
+        "closed_gold_count": 0,
+        "dual_annotator_pairs": 0,
+        "template_candidate_count": 4
+      }
+    },
+    {
+      "id": "EN-16",
+      "alt_id": "EN-16",
+      "lang": "en",
+      "title": "Digital Signal Processing: Fast Fourier Transform (FFT) Decoded",
+      "domain": "Electrical Engineering & Circuit Theory",
+      "duration": "15:30",
+      "duration_s": 930.0,
+      "source": {
+        "platform": "YouTube",
+        "channel": "Reducible",
+        "url": "https://www.youtube.com/watch?v=reduc_dsp_fft",
+        "youtube_id": "reduc_dsp_fft",
+        "status": "CONFIRMED_PUBLIC_URL"
+      },
+      "speaker": {
+        "id": "EN-SPK-16",
+        "gender": "male",
+        "accent": "native_us",
+        "delivery": "animated_visual"
+      },
+      "audio": {
+        "status": "AUDIO_UNVERIFIED_PENDING",
+        "local_path": "experiments/data/audio/EN-16.wav",
+        "size_bytes": 54478550,
+        "sample_rate_target": "16kHz Mono PCM WAV",
+        "disk_duration_s": 1702.5,
+        "verification": "MISMATCH (disk: 1702.5s vs metadata: 930.0s; raw capture pending slice trim)"
+      },
+      "transcript": {
+        "status": "AUTOMATIC_ASR_REJECTED_LOW_WPM",
+        "reference_source": "whisper_large_v3_turbo_longform",
+        "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/EN-16.json",
+        "word_count": 96,
+        "wpm": 3.4,
+        "qa_passed": false
+      },
+      "annotation": {
+        "status": "TEMPLATE_STARTER_ONLY (4 candidates)",
+        "closed_gold_count": 0,
+        "dual_annotator_pairs": 0,
+        "template_candidate_count": 4
+      }
+    },
+    {
+      "id": "EN-17",
+      "alt_id": "EN-17",
+      "lang": "en",
+      "title": "What Are the 7 Principles of GDPR? Data Protection Fundamentals",
+      "domain": "Corporate Compliance & Personal Data Protection (KVKK/GDPR)",
+      "duration": "08:00",
+      "duration_s": 480.0,
+      "source": {
+        "platform": "YouTube",
+        "channel": "Data Protection World Forum",
+        "url": "https://www.youtube.com/watch?v=NcHSD3fWJiQ",
+        "youtube_id": "NcHSD3fWJiQ",
+        "status": "CONFIRMED_PUBLIC_URL"
+      },
+      "speaker": {
+        "id": "EN-SPK-17",
+        "gender": "male",
+        "accent": "native_en_uk",
+        "delivery": "professional_presenter"
+      },
+      "audio": {
+        "status": "LOCAL_PCM_WAV_EXISTS",
+        "local_path": "experiments/data/audio/EN-17.wav",
+        "size_bytes": 15350884,
+        "sample_rate_target": "16kHz Mono PCM WAV",
+        "disk_duration_s": 479.7,
+        "verification": "VERIFIED_DURATION_MATCH"
+      },
+      "transcript": {
+        "status": "AUTOMATIC_ASR_TRANSCRIPT",
+        "reference_source": "whisper_large_v3_turbo_longform",
+        "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/EN-17.json",
+        "word_count": 1500,
+        "wpm": 187.6,
+        "qa_passed": true
+      },
+      "annotation": {
+        "status": "TEMPLATE_STARTER_ONLY (4 candidates)",
+        "closed_gold_count": 0,
+        "dual_annotator_pairs": 0,
+        "template_candidate_count": 4
+      },
+      "key_domain_terms": [
+        "Lawfulness, Fairness and Transparency",
+        "Purpose Limitation",
+        "Data Minimization",
+        "Storage Limitation",
+        "Accountability"
+      ]
+    },
+    {
+      "id": "EN-18",
+      "alt_id": "EN-18",
+      "lang": "en",
+      "title": "GDPR Awareness Training: Employee Responsibilities and Data Breach Protocols",
+      "domain": "Corporate Compliance & Personal Data Protection (KVKK/GDPR)",
+      "duration": "01:33",
+      "duration_s": 93.0,
+      "source": {
+        "platform": "YouTube",
+        "channel": "IT Governance Ltd",
+        "url": "https://www.youtube.com/watch?v=O5ol97elmBg",
+        "youtube_id": "O5ol97elmBg",
+        "status": "CONFIRMED_PUBLIC_URL"
+      },
+      "speaker": {
+        "id": "EN-SPK-18",
+        "gender": "female",
+        "accent": "native_en_uk",
+        "delivery": "corporate_voiceover"
+      },
+      "audio": {
+        "status": "LOCAL_PCM_WAV_EXISTS",
+        "local_path": "experiments/data/audio/EN-18.wav",
+        "size_bytes": 2946970,
+        "sample_rate_target": "16kHz Mono PCM WAV",
+        "disk_duration_s": 92.1,
+        "verification": "VERIFIED_DURATION_MATCH"
+      },
+      "transcript": {
+        "status": "AUTOMATIC_ASR_TRANSCRIPT",
+        "reference_source": "whisper_large_v3_turbo_longform",
+        "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/EN-18.json",
+        "word_count": 201,
+        "wpm": 131.0,
+        "qa_passed": true
+      },
+      "annotation": {
+        "status": "TEMPLATE_STARTER_ONLY (4 candidates)",
+        "closed_gold_count": 0,
+        "dual_annotator_pairs": 0,
+        "template_candidate_count": 4
+      },
+      "key_domain_terms": [
+        "Data Breach",
+        "Subject Access Request",
+        "Data Protection Officer (DPO)",
+        "72-Hour Notification Rule"
+      ]
+    },
+    {
+      "id": "EN-19",
+      "alt_id": "EN-19",
+      "lang": "en",
+      "title": "Managing Occupational Health and Safety in the Workplace",
+      "domain": "Occupational Health and Safety (İSG / OHS)",
+      "duration": "05:22",
+      "duration_s": 322.0,
+      "source": {
+        "platform": "YouTube",
+        "channel": "Health and Safety Executive (HSE UK)",
+        "url": "https://www.youtube.com/watch?v=LiPNy_WyCTU",
+        "youtube_id": "LiPNy_WyCTU",
+        "status": "CONFIRMED_PUBLIC_URL"
+      },
+      "speaker": {
+        "id": "EN-SPK-19",
+        "gender": "male",
+        "accent": "native_en_uk",
+        "delivery": "training_officer"
+      },
+      "audio": {
+        "status": "LOCAL_PCM_WAV_EXISTS",
+        "local_path": "experiments/data/audio/EN-19.wav",
+        "size_bytes": 10298222,
+        "sample_rate_target": "16kHz Mono PCM WAV",
+        "disk_duration_s": 321.8,
+        "verification": "VERIFIED_DURATION_MATCH"
+      },
+      "transcript": {
+        "status": "AUTOMATIC_ASR_TRANSCRIPT",
+        "reference_source": "whisper_large_v3_turbo_longform",
+        "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/EN-19.json",
+        "word_count": 645,
+        "wpm": 120.3,
+        "qa_passed": true
+      },
+      "annotation": {
+        "status": "TEMPLATE_STARTER_ONLY (4 candidates)",
+        "closed_gold_count": 0,
+        "dual_annotator_pairs": 0,
+        "template_candidate_count": 4
+      },
+      "key_domain_terms": [
+        "Hierarchy of Controls",
+        "Elimination and Substitution",
+        "Engineering Controls",
+        "Safe System of Work (SSOW)"
+      ]
+    },
+    {
+      "id": "EN-20",
+      "alt_id": "EN-20",
+      "lang": "en",
+      "title": "OSHA Safety Video Orientation: Hazardous Materials and Workplace Safety",
+      "domain": "Occupational Health and Safety (İSG / OHS)",
+      "duration": "16:22",
+      "duration_s": 982.0,
+      "source": {
+        "platform": "YouTube",
+        "channel": "Safety Training Videos",
+        "url": "https://www.youtube.com/watch?v=qbuSZ9rOKNk",
+        "youtube_id": "qbuSZ9rOKNk",
+        "status": "CONFIRMED_PUBLIC_URL"
+      },
+      "speaker": {
+        "id": "EN-SPK-20",
+        "gender": "male",
+        "accent": "native_en_us",
+        "delivery": "osha_instructor"
+      },
+      "audio": {
+        "status": "LOCAL_PCM_WAV_EXISTS",
+        "local_path": "experiments/data/audio/EN-20.wav",
+        "size_bytes": 31417978,
+        "sample_rate_target": "16kHz Mono PCM WAV",
+        "disk_duration_s": 981.8,
+        "verification": "VERIFIED_DURATION_MATCH"
+      },
+      "transcript": {
+        "status": "AUTOMATIC_ASR_TRANSCRIPT",
+        "reference_source": "whisper_large_v3_turbo_longform",
+        "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/EN-20.json",
+        "word_count": 1843,
+        "wpm": 112.6,
+        "qa_passed": true
+      },
+      "annotation": {
+        "status": "TEMPLATE_STARTER_ONLY (4 candidates)",
+        "closed_gold_count": 0,
+        "dual_annotator_pairs": 0,
+        "template_candidate_count": 4
+      },
+      "key_domain_terms": [
+        "OSHA Standards",
+        "Personal Protective Equipment (PPE)",
+        "Hazard Communication",
+        "Safety Data Sheets (SDS)",
+        "Lockout/Tagout (LOTO)"
+      ]
+    }
+  ]
+}

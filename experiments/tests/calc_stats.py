@@ -1,14 +1,16 @@
 import json
 from pathlib import Path
 
-manifest_file = Path("data/manifest.jsonl")
+ROOT = Path(__file__).resolve().parent.parent
+
+manifest_file = ROOT / "data" / "manifest.jsonl"
 rows = [json.loads(line) for line in manifest_file.read_text(encoding="utf-8").splitlines() if line.strip()]
 
 total_words = 0
 total_dur = 0.0
 
 # Load terms per video
-terms_csv = Path("annotation/ablation_terms_qwen3.5_4b.csv")
+terms_csv = ROOT / "annotation" / "ablation_terms_qwen3.5_4b.csv"
 import csv
 clip_terms = {}
 if terms_csv.exists():

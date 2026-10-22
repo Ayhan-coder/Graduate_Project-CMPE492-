@@ -138,6 +138,33 @@
       "notes": "Default ablation LLM. Kept so the pilot semantic table remains comparable."
     },
     {
+      "id": "evren/qwen3.8-flash-next",
+      "provider": "evren",
+      "role": "evren_national_speed",
+      "params": "Cloud H200",
+      "license": "ssb-evren",
+      "subset": "all",
+      "notes": "Türkiye Savunma Sanayii Başkanlığı EVREN platformu Qwen 3.8 Flash modeli. H200 GPU kümesinde ultra hızlı Türkçe/İngilizce terim çıkarımı."
+    },
+    {
+      "id": "evren/deepseek-v4.1-flash",
+      "provider": "evren",
+      "role": "evren_national_capacity",
+      "params": "Cloud H200",
+      "license": "ssb-evren",
+      "subset": "all",
+      "notes": "Türkiye Savunma Sanayii Başkanlığı EVREN platformu DeepSeek V4.1 Flash modeli. Derin bağlamsal akıl yürütme ve CEFR B1 açıklama gücü."
+    },
+    {
+      "id": "evren/glm-5.3",
+      "provider": "evren",
+      "role": "evren_national_reasoning",
+      "params": "Cloud H200",
+      "license": "ssb-evren",
+      "subset": "all",
+      "notes": "Türkiye Savunma Sanayii Başkanlığı EVREN platformu GLM 5.3 modeli. Kompleks eğitim içerikleri için analitik terminoloji çıkarımı."
+    },
+    {
       "id": "Qwen/Qwen3.5-9B",
       "provider": "huggingface",
       "role": "refresh_open_capacity",

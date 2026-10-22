@@ -43,6 +43,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 from fetch_models import resolve_hub_cache
 from run_llm import PROMPT, _local_model_path, clear_llm_cache, generate_hf, get_or_load_llm, parse_terms
+from evren_llm import is_evren_model, generate_evren
 from enriched_schema import build_enriched_output
 
 # Global in-memory Whisper cache: model_id -> (processor, model)
@@ -623,6 +624,18 @@ def parse_timestamp_segments(raw_text: str, fallback_full_text: str) -> list[dic
     return segments
 
 
+def detect_whisper_language(raw_text: str, processor: object) -> Optional[str]:
+    """Read Whisper's language token so auto-detection can stay stable across chunks."""
+    tokenizer = getattr(processor, "tokenizer", None)
+    known_languages = getattr(tokenizer, "lang_code_to_id", None) or {}
+    if not known_languages:
+        return None
+    match = re.search(r"<\|([a-z]{2,3})\|>", raw_text or "")
+    if match and match.group(1) in known_languages:
+        return match.group(1)
+    return None
+
+
 def get_or_load_whisper(
     model_id: str = "openai/whisper-large-v3-turbo",
     progress_cb: Optional[Callable[[str], None]] = None,
@@ -675,14 +688,17 @@ def preload_models(
     llm_model_id: str = "Qwen/Qwen3.5-4B",
 ) -> None:
     """Pre-warm default ASR and LLM weights in GPU memory so all runs are instantaneous."""
+    from evren_llm import is_evren_model
+
     try:
         get_or_load_whisper(asr_model_id)
     except Exception:
         pass
-    try:
-        get_or_load_llm(llm_model_id)
-    except Exception:
-        pass
+    if not is_evren_model(llm_model_id):
+        try:
+            get_or_load_llm(llm_model_id)
+        except Exception:
+            pass
 
 
 def transcribe_audio(
@@ -780,6 +796,7 @@ def transcribe_audio(
             chunks.append((chunk_time, piece))
 
     n_chunks = len(chunks)
+    detected_whisper_lang = lang if lang in {"tr", "en"} else None
     for i, (chunk_start_s, piece) in enumerate(chunks):
         if is_cancelled and is_cancelled():
             clear_gpu_memory()
@@ -813,6 +830,15 @@ def transcribe_audio(
             clean_chunk = processor.batch_decode(ids, skip_special_tokens=True)[0].strip()
             raw_chunk = processor.batch_decode(ids, skip_special_tokens=False)[0]
 
+        # Whisper otherwise re-detects language independently for each 30s chunk.
+        # On long videos this can make later chunks switch to an unrelated language.
+        if detected_whisper_lang is None:
+            detected_whisper_lang = detect_whisper_language(raw_chunk, processor)
+            if detected_whisper_lang:
+                gen_config.language = detected_whisper_lang
+                if progress_cb:
+                    progress_cb(f"Whisper detected {detected_whisper_lang}; keeping that language for the remaining chunks.")
+
         if clean_chunk:
             text_parts.append(clean_chunk)
 
@@ -844,7 +870,7 @@ def transcribe_audio(
 def extract_terms(
     transcript: str,
     lang: str = "tr",
-    model_id: str = "Qwen/Qwen3-8B",
+    model_id: str = "Qwen/Qwen3.5-4B",
     progress_cb: Optional[Callable[[str], None]] = None,
     is_cancelled: Optional[Callable[[], bool]] = None,
     learner_context: Optional[str] = None,
@@ -869,22 +895,27 @@ def extract_terms(
             "lang": lang,
         }
 
-    from run_llm import _HF_LLM_CACHE
-
-    is_cached = model_id in _HF_LLM_CACHE
-    if not is_cached:
-        # Check if VRAM is tight before loading LLM weights:
-        # 8B/9B models in 4-bit need ~6.0 GB headroom; smaller models (3B/4B) need ~3.5 GB
-        is_large = any(tag in model_id.lower() for tag in ("8b", "9b", "7b"))
-        needed_mb = 6000 if is_large else 3500
-        if get_free_vram_mb() < needed_mb:
-            clear_asr_cache()
-
+    is_evren = is_evren_model(model_id)
+    if is_evren:
         if progress_cb:
-            progress_cb(f"Extracting domain terms with {model_id} (4-bit GPU)...")
+            progress_cb(f"Extracting domain terms with {model_id} (EVREN Cloud H200)...")
     else:
-        if progress_cb:
-            progress_cb(f"Reusing resident {model_id} (4-bit GPU)...")
+        from run_llm import _HF_LLM_CACHE
+
+        is_cached = model_id in _HF_LLM_CACHE
+        if not is_cached:
+            # Check if VRAM is tight before loading LLM weights:
+            # 8B/9B models in 4-bit need ~6.0 GB headroom; smaller models (3B/4B) need ~3.5 GB
+            is_large = any(tag in model_id.lower() for tag in ("8b", "9b", "7b"))
+            needed_mb = 6000 if is_large else 3500
+            if get_free_vram_mb() < needed_mb:
+                clear_asr_cache()
+
+            if progress_cb:
+                progress_cb(f"Extracting domain terms with {model_id} (4-bit GPU)...")
+        else:
+            if progress_cb:
+                progress_cb(f"Reusing resident {model_id} (4-bit GPU)...")
 
     if is_cancelled and is_cancelled():
         clear_gpu_memory()
@@ -926,7 +957,10 @@ def extract_terms(
                 f"{prompt}\n\n{extra}\n"
                 'Optionally add a "focus" field per term: review, new, or known.'
             )
-        raw = generate_hf(model_id, prompt)
+        if is_evren:
+            raw = generate_evren(model_id, prompt)
+        else:
+            raw = generate_hf(model_id, prompt)
         raw_outputs.append(raw)
         part_terms = parse_terms(raw)
         all_terms.extend(part_terms)
@@ -977,11 +1011,11 @@ def find_all_term_occurrences(term_text: str, segments: list[dict]) -> list[dict
             continue
 
         is_match = False
-        if cleaned_term in seg_txt_lower:
+        if re.search(r"\b" + re.escape(cleaned_term) + r"\b", seg_txt_lower):
             is_match = True
-        elif term_words and len(term_words) >= 2 and all(w in seg_txt_lower for w in term_words):
+        elif term_words and len(term_words) >= 2 and all(re.search(r"\b" + re.escape(w) + r"\b", seg_txt_lower) for w in term_words):
             is_match = True
-        elif term_words and len(term_words) == 1 and term_words[0] in seg_txt_lower:
+        elif term_words and len(term_words) == 1 and re.search(r"\b" + re.escape(term_words[0]) + r"\b", seg_txt_lower):
             is_match = True
 
         if is_match and seg.get("start") is not None:
@@ -1649,38 +1683,65 @@ def build_slide_specification(
     # 2. Deep LLM Generation (if requested by student)
     if use_llm:
         try:
-            from run_llm import get_or_load_llm
-            model, tokenizer = get_or_load_llm(model_id)
+            from evren_llm import is_evren_model, generate_evren
 
-            prompt = (
-                f"<|im_start|>system\n"
-                f"Sen uzman bir sunum ve eğitim slaytı mimarısın. Çıktını SADECE geçerli JSON olarak ver.\n"
-                f"<|im_end|>\n"
-                f"<|im_start|>user\n"
-                f"Öğrencinin anlamadığı ders konusu: '{topic_clean}'\n"
-                f"Videoda son dinlenen bölüm: \"{recent_text[:400]}\"\n"
-                f"Geçen terimler: {', '.join(t.get('term', '') for t in active_terms[:4])}\n"
-                f"Dil: {'Türkçe' if is_tr else 'English'}\n\n"
-                f"Lütfen bu konuyu 16:9 modern sunum slaytına dönüştür. Çıktı formatı:\n"
-                f"{{\n"
-                f'  "title": "{topic_clean}",\n'
-                f'  "subtitle": "Etkileyici alt başlık",\n'
-                f'  "core_takeaway": "CEFR B1 düzeyinde 1-2 cümlelik temel anlatım",\n'
-                f'  "mermaid_diagram": "graph LR\\n  A[...] --> B[...]",\n'
-                f'  "cards": [\n'
-                f'    {{"icon": "💡", "title": "Terim Adı", "desc": "Açıklama"}}\n'
-                f"  ],\n"
-                f'  "analogy": "Günlük hayattan somut benzetme",\n'
-                f'  "exam_tip": "Sınav altın kuralı veya pratik ipucu"\n'
-                f"}}\n"
-                f"<|im_end|>\n"
-                f"<|im_start|>assistant\n"
-            )
+            is_evren = is_evren_model(model_id)
+            if is_evren:
+                raw = generate_evren(
+                    model_id,
+                    prompt=(
+                        f"Öğrencinin anlamadığı ders konusu: '{topic_clean}'\n"
+                        f"Videoda son dinlenen bölüm: \"{recent_text[:400]}\"\n"
+                        f"Geçen terimler: {', '.join(t.get('term', '') for t in active_terms[:4])}\n"
+                        f"Dil: {'Türkçe' if is_tr else 'English'}\n\n"
+                        f"Lütfen bu konuyu 16:9 modern sunum slaytına dönüştür. Çıktı formatı:\n"
+                        f"{{\n"
+                        f'  "title": "{topic_clean}",\n'
+                        f'  "subtitle": "Etkileyici alt başlık",\n'
+                        f'  "core_takeaway": "CEFR B1 düzeyinde 1-2 cümlelik temel anlatım",\n'
+                        f'  "mermaid_diagram": "graph LR\\n  A[...] --> B[...]",\n'
+                        f'  "cards": [\n'
+                        f'    {{"icon": "💡", "title": "Terim Adı", "desc": "Açıklama"}}\n'
+                        f"  ],\n"
+                        f'  "analogy": "Günlük hayattan somut benzetme",\n'
+                        f'  "exam_tip": "Sınav altın kuralı veya pratik ipucu"\n'
+                        f"}}\n"
+                    ),
+                    system_prompt="Sen uzman bir sunum ve eğitim slaytı mimarısın. Çıktını SADECE geçerli JSON olarak ver.",
+                )
+            else:
+                from run_llm import get_or_load_llm
+                model, tokenizer = get_or_load_llm(model_id)
 
-            inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
-            with torch.no_grad():
-                out = model.generate(**inputs, max_new_tokens=320, do_sample=False, temperature=0.0)
-            raw = tokenizer.decode(out[0][inputs.input_ids.shape[1]:], skip_special_tokens=True).strip()
+                prompt = (
+                    f"<|im_start|>system\n"
+                    f"Sen uzman bir sunum ve eğitim slaytı mimarısın. Çıktını SADECE geçerli JSON olarak ver.\n"
+                    f"<|im_end|>\n"
+                    f"<|im_start|>user\n"
+                    f"Öğrencinin anlamadığı ders konusu: '{topic_clean}'\n"
+                    f"Videoda son dinlenen bölüm: \"{recent_text[:400]}\"\n"
+                    f"Geçen terimler: {', '.join(t.get('term', '') for t in active_terms[:4])}\n"
+                    f"Dil: {'Türkçe' if is_tr else 'English'}\n\n"
+                    f"Lütfen bu konuyu 16:9 modern sunum slaytına dönüştür. Çıktı formatı:\n"
+                    f"{{\n"
+                    f'  "title": "{topic_clean}",\n'
+                    f'  "subtitle": "Etkileyici alt başlık",\n'
+                    f'  "core_takeaway": "CEFR B1 düzeyinde 1-2 cümlelik temel anlatım",\n'
+                    f'  "mermaid_diagram": "graph LR\\n  A[...] --> B[...]",\n'
+                    f'  "cards": [\n'
+                    f'    {{"icon": "💡", "title": "Terim Adı", "desc": "Açıklama"}}\n'
+                    f"  ],\n"
+                    f'  "analogy": "Günlük hayattan somut benzetme",\n'
+                    f'  "exam_tip": "Sınav altın kuralı veya pratik ipucu"\n'
+                    f"}}\n"
+                    f"<|im_end|>\n"
+                    f"<|im_start|>assistant\n"
+                )
+
+                inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
+                with torch.no_grad():
+                    out = model.generate(**inputs, max_new_tokens=320, do_sample=False, temperature=0.0)
+                raw = tokenizer.decode(out[0][inputs.input_ids.shape[1]:], skip_special_tokens=True).strip()
 
             # Parse JSON from LLM output
             m = re.search(r"(\{.*\})", raw, re.DOTALL)

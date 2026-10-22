@@ -36,6 +36,7 @@ def main() -> None:
         "torch": torch_ver,
         "gpu": gpu_name(),
         "openai_key": bool(os.environ.get("OPENAI_API_KEY")),
+        "evren_llm_key": bool(os.environ.get("EVREN_API_KEY") or (ROOT / ".env").exists()),
         "manifest_present": (ROOT / "data" / "manifest.jsonl").exists(),
         "default_decoding": {
             "task": "transcribe",

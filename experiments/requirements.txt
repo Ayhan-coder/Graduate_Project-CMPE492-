@@ -10,3 +10,9 @@ numpy>=1.26.0
 tqdm>=4.66.0
 openai>=1.40.0
 speechbrain>=1.0.0
+# 7.2.8 and older are rejected by the Edge voice endpoint (HTTP 403), which silently
+# downgrades narration to the offline system voice.
+edge-tts>=7.3.1
+# Manim's CLI (cloup 4) needs click>=8.5. gTTS pins click<8.2 and breaks rendering,
+# so the Google narration fallback calls the endpoint directly with requests instead.
+manim>=0.21.0

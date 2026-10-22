@@ -34,6 +34,10 @@ from fetch_models import hub_slug, load_registry, resolve_hub_cache
 ROOT = Path(__file__).resolve().parent
 OUT_DIR = ROOT / "outputs"
 
+# EVREN answers need the full JSON array inside one completion; the verbose models exceed
+# 2048 tokens on the longer lectures and get truncated mid-array.
+EVREN_MAX_TOKENS = 4096
+
 
 def _local_model_path(model_id: str) -> str:
     cache = resolve_hub_cache(model_id)
@@ -193,6 +197,11 @@ def get_or_load_llm(model_id: str = "Qwen/Qwen3.5-4B") -> tuple[object, object]:
 
 
 def generate_hf(model_id: str, prompt: str, max_new_tokens: int = 1024) -> str:
+    from evren_llm import is_evren_model, generate_evren
+
+    if is_evren_model(model_id):
+        return generate_evren(model_id, prompt, max_tokens=max_new_tokens)
+
     import torch
 
     tok, model = get_or_load_llm(model_id)
@@ -253,18 +262,29 @@ def main() -> None:
     rows = load_manifest(args.manifest)
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     out_path = OUT_DIR / f"llm-{time.strftime('%Y%m%d-%H%M%S')}.jsonl"
+    bad_by_model: dict[str, tuple[int, int]] = {}
     with out_path.open("w", encoding="utf-8") as fh:
         for model in models:
             print(f"== {model['id']} ==")
+            empty = unparsed = 0
             for row in rows:
                 prompt = PROMPT.format(LANG=row.get("lang", "English"), TRANSCRIPT=row["transcript"])
                 t0 = time.perf_counter()
+                is_evren = model.get("provider") == "evren" or is_evren_model(model.get("id", ""))
                 if model.get("provider") == "openai_api":
                     text = generate_openai(model["id"], prompt)
+                elif is_evren:
+                    from evren_llm import generate_evren
+
+                    text = generate_evren(model["id"], prompt, max_tokens=EVREN_MAX_TOKENS, temperature=0.0)
                 else:
                     text = generate_hf(model["id"], prompt)
                 elapsed = time.perf_counter() - t0
                 terms = parse_terms(text)
+                if not text.strip():
+                    empty += 1
+                elif not terms:
+                    unparsed += 1
                 rec = {
                     "id": row["id"],
                     "lang": row.get("lang"),
@@ -274,10 +294,24 @@ def main() -> None:
                     "n_terms": len(terms),
                     "terms": terms,
                 }
+                if is_evren:
+                    rec["reasoning_effort"] = "none"
+                    rec["max_tokens"] = EVREN_MAX_TOKENS
                 fh.write(json.dumps(rec, ensure_ascii=False) + "\n")
                 fh.flush()
                 print(f"  {row['id']}: {len(terms)} terms in {elapsed:.1f}s")
+            bad_by_model[model["id"]] = (empty, unparsed)
     print("wrote", out_path)
+    failed = {m: (e, u) for m, (e, u) in bad_by_model.items() if e or u}
+    if failed:
+        raise SystemExit(
+            "UNUSABLE OUTPUT: "
+            + "; ".join(
+                f"{m}: {e} of {len(rows)} empty, {u} of {len(rows)} answer-with-zero-parsed-terms"
+                for m, (e, u) in failed.items()
+            )
+            + f" — results in {out_path.name} are not usable."
+        )
 
 
 if __name__ == "__main__":

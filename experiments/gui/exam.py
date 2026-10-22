@@ -38,16 +38,18 @@ EXAM_PROMPT = (
 )
 
 GENERIC_DISTRACTORS_EN = [
-    "A general meeting with no time limit",
-    "A document that lists employee holidays",
-    "A tool used only for file storage",
-    "A role that only manages office furniture",
+    "An unvalidated theoretical assumption with no empirical support",
+    "A secondary implementation detail not covered in this curriculum",
+    "A measurement index that quantifies unrelated external noise",
+    "A preliminary hypothesis that was refuted in earlier experiments",
+    "A deprecated procedure superseded by modern standards",
 ]
 GENERIC_DISTRACTORS_TR = [
-    "Süresi olmayan genel bir toplantı",
-    "Çalışan tatillerini listeleyen bir belge",
-    "Yalnızca dosya saklamak için kullanılan bir araç",
-    "Sadece ofis mobilyasını yöneten bir rol",
+    "Ders kapsamında ele alınmayan ikincil bir uygulama ayrıntısı",
+    "Deneysel desteği bulunmayan doğrulanmamış teorik bir varsayım",
+    "Sistem dışı gürültüyü ölçen ilgisiz bir değerlendirme metriği",
+    "Önceki aşamalarda elenmiş geçersiz bir başlangıç hipotezi",
+    "Güncel standartların yerine geçmiş eski bir yöntem",
 ]
 
 
@@ -225,6 +227,8 @@ def fallback_exam_from_terms(
 def _mcq_from_term(item: dict, pool: list[dict], index: int, generics: list[str], is_tr: bool) -> dict:
     term = item["term"]
     correct = (item.get("explanation") or "").strip()
+    if not correct:
+        correct = f"{term} kavramının ders bağlamındaki pedagojik tanımı." if is_tr else f"The pedagogical definition of {term}."
     others = [
         (t.get("explanation") or "").strip()
         for t in pool
@@ -232,12 +236,21 @@ def _mcq_from_term(item: dict, pool: list[dict], index: int, generics: list[str]
         and (t.get("explanation") or "").strip()
         and (t.get("explanation") or "").strip() != correct
     ]
-    distractors = others[:3]
+    distractors = list(dict.fromkeys(others))[:3]
     gi = 0
     while len(distractors) < 3 and gi < len(generics):
-        if generics[gi] != correct and generics[gi] not in distractors:
-            distractors.append(generics[gi])
+        g = generics[gi]
+        if g != correct and g not in distractors:
+            distractors.append(g)
         gi += 1
+    # Fallback to ensure exactly 3 distinct distractors (4 options total)
+    fallback_idx = 1
+    while len(distractors) < 3:
+        placeholder = f"Seçenek {fallback_idx}: İlgisiz kavram tanımı" if is_tr else f"Option {fallback_idx}: Alternate concept definition"
+        if placeholder not in distractors and placeholder != correct:
+            distractors.append(placeholder)
+        fallback_idx += 1
+
     options = [correct] + distractors[:3]
     rng = random.Random(normalize_term(term) + str(index))
     order = list(range(len(options)))

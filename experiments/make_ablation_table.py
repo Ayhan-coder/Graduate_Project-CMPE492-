@@ -1,0 +1,177 @@
+"""make_ablation_table.py: regenerate paper/tables/ablation.tex from stored label artifacts.
+
+Each (ASR checkpoint, language) cell is scored from exactly one label file, and the file
+used is printed in the table so a reader can tell human ratings from judge ratings:
+
+    openai/whisper-{medium,large-v3,large-v3-turbo}  -> annotation/labels_a1.csv
+                                                        (human annotator 1, 233 pairs)
+    selimc/..., Qwen3-ASR-0.6B, nvidia/nemotron-...  -> annotation/labels_ablation_real_judge.csv
+                                                        (Qwen3.5-4B rubric calls, 200 pairs)
+
+annotation/labels_ablation_extended.csv is deliberately NOT used: it is the deterministic
+keyword/circularity heuristic (use_mock=True), not a judge, and must not be presented as
+validated LLM-as-a-judge scoring.
+
+Run:  python experiments/make_ablation_table.py
+"""
+
+from __future__ import annotations
+
+import csv
+import json
+from collections import defaultdict
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent
+TABLES = ROOT.parent / "paper" / "tables"
+
+ABLATION = ROOT / "outputs" / "ablation-all.jsonl"
+HUMAN_CSV = ROOT / "annotation" / "labels_a1.csv"
+JUDGE_CSV = ROOT / "annotation" / "labels_ablation_real_judge.csv"
+OUT_TEX = TABLES / "ablation.tex"
+
+# ASR checkpoint -> row label, and which label file backs it.
+DISPLAY = {
+    "openai/whisper-medium": "Whisper Medium",
+    "openai/whisper-large-v3": "Whisper Large-v3",
+    "openai/whisper-large-v3-turbo": "Whisper Turbo",
+    "selimc/whisper-large-v3-turbo-turkish": "Whisper Turbo TR",
+    "Qwen/Qwen3-ASR-0.6B-hf": "Qwen3-ASR 0.6B",
+    "nvidia/nemotron-3.5-asr-streaming-0.6b": "Nemotron 3.5 ASR",
+}
+ORDER = list(DISPLAY)
+
+HUMAN_CELLS = {
+    ("openai/whisper-medium", "tr"),
+    ("openai/whisper-medium", "en"),
+    ("openai/whisper-large-v3", "tr"),
+    ("openai/whisper-large-v3", "en"),
+    ("openai/whisper-large-v3-turbo", "tr"),
+    ("openai/whisper-large-v3-turbo", "en"),
+}
+
+
+def cell_of(model_field: str) -> tuple[str, str]:
+    """labels_* files store ``model`` as 'asr|llm' for human rows and bare 'asr' for judge rows."""
+    asr = str(model_field).split("|")[0]
+    return asr, ""
+
+
+def load_labels(path: Path) -> dict[tuple[str, str], list[int, int, int]]:
+    agg: dict[tuple[str, str], list[int, int, int]] = defaultdict(lambda: [0, 0, 0])
+    with path.open(encoding="utf-8") as fh:
+        for row in csv.DictReader(fh):
+            asr, _ = cell_of(row["model"])
+            lang = str(row["lang"]).lower()[:2]
+            try:
+                r, d = int(row["R"]), int(row["D"])
+            except (KeyError, TypeError, ValueError):
+                continue
+            a = agg[(asr, lang)]
+            a[0] += 1
+            a[1] += r
+            a[2] += d
+    return agg
+
+
+def load_runs() -> dict[tuple[str, str], dict]:
+    """Terms emitted per cell plus the feeding ASR's normalised WER."""
+    runs: dict[tuple[str, str], dict] = {}
+    for line in ABLATION.read_text(encoding="utf-8").splitlines():
+        if not line.strip():
+            continue
+        rec = json.loads(line)
+        asr = rec.get("asr_model")
+        lang = str(rec.get("lang", "")).lower()[:2]
+        cell = runs.setdefault((asr, lang), {"terms": 0, "clips": 0, "wer": []})
+        cell["terms"] += len(rec.get("terms", []))
+        cell["clips"] += 1
+        wer = rec.get("asr_wer_norm")
+        if isinstance(wer, (int, float)):
+            cell["wer"].append(float(wer))
+    return runs
+
+
+def pct(num: int, den: int) -> str:
+    return f"{100.0 * num / den:.1f}" if den else "--"
+
+
+def main() -> None:
+    human = load_labels(HUMAN_CSV)
+    judge = load_labels(JUDGE_CSV)
+    runs = load_runs()
+
+    rows = []
+    for asr in ORDER:
+        for lang in ("tr", "en"):
+            key = (asr, lang)
+            run = runs.get(key)
+            if not run:
+                continue
+            if key in HUMAN_CELLS:
+                labels, source = human, "Human A1"
+            else:
+                labels, source = judge, "LLM judge"
+            n, r1, d1 = labels.get(key, (0, 0, 0))
+            if n == 0:
+                raise SystemExit(f"No labels for cell {key} in {'a1' if source == 'Human A1' else 'real-judge'} file")
+            if n != run["terms"]:
+                raise SystemExit(
+                    f"Cell {key}: label file has {n} pairs but ablation run emitted {run['terms']} terms"
+                )
+            wer = sum(run["wer"]) / len(run["wer"]) if run["wer"] else float("nan")
+            rows.append(
+                {
+                    "asr": DISPLAY[asr],
+                    "lang": lang.upper(),
+                    "wer": f"{wer:.3f}",
+                    "clips": run["clips"],
+                    "terms": n,
+                    "r1": pct(r1, n),
+                    "d1": pct(d1, n),
+                    "source": source,
+                }
+            )
+
+    lines = [
+        "% GENERATED by experiments/make_ablation_table.py -- do not edit by hand.",
+        "% R1%/D1% recomputed from outputs/ablation-all.jsonl against the label file named in",
+        "% each row. annotation/labels_ablation_extended.csv (keyword heuristic) is excluded.",
+        r"\begin{table}[t]",
+        r"\centering",
+        r"\renewcommand{\arraystretch}{1.1}",
+        r"\small",
+        r"\begin{tabular}{llrrcrrl}",
+        r"\toprule",
+        r"\textbf{ASR checkpoint} & \textbf{Lang} & \textbf{WER} & \textbf{Clips} & \textbf{Terms} & \textbf{$R1\%$} & \textbf{$D1\%$} & \textbf{Labels} \\",
+        r"\midrule",
+    ]
+    for r in rows:
+        lines.append(
+            f"{r['asr']} & {r['lang']} & {r['wer']} & {r['clips']} & {r['terms']} & "
+            f"{r['r1']} & {r['d1']} & {r['source']} \\\\"
+        )
+    lines += [
+        r"\bottomrule",
+        r"\end{tabular}",
+        r"\caption{Cross-layer ablation: one fixed open-weight LLM (\texttt{Qwen3.5-4B}) run over",
+        r"different ASR hypotheses. \textbf{Labels} states who produced the $R1$/$D1$ ratings:",
+        r"the six Whisper cells are the human annotator-1 sheet (\texttt{labels\_a1.csv}, 233 pairs);",
+        r"the three 2026 checkpoints are closed-form rubric calls by the local",
+        r"\texttt{Qwen3.5-4B} judge (\texttt{labels\_ablation\_real\_judge.csv}, 200 pairs).",
+        r"The two sources are not interchangeable, so the table keeps them apart rather than",
+        r"presenting one homogeneous rating protocol. WER is the mean normalised word error rate",
+        r"of the feeding ASR hypothesis over the listed clips.}",
+        r"% AUTOGEN-END",
+        r"\label{tab:ablation}",
+        r"\end{table}",
+        "",
+    ]
+    OUT_TEX.write_text("\n".join(lines), encoding="utf-8")
+    print(f"wrote {OUT_TEX} ({len(rows)} cells)")
+    for r in rows:
+        print(f"  {r['asr']:<17}{r['lang']}  wer={r['wer']}  n={r['terms']:<4} R1={r['r1']:<6} D1={r['d1']:<6} {r['source']}")
+
+
+if __name__ == "__main__":
+    main()

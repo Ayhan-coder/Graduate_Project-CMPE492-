@@ -17,7 +17,7 @@ from gui.manimator import (
     _clean_json_output,
     _heal_manim_code,
     generate_default_manim_code,
-    generate_explainer_script_qwen,
+    generate_explainer_script,
     generate_fallback_explainer_spec,
     produce_student_explainer_video,
 )
@@ -90,6 +90,31 @@ class ManimatorScriptGenerationTests(unittest.TestCase):
         healed_latex = _heal_manim_code(latex_code, "LaTeX error: xdvipdfmx failed")
         self.assertIn("Text(", healed_latex)
 
+    def test_evren_backend_authors_script(self):
+        """A successful EVREN call is used verbatim and attributed to the evren backend."""
+        payload = json.dumps({
+            "title": "Kazanılmış Değer",
+            "target_concept": "EVM",
+            "pedagogical_hook": "Duvar ustası benzetmesi",
+            "terms": [{"term": "PV", "explanation": "Hedef bütçe"}],
+            "narration_script": "EVREN'in yazdığı anlatım metni",
+            "scenes": [{"id": 1, "title": "Giriş", "narration": "Giriş", "duration_s": 12.0}],
+            "manim_code": "from manim import *\n\n\nclass ExplainerScene(Scene):\n    def construct(self):\n        pass\n",
+        }, ensure_ascii=False)
+        with patch("evren_llm.generate_evren", return_value=payload) as mock_evren:
+            spec = generate_explainer_script("Kazanılmış Değer", "EV ile AC farkı", "tr", 50, backend="evren")
+        self.assertTrue(mock_evren.called)
+        self.assertEqual(spec["script_backend"], "evren")
+        self.assertEqual(spec["narration_script"], "EVREN'in yazdığı anlatım metni")
+        self.assertIn("ExplainerScene", spec["manim_code"])
+
+    def test_evren_failure_degrades_to_template_not_another_model(self):
+        """EVREN being down must not silently relabel a local run as the chosen engine."""
+        with patch("evren_llm.generate_evren", side_effect=RuntimeError("platform unreachable")):
+            spec = generate_explainer_script("Turizm ve UKTKG Modeli", "", "tr", 50, backend="evren")
+        self.assertEqual(spec["script_backend"], "heuristic")
+        self.assertIn("UKTKG", spec["title"])
+
 
 class ManimatorApiEndpointsTests(unittest.TestCase):
     def setUp(self):
@@ -140,7 +165,8 @@ class ManimatorApiEndpointsTests(unittest.TestCase):
                 "current_time_s": 10.0,
                 "video_style": "manim_animation",
                 "duration_s": 35,
-                "use_local_qwen": False,
+                "llm_backend": "heuristic",
+                "video_quality": "high",
             },
         )
         self.assertEqual(resp.status_code, 200)
@@ -186,7 +212,8 @@ class ManimatorApiEndpointsTests(unittest.TestCase):
                 "context": "ortaya çıkan problemlerin çözümü için önerilen alternatiflerden hangisinin proje amaçlarına daha uygun olduğuna karar vermek durumundadır.",
                 "video_style": "manim_animation",
                 "duration_s": 35,
-                "use_local_qwen": False,
+                "llm_backend": "heuristic",
+                "video_quality": "high",
             },
         )
         self.assertEqual(resp.status_code, 200)
@@ -197,6 +224,57 @@ class ManimatorApiEndpointsTests(unittest.TestCase):
         call_kwargs = mock_produce.call_args[1]
         self.assertEqual(call_kwargs["topic"], "Proje Yönetimi")
         self.assertIn("problemlerin", call_kwargs["context"])
+        self.assertEqual(call_kwargs["backend"], "heuristic")
+        self.assertEqual(call_kwargs["video_quality"], "high")
+
+
+class NarrationEngineTests(unittest.TestCase):
+    """The reported voice must be the one that actually produced the audio."""
+
+    def _run(self, edge_error, google_ok, sapi_voice):
+        import gui.manimator as manimator
+
+        with patch.object(manimator, "_EDGE_RETRY_WAS_S", (0.0,)), \
+             patch.object(manimator, "_synthesize_edge_tts_async",
+                          side_effect=edge_error or (lambda *a, **k: None)), \
+             patch.object(manimator, "_synthesize_with_google_tts", return_value=google_ok), \
+             patch.object(manimator, "_synthesize_with_windows_sapi", return_value=sapi_voice):
+            return manimator.synthesize_narration_audio(
+                "Kazanılmış Değer Analizi bir pusuladır.", lang="tr",
+                output_filename="narration_test.mp3",
+            )
+
+    def test_edge_voice_is_preferred(self):
+        async def fake(text, voice, out_path):
+            Path(out_path).write_bytes(b"x" * 2000)
+
+        import gui.manimator as manimator
+
+        with patch.object(manimator, "_EDGE_RETRY_WAS_S", (0.0,)), \
+             patch.object(manimator, "_synthesize_edge_tts_async", fake), \
+             patch.object(manimator, "_synthesize_with_google_tts", return_value=False), \
+             patch.object(manimator, "_synthesize_with_windows_sapi",
+                          return_value="Microsoft Zira Desktop (en-US)"):
+            path, info = manimator.synthesize_narration_audio(
+                "Kazanılmış Değer Analizi bir pusuladır.", lang="tr",
+                output_filename="narration_test.mp3",
+            )
+        self.assertEqual(info["narration_engine"], "edge-tts")
+        self.assertEqual(info["narration_voice"], "tr-TR-AhmetNeural")
+
+    def test_google_tts_before_mismatched_system_voice(self):
+        path, info = self._run(RuntimeError("throttled"), True, "Microsoft Zira Desktop (en-US)")
+        self.assertEqual(info["narration_engine"], "google-tts")
+
+    def test_system_voice_only_when_no_online_voice_works(self):
+        path, info = self._run(RuntimeError("throttled"), False, "Microsoft Zira Desktop (en-US)")
+        self.assertEqual(info["narration_engine"], "sapi5-offline")
+        self.assertEqual(info["narration_voice"], "Microsoft Zira Desktop (en-US)")
+
+    def test_silent_is_reported_as_silent(self):
+        path, info = self._run(RuntimeError("throttled"), False, None)
+        self.assertEqual(info["narration_engine"], "silent")
+        self.assertEqual(info["narration_voice"], "")
 
 
 if __name__ == "__main__":

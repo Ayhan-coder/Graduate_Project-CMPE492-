@@ -78,6 +78,9 @@ from gui.pipeline import (
 from gui.manimator import (
     produce_student_explainer_video,
     VIDEOS_DIR,
+    DEFAULT_EVREN_MODEL,
+    DEFAULT_VIDEO_QUALITY,
+    VIDEO_QUALITY_TIERS,
     TEMP_DIR as MANIMATOR_TEMP_DIR,
 )
 from gui.socratic import generate_socratic_response
@@ -323,8 +326,10 @@ class ManimatorGenerateRequest(BaseModel):
     video_style: str = "manim_animation"  # "manim_animation" or "figure_walkthrough"
     duration_s: int = 50
     voice: Optional[str] = None
-    use_local_qwen: bool = True  # Falls back to heuristic script if the model is unavailable
-    model_id: str = "Qwen/Qwen3.5-4B"
+    llm_backend: str = "evren"  # "evren" | "local" | "heuristic"; degrades down this chain
+    evren_model: str = DEFAULT_EVREN_MODEL
+    video_quality: str = DEFAULT_VIDEO_QUALITY  # a key of gui.manimator.VIDEO_QUALITY_TIERS
+    model_id: str = "Qwen/Qwen3.5-4B"  # local weights used when llm_backend == "local"
 
 
 MANIMATOR_HISTORY: list[dict] = []
@@ -379,21 +384,39 @@ def get_models():
         ],
         "llm_models": [
             {
+                "id": "evren/qwen3.8-flash-next",
+                "name": "⚡ EVREN Qwen 3.8 Flash (TÜBİTAK/SSB Bulut • H200 • Ultra Hızlı)",
+                "desc": "Yerli H200 GPU altyapısı, semantik katman istemci VRAM'inde ağırlık barındırmaz (ASR katmanı yine yerelde çalışır). Ücretli kredi harcar; kullanımı EVREN_API_KEY ve EVREN_ACCEPT_TERMS=1 opt-in'ine bağlıdır",
+                "default": False,
+            },
+            {
+                "id": "evren/deepseek-v4.1-flash",
+                "name": "🧠 EVREN DeepSeek V4.1 Flash (TÜBİTAK/SSB Bulut • Derin Muhakeme)",
+                "desc": "Gelişmiş akıl yürütme, derin pedagojik bağlam ve CEFR B1 açıklama gücü",
+                "default": False,
+            },
+            {
+                "id": "evren/glm-5.3",
+                "name": "🔬 EVREN GLM-5.3 (TÜBİTAK/SSB Bulut • Kompleks Analiz)",
+                "desc": "Yoğun terminoloji ve teknik dersler için genişletilmiş akıl yürütme",
+                "default": False,
+            },
+            {
                 "id": "Qwen/Qwen3.5-4B",
-                "name": "Qwen3.5-4B (Recommended for RTX 5060 • Fast • Zero Crash)",
-                "desc": "Lightweight open 4B model, runs in ~3.1 GB VRAM in 4-bit, highly stable on Windows",
+                "name": "Qwen3.5-4B (Yerel CUDA • RTX 5060 • 4-bit)",
+                "desc": "Lightweight open 4B model, yerel varsayılan (ücretsiz/çevrimdışı). Bu makinede ölçüldü (outputs/local_vram_probe.json): 3.08 GB ağırlık kalıcı, tam klip çağrısında 4.72 GB tepe ayırıcı / 5.26 GB cihaz kullanımı, 8.12 GB RTX 5060 üzerinde",
                 "default": True,
             },
             {
                 "id": "Qwen/Qwen3-8B",
                 "name": "Qwen3-8B (8 Billion Parameters, High Accuracy)",
-                "desc": "Powerful 8B open model (~5.2 GB VRAM in 4-bit)",
+                "desc": "Powerful 8B open model (~5.2 GB VRAM in 4-bit - projection from the measured 4B figure, not instrumented)",
                 "default": False,
             },
             {
                 "id": "Qwen/Qwen3.5-9B",
                 "name": "Qwen3.5-9B (9 Billion Parameters, Maximum Capacity)",
-                "desc": "Deepest open reasoning capacity benchmark (~6.2 GB VRAM in 4-bit)",
+                "desc": "Deepest open reasoning capacity benchmark (~6.2 GB VRAM in 4-bit - projection, not instrumented; on this 8 GB card it ran offloaded to host memory at 513 s/clip mean)",
                 "default": False,
             },
             {
@@ -1683,8 +1706,8 @@ def generate_manimator_video(req: ManimatorGenerateRequest):
             lang = res.get("lang", lang)
 
             t = max(0.0, float(req.current_time_s))
-            window_start = max(0.0, t - 45.0)
-            window_end = t + 10.0
+            window_start = max(0.0, t - 20.0)
+            window_end = t + 8.0
 
             if not recent_text:
                 recent_segments = [
@@ -1694,6 +1717,14 @@ def generate_manimator_video(req: ManimatorGenerateRequest):
                 ]
                 if recent_segments:
                     recent_text = " ".join(s.get("text", "").strip() for s in recent_segments)
+                elif segments:
+                    timed_segments = [s for s in segments if s.get("start") is not None and s.get("end") is not None]
+                    if timed_segments:
+                        nearest = min(
+                            timed_segments,
+                            key=lambda s: abs((float(s["start"]) + float(s["end"])) / 2 - t),
+                        )
+                        recent_text = str(nearest.get("text", "")).strip()
                 elif asr.get("text"):
                     recent_text = asr.get("text", "")[:350]
 
@@ -1704,7 +1735,8 @@ def generate_manimator_video(req: ManimatorGenerateRequest):
                     t_start = term_obj.get("start")
                     if t_start is not None:
                         dist = abs(float(t_start) - t)
-                        timed_candidates.append((dist, term_obj.get("term", "").strip()))
+                        if dist <= 30.0:
+                            timed_candidates.append((dist, term_obj.get("term", "").strip()))
                 if timed_candidates:
                     timed_candidates.sort(key=lambda x: x[0])
                     topic_title = timed_candidates[0][1]
@@ -1718,11 +1750,17 @@ def generate_manimator_video(req: ManimatorGenerateRequest):
                             topic_title = t_name
                             break
 
-                if not topic_title and terms:
+                if not topic_title and terms and not req.job_id:
                     topic_title = terms[0].get("term", "Ders Bölümü")
 
     if not topic_title:
         topic_title = "Ders Kavramı"
+
+    if req.video_quality not in VIDEO_QUALITY_TIERS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unknown video_quality {req.video_quality!r}; expected one of {sorted(VIDEO_QUALITY_TIERS)}",
+        )
 
     try:
         explainer_result = produce_student_explainer_video(
@@ -1732,8 +1770,10 @@ def generate_manimator_video(req: ManimatorGenerateRequest):
             video_style=req.video_style or "manim_animation",
             duration_s=req.duration_s or 50,
             voice=req.voice,
-            use_local_qwen=req.use_local_qwen,
-            model_id=req.model_id or "Qwen/Qwen3.5-4B",
+            backend=req.llm_backend or "evren",
+            evren_model=req.evren_model or DEFAULT_EVREN_MODEL,
+            local_model_id=req.model_id or "Qwen/Qwen3.5-4B",
+            video_quality=req.video_quality,
         )
     except Exception as exc:
         logger.error("Manimator generation error: %s", exc, exc_info=True)
@@ -1765,6 +1805,8 @@ def generate_manimator_video(req: ManimatorGenerateRequest):
         "video_url": explainer_result["video_url"],
         "duration_s": explainer_result["duration_s"],
         "created_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+        "script_backend": explainer_result.get("script_backend"),
+        "video_quality": explainer_result.get("video_quality"),
         "terms": [t.get("term") for t in explainer_result.get("terms", [])],
     })
 
@@ -1779,9 +1821,17 @@ async def generate_pdf_video(
     duration_s: int = Form(50),
     voice: Optional[str] = Form(None),
     lang: str = Form("tr"),
+    llm_backend: str = Form("evren"),
+    evren_model: str = Form(DEFAULT_EVREN_MODEL),
+    video_quality: str = Form(DEFAULT_VIDEO_QUALITY),
 ):
     """Upload PDF and turn it directly into a narrated Manim or Figure Walkthrough video."""
     safe_name = Path((file.filename or "").replace("\\", "/")).name.strip() or "Ders_Belgesi.pdf"
+    if video_quality not in VIDEO_QUALITY_TIERS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unknown video_quality {video_quality!r}; expected one of {sorted(VIDEO_QUALITY_TIERS)}",
+        )
     temp_pdf = Path(tempfile.gettempdir()) / f"upload_{uuid.uuid4().hex[:8]}_{safe_name}"
     try:
         contents = await file.read()
@@ -1797,7 +1847,9 @@ async def generate_pdf_video(
             duration_s=duration_s,
             voice=voice,
             pdf_path=temp_pdf,
-            use_local_qwen=False,
+            backend=llm_backend or "evren",
+            evren_model=evren_model or DEFAULT_EVREN_MODEL,
+            video_quality=video_quality,
         )
 
         MANIMATOR_HISTORY.insert(0, {
@@ -1860,3 +1912,31 @@ def serve_index():
     resp.headers["Pragma"] = "no-cache"
     resp.headers["Expires"] = "0"
     return resp
+
+
+@app.get("/poster", response_class=HTMLResponse)
+def serve_poster():
+    poster_file = STATIC_DIR / "poster.html"
+    if not poster_file.exists():
+        return "<h1>A3 Poster Sunumu Yükleniyor...</h1>"
+    resp = HTMLResponse(content=poster_file.read_text(encoding="utf-8"))
+    resp.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    return resp
+
+
+@app.get("/api/download/poster-pdf")
+def download_poster_pdf():
+    pdf_path = ROOT.parent / "notes" / "Bitirme_Projesi_A3_Posteri.pdf"
+    if not pdf_path.exists():
+        try:
+            import importlib.util
+            script_path = ROOT.parent / "notes" / "generate_a3_poster_pdf.py"
+            spec = importlib.util.spec_from_file_location("generate_a3_poster_pdf", str(script_path))
+            mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(mod)
+            mod.build_poster_pdf()
+        except Exception as e:
+            logger.error("A3 poster PDF build failed: %s", e)
+    if not pdf_path.exists():
+        raise HTTPException(status_code=404, detail="A3 Poster PDF bulunamadı.")
+    return FileResponse(pdf_path, media_type="application/pdf", filename="Bitirme_Projesi_A3_Posteri.pdf")

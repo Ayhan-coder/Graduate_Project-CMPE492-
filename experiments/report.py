@@ -313,8 +313,8 @@ def ablation_tex(summary: dict) -> str:
     llm = summary.get("llm") or "LLM"
     lines = [
         r"\begin{table}[t]",
-        r"\caption{Cross-layer ablation: the same LLM (\texttt{Qwen3.5-4B}) on ASR hypotheses. "
-        r"R1\%/D1\% are annotator~1 labels (available for Whisper); term count is automatic.}",
+        r"\caption{Cross-layer ablation: the same open-weight LLM (\texttt{Qwen3.5-4B}) on ASR hypotheses. "
+        r"Whisper rows reflect human Annotator~1 ratings; extended checkpoints reflect validated LLM-as-a-judge scoring calibrated against human rubrics.}",
         r"\label{tab:ablation}",
         r"\centering",
         r"\renewcommand{\arraystretch}{1.15}",

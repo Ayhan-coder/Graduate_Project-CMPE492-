@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+import sys
 from pathlib import Path
 
 from reportlab.lib import colors
@@ -27,7 +28,15 @@ from reportlab.platypus import (
 )
 
 ROOT = Path(__file__).resolve().parent
-OUT_PDF = ROOT / "Bitirme_Projesi_Raporu.pdf"
+CANONICAL_REPORT = ROOT / "Bitirme_Projesi_Raporu.pdf"
+# The authoritative report is built by md2tex.py + latexmk from the Markdown. This ReportLab
+# renderer is superseded and is kept only as a legacy side-by-side rendering; it may not silently
+# overwrite the deliverable (pass --allow-overwrite-report to opt in). Its claims are audited
+# against artifacts on disk exactly like the canonical report: three-layer title, measured
+# intervention ladder, no acoustic attribution, 9B row labelled "input not logged".
+OUT_PDF = ROOT / "Bitirme_Projesi_Raporu.legacy-reportlab.pdf"
+if "--allow-overwrite-report" in sys.argv:
+    OUT_PDF = CANONICAL_REPORT
 MD_SRC = ROOT / "Bitirme_Projesi_Raporu.md"
 
 FONT_DIR = Path(r"C:\Windows\Fonts")
@@ -96,7 +105,7 @@ class ThesisNumberedCanvas(canvas.Canvas):
         self.drawString(18 * mm, h - 10 * mm, "KOÇ ÜNİVERSİTESİ  ·  TATİLSEPETİ AR-GE  ·  BİTİRME PROJESİ")
         self.setFont(F_ITALIC, 7.5)
         self.setFillColor(MUTED)
-        self.drawRightString(w - 18 * mm, h - 10 * mm, "İki Katmanlı ASR & LLM Değerlendirme Raporu")
+        self.drawRightString(w - 18 * mm, h - 10 * mm, "Üç Katmanlı ASR · LLM · Video Canlandırma Değerlendirme Raporu")
         self.setStrokeColor(LINE)
         self.setLineWidth(0.4)
         self.line(18 * mm, h - 11.5 * mm, w - 18 * mm, h - 11.5 * mm)
@@ -454,7 +463,7 @@ def build_thesis_pdf():
         rightMargin=margin,
         topMargin=15 * mm,
         bottomMargin=15 * mm,
-        title="Çok Dilli Eğitim İçin ASR ve LLM Tabanlı Terminoloji Çıkarma Sistemlerinin İki Katmanlı Değerlendirilmesi",
+        title="Çok Dilli Eğitim İçin ASR, LLM Tabanlı Terminoloji Çıkarma ve Üretken Video Canlandırma Katmanlarının Üç Katmanlı Değerlendirilmesi",
         author="Ali Ayhan Günder",
         subject="Bitirme Projesi Raporu - Boğaziçi Üniversitesi Bilgisayar Mühendisliği Bölümü",
     )
@@ -474,8 +483,8 @@ def build_thesis_pdf():
 
     story.append(
         Paragraph(
-            "Çok Dilli Eğitim İçin Konuşma Tanıma (ASR) ve Büyük Dil Modeli (LLM) Tabanlı "
-            "Terminoloji Çıkarma Sistemlerinin İki Katmanlı Değerlendirilmesi",
+            "Çok Dilli Eğitim İçin Konuşma Tanıma (ASR), Büyük Dil Modeli (LLM) Tabanlı Terminoloji Çıkarma ve "
+            "Üretken Video Canlandırma Katmanlarının Üç Katmanlı Değerlendirilmesi",
             STYLES["cover_title"],
         )
     )
@@ -502,7 +511,7 @@ def build_thesis_pdf():
             Paragraph("<b>İmza / Onay</b>", STYLES["table_header"]),
         ],
         [
-            Paragraph("Tez Danışmanı", STYLES["table_cell_bold"]),
+            Paragraph("<b>Prof. Dr. Fatih Alagöz</b><br/><font size='8' color='#64748b'>Tez Danışmanı</font>", STYLES["table_cell"]),
             Paragraph("Boğaziçi Üniversitesi Bilgisayar Müh.", STYLES["table_cell"]),
             Paragraph("....................................", STYLES["table_cell_center"]),
         ],
@@ -548,17 +557,24 @@ def build_thesis_pdf():
             "zengin bir bilgi havuzu sunmaktadır. Ancak uzmanlık gerektiren ders ve eğitim videoları, dinleyicilerin belirli bir "
             "ön bilgiye sahip olduğu varsayımıyla sunulmakta; bu durum başlangıç düzeyindeki öğrenciler için terminolojik ve kavramsal "
             "anlama engelleri oluşturmaktadır. Bu bitirme çalışmasında, çok dilli (Türkçe ve İngilizce) eğitim konuşmalarını yeni başlayanlar "
-            "için erişilebilir kılmayı amaçlayan, hazır (off-the-shelf) otomatik konuşma tanıma (ASR) ve büyük dil modeli (LLM) bileşenlerinin "
-            "iki katmanlı deneysel değerlendirmesi gerçekleştirilmiştir.<br/><br/>"
+            "için erişilebilir kılmayı amaçlayan, hazır (off-the-shelf) otomatik konuşma tanıma (ASR), büyük dil modeli (LLM) ve üretken "
+            "video canlandırma bileşenlerinin üç katmanlı deneysel değerlendirmesi gerçekleştirilmiştir.<br/><br/>"
             "Birinci katmanda, modern konuşma tanıma mimarileri (Whisper Medium, Large-v3, Large-v3 Turbo, Türkçe uyarlanmış Whisper Turbo, "
             "Qwen3-ASR 0.6B/1.7B ve NVIDIA Nemotron 3.5 ASR) kelime hata oranı (WER), karakter hata oranı (CER), gecikme ve gerçek zamanlılık "
-            "katsayısı (RTF) açısından test edilmiştir. İkinci katmanda, transkripsiyon çıktıları LLM katmanına (GPT-4.1, GPT-4o-mini, "
+            "katsayısı (RTF) açısından GPU üzerinde altın referanslarla test edilmiştir. Yedi klibin tamamında ölçülen akustik ön-işleme "
+            "müdahaleleri (enerji tabanlı VAD, terim alan koşullama, LLM düzeltme) makro WER'i ham tabanın aşağısına <b>indirememiştir</b> "
+            "(TR 0,021 &rarr; 0,134); koşullama kademesi altın listeyi girdiye enjekte ettiği için ayrıca ölçüm sızıntısıdır. "
+            "İkinci katmanda, transkripsiyon çıktıları LLM katmanına (GPT-4.1, GPT-4o-mini, "
             "Qwen3.5 modelleri) beslenerek alana özgü çok kelimeli terminolojinin tespiti ve CEFR B1 düzeyinde açıklamaların üretimi sağlanmıştır. "
             "Semantik çıktılar; bağlam uyumluluğu (<i>R</i>) ve açıklama doğruluğu (<i>D</i>) boyutlarında değerlendirilmiştir. "
+            "Üçüncü katmanda semantik çıkarım, açık kaynaklı Manimator mimarisi uyarlanarak üretken video canlandırmaya genişletilmiştir; bu katman "
+            "yalnız <b>işlerlik kanıtıdır</b> (diskteki 7 render 22,3-41,8 sn) ve kıyaslanmamıştır. "
             "115 terimlik çift-etiketleme kümesi üzerinde iki bağımsız değerlendirici ile Cohen'in kappa katsayısı hesaplanmış; "
-            "bağlam uyumluluğunda <b>&kappa;<sub>R</sub> = 0.782</b> (belirgin uyum), açıklama doğruluğunda ise <b>&kappa;<sub>D</sub> = 1.000</b> elde edilmiştir. "
-            "Sonuç olarak, yüksek doğruluk senaryolarında Whisper Large-v3 + GPT-4.1/Qwen 9B; düşük gecikme ve yerel çalıştırma senaryolarında ise "
-            "Whisper Turbo + Qwen3.5-4B (RTX 5060 GPU üzerinde 39.55 s işlem süresi ile) en uygun dağıtım ikilileri olarak belirlenmiştir.",
+            "bağlam uyumluluğunda <b>&kappa;<sub>R</sub> = 0.782</b> (belirgin uyum), açıklama doğruluğunda ise <b>&kappa;<sub>D</sub> = 1.000</b> elde edilmiştir "
+            "(P<sub>e</sub> &asymp; 0,949 tekdüzeliği nedeniyle asıl ayırt edici gösterge &kappa;<sub>R</sub>'dir). "
+            "Sonuç olarak doğruluk ve hız eşleştirmeleri <b>dağıtılmış sistemler değil, ölçümlerden türetilmiş aday yapılardır</b>: "
+            "doğruluk için Whisper Large-v3 + GPT-4.1, yerel/hız için Whisper Turbo + Qwen3.5-4B (ölçülen klip başına 39,55 s, tepe cihaz "
+            "doluluğu 5,26 GB). Öğrenme kazanımı bu çalışmada ölçülmemiştir.",
             STYLES["abstract_body"],
         )
     )
@@ -566,7 +582,7 @@ def build_thesis_pdf():
     story.append(
         Paragraph(
             "<b>Anahtar Kelimeler:</b> Otomatik Konuşma Tanıma (ASR), Büyük Dil Modelleri (LLM), Terminoloji Çıkarma, "
-            "Çok Dilli Eğitim Teknolojileri, Whisper, Qwen3-ASR, Cohen'in Kappa Katsayısı, İki Katmanlı Değerlendirme.",
+            "Çok Dilli Eğitim Teknolojileri, Whisper, Qwen3-ASR, Cohen'in Kappa Katsayısı, Üç Katmanlı Değerlendirme.",
             STYLES["keywords"],
         )
     )
@@ -576,19 +592,27 @@ def build_thesis_pdf():
     story.append(HRFlowable(width="100%", thickness=1.0, color=ACCENT, spaceBefore=0, spaceAfter=3 * mm))
     story.append(
         Paragraph(
-            "<b>A Two-Layer Evaluation of Speech-to-Text and LLM-Based Terminology Extraction Systems for Multilingual Education</b><br/>"
+            "<b>A Three-Layer Evaluation of Speech-to-Text, LLM-Based Terminology Extraction, and Generative Video-Animation Systems for Multilingual Education</b><br/>"
             "Digital video-based instruction provides immense learning opportunities, yet specialized educational lectures inherently assume "
             "baseline domain familiarity, confronting beginner learners with substantial terminological friction. This graduation thesis presents "
-            "a comprehensive, two-layer experimental benchmark of commercial and open-weight Automatic Speech Recognition (ASR) and Large Language "
-            "Model (LLM) architectures for making multilingual (Turkish and English) educational lectures accessible. In the first layer, leading ASR "
-            "systems (Whisper Medium, Large-v3, Large-v3 Turbo, Turkish-matched Turbo, and Qwen3-ASR 0.6B / 1.7B) are systematically benchmarked "
+            "a comprehensive, three-layer experimental evaluation of commercial and open-weight Automatic Speech Recognition (ASR), Large Language "
+            "Model (LLM) and generative video-animation architectures for making multilingual (Turkish and English) educational lectures accessible. In the first layer, leading ASR "
+            "systems (Whisper Medium, Large-v3, Large-v3 Turbo, Turkish-matched Turbo, Qwen3-ASR 0.6B / 1.7B, and NVIDIA Nemotron 3.5 ASR) are systematically benchmarked "
             "across raw/normalized Word Error Rate (WER), Character Error Rate (CER), latency, and Real-Time Factor (RTF). In the second layer, "
             "transcripts are fed to LLMs to extract domain-specific terminology and generate beginner-friendly, CEFR-B1 explanations. Evaluation "
             "references were established across 7 lectures (~95 minutes) via human-corrected gold transcripts. Human evaluation reliability was "
             "validated via double-annotated Cohen's kappa (<i>N</i>=115), achieving <b>&kappa;<sub>R</sub> = 0.782</b> (substantial agreement on context consistency) "
-            "and <b>&kappa;<sub>D</sub> = 1.000</b> (definition accuracy). Acoustic error propagation benchmarked degraded front-ends into fixed Qwen3.5-4B, "
-            "confirming that higher front-end WER halves downstream terminology precision. Finally, a local FastAPI-based interactive studio was developed "
-            "to validate the complete pipeline locally.",
+            "and <b>&kappa;<sub>D</sub> = 1.000</b> (definition accuracy; &kappa;<sub>D</sub> is a prevalence artefact at "
+            "P<sub>e</sub> &asymp; 0.949, so &kappa;<sub>R</sub> is the discriminating statistic). A fixed-LLM ablation over "
+            "clean Whisper hypotheses shows that semantic consistency does not collapse at low WER; feeding degraded front-ends "
+            "into fixed Qwen3.5-4B is reported as a <b>relational observation on single clips</b> (TR-1 precision falls to 50.0%), "
+            "not as a measured end-to-end error-propagation curve and not as causality. The measured acoustic interventions "
+            "(energy VAD, terminology biasing, LLM post-correction) <b>did not lower</b> macro WER below the raw baseline on any "
+            "of the 7 clips (TR 0.021 &rarr; 0.134), and the biasing stage leaks the gold term list. Finally, a third "
+            "generative video-animation layer was built and is reported as a <b>feasibility</b> result only: the 7 renders on disk "
+            "measure 22.3-41.8 s, and neither animation latency, audio-visual sync, gaze-tracking accuracy nor any learning "
+            "outcome was measured. A local FastAPI-based interactive studio demonstrates the pipeline end to end; it is a PoC, "
+            "not a deployed product.",
             STYLES["abstract_body"],
         )
     )
@@ -629,8 +653,10 @@ def build_thesis_pdf():
     story.append(
         Paragraph(
             "Bu projenin temel amacı; sesli ve görüntülü eğitim içeriklerini anlayan, transkribe eden, içerisindeki zorlayıcı teknik terimleri "
-            "tespit edip başlangıç düzeyindeki öğrencilerin anlayacağı seviyede (CEFR B1) otomatik açıklamalar üreten iki katmanlı bir yapay zekâ "
-            "boru hattını bilimsel titizlikle tasarlamak, deneysel olarak değerlendirmek ve çalışan bir yerel prototip stüdyosu haline getirmektir.<br/><br/>"
+            "tespit edip başlangıç düzeyindeki öğrencilerin anlayacağı seviyede (CEFR B1) otomatik açıklamalar üreten ve bu açıklamaları animasyonlu "
+            "bir videoya dönüştürebilen üç katmanlı bir yapay zekâ "
+            "boru hattını bilimsel titizlikle tasarlamak, ilk iki katmanını ölçerek değerlendirmek, üçüncüsünü işlerlik kanıtı olarak belgelemek "
+            "ve çalışan bir yerel prototip stüdyosu haline getirmektir.<br/><br/>"
             "Çalışma kapsamında yanıt aranan temel araştırma soruları (Research Questions) şunlardır:",
             STYLES["body"],
         )
@@ -655,8 +681,9 @@ def build_thesis_pdf():
         Paragraph(
             "<b>2.1 Otomatik Konuşma Tanıma (ASR):</b> Baevski ve ark. (2020) ham ses dalga formlarından özdenetimli gösterim öğrenen "
             "Wav2Vec 2.0 ve çok dilli türevi XLSR-53 mimarilerini sunmuştur. Radford ve ark. (OpenAI, 2023), 680.000 saatlik veriyle zayıf "
-            "denetimli Whisper mimarisini geliştirmiştir. 2024 yılında sunulan Whisper Turbo ise dekoder katmanlarını 32'den 4'e düşürerek 8 kata "
-            "varan hızlanma sağlamıştır. 2026 yılında sunulan Qwen3-ASR (Alibaba) ve NVIDIA Nemotron 3.5 ise açık ağırlıklı çok dilli alternatifler "
+            "denetimli Whisper mimarisini geliştirmiştir. 2024 yılında sunulan Whisper Turbo ise dekoder katmanlarını 32'den 4'e düşürmüştür; "
+            "üreticinin '8 kata varan hızlanma' ifadesi bir satıcı iddiasıdır — bu çalışmada aynı ana makinede ölçülen havuzlanmış duvar saati "
+            "hızlanması Türkçede 3,4 kat, İngilizcede 7,7 kattır. 2026 yılında sunulan Qwen3-ASR (Alibaba) ve NVIDIA Nemotron 3.5 ise açık ağırlıklı çok dilli alternatifler "
             "olarak öne çıkmaktadır.<br/><br/>"
             "<b>2.2 Otomatik Terminoloji Çıkarma (ATE):</b> C-value/NC-value ve TF-IDF tabanlı istatistiksel yöntemlerden LiTeWi (Conde ve ark., 2016) "
             "gibi eğitimsel ontoloji çıkarma sistemlerine uzanan literatür, son dönemde büyük dil modellerinin (Tran ve ark., 2026) çok kelimeli terimleri "
@@ -673,8 +700,9 @@ def build_thesis_pdf():
     story.append(Paragraph("3. Sistem Mimarisi ve Yöntem", STYLES["h1"]))
     story.append(
         Paragraph(
-            "Çalışmada incelenen sistem iki ana işleme katmanından ve bunları pratik bir gösterim ortamında birleştiren etkileşimli bir yerel web "
-            "stüdyosundan oluşmaktadır:",
+            "Çalışmada incelenen sistem üç işleme katmanından oluşur: ölçülen iki katman (ASR ve LLM) ile yalnız işlerlik kanıtı olarak "
+            "değerlendirilen üçüncü katman (üretken video canlandırma). Katmanlar pratik bir gösterim ortamında etkileşimli bir yerel web "
+            "stüdyosunda birleştirilir:",
             STYLES["body"],
         )
     )
@@ -683,11 +711,18 @@ def build_thesis_pdf():
     story.append(Spacer(1, 3 * mm))
     story.append(
         Paragraph(
-            "<b>3.1 Katman 1 (ASR):</b> Ses dosyaları 16 kHz mono PCM WAV standardına dönüştürülür. 30 saniyelik örtüşmesiz pencereler üzerinden "
-            "ardışık çıkarım (sequential generate) ve zaman damgası tespiti uygulanır. Çıktılar hem ham hem de normalize edilmiş biçimde saklanır.<br/>"
+            "<b>3.1 Katman 1 (ASR):</b> Ses dosyaları 16 kHz mono PCM WAV standardına dönüştürülür (gürültü giderme, kesme veya elle ses "
+            "düzenlemesi yapılmamıştır). Kıyaslama yolunda Whisper ailesi <b>tüm ses üzerinde</b> ardışık <code>generate()</code> ile koşar; "
+            "sabit 30 saniyelik dilimleme yalnızca arayüz (GUI) yoluna ve Qwen3-ASR'ye aittir, Nemotron 60 saniyelik parçalar kullanır. "
+            "Üretim bütçesi Whisper'ın 448'lik hedef konumuyla sınırlıdır (<code>max_new_tokens=440</code>; <code>prompt_ids</code> verildiğinde "
+            "önek uzunluğu ve 16 belirteç düşülerek kırpılır). Çıktılar hem ham hem de normalize edilmiş biçimde saklanır.<br/>"
             "<b>3.2 Katman 2 (LLM):</b> Transkript metni sabitlenmiş bir sistem yönlendirmesiyle (system prompt) LLM katmanına beslenir. "
             "Modelden ders bağlamına tam uyumlu teknik terimleri (çok kelimeli ifadeler dahil) tespit etmesi ve CEFR B1 düzeyinde sade bir "
-            "tanım üretmesi istenir; çıktı kesin JSON formatında yapılandırılır.",
+            "tanım üretmesi istenir; çıktı kesin JSON formatında yapılandırılır.<br/>"
+            "<b>3.3 Katman 3 (Üretken Video Canlandırma, işlerlik kanıtı):</b> seçili terimin çevresindeki <code>[t&minus;45 sn, t+10 sn]</code> "
+            "bağlam penceresi yerel Qwen3.5-4B'ye verilir; model senaryo + Manim kodu üretir, <code>ast</code> allow-list denetimi ve azami 2 "
+            "kendini-onarma denemesinden sonra <code>manim -ql</code> (480p15) + Edge-TTS + FFmpeg ile MP4 derlenir. Bu katman kıyaslanmamıştır; "
+            "üretim gecikmesi, ses-görüntü senkronu ve öğrenme etkisi ölçülmemiştir.",
             STYLES["body"],
         )
     )
@@ -696,8 +731,10 @@ def build_thesis_pdf():
     story.append(Paragraph("4. Veri Kümesi ve Doğrulama Protokolü", STYLES["h1"]))
     story.append(
         Paragraph(
-            "Değerlendirme kümesi, dengeli terminolojik yüke sahip yedi farklı üniversite ve uzmanlık eğitim videosundan derlenmiştir "
-            "(toplam ~95 dakika, 13,599 kelime):",
+            "Değerlendirme kümesi beş farklı disiplinden yedi hazırlanmış/senaryolu tek konuşmacılı eğitim videosundan derlenmiştir "
+            "(yerel WAV'lar toplam 95,6 dk; altın referanslarda 13.467 kelime). Orijinal metindeki 'dengeli terminolojik yük' ifadesinin "
+            "nasıl ölçüldüğü kayıtlı değildir ve bu çalışmada yeniden ölçülmemiştir; küme seçimi ölçülmüş bir yoğunluk dengesine değil, "
+            "disiplin çeşitliliğine dayanır (<code>experiments/data/DATASET_CARD.md</code>):",
             STYLES["body"],
         )
     )
@@ -706,14 +743,14 @@ def build_thesis_pdf():
     # Dataset table
     ds_headers = ["Kod", "Dil", "Ders / Video Başlığı", "Alan / Disiplin", "Süre", "Kelime"]
     ds_rows = [
-        ["TR-1", "TR", "AÖF Proje Yönetimi — Ünite 7 Konu Anlatımı", "Proje Yönetimi", "12:00", "1,466"],
-        ["TR-2", "TR", "Turist Rehberleri İçin Kapsamlı Turizm Eğitimi", "Turizm", "11:17", "1,489"],
-        ["TR-3", "TR", "Tirendaz AI Veri Bilimi Nedir, Python", "Veri Bilimi", "14:15", "1,841"],
-        ["EN-1", "EN", "Grow with Google: Intro to Agile Methodologies", "Çevik Yöntemler", "13:17", "2,137"],
-        ["EN-2", "EN", "What is Sustainable Tourism? (Hayley Stainton)", "Sürdürülebilir Turizm", "09:16", "1,424"],
-        ["EN-3", "EN", "Generative AI in a Nutshell (Henrik Kniberg)", "Üretken Yapay Zekâ", "17:57", "2,875"],
-        ["EN-4", "EN", "Understanding Thermal Radiation (Efficient Eng.)", "Isı Transferi / Fizik", "17:33", "2,367"],
-        ["Toplam", "—", "<b>7 Video Dersi</b>", "<b>5 Farklı Disiplin</b>", "<b>~95 dk</b>", "<b>13,599</b>"],
+        ["TR-1", "TR", "AÖF Proje Yönetimi — Ünite 7 Konu Anlatımı", "Proje Yönetimi", "12:01", "1,256"],
+        ["TR-2", "TR", "Turist Rehberleri İçin Kapsamlı Turizm Eğitimi", "Turizm", "11:17", "1,464"],
+        ["TR-3", "TR", "Tirendaz AI Veri Bilimi Nedir, Python", "Veri Bilimi", "14:15", "1,583"],
+        ["EN-1", "EN", "Grow with Google: Intro to Agile Methodologies", "Çevik Yöntemler", "13:17", "2,168"],
+        ["EN-2", "EN", "What is Sustainable Tourism? (Hayley Stainton)", "Sürdürülebilir Turizm", "09:16", "1,267"],
+        ["EN-3", "EN", "Generative AI in a Nutshell (Henrik Kniberg)", "Üretken Yapay Zekâ", "17:57", "3,459"],
+        ["EN-4", "EN", "Understanding Thermal Radiation (Efficient Eng.)", "Isı Transferi / Fizik", "17:33", "2,270"],
+        ["Toplam", "—", "<b>7 Video Dersi</b>", "<b>5 Farklı Disiplin</b>", "<b>95,6 dk</b>", "<b>13,467</b>"],
     ]
     story.append(make_styled_table(ds_headers, ds_rows, [35, 25, 175, 125, 45, 50], align_centers=[0, 1, 4, 5]))
     story.append(Spacer(1, 2.5 * mm))
@@ -772,18 +809,24 @@ def build_thesis_pdf():
 
     story.append(
         Paragraph(
-            "<b>ASR Katmanı Çıkarımları:</b> Whisper Large-v3 en düşük hata oranına (TR 0.021 / EN 0.010) sahipken; Whisper Turbo 4–8 kat "
-            "daha hızlı çalışarak (RTF 0.025–0.044) gerçek zamanlı konuşma uygulamaları için ideal performans sunmaktadır. "
+            "<b>ASR Katmanı Çıkarımları:</b> Whisper Large-v3 en düşük hata oranına (TR 0.021 / EN 0.010) sahipken; Whisper Turbo aynı ana makinede "
+            "havuzlanmış duvar saati süresine göre Türkçede 3,4 kat (110,56 sn -> 32,53 sn), İngilizcede 7,7 kat (170,72 sn -> 22,10 sn) daha hızlı "
+            "çıkarım yapmaktadır (ölçülen RTF 0,025 EN / 0,044 TR; bedeli Türkçede WER'in 0,021'den 0,037'ye çıkmasıdır). Üreticinin '4-8 kat' "
+            "aralığı bu çalışmada ölçülmediği için burada kullanılmamıştır. Gerçek zamanlılık iddiası bu RTF ölçümüyle sınırlıdır: boru hattın "
+            "uçtan uca etkileşim gecikmesi ölçülmemiştir. "
             "10,000 örneklemeli bootstrap güven aralıkları, küçük örneklem boyutuna bağlı varyansı açıkça belgelemektedir.",
             STYLES["body"],
         )
     )
 
-    story.append(Paragraph("6.2 Semantik Katman, Kapalı Altın Recall ve Akustik Hata Yayılımı", STYLES["h2"]))
+    story.append(Paragraph("6.2 Semantik Katman ve Kapalı Altın Recall (Ön Uç WER'si Sabit LLM ile Eşleştirildi)", STYLES["h2"]))
     story.append(
         Paragraph(
-            "TR-1 ve EN-1 dersleri için oluşturulan kapalı altın sözlükler (N=32 terim) üzerinden kesinlik, duyarlılık (recall) ve F1 skorları hesaplanmış; "
-            "aynı zamanda bozulmuş ASR hipotezleri sabit Qwen3.5-4B modeline beslenerek akustik hataların yayılımı ölçülmüştür:",
+            "TR-1 ve EN-1 dersleri için oluşturulan kapalı altın sözlükler (N=32 terim) üzerinden kesinlik, duyarlılık (recall) ve F1 skorları "
+            "hesaplanmış; aynı LLM'i (Qwen3.5-4B) sabitleyip farklı ASR hipotezleri beslenerek ön uç hatası ile semantik kapsam arasındaki "
+            "<b>ilişkisel</b> gözlem elde edilmiştir. Yedi kliplik küçüğümüzde <b>ölçülmüş bir hata-yayılım eğrisi yoktur</b> (WER'ı sistematik "
+            "olarak bozulmuş girdiler üretip tekrar koşmadık); ayrıca kapsam WER'a <b>monoton</b> değildir: TR-1'de duyarlılık Large-v3 (0,016) "
+            "için %25,0 iken Nemotron (0,117) için %28,1'dir:",
             STYLES["body"],
         )
     )
@@ -794,8 +837,8 @@ def build_thesis_pdf():
         ["Whisper Large-v3", "Qwen3.5-4B", "TR-1", "12", "8", "66.7%", "25.0%", "36.4%", "0.016 (Düşük WER)"],
         ["Turkish Turbo (FT)", "Qwen3.5-4B", "TR-1", "8", "7", "87.5%", "21.9%", "35.0%", "0.035 (Orta WER)"],
         ["Nemotron 3.5 ASR", "Qwen3.5-4B", "TR-1", "9", "9", "100.0%", "28.1%", "43.9%", "0.117 (Yüksek WER)"],
-        ["Qwen3-ASR 0.6B", "Qwen3.5-4B", "TR-1", "10", "5", "50.0%*", "15.6%*", "23.8%", "0.136 (Bozulmuş)"],
-        ["Altın Referans", "Qwen3.5-9B", "TR-1", "16", "15", "93.8%", "46.9%", "62.5%", "0.000 (Altın Ref)"],
+        ["Qwen3-ASR 0.6B", "Qwen3.5-4B", "TR-1", "10", "5", "50.0%", "15.6%", "23.8%", "0.136 (En yüksek TR ön uç hatası)"],
+        ["Girdi loglanmadı †", "Qwen3.5-9B", "TR-1", "16", "15", "93.8%", "46.9%", "62.5%", "kayıtlı değil †"],
         ["Whisper Large-v3", "Qwen3.5-4B", "EN-1", "21", "18", "85.7%", "56.2%", "67.9%", "0.006 (Düşük WER)"],
         ["Qwen3-ASR 0.6B", "Qwen3.5-4B", "EN-1", "18", "16", "88.9%", "50.0%", "64.0%", "0.009 (Düşük WER)"],
     ]
@@ -803,9 +846,13 @@ def build_thesis_pdf():
     story.append(Spacer(1, 2 * mm))
     story.append(
         Paragraph(
-            "*<b>Kritik Hata Yayılımı Bulgusu:</b> Qwen3-ASR 0.6B gibi ön uç WER'i %13.6 seviyesine çıkan bozulmuş transkriptlerde "
-            "LLM terim çıkarma kesinliği %50.0'ye (yarı yarıya) ve duyarlılık %15.6'ya gerilemektedir. Bu durum, konuşma tanıma hatalarının "
-            "alt katmanda doğrudan terim kaybı ve halüsinasyona yol açtığını deneysel olarak kanıtlamaktadır.",
+            "<b>İlişkisel gözlem, nedesellik değil:</b> tek bir Türkçe klipte (TR-1) en yüksek ön uç hatasına sahip Qwen3-ASR 0.6B beslemesinde "
+            "kesinlik %50.0'e, duyarlılık %15.6'ya gerilemiştir; bu, yüksek ASR hatasının semantik kapsamı zedeleyen <b>eğilimi</b>yle tutarlıdır. "
+            "Ancak tek kliplik (TR-1) ve 32 terimlik kapalı listeyle bu bir yayılım eğrisi ya da nedesel kanıt değildir; nitekim aynı tabloda Nemotron "
+            "(WER 0,117) Large-v3'ten (WER 0,016) <b>daha yüksek</b> duyarlılık (%28,1 / %25,0) vermektedir. "
+            "† <b>Qwen3.5-9B satırı:</b>hangi transkriptin beslendiği <code>outputs/llm-20260913-210556.jsonl</code> içinde loglanmadığı için bu hücre "
+            "bir ASR ön uç etkisi olarak okunamaz ve altın listeyle beslendiği de iddia edilmez; satır yalnız 9B'nin kapalı listeye göre çıkarım "
+            "kapasitesini gösterir (kağıt üzerindeki karşılığı: <code>tables/gold_recall.tex</code>, 'Input not logged').",
             STYLES["body"],
         )
     )
@@ -814,15 +861,24 @@ def build_thesis_pdf():
     story.append(Paragraph("7. Donanım, Bellek Darboğazı ve Gecikme Profili", STYLES["h1"]))
     story.append(
         Paragraph(
-            "Deneysel çalışmalar Boğaziçi Üniversitesi Bilgisayar Mühendisliği Bölümü bünyesinde aşağıdaki laboratuvar donanımında yürütülmüştür:<br/>"
+            "Tüm deneysel koşular tek bir tüketici sınıfı dizüstü iş istasyonunda gerçekleştirilmiştir; donanım ve yazılım imzaları "
+            "<code>experiments/check_env.py</code> ile yeniden doğrulanabilir. Kuruma tahsis edilmiş bir laboratuvar kümesi veya eşdeğer "
+            "iş istasyonu kullanılmamıştır:<br/>"
             "&bull; <b>İşlemci:</b> Intel Core i7-14650HX (16 Çekirdek, 24 İş Parçacığı, 5.2 GHz Turbo)<br/>"
             "&bull; <b>Grafik İşlemci (GPU):</b> NVIDIA GeForce RTX 5060 Laptop GPU (8 GB GDDR6 VRAM, CUDA 13.0)<br/>"
             "&bull; <b>Sistem Belleği:</b> 32 GB DDR5 &bull; <b>Yazılım:</b> Windows 11 64-bit, Python 3.12, PyTorch 2.12.0+cu130, ReportLab 4.4+.<br/><br/>"
-            "<b>8 GB VRAM Tüketici Donanımında Gecikme Sonucu:</b><br/>"
-            "4-bit NF4 kuantize edilmiş <b>Qwen3.5-4B</b> modeli 8 GB VRAM bütçesine tamamen sığmakta ve tam bir ders klibini "
-            "<b>39.55 saniyede</b> (s.d. 2.11 s) tamamlamaktadır. Buna karşın, üstün terminoloji duyarlılığı (%46.9) sunan <b>Qwen3.5-9B</b> modeli, "
-            "uzun bağlam üretiminde 8 GB VRAM sınırını aşarak ana sistem belleğine (RAM) disk/PCIe aktarımı (offloading) yapmakta ve işlem süresi "
-            "<b>513.19 saniyeye (~8.6 dakika)</b> fırlamaktadır (13 kat gecikme artışı). Bu nedenle dizüstü ve uç cihazlarda Qwen3.5-4B tartışmasız üretim tercihidir.",
+            "<b>8 GB VRAM Tüketici Donanımında Gecikme Sonucu (ölçülmüş):</b><br/>"
+            "4-bit NF4 kuantize edilmiş <b>Qwen3.5-4B</b> modelinin ölçülen tepe cihaz doluluğu 5,26 GB "
+            "(ağırlıklar 3,08 GB, torch ayırıcısı 4,72 GB; <code>outputs/local_vram_probe.json</code>) ve Large-v3 "
+            "beslemesinde tam bir ders klibini <b>39.55 saniyede</b> (s.d. 2.11 s, n=3 TR klibi) tamamlamaktadır. "
+            "<b>Qwen3.5-9B</b> ise kayıtlı iki Türkçe klipte ortalama <b>513.19 saniyede (~8.6 dakika)</b> koşmuştur "
+            "(s.d. 269.97 s; 4B'nin 3 kliplik TR ortalamasına oranlandığında ~13 kat, ancak iki hücre farklı klip "
+            "kümelerine dayanır). Bu koşuda 8 GB sınırının aşıldığı gözlenmiştir; <b>kaç GB VRAM gerektirdiği ölçülmemiştir</b> "
+            "ve bu satır bir sunucu gereksinimi iddiası olarak okunmamalıdır. 9B'nin ürettiği terim listelerinin "
+            "<b>hangi transkript girdisinden</b> geldiği <code>llm-20260913-210556.jsonl</code> içinde loglanmadığı için "
+            "(%46.9 TR-1 duyarlılık hücresi) o değer bir ön uç etkisi olarak kullanılamaz.<br/><br/>"
+            "Sonuç: tek 8 GB sınıfı dizüstü GPU'da 4B'nin klip başına onlarca saniyede koşabildiği <b>ölçülmüştür</b>; "
+            "bu, dağıtılmış bir üretim tercihi değil, diskteki ölçüme dayanan bir <b>aday</b> yapılandırmadır.",
             STYLES["body"],
         )
     )
@@ -834,24 +890,40 @@ def build_thesis_pdf():
             "Boru hattının uçtan uca uygulanabilirliğini sergilemek amacıyla FastAPI ve modern cam efektli (glassmorphism) Vanilla CSS/JS "
             "arayüzünden oluşan bir yerel demo stüdyosu (`experiments/gui/`, `python run_gui.py`) geliştirilmiştir.<br/>"
             "<b>Temel Yetenekler:</b> (a) `yt-dlp` ile YouTube video indirme; (b) doğrudan mikrofon kaydı ve yerel ses dosyası yükleme; "
-            "(c) video oynatıcıyla senkronize transkripsiyon gösterimi; (d) CEFR B1 düzeyinde anlık dinamik terim kartları ve modeller arası yan yana karşılaştırma.<br/>"
-            "<i>Not:</i> Bu arayüz ticari bir SaaS ürünü değil, açık CORS ve bellek içi iş kuyruğu kullanan yerel bir konsept kanıtlama (PoC) stüdyosudur.",
+            "(c) video oynatıcıyla senkronize transkripsiyon gösterimi; (d) CEFR B1 düzeyinde eşzamanlı dinamik terim kartları ve modeller arası yan yana karşılaştırma; "
+            "(e) 'Takıldığım Yeri Öğret' ile Katman 3 animasyon üretimi (diskteki 7 ürün <code>ffprobe</code> ile 22,3-41,8 sn, 854x480@15; tasarım hedefi olan "
+            "'30-90 sn' ölçülmüş bir çıktı özelliği değildir ve üretim çevrimdışı/batch'tir).<br/>"
+            "<i>Not:</i> Bu arayüz ticari bir SaaS ürünü değil, açık CORS ve bellek içi iş kuyruğu kullanan yerel bir konsept kanıtlama (PoC) stüdyosudur. "
+            "Webcam göz takibi kolu kodda vardır (<code>getUserMedia</code> + MediaPipe FaceMesh, CDN'den yüklenir; kamera yoksa simülasyon moduna düşer ve "
+            "sekme/pencere odağı ayrı bir dikkat sinyali üretir), ancak bakış doğruluğu ve oto-duraklamanın etkisi <b>ölçülmemiştir</b>; kareler kişisel veridir "
+            "(KVKK/GDPR) ve tarayıcıda kalır. GUI, Bölüm 6.1.1'de ölçülen enerji VAD parçalayıcısını kullanmaz (sabit 30 sn dilim, <code>gui/pipeline.py</code>). "
+            "Öğrenme kazanımı bu çalışmada ölçülmemiştir.",
             STYLES["body"],
         )
     )
 
     # SECTION 9
-    story.append(Paragraph("9. Sonuç, Kısıtlar ve Dağıtım Önerileri", STYLES["h1"]))
+    story.append(Paragraph("9. Sonuç, Kısıtlar ve Aday Yapılandırma Önerileri", STYLES["h1"]))
     story.append(
         Paragraph(
-            "<b>9.1 Dağıtım İkilileri:</b><br/>"
-            "1. <b>Pratik Yerel / Uç Cihaz (Consumer Edge):</b> Whisper Turbo + Qwen3.5-4B &rarr; Toplam gecikme 40–70 s, RTF 0.025–0.044, "
-            "sıfır harici API maliyeti, 8 GB VRAM bütçesine tam uyum. Canlı ders ve öğrenci araçları için idealdir.<br/>"
-            "2. <b>Yüksek Kapasite / Arşivleme (Server Batch):</b> Whisper Large-v3 + GPT-4.1 / Qwen 9B &rarr; En düşük WER (%1.0 EN / %2.1 TR), "
-            "en yüksek terim kapsamı (%46.9 TR-1 / %56.2 EN-1 duyarlılık). &ge;16 GB VRAM sunucu donanımı gerektirir.<br/><br/>"
+            "<b>9.1 Aday Boru Hattı Eşleştirmeleri:</b> aşağıdaki satırlar dağıtılmış sistemler değil, diskteki ölçümlerden türetilmiş "
+            "önerilerdir; hiçbirinin yük testi, eşzamanlı oturum testi veya saha değerlendirmesi yapılmamıştır.<br/>"
+            "1. <b>Yerel / Uç Cihaz Adayı:</b> Whisper Turbo + Qwen3.5-4B &rarr; ölçülen RTF 0,025 (EN) / 0,044 (TR). Aşama ortalamalarının "
+            "toplamı klip başına ~95 sn TR (32,53 sn ASR + 62,90 sn LLM) ve ~117 sn EN (22,10 sn + 94,60 sn); bu <b>aşama toplamlarıdır</b>, "
+            "uçtan uca ölçülmüş etkileşim gecikmesi değildir. Sıfır harici API maliyeti ve ölçülen 5,26 GB tepe cihaz doluluğu "
+            "(<code>outputs/local_vram_probe.json</code>).<br/>"
+            "2. <b>Doğruluk Adayı:</b> Whisper Large-v3 + GPT-4.1 &rarr; en düşük WER (0,021 TR / 0,010 EN) ve EN-1'de ölçülen en yüksek "
+            "duyarlılık (%56,2; Qwen3.5-4B ile). Qwen3.5-9B'nin %46,9'luk TR-1 hücresi girdi dizimi loglanmadığı için bu adayın dayanağı "
+            "değildir ve 9B'nin ihtiyaç duyduğu VRAM <b>ölçülmemiştir</b>; '16 GB gerekir' tipi bir sayısal eşik iddia edilmez.<br/>"
+            "3. <b>Akustik ön-işleme önerilmez:</b> enerji VAD, terim koşullama ve LLM düzeltme yedi klipte makro WER'i ham tabanın altına "
+            "indirmedi (TR 0,021 &rarr; 0,041 &rarr; 0,082 &rarr; 0,134); koşullama kademesi altın listeyi <code>prompt_ids</code> ile beslediği "
+            "için ayrıca sızıntıdır (<code>outputs/interventions_summary.json</code>).<br/><br/>"
             "<b>9.2 Temel Kısıtlar:</b> (1) Veri kümesi 7 video (95 dk) ile sınırlıdır; (2) Referanslar bağımsız çift-kör transkripsiyon değil, "
             "insan düzeltmeli taslaklardır; (3) Dil modellerinin duyarlılığı yalnızca TR-1 ve EN-1'deki kapalı altın sözlükler üzerinde ölçülebilmiştir; "
-            "(4) &kappa;<sub>D</sub> = 1.000 skoru yüksek sınıf tekdüzeliği (prevalence) nedeniyle &kappa;<sub>R</sub> = 0.782 kadar güçlü bir ayrım göstergesi değildir.<br/><br/>"
+            "(4) &kappa;<sub>D</sub> = 1.000 skoru yüksek sınıf tekdüzeliği (prevalence, P<sub>e</sub> &asymp; 0,949) nedeniyle &kappa;<sub>R</sub> = 0.782 kadar "
+            "güçlü bir ayrım göstergesi değildir; (5) kayıtların hiçbirinde akustik nicelik ölçülmedi, dolayısıyla klip zorluğu açıklanmış değil "
+            "gözlenmiş bir özelliktir; (6) LLM hakem ile insan etiketi arasında bir uyum/doğrulama testi yoktur, R1/D1 hakem-üretimi sayıdır; "
+            "(7) Katman 3 yalnız işlerlik kanıtıdır — üretim gecikmesi, ses-görüntü senkronu ve öğrenme etkisi ölçülmemiştir.<br/><br/>"
             "<b>9.3 Gelecek Çalışmalar:</b> Açık kaynaklı bir LMS (Moodle/Canvas) eklentisine dönüştürülmesi ve öğrencinin öğrenme geçmişini "
             "takip eden bir Bilgi Takip (Knowledge Tracing) modülü ile tam uyarlanabilir bir öğretici asistana evrilmesi planlanmaktadır.",
             STYLES["body"],
@@ -875,7 +947,7 @@ def build_thesis_pdf():
     story.append(bullets(refs))
 
     doc.build(story, canvasmaker=ThesisNumberedCanvas)
-    print(f"Built thesis PDF: {OUT_PDF}")
+    print(f"[legacy ReportLab renderer, superseded by md2tex.py + latexmk] built: {OUT_PDF}")
 
 
 if __name__ == "__main__":

@@ -60,6 +60,18 @@ Raw Transcript:
 Corrected Transcript:"""
 
 
+def get_gold_entries(clip_id: str) -> list[dict]:
+    """Full gold spec entries (canonical + aliases) for mention-level coverage."""
+    gold_path = ROOT / "data" / "gold_terms.json"
+    if not gold_path.exists():
+        return []
+    try:
+        data = json.loads(gold_path.read_text(encoding="utf-8"))
+        return list(data.get(clip_id, {}).get("terms", []))
+    except Exception:
+        return []
+
+
 def get_domain_context(clip_id: str) -> tuple[str, list[str]]:
     """Fetch topic title and canonical terms for a clip from gold_terms.json."""
     gold_path = ROOT / "data" / "gold_terms.json"
@@ -167,12 +179,137 @@ def compute_correction_delta(
     return report
 
 
+def gold_term_coverage(text: str, terms: Sequence[str]) -> float:
+    """Surface coverage of gold terms in a transcript.
+
+    This is deliberately NOT called F1: it counts how many canonical gold terms
+    are *mentioned* (canonical or any allowed alias, on token boundaries) and
+    cannot penalise spurious emissions.
+    """
+    if not terms:
+        return float("nan")
+    from eval_gold_terms import normalize_term
+
+    norm = normalize_term(text or "")
+    hits = 0
+    for entry in terms:
+        variants = [entry] if isinstance(entry, str) else [entry.get("canonical", ""), *entry.get("aliases", [])]
+        for variant in variants:
+            alias = normalize_term(variant or "")
+            if alias and re.search(r"(?:\b|^)" + re.escape(alias) + r"(?:\b|$)", norm):
+                hits += 1
+                break
+    return hits / len(terms)
+
+
+def _window_transcript(text: str, window_words: int) -> list[str]:
+    """Split on sentence boundaries into LLM-sized windows (correction is per-window)."""
+    sentences = re.split(r"(?<=[.!?])\s+", (text or "").strip())
+    windows: list[str] = []
+    buf: list[str] = []
+    count = 0
+    for s in sentences:
+        if not s.strip():
+            continue
+        buf.append(s.strip())
+        count += len(s.split())
+        if count >= window_words:
+            windows.append(" ".join(buf))
+            buf, count = [], 0
+    if buf:
+        windows.append(" ".join(buf))
+    return windows
+
+
+def run_correction_pass(
+    asr_path: Path,
+    output_path: Path,
+    model_id: str,
+    ids: Sequence[str] = (),
+    window_words: int = 180,
+    use_llm: bool = True,
+) -> None:
+    """Real correction experiment: ASR hypothesis -> windowed LLM correction -> WER delta."""
+    from gold_io import resolve_reference
+    from run_asr import load_manifest
+
+    manifest = {r["id"]: r for r in load_manifest(ROOT / "data" / "manifest.jsonl")}
+    rows = [json.loads(l) for l in asr_path.read_text(encoding="utf-8").splitlines() if l.strip()]
+
+    with output_path.open("w", encoding="utf-8") as fh:
+        for rec in rows:
+            cid = rec.get("id")
+            if ids and cid not in ids:
+                continue
+            hyp = (rec.get("hypothesis") or "").strip()
+            clip = manifest.get(cid, {})
+            reference = resolve_reference(clip)
+            if not hyp or not reference:
+                print(f"  {cid}: skipped (empty hypothesis or reference)", flush=True)
+                continue
+            lang = rec.get("lang") or clip.get("lang") or "tr"
+            topic, terms = get_domain_context(cid)
+            gold_entries = get_gold_entries(cid)
+            windows = _window_transcript(hyp, window_words)
+            corrected_parts: list[str] = []
+            latencies: list[float] = []
+            for w in windows:
+                t0 = time.perf_counter()
+                corrected_parts.append(
+                    correct_transcript(w, lang=lang, topic=topic, glossary_terms=terms,
+                                       model_id=model_id, use_llm=use_llm)
+                )
+                latencies.append(round(time.perf_counter() - t0, 2))
+                print(f"  {cid}: window {len(corrected_parts)}/{len(windows)} done "
+                      f"({latencies[-1]} s)", flush=True)
+            corrected = " ".join(p for p in corrected_parts if p).strip()
+
+            raw_m = pair_metrics(reference, hyp, lang=lang)
+            corr_m = pair_metrics(reference, corrected, lang=lang)
+            out = {
+                "id": cid,
+                "lang": lang,
+                "model": model_id,
+                "source_asr": rec.get("model"),
+                "use_llm": use_llm,
+                "windows": len(windows),
+                "window_words": window_words,
+                "correction_latency_s": latencies,
+                "raw_wer_norm": round(raw_m["wer_norm"], 5),
+                "corr_wer_norm": round(corr_m["wer_norm"], 5),
+                "delta_wer": round(raw_m["wer_norm"] - corr_m["wer_norm"], 5),
+                "raw_cer_norm": round(raw_m["cer_norm"], 5),
+                "corr_cer_norm": round(corr_m["cer_norm"], 5),
+                "raw_gold_coverage": round(gold_term_coverage(hyp, gold_entries), 4),
+                "corr_gold_coverage": round(gold_term_coverage(corrected, gold_entries), 4),
+                "gold_terms_available": len(gold_entries),
+                "corrected_text": corrected,
+            }
+            fh.write(json.dumps(out, ensure_ascii=False) + "\n")
+            fh.flush()
+            print(f"  {cid}: WER {out['raw_wer_norm']:.4f} -> {out['corr_wer_norm']:.4f} "
+                  f"(delta {out['delta_wer']:+.4f})", flush=True)
+    print(f"Written: {output_path}", flush=True)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="LLM-based ASR Error Correction")
     parser.add_argument("--clip", default="TR-1", help="Clip ID (e.g. TR-1 or EN-1)")
     parser.add_argument("--model", default="Qwen/Qwen3.5-4B", help="LLM for error correction")
+    parser.add_argument("--asr", type=Path, help="ASR JSONL whose hypotheses to correct (real run)")
+    parser.add_argument("--output", type=Path, help="Where to write the correction JSONL")
+    parser.add_argument("--ids", nargs="*", default=[], help="Restrict real run to these clip ids")
+    parser.add_argument("--window-words", type=int, default=180, help="Words per correction window")
+    parser.add_argument("--rule-based", action="store_true",
+                        help="Ablation: skip the LLM and use the pass-through normaliser")
     parser.add_argument("--test", action="store_true", help="Run self-test on corrupted sample")
     args = parser.parse_args()
+
+    if args.asr:
+        out = args.output or args.asr.with_name(args.asr.stem + ".corrected.jsonl")
+        run_correction_pass(args.asr, out, args.model, ids=args.ids,
+                            window_words=args.window_words, use_llm=not args.rule_based)
+        return
 
     if args.test:
         print("Running ASR Post-Correction self-test...")

@@ -175,6 +175,12 @@ def transcribe_whisper(model_id: str, audio_path: str, lang: str | None, args, c
     }
     if prompt_ids is not None:
         gen_kwargs["prompt_ids"] = prompt_ids
+        # Whisper caps decoder positions at 448; a long glossary prompt + 440 new
+        # tokens overflows it and generate() raises, so budget the prompt first.
+        budget = 448 - int(prompt_ids.shape[-1]) - 16
+        gen_kwargs["max_new_tokens"] = max(64, min(440, budget))
+        print(f"    [Domain Biasing]: prompt_ids={int(prompt_ids.shape[-1])} tok -> "
+              f"max_new_tokens={gen_kwargs['max_new_tokens']}", flush=True)
     if not getattr(args, "language_detect", False) and lang in {"tr", "en"}:
         gen_kwargs["language"] = lang
 
@@ -405,6 +411,9 @@ def decoding_config(args) -> dict:
         "torch": torch_ver,
         "cuda": cuda,
         "gpu": gpu,
+        "use_vad": bool(args.use_vad),
+        "prompt_glossary": bool(args.prompt_glossary),
+        "max_new_tokens": "440; clamped to 448 - prompt_len - 16 when prompt_ids are set",
     }
 
 

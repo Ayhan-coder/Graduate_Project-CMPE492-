@@ -392,15 +392,15 @@ def story():
     out.append(P("What Was Added and What Improved", "title"))
     out.append(
         P(
-            "A two-layer evaluation of speech-to-text and LLM-based terminology extraction "
-            "for multilingual education",
+            "A three-layer evaluation of speech-to-text, LLM-based terminology extraction "
+            "and generative video animation for multilingual education",
             "subtitle",
         )
     )
     out.append(
         P(
-            "Paper: <i>A Two-Layer Evaluation of Speech-to-Text and LLM-Based Terminology "
-            "Extraction Systems for Multilingual Education</i><br/>"
+            "Paper: <i>A Three-Layer Evaluation of Speech-to-Text, LLM-Based Terminology "
+            "Extraction, and Generative Video-Animation Systems for Multilingual Education</i><br/>"
             "Authors: Cakil Yilmaz (Koç University); Berat Enes Dadak, Efe Batur Giritli, "
             "Yekta Said Can (Tatilsepeti Ar-Ge)<br/>"
             "This report: 16 September 2026 (Pass 1 + Pass 2 + Pass 3 Final Empirical Milestones, Gold Standards & Double Annotation)  ·  "
@@ -424,9 +424,11 @@ def story():
             "2026 Hugging Face ASR refresh benchmarks, and double-annotated Cohen's kappa agreement. "
             "<b>Pass 3 completed the final thesis milestones</b>: 10,000-resample non-parametric bootstrap "
             "confidence intervals, word-weighted micro-WER, closed-gold terminology recall (N=32), "
-            "cross-layer acoustic error propagation into open-weight LLMs, latency/VRAM profiling on "
+            "a fixed-LLM cross-front-end ablation (four Whisper/2026 ASR hypotheses into the same "
+            "Qwen3.5-4B) rather than a measured error-propagation curve, latency profiling on "
             "consumer laptop hardware (RTX 5060 8GB), and an interactive local demonstration studio "
-            "(`experiments/gui/`).",
+            "(`experiments/gui/`). Peak memory was instrumented for one configuration only "
+            "(4-bit Qwen3.5-4B, `outputs/local_vram_probe.json`).",
             "sumbody",
         )
     )
@@ -453,7 +455,8 @@ def story():
                 [
                     "Double Annotation & Kappa",
                     "Added",
-                    "115 double-annotated terms: substantial context agreement (kappa_R = 0.782) and accuracy (kappa_D = 1.000).",
+                    "115 double-annotated terms: kappa_R = 0.782 (substantial) is the discriminative "
+                    "figure; kappa_D = 1.000 is a prevalence artefact (112 of 115 positive, P_e ~ 0.95).",
                 ],
                 [
                     "Bootstrap CIs & Micro-WER",
@@ -466,14 +469,18 @@ def story():
                     "Strict token-level Precision, Recall, and F1 on TR-1 and EN-1 without substring hallucination.",
                 ],
                 [
-                    "Acoustic Error Propagation",
+                    "Fixed-LLM Cross-Front-End Ablation",
                     "Added",
-                    "Feeding degraded ASR into Qwen3.5-4B reveals severe precision drop (87.5% -> 50.0%) and recall halving.",
+                    "Four ASR hypotheses into the same Qwen3.5-4B change closed-gold precision/recall, "
+                    "but NOT monotonically with WER (Nemotron, the most error-prone front-end, scores "
+                    "100.0% precision). Reported as variation across front-ends, not as a proven "
+                    "propagation law.",
                 ],
                 [
                     "Hardware Latency Profiling",
                     "Added",
-                    "RTX 5060 Laptop GPU: 4B NF4 executes in 39.55s in VRAM; 9B exceeds VRAM and thrashes RAM (513.19s).",
+                    "RTX 5060 Laptop GPU: 4B NF4 completes a clip call in 39.55 s; 9B took 513.19 s in a "
+                    "host-memory-offloaded configuration. Occupancy was measured for the 4B probe only.",
                 ],
                 [
                     "Interactive Demo Studio",
@@ -505,8 +512,16 @@ def story():
     out.append(P("2. What did not change", "h1"))
     out.append(
         P(
-            "These headline results are the same as in the original PDF. They were not "
-            "recomputed and they were not edited."
+            "These are the headline figures printed in the original six-page draft. They were not "
+            "recomputed for that draft and they were not edited out of it: Tables III–VI still carry "
+            "them, labelled as the historical CPU pilot. Two caveats belong on this table. "
+            "(a) The pilot ASR rows are <b>superseded, not confirmed</b>: the gold-rescored GPU "
+            "re-run reverses the Medium/Large-v3 ordering (Large-v3 0.021 TR / 0.010 EN against "
+            "Medium 0.049 / 0.011). "
+            "(b) The commercial-API R1% / D1% cells in the last two rows are <b>withdrawn from the "
+            "current paper</b>: no per-item rating sheet for GPT-4.1 or GPT-4o-mini exists anywhere in "
+            "the repository, so those cells now print em dashes. They appear here only as a record of "
+            "what the original draft claimed."
         )
     )
     out.append(
@@ -517,31 +532,31 @@ def story():
                     "ASR (pooled)",
                     "Whisper Medium",
                     "Normalized WER 0.021  ·  CER 0.015  ·  RTF 0.156",
-                    "Unchanged",
+                    "Pilot row kept (Table III)",
                 ],
                 [
                     "ASR (pooled)",
                     "Whisper Large-v3",
                     "Normalized WER 0.129  ·  CER 0.112  ·  RTF 0.703",
-                    "Unchanged",
+                    "Kept as history; GPU re-run gives 0.021 TR / 0.010 EN",
                 ],
                 [
                     "ASR (pooled)",
                     "Wav2Vec 2.0 / SpeechBrain",
                     "WER 0.548 / 0.382 (English-oriented checkpoints)",
-                    "Unchanged",
+                    "Not re-run on gold; printed as --- in the GPU table",
                 ],
                 [
                     "LLM",
                     "GPT-4.1",
                     "EN 105 terms, R1 96.2%, D1 99.0%; TR 78 terms, R1 96.2%",
-                    "Unchanged",
+                    "R1/D1 WITHDRAWN: no rating sheet on disk",
                 ],
                 [
                     "LLM",
                     "GPT-4o-mini",
                     "EN 56 terms, R1 91.1%; TR 36 terms, R1 91.7%; faster, stabler",
-                    "Unchanged",
+                    "R1 WITHDRAWN: no rating sheet on disk",
                 ],
             ],
             [28 * mm, 38 * mm, 82 * mm, 29 * mm],
@@ -618,7 +633,7 @@ def story():
                 ["Industry emails", "berat.dadak, batur.giritli, yekta.can @tatilsepeti.com", "{berat.dadak, batur.giritli, yekta.can}@tatilsepeti.com"],
                 ["Table I IDs", "ENG-1 wrapped across cells as E / NG-.", "EN-1 ... EN-4, no broken IDs."],
                 ["Table II", "Cramped; Latency / BLEU cells collided in the PDF.", "Readable yes / — protocol table by language."],
-                ["Figure 1", "Eraser export; caption named the drawing tool.", "TikZ two-layer pipeline. Caption describes the science, not the tool."],
+                ["Figure 1", "Eraser export; caption named the drawing tool.", "TikZ three-layer pipeline. Caption describes the science, not the tool."],
                 ["Figure 2 y-axis", "Turkish: “Hata Oranı”.", "English: “Normalized error rate”."],
                 ["Table VI caption", "Repeated min/max already shown in the table.", "Clean caption; min/max stay in the cells only."],
             ],
@@ -734,9 +749,10 @@ def story():
     out.append(P("4.8.1 Bootstrap Confidence Bounds and Word-Weighted Micro-WER", "h2"))
     out.append(
         P(
-            "Because lecture durations and acoustic environments vary substantially across the corpus "
-            "(e.g. TR-3 contains 1,583 words in a reverberant auditorium vs TR-2 clean studio audio), unweighted "
-            "macro-WER can disproportionately weight short recordings. Non-parametric bootstrap confidence "
+            "Because clip lengths vary substantially across the corpus (TR-2 holds 1,464 gold words, EN-3 holds 3,459) and the per-clip difficulty "
+            "is not uniform (TR-3 is the hardest Turkish clip for every checkpoint: Whisper Medium 0.081 there against 0.030 on TR-2 and 0.035 on TR-1), unweighted "
+            "macro-WER can disproportionately weight short recordings. No acoustic property of the recordings was measured, so that spread is reported as an "
+            "observed per-clip difference rather than an explained one. Non-parametric bootstrap confidence "
             "intervals (10,000 resamples) honestly capture sample variance given n=3 Turkish and n=4 English clips:"
         )
     )
@@ -755,13 +771,16 @@ def story():
         )
     )
 
-    out.append(P("4.8.2 Closed Gold Terminology Recall and Acoustic Error Propagation", "h2"))
+    out.append(P("4.8.2 Closed Gold Terminology Recall and Fixed-LLM Cross-Front-End Ablation", "h2"))
     out.append(
         P(
             "To test whether high term counts reflect genuine domain coverage or hallucination, closed gold "
             "glossaries (N=32 curated concepts) were established for TR-1 (Earned Value Management) and EN-1 (Agile Scrum). "
-            "Concurrently, degraded ASR front-ends were fed into fixed `Qwen3.5-4B` to empirically quantify acoustic "
-            "error propagation for the first time:"
+            "Separately, the four best-scoring ASR front-ends' hypotheses were fed into the same fixed "
+            "`Qwen3.5-4B` to see how much the extraction result moves when only the transcript source changes. "
+            "This is a one-clip-per-language comparison of outputs, not a controlled noise-injection experiment: "
+            "front-ends differ in more than WER, each cell is a single run, and the 9B row comes from a different "
+            "run whose input transcript was never recorded:"
         )
     )
     out.append(
@@ -781,8 +800,13 @@ def story():
     )
     out.append(
         P(
-            "*Key Empirical Finding: On Qwen3-ASR 0.6B (13.6% front-end WER), extraction precision drops to 50.0% and recall falls to 15.6%, "
-            "proving that acoustic word errors propagate directly into semantic term hallucination.",
+            "*Reading this table: the Qwen3-ASR 0.6B TR-1 cell is the weakest of the four front-ends on both axes "
+            "(50.0% precision, 15.6% recall at 13.6% WER), so error-prone transcripts do coincide with worse "
+            "extraction here. But the ordering is not monotone in WER: Nemotron carries the highest WER of the four "
+            "(11.7%) and still scores 100.0% precision, and Turkish Turbo sits between them. The honest statement is "
+            "that extraction quality varies with the ASR front-end, not that word errors propagate proportionally into "
+            "term hallucination. A proportional claim would need controlled corruption of one transcript at fixed "
+            "LLM settings, which is the analytical ladder in the paper rather than a measurement.",
             "note",
         )
     )
@@ -791,10 +815,16 @@ def story():
     out.append(
         callout(
             "Consumer GPU Deployment Bottleneck (RTX 5060 Laptop, 8 GB VRAM)",
-            "<b>Qwen3.5-4B</b> (NF4 quantized) fits comfortably within the 8 GB VRAM budget, processing a full lecture "
-            "in <b>39.55 s</b> (s.d. 2.11 s). Conversely, while <b>Qwen3.5-9B</b> achieves superior terminology recall (46.9% vs 25.0%), "
-            "its memory footprint exceeds 8 GB during long-context generation, triggering PCIe host RAM paging and inflating latency "
-            "to <b>513.19 s (~8.6 minutes per clip)</b>. This establishes Qwen3.5-4B as the strictly optimal local edge deployment choice.",
+            "<b>Qwen3.5-4B</b> (NF4 quantized) is the only configuration whose memory was instrumented: "
+            "<font face='Calibri-Italic'>outputs/local_vram_probe.json</font> records 3.08 GB of weights resident "
+            "after load and 5.26 GB of total device occupancy mid-call on the 8.12 GB card, with a clip call "
+            "completing in <b>39.55 s</b> (s.d. 2.11 s). <b>Qwen3.5-9B</b> achieved higher closed-gold recall "
+            "(46.9% vs 25.0% on TR-1) but took <b>513.19 s</b> per clip over two Turkish clips "
+            "(322.29 s and 704.08 s). That run was placed with host-memory offloading, and the per-clip spread is "
+            "consistent with paging, but occupancy was never measured for the 9B, so the latency figure is a "
+            "wall-clock observation and not a sized GPU requirement. On this evidence 4B is the only checkpoint we "
+            "can recommend for local edge use; we did not run 9B on any larger device, so no claim is made about "
+            "what hardware it would need.",
             "primary",
         )
     )
@@ -803,18 +833,30 @@ def story():
     out.append(P("4.8.4 Interactive Demonstration Studio (`experiments/gui/`)", "h2"))
     out.append(
         P(
-            "To prove end-to-end practical viability, a modern full-stack web studio was built using FastAPI and Vanilla CSS/JS. "
+            "To demonstrate the pipeline end to end on one machine, a full-stack web studio was built using FastAPI and "
+            "Vanilla CSS/JS. "
             "Features include: (a) direct YouTube video downloading via yt-dlp; (b) local microphone recording and audio file uploads; "
-            "(c) synchronized video playback with ASR transcription timecodes; and (d) dynamic CEFR-B1 terminology badges with instant "
-            "definitions and side-by-side model comparison."
+            "(c) video playback aligned to ASR transcription timecodes; and (d) dynamic terminology badges with CEFR-B1-targeted "
+            "definitions and side-by-side model comparison. "
+            "This is a local proof-of-concept studio, not a deployed service: it binds to localhost, has no authentication, "
+            "no queue and no persistence layer, and the B1 label is a measured band share per explanation rather than a "
+            "guarantee on every output."
         )
     )
 
     out.append(P("5. Project Milestones and Final Verification Status", "h1"))
     out.append(
         P(
-            "All empirical requirements across all eight project tracks have now been fully executed, "
-            "tested, and verified against reproducible codebase artifacts."
+            "Every track below is backed by a run artifact under "
+            "<font face='Calibri-Italic'>experiments/outputs/</font> or "
+            "<font face='Calibri-Italic'>experiments/annotation/</font>. Three statuses are used deliberately: "
+            "<b>DONE / VERIFIED</b> means the number published in the paper is recomputable from that artifact; "
+            "<b>MEASURED, NEGATIVE</b> means the experiment ran and the result is a regression that we report as a "
+            "result; <b>IMPLEMENTED, NOT BENCHMARKED</b> means the component exists and works end to end but no gold "
+            "reference or systematic trial exists for it. What is explicitly <i>not</i> claimed anywhere in this "
+            "report: a validated LLM judge (no judge-versus-human agreement sheet was stored), a measured "
+            "continuous error-propagation curve (the WER ladder is an analytical model), a KVKK compliance "
+            "conclusion, or any measured learning gain."
         )
     )
 
@@ -842,18 +884,21 @@ def story():
                 "DONE / VERIFIED",
             ],
             [
-                "5. Acoustic Error Propagation",
-                "Downstream semantic impact measured across 4 ASR front-ends into fixed Qwen3.5-4B.",
+                "5. Fixed-LLM Cross-Front-End Ablation",
+                "Closed-gold precision/recall for 4 ASR hypotheses into the same Qwen3.5-4B (TR-1, EN-1). "
+                "Varies with the front-end; not monotone in WER.",
                 "DONE / VERIFIED",
             ],
             [
-                "6. Hardware Latency & VRAM Profiling",
-                "RTX 5060 Laptop GPU: 4B NF4 (39.55s) vs 9B host RAM paging (513.19s) profiled.",
+                "6. Hardware Latency Profiling (+ one VRAM probe)",
+                "RTX 5060 Laptop GPU: 4B NF4 39.55 s and 5.26 GB device occupancy; 9B 513.19 s in an offloaded "
+                "configuration (latency only, occupancy unmeasured).",
                 "DONE / VERIFIED",
             ],
             [
                 "7. Inter-Annotator Agreement",
-                "115 double-annotated terms: kappa_R = 0.782 (substantial), kappa_D = 1.000 (perfect).",
+                "115 double-annotated terms: kappa_R = 0.782 (substantial) is discriminative; kappa_D = 1.000 is a "
+                "prevalence artefact (P_e ~ 0.95).",
                 "DONE / VERIFIED",
             ],
             [
@@ -866,6 +911,20 @@ def story():
                 "Comprehensive 10-section formal thesis report in Turkish (notes/Bitirme_Projesi_Raporu.md).",
                 "DONE / VERIFIED",
             ],
+            [
+                "10. Measured Acoustic Intervention Ladder",
+                "Energy VAD, glossary biasing and LLM post-correction each re-run on all 7 clips against gold "
+                "(outputs/interventions_summary.json). Every stage that ran raises macro WER; biasing additionally "
+                "leaks the gold list and crashes the 448-position decoder on long prompts. VAD is off in the app.",
+                "MEASURED, NEGATIVE",
+            ],
+            [
+                "11. Generative Animation Layer (Layer 3)",
+                "Manim + Edge-TTS explainer generation wired into the pipeline; 7 videos on disk, ffprobe durations "
+                "22.3-41.8 s at 854x480/15 fps, with a title-card fallback on render failure. No gold reference, no "
+                "systematic trial, no measured learning gain.",
+                "IMPLEMENTED, NOT BENCHMARKED",
+            ],
         ],
         [44 * mm, 95 * mm, 38 * mm],
     )
@@ -876,11 +935,12 @@ def story():
     out.append(
         bullets(
             [
-                "<b>Empirically complete:</b> Ground-truth gold references, 2026 refresh ASR runs, double-annotated Cohen's kappa, bootstrap confidence intervals, closed gold recall, and cross-layer acoustic error propagation are all in place.",
-                "<b>Statistically credible:</b> 10,000-resample bootstrap intervals quantify small-sample uncertainty, and Cohen's kappa (0.782 / 1.000) validates human evaluation reliability against subjective bias.",
-                "<b>Hardware grounded:</b> Empirical latency profiling on an RTX 5060 Laptop GPU proves that 4-bit Qwen3.5-4B is the only viable local model, while Qwen3.5-9B requires dedicated server hardware due to severe RAM offload latency.",
-                "<b>Production ready:</b> An interactive demonstration studio is operational in `experiments/gui/` demonstrating the complete pipeline from raw audio to synchronized CEFR-B1 definitions.",
-                "<b>Faithful to historical pilot:</b> Original pilot numbers in Tables III–VI remain untouched for historical auditability.",
+                "<b>Artifact-traceable, not empirically complete:</b> Gold references, the 2026 ASR refresh, double-annotated Cohen's kappa, bootstrap intervals, closed-gold recall and the three acoustic interventions are all recomputable from files under `experiments/`. Three things the earlier draft implied are <i>not</i> in place: a continuous measured error-propagation curve (the WER ladder is an analytical model of word-boundary corruption), judge-versus-human validation for the LLM scorer, and any benchmark of the animation layer.",
+                "<b>Statistically bounded:</b> 10,000-resample bootstrap intervals quantify small-sample uncertainty on 7 clips, but no significance test is claimed and no result generalises beyond this corpus. Cohen's kappa measures human-human agreement only: kappa_R = 0.782 is the discriminative figure, while kappa_D = 1.000 follows from a 112/3 class imbalance (P_e ~ 0.95) and validates neither the LLM judge nor an adaptive-tutor claim.",
+                "<b>Hardware grounded for one configuration:</b> Latency is measured on an RTX 5060 Laptop GPU for every local run, and memory occupancy for the 4-bit Qwen3.5-4B probe only (3.08 GB weights, 5.26 GB device occupancy mid-call). Qwen3.5-9B is reported from wall-clock latency in a host-offloaded run; larger hardware was never tested, so no requirement is asserted for it.",
+                "<b>Demonstrated locally, not deployed:</b> `experiments/gui/` runs the full pipeline on one machine as a proof-of-concept studio; the explanations it shows are CEFR-B1-<i>targeted</i> and their band membership is measured as a per-explanation share, not as a guarantee.",
+                "<b>Faithful to historical pilot:</b> Original pilot numbers in Tables III-VI remain printed as historical CPU-pilot rows for auditability, with the GPU gold re-score shown alongside them where it reverses the ordering.",
+                "<b>Negative results are results:</b> The measured acoustic ladder (energy VAD, glossary biasing, LLM post-correction) is published as a regression rather than deleted, and VAD ships disabled in the delivered app.",
             ]
         )
     )
@@ -898,7 +958,7 @@ def main():
         bottomMargin=16 * mm,
         title="What Was Added and What Improved",
         author="Cakil Yilmaz; Berat Enes Dadak, Efe Batur Giritli, Yekta Said Can",
-        subject="Revision report for the two-layer ASR+LLM bitirme paper",
+        subject="Revision report for the three-layer ASR+LLM+animation bitirme paper",
     )
     doc.build(story(), canvasmaker=NumberedCanvas)
     print("wrote", OUT)

@@ -507,18 +507,34 @@ class SemanticSimilarityTests(unittest.TestCase):
 
         cands = ["Proje yönetimi hedeflere zamanında ulaşma sürecidir."]
         refs = ["Proje yönetimi hedeflere zamanında ulaşma sürecidir."]
-        P, R, F1 = compute_bert_score(cands, refs, lang="tr")
+        P, R, F1, backend = compute_bert_score(cands, refs, lang="tr")
         self.assertAlmostEqual(P[0], 1.0, places=2)
         self.assertAlmostEqual(R[0], 1.0, places=2)
         self.assertAlmostEqual(F1[0], 1.0, places=2)
+        # Without the optional bert_score package the proxy must label itself honestly.
+        self.assertTrue(backend.startswith("lexical-proxy") or backend.startswith("bert_score::"))
 
     def test_bert_score_dissimilar_pairs(self):
         from eval_semantic import compute_bert_score
 
         cands = ["Deniz kenarında güneşli bir günde yüzmek çok eğlencelidir."]
         refs = ["Kazanılmış değer yönetimi projenin maliyet sapmasını hesaplar."]
-        P, R, F1 = compute_bert_score(cands, refs, lang="tr")
+        P, R, F1, _ = compute_bert_score(cands, refs, lang="tr")
         self.assertLess(F1[0], 0.35)
+
+
+class LangCodeTests(unittest.TestCase):
+    def test_full_language_names_are_not_misclassified(self):
+        from eval_semantic import lang_code
+
+        # "Turkish".startswith("tr") is False, which silently scored Turkish rows as English.
+        self.assertEqual(lang_code("Turkish"), "tr")
+        self.assertEqual(lang_code("English"), "en")
+        self.assertEqual(lang_code("tr"), "tr")
+        self.assertEqual(lang_code("en"), "en")
+        self.assertEqual(lang_code("Türkçe"), "tr")
+        self.assertEqual(lang_code(None, "TR-2"), "tr")
+        self.assertEqual(lang_code(None, "EN-3"), "en")
 
 
 class NoiseInjectionTests(unittest.TestCase):

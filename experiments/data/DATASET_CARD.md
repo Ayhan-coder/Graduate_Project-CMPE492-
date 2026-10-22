@@ -4,7 +4,7 @@ Follows the datasheets-for-datasets fields that this benchmark actually uses.
 
 ## Motivation
 
-- **Why:** Gold audio + transcripts for a two-layer ASR then LLM terminology benchmark on beginner-oriented educational speech.
+- **Why:** Gold audio + transcripts for a three-layer evaluation (layer 1 ASR, layer 2 LLM terminology extraction, both measured here; layer 3 generative animation, feasibility only) on beginner-oriented educational speech.
 - **Funders / creators:** Cakil Yilmaz (Koç University) with Berat Enes Dadak, Efe Batur Giritli, Yekta Said Can (Tatilsepeti R&D).
 - **Not for:** Training new ASR or LLM weights. Evaluation only.
 
@@ -123,6 +123,6 @@ The 32 clips cover balanced disciplines across STEM, Humanities, and Social Scie
 
 ## Maintenance
 
-- Contact: dogacakilyilmaz2005@gmail.com
+- Contact: gunderaliayhan@gmail.com
 - Errors in IDs, titles, or gold wording: open an issue on the project repository.
 

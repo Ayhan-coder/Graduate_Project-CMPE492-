@@ -1,44 +1,64 @@
-# Two-layer ASR + LLM evaluation (TR / EN educational speech)
+# Three-Layer Evaluation of ASR, LLM Terminology Extraction, and Generative Video-Animation Systems (TR / EN Educational Speech)
 
-Benchmark of off-the-shelf speech recognition and terminology-extraction models on Turkish and English lecture video. Not a new architecture and not an adaptive tutor.
+Comprehensive benchmark and open-weight evaluation framework for making multilingual (Turkish and English) educational and corporate compliance lectures accessible.
 
-| Path | What it is |
-|------|------------|
-| `paper/main.tex` | IEEE conference source (single file; compiles on Overleaf) |
-| `paper/original/` | Unchanged starting PDF |
-| `experiments/` | Evaluation kit: ASR, LLM, ablation, IAA, table export |
-| `experiments/data/DATASET_CARD.md` | Dataset card (source, license, speakers, gold how) |
-| `experiments/HARDWARE.md` | Decoding flags + kit machine |
-| `experiments/annotation/PROTOCOL.md` | Second-annotator protocol |
-| `notes/` | Review and change log |
+## Architecture Layers
 
-## Compile the paper
+1. **Layer 1 (Speech-to-Text / ASR):** Leading open-weight and commercial speech recognition models (Whisper Medium, Large-v3, Large-v3 Turbo, Turkish-matched Turbo, Qwen3-ASR 0.6B/1.7B, and NVIDIA Nemotron 3.5 ASR) benchmarked on GPU gold references across WER, CER, and RTF.
+2. **Layer 2 (Semantic Analysis & Ontology Grounding):** LLM-based terminology extraction and CEFR-B1 simplified explanation generation evaluated across Ateşman (50–69) and Flesch (60–70) readability bands, Cohen's kappa inter-annotator agreement ($\kappa_R=0.782$, $\kappa_D=1.000$), closed 32-term gold lists, and hybrid RAG + NetworkX prerequisite DAG grounding.
+3. **Layer 3 (Generative Explainer Video Animation):** On-demand personalized explainer video studio adapting open-source Manimator with Qwen 3.5 scenario generation, Edge-TTS neural voice synthesis, and FFmpeg synchronization.
 
-LaTeX may not be installed locally. On [Overleaf](https://www.overleaf.com): new project → upload `paper/main.tex` → pdfLaTeX, TeX Live 2024+. Figures are TikZ / pgfplots (no image files).
+| Directory / File | Description |
+|---|---|
+| `paper/main.tex` | IEEE conference paper source (compiles with pdfLaTeX on Overleaf / MiKTeX) |
+| `notes/Bitirme_Projesi_Raporu.md` | Single source of truth for the comprehensive graduation thesis report |
+| `notes/Bitirme_Projesi_Raporu.pdf` | 35-page compiled graduation thesis report |
+| `experiments/` | Evaluation kit: ASR, LLM, ablation, fine-tuning, RAG, and table generation |
+| `experiments/data/data_inventory.json` | 40-video balanced inventory (20 TR, 20 EN; STEM, Social Sciences, Corporate Compliance) |
+| `experiments/data/DATASET_CARD.md` | Dataset documentation, sources, licensing, and annotation provenance |
+| `experiments/finetune/` | LoRA fine-tuning scripts and evaluation checkpoints for Whisper Small TR |
+| `experiments/rag/` | Hybrid BM25/TF-IDF RRF retriever, prerequisite DAG verifier, and grounding benchmarks |
+| `gui/` | Interactive FastAPI local demo studio (`gui/app.py` on `localhost:7860`) |
 
-## Reproduce numbers (do not invent cells)
+## Quick Start & Reproduction
 
-Pending tables in the paper (per-language ASR, 2026 refresh, ASR→LLM ablation, Cohen’s κ) stay `---` until you run:
-
-```text
-cd experiments
-pip install -r requirements.txt
-python check_env.py
-# put TR-1.wav … EN-4.wav and data/manifest.jsonl here first
-python run_asr.py --manifest data/manifest.jsonl --all-pilot
-python report.py --asr outputs/asr-TIMESTAMP.jsonl
-python run_ablation.py --asr-outputs outputs/asr-TIMESTAMP.jsonl --model Qwen/Qwen3.5-4B
-python iaa.py --a1 annotation/labels_a1.csv --a2 annotation/labels_a2.csv
+### 1. Environment Setup
+```bash
+pip install -r experiments/requirements.txt
+python experiments/check_env.py
 ```
 
-Full command list: `experiments/README.md`.
+### 2. ASR Benchmarking & Corpus Pipeline
+```bash
+# Verify environment and hardware
+python experiments/benchmark_srm_slm.py
 
-## What is already filled vs empty
+# Long-form chunked transcription of corporate corpus (TR-17..20, EN-17..20)
+python experiments/data/download_and_transcribe_corpus.py --corporate-only
+```
 
-- **Filled:** pooled CPU-pilot WER/CER/RTF and GPT-4.1 / GPT-4o-mini semantic scores from the original study; gold-rescored GPU per-language ASR (Whisper Medium / Large-v3 / Turbo, Qwen3-ASR 0.6B / 1.7B, Turkish-matched Turbo); same-LLM ablation on Whisper hypotheses (`Qwen3.5-4B`, annotator-1 R1/D1); Cohen’s κ on the 115-item double-labeled subset (`κ_R=0.782`, `κ_D=1.000`).
-- **Still empty:** Wav2Vec2 / SpeechBrain / Nemotron 3.5 gold cells; Qwen3-ASR 1.7B on EN-4.
-- **Blocked on you:** GitHub remote. Wavs and gold stay local. New semantic and ablation runs use free Qwen3.5 weights (no paid API).
+### 3. Semantic Layer & RAG Grounding
+```bash
+# Evaluate cross-layer RAG grounding on corporate speech
+python experiments/rag/eval_corporate_rag.py
+
+# Run RAG ablation evaluation (synthetic baseline check)
+python experiments/rag/domain_rag_extractor.py
+```
+
+### 4. Interactive Local Demo Studio
+```bash
+python run_app.py
+# Opens browser at http://localhost:7860 (protected by local token)
+```
+
+## Scientific Honesty Guardrails
+
+- **Held-Out Gold References:** ASR WER/CER scores are measured against human-corrected reference transcripts. Legacy English-only checkpoints without Turkish support (Wav2Vec 2.0 and SpeechBrain) remain documented as uncomputed (`---`) in multi-language comparison tables.
+- **Precision vs. Recall Ceiling:** While LLM terminology precision is high, closed 32-term gold list recall remains bounded (<28.1% in TR, <56.2% in EN).
+- **RAG Scoring Notice:** Domain RAG grounding is evaluated via surface-mention verification; synthetic queries derived from the knowledge base itself are non-citable as general accuracy numbers to avoid circularity (`paper/main.tex:198`).
+- **Hardware Probes:** All reported VRAM usage and latencies reflect physical GPU measurements (`local_vram_probe.json` on NVIDIA GeForce RTX 5060 Laptop GPU, 8,151 MiB). Target profiles for unmeasured edge models are explicitly labeled as *Design Projections*.
 
 ## License
 
-Evaluation code: MIT (`LICENSE`). Model weights keep their own licenses (see `experiments/models.json`). Audio is not shipped.
+Evaluation code is released under the MIT License (`LICENSE`). Pre-trained model weights retain their respective upstream licenses. Audio clips are referenced from public educational YouTube channels under their respective licenses (CC0-1.0, CC-BY-SA, or Standard YouTube License).

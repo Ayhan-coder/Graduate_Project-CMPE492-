@@ -1,10 +1,10 @@
 """Manimator Integration Module for EduTerm AI Studio.
 
-Extends the local Qwen 3.5 semantic layer to dynamic video generation:
-  [PDF / Lecture Context]
+Turns the semantic layer into dynamic video generation:
+  [Lecture / PDF Context]
         │
         ▼
-   Qwen 3.5 (Local)
+   EVREN cloud LLM  (fallback: local Qwen 3.5, then domain heuristics)
    ├── Terminology Extraction
    ├── CEFR B1 Pedagogical Explanations
    └── Scene-by-Scene Video Narration Script + Manim Animation Code
@@ -17,8 +17,8 @@ Extends the local Qwen 3.5 semantic layer to dynamic video generation:
         Narrated Explainer Video (.mp4) for Confused Students
 
 Supports:
-1. "Takıldığım Yeri Öğret": Instant 30-90s explainer video tailored to the
-   exact moment and concept the student struggled with in the lecture.
+1. "Takıldığım Yeri Öğret": 30-90s explainer video tailored to the exact moment
+   and concept the student struggled with in the lecture.
 2. "PDF to Narrated Video": Academic paper / slides PDF to Manim animation
    or Figure Walkthrough video.
 3. Self-healing Manim code execution with automatic syntax/attribute repairs.
@@ -58,6 +58,31 @@ DEFAULT_VOICE_TR_FEMALE = "tr-TR-EmelNeural"
 DEFAULT_VOICE_EN = "en-US-GuyNeural"
 DEFAULT_VOICE_EN_FEMALE = "en-US-JennyNeural"
 
+# The Edge voice endpoint rate-limits this machine to roughly one request per minute,
+# so a rejection is retried once and then handed to a second online Turkish voice
+# rather than to an offline voice that cannot pronounce the language.
+_EDGE_RETRY_WAS_S: Tuple[float, ...] = (0.0,)
+_GOOGLE_TTS_URL = "https://translate.google.com/translate_tts"
+_GOOGLE_TTS_CHUNK_CHARS = 160
+_GOOGLE_TTS_UA = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+)
+
+# EVREN is the default script/animation author for Layer 3; the raw platform id
+# is what /v1/chat/completions expects.
+DEFAULT_EVREN_MODEL = "qwen3.8-flash-next"
+
+# Render tiers: Manim raster settings plus the x264 settings used when the
+# narration is muxed back onto the animation.
+VIDEO_QUALITY_TIERS: Dict[str, Dict[str, Any]] = {
+    "draft":    {"resolution": (854, 480),   "fps": 15.0, "crf": 23, "preset": "veryfast"},
+    "standard": {"resolution": (1280, 720),  "fps": 30.0, "crf": 20, "preset": "veryfast"},
+    "high":     {"resolution": (1920, 1080), "fps": 30.0, "crf": 18, "preset": "medium"},
+    "ultra":    {"resolution": (1920, 1080), "fps": 60.0, "crf": 17, "preset": "medium"},
+}
+DEFAULT_VIDEO_QUALITY = "standard"
+
 _RENDER_LOCK = threading.Lock()
 
 
@@ -66,14 +91,12 @@ _RENDER_LOCK = threading.Lock()
 # ---------------------------------------------------------------------------
 
 MANIM_PROMPT_TEMPLATE = """<|im_start|>system
-Sen uzman bir pedagojik video yapımcısı ve Manim (Mathematical Animation Engine) geliştiricisisin.
-Görevin: Başlangıç seviyesindeki bir öğrencinin videoda/derste anlamadığı, kafasının karıştığı teknik konuyu 45-60 saniyelik harika bir animasyonlu anlatım videosuna dönüştürmektir.
+Sen uzman bir pedagojik video senaristisin. Gorevin, derste takildigi teknik konuyu B1 duzeyinde kisa bir anlatima donusturmektir.
 
 Kurallar:
 1. Terimler ve anlatım kesinlikle CEFR B1 düzeyinde, anlaşılır, somut ve sade olmalıdır.
-2. Günlük hayattan akılda kalıcı bir benzetme (analogy) kullan.
-3. Manim kodu Manim Community v0.18+ uyumlu, 'class ExplainerScene(Scene):' adında olmalıdır.
-4. Manim kodunda LaTeX kurulumu gerektirmeyen 'Text' nesneleri kullan (MathTex yerine Text veya basit formüller).
+2. Yalnizca verilen ders baglamiyla desteklenen bilgileri soyle. Baska konuya ait kavram veya genel tavsiye ekleme.
+3. Baglam yetersizse bunu acikca soyle; kesin olmayan tanim uydurma. Baglamla uyusan bir benzetme yoksa bos birak.
 5. Çıktıyı SADECE geçerli bir JSON objesi olarak ver. Markdown kod bloğu içine alma.
 <|im_end|>
 <|im_start|>user
@@ -111,7 +134,7 @@ Lütfen aşağıdaki JSON şemasına birebir uyarak yanıt ver:
       "duration_s": 15.0
     }}
   ],
-  "manim_code": "from manim import *\\n\\nclass ExplainerScene(Scene):\\n    def construct(self):\\n        # Scene animations\\n"
+  "manim_code": ""
 }}
 <|im_end|>
 <|im_start|>assistant
@@ -149,50 +172,173 @@ def _clean_json_output(raw_text: str) -> dict:
     raise ValueError("Valid JSON structure not found in model output")
 
 
+EVREN_MANIM_SYSTEM_PROMPT = """Sen uzman bir pedagojik video senaristisin.
+Gorevin: bir ogrencinin derste takildigi teknik konuyu, CEFR B1 duzeyinde, kisa ve baglama sadik bir anlatima donusturmek.
+
+Kurallar:
+1. Anlatim secilen dilde (Türkçe veya English), somut, sade ve B1 duzeyinde olacak.
+2. Yalnizca verilen ders baglamiyla desteklenen bilgileri soyle. Alakasiz genel tavsiye, baska konuya ait kavram, uydurma ornek veya baglamda olmayan bilgi ekleme.
+3. Baglam yetersizse bunu acikca soyle; kesin olmayan tanim uydurma. Teknik terimi bu kesitteki anlami ile acikla.
+4. Benzetme kullanacaksan teknik fikri dogru korusun ve baglamla uyussun; aksi halde bos birak.
+5. narration_script, sahnelerdeki anlatimlarin sirayla birlestirilmis hali olsun.
+6. Yanit SADECE gecerli bir JSON nesnesi olsun. manim_code alanini bos birak; animasyon sablonu uygulama tarafinda olusturulur.
+"""
+
+EVREN_MANIM_USER_TEMPLATE = """Ogrencinin Takildigi Konu / Terim: {TOPIC}
+Dersin Ilgili Bolumundeki Anlatim (tek bilgi kaynagi): "{CONTEXT}"
+Hedef Dil: {LANG}
+Hedef Sure: {DURATION_S} saniye
+
+Asagidaki JSON semasina birebir uyarak yanit ver:
+{{
+  "title": "Konu Basligi",
+  "target_concept": "Temel Kavram",
+  "pedagogical_hook": "Ogrencinin dikkatini cekecek somut benzetme",
+  "terms": [
+    {{"term": "Terim Adi", "explanation": "B1 duzeyinde sade tanim"}}
+  ],
+  "narration_script": "Videonun bastan sona eksiksiz seslendirme metni",
+  "scenes": [
+    {{"id": 1, "title": "Giris ve Problem", "narration": "Bu sahnenin anlatimi", "duration_s": 12.0}},
+    {{"id": 2, "title": "Kavram ve Benzetme", "narration": "Benzetmenin anlatimi", "duration_s": 18.0}},
+    {{"id": 3, "title": "Kural ve Ozet", "narration": "Altin ipucu", "duration_s": 15.0}}
+  ],
+  "manim_code": ""
+}}
+"""
+
+
+def _complete_spec(parsed: dict, topic_clean: str, lang: str, target_duration_s: float = 0.0) -> dict:
+    """Fill in any field the model omitted so the renderer never sees a partial spec."""
+    spec = dict(parsed or {})
+    spec.setdefault("title", topic_clean)
+    spec.setdefault("target_concept", topic_clean)
+    spec.setdefault("pedagogical_hook", "")
+    spec.setdefault("terms", [])
+    spec.setdefault("narration_script", "")
+    spec.setdefault("scenes", [])
+    if not spec["narration_script"] and spec["scenes"]:
+        spec["narration_script"] = " ".join(
+            str(s.get("narration", "")).strip() for s in spec["scenes"] if s.get("narration")
+        )
+    if not spec["terms"] and spec["scenes"]:
+        spec["terms"] = [{"term": topic_clean, "explanation": str(spec["scenes"][0].get("narration", ""))[:160]}]
+    # Keep animation deterministic and inexpensive. The model supplies the teaching
+    # content; the renderer owns a compact, safe visual template and readable layout.
+    spec["manim_code"] = generate_default_manim_code(
+        topic=spec.get("title", topic_clean),
+        analogy=spec.get("pedagogical_hook", ""),
+        terms=spec.get("terms", []),
+        lang=lang,
+        target_duration_s=target_duration_s,
+    )
+    spec["manim_code_source"] = "template"
+    return spec
+
+
+def generate_explainer_script_evren(
+    topic: str,
+    context: str = "",
+    lang: str = "tr",
+    duration_s: int = 50,
+    model_id: str = DEFAULT_EVREN_MODEL,
+) -> dict:
+    """Author the narration script and Manim scene through the EVREN cloud LLM.
+
+    Raises on any platform or parsing failure so the caller can tell EVREN apart
+    from the degraded fallbacks.
+    """
+    from evren_llm import generate_evren
+
+    topic_clean = topic.strip() or "Ders Kavramı"
+    is_tr = str(lang).lower().startswith("tr")
+    lang_name = "Türkçe" if is_tr else "English"
+
+    user_prompt = EVREN_MANIM_USER_TEMPLATE.format(
+        TOPIC=topic_clean,
+        CONTEXT=(context[:900].strip() if context else topic_clean),
+        LANG=lang_name,
+        DURATION_S=duration_s,
+    )
+    raw = generate_evren(
+        model_id,
+        user_prompt,
+        max_tokens=1500,
+        temperature=0.15,
+        system_prompt=EVREN_MANIM_SYSTEM_PROMPT,
+    ).strip()
+    return _complete_spec(_clean_json_output(raw), topic_clean, lang, duration_s)
+
+
 def generate_explainer_script_qwen(
     topic: str,
     context: str = "",
     lang: str = "tr",
     duration_s: int = 50,
     model_id: str = "Qwen/Qwen3.5-4B",
-    use_local_llm: bool = True,
 ) -> dict:
-    """Generate structured terminology, narration script, and Manim code via Qwen 3.5.
+    """Generate structured terminology, narration script, and Manim code via local Qwen 3.5.
 
-    Falls back cleanly to domain-aware heuristic generator if local model
-    is not loaded or execution fails.
+    Raises so the caller's backend chain can degrade to the heuristic spec instead of
+    silently labelling a hand-written template as model output.
     """
+    from run_llm import generate_hf
+
     topic_clean = topic.strip() or "Ders Kavramı"
     is_tr = str(lang).lower().startswith("tr")
     lang_name = "Türkçe" if is_tr else "English"
 
-    if use_local_llm:
+    prompt = MANIM_PROMPT_TEMPLATE.format(
+        TOPIC=topic_clean,
+        CONTEXT=context[:450] if context else topic_clean,
+        LANG=lang_name,
+        DURATION_S=duration_s,
+    )
+    raw = generate_hf(model_id, prompt, max_new_tokens=650).strip()
+    return _complete_spec(_clean_json_output(raw), topic_clean, lang, duration_s)
+
+
+def generate_explainer_script(
+    topic: str,
+    context: str = "",
+    lang: str = "tr",
+    duration_s: int = 50,
+    backend: str = "evren",
+    evren_model: str = DEFAULT_EVREN_MODEL,
+    local_model_id: str = "Qwen/Qwen3.5-4B",
+) -> dict:
+    """Author the explainer spec, using the requested backend with a template safety net.
+
+    A failing backend degrades to the heuristic spec, never to a different model: the
+    engine the student picked is the engine the result is attributed to. The returned
+    'script_backend' records which one actually produced the script.
+    """
+    chain = {
+        "evren": ("evren", "heuristic"),
+        "local": ("local", "heuristic"),
+        "heuristic": ("heuristic",),
+    }.get(str(backend).lower(), ("evren", "heuristic"))
+
+    topic_clean = topic.strip() or "Ders Kavramı"
+    backend_error = None
+    for step in chain:
         try:
-            from run_llm import generate_hf
-
-            prompt = MANIM_PROMPT_TEMPLATE.format(
-                TOPIC=topic_clean,
-                CONTEXT=context[:450] if context else topic_clean,
-                LANG=lang_name,
-                DURATION_S=duration_s,
-            )
-            raw = generate_hf(model_id, prompt, max_new_tokens=650).strip()
-            parsed = _clean_json_output(raw)
-            if parsed and "narration_script" in parsed:
-                # Ensure manim_code is present
-                if not parsed.get("manim_code") or "class ExplainerScene" not in parsed.get("manim_code", ""):
-                    parsed["manim_code"] = generate_default_manim_code(
-                        topic=parsed.get("title", topic_clean),
-                        analogy=parsed.get("pedagogical_hook", ""),
-                        terms=parsed.get("terms", []),
-                        lang=lang,
-                    )
-                return parsed
+            if step == "evren":
+                spec = generate_explainer_script_evren(topic_clean, context, lang, duration_s, evren_model)
+            elif step == "local":
+                spec = generate_explainer_script_qwen(topic_clean, context, lang, duration_s, local_model_id)
+            else:
+                spec = generate_fallback_explainer_spec(topic_clean, context, lang, duration_s)
+            return {**spec, "script_backend": step, "script_backend_error": backend_error}
         except Exception as exc:
-            logger.warning("Local Qwen 3.5 script generation fallback: %s", exc)
+            logger.warning("Manimator script backend %r failed: %s", step, exc)
+            backend_error = re.sub(r"evren_llm_[A-Za-z0-9_-]+", "[anahtar gizlendi]", str(exc))[:300]
 
-    # High-quality domain heuristic fallback
-    return generate_fallback_explainer_spec(topic_clean, context, lang, duration_s)
+    return {
+        **generate_fallback_explainer_spec(topic_clean, context, lang, duration_s),
+        "script_backend": "heuristic",
+        "script_backend_error": backend_error,
+    }
 
 
 def generate_fallback_explainer_spec(
@@ -308,24 +454,24 @@ def generate_fallback_explainer_spec(
         ]
     elif context and len(context.strip()) > 20:
         clean_ctx = context.strip()
-        first_sent = clean_ctx.split(".")[0].strip() if "." in clean_ctx else clean_ctx[:100]
+        first_sent = clean_ctx.split(".")[0].strip() if "." in clean_ctx else clean_ctx[:180]
+        if len(first_sent) > 180:
+            first_sent = first_sent[:177].rsplit(" ", 1)[0] + "..."
         title = topic_clean
-        hook = f"{topic_clean} kavramı, dersin bu anında takıldığınız cümlenin mantık haritasıdır."
+        hook = f"Ders kesitindeki ifade: {first_sent}"
         terms = [
-            {"term": topic_clean, "explanation": "Öğrencinin videoda takıldığı ve incelenen temel pedagojik kavram."},
-            {"term": "Bağlam Analizi", "explanation": f"\"{first_sent[:80]}...\" ifadesinde geçen temel ilke."},
-            {"term": "Pratik Çözüm", "explanation": "Kavramın gerçek senaryolarda ve sınav sorularında uygulanması."},
+            {"term": topic_clean, "explanation": f"Bu kesitteki anlamı: {first_sent}"},
         ]
         script = (
-            f"Videoda takıldığınız {topic_clean} konusunu hemen netleştirelim. "
-            f"Dersin bu anında: '{first_sent}.' "
-            "Burada amaç, hedeflere ulaşırken sapmaları erkenden görüp doğru kararı vermektir. "
-            "Temel mantığı kavradığınızda hem dersteki akışı yakalayacak hem de sınavda rahatça uygulayacaksınız."
+            f"Bu ders kesitinde odak kavram {topic_clean}. "
+            f"İlgili ifade şöyle: {first_sent}. "
+            "Bu otomatik kısa özet, kesitteki bu ifadenin dışına çıkarak ek bilgi varsaymıyor. "
+            "Terimin cümledeki görevine ve önceki-sonraki ifadelerle ilişkisine dikkat edin."
         )
         scenes = [
-            {"id": 1, "title": f"Odak: {topic_clean}", "narration": f"Takıldığınız {topic_clean} konusunun temel sorusu.", "duration_s": 12.0},
-            {"id": 2, "title": "Ders Bağlamı", "narration": f"{first_sent[:60]}...", "duration_s": 20.0},
-            {"id": 3, "title": "Çözüm & Uygulama", "narration": "Kavramın pratik problem çözümündeki yansıması.", "duration_s": 14.0},
+            {"id": 1, "title": f"Odak: {topic_clean}", "narration": f"Bu kesitte odak kavram {topic_clean}.", "duration_s": 12.0},
+            {"id": 2, "title": "Ders Kesiti", "narration": first_sent, "duration_s": 20.0},
+            {"id": 3, "title": "Bağlamı İzle", "narration": "Terimin cümledeki görevine ve çevresindeki ifadelere dikkat edin.", "duration_s": 14.0},
         ]
     else:
         title = topic_clean
@@ -347,7 +493,7 @@ def generate_fallback_explainer_spec(
             {"id": 3, "title": "Özet ve İpucu", "narration": "Akılda tutulması gereken temel nokta.", "duration_s": 12.0},
         ]
 
-    manim_code = generate_default_manim_code(title, hook, terms, lang=lang)
+    manim_code = generate_default_manim_code(title, hook, terms, lang=lang, target_duration_s=duration_s)
 
     return {
         "title": title,
@@ -357,42 +503,78 @@ def generate_fallback_explainer_spec(
         "narration_script": script,
         "scenes": scenes,
         "manim_code": manim_code,
+        "manim_code_source": "template",
     }
 
 
 import textwrap
+
+# Beat budget of the template scene below: 8 animations and 5 holds. The literal
+# run_time values in generate_default_manim_code must keep matching these totals.
+TEMPLATE_ANIMATION_S = 9.1
+TEMPLATE_HOLD_S = 6.0
+TEMPLATE_SCENE_S = TEMPLATE_ANIMATION_S + TEMPLATE_HOLD_S
+
+
+def _template_pace(target_duration_s: float) -> tuple[float, float]:
+    """Return (animation, hold) multipliers that stretch the template to the target.
+
+    Holds absorb the extra seconds first so the writing animations keep a natural
+    drawing speed instead of crawling when the narration runs much longer than the
+    unscaled template.
+    """
+    if target_duration_s <= 0:
+        return 1.0, 1.0
+    scale = max(0.5, min(8.0, target_duration_s / TEMPLATE_SCENE_S))
+    anim_scale = max(0.5, min(2.5, scale))
+    hold_scale = (scale * TEMPLATE_SCENE_S - TEMPLATE_ANIMATION_S * anim_scale) / TEMPLATE_HOLD_S
+    return anim_scale, max(0.5, min(8.0, hold_scale))
+
 
 def generate_default_manim_code(
     topic: str,
     analogy: str,
     terms: list[dict],
     lang: str = "tr",
+    target_duration_s: float = 0.0,
 ) -> str:
     """Generate guaranteed error-free Manim Community Python code with full text wrapping.
 
-    Avoids LaTeX dependency by using pure Text and VGroup geometric shapes.
+    Avoids LaTeX dependency by using pure Text and VGroup geometric shapes. When
+    target_duration_s is given, the scene is paced to that length so the merge step
+    does not have to freeze the closing frame under the narration.
     """
+    anim_scale, hold_scale = _template_pace(target_duration_s)
+
+    def beat(seconds: float, hold: bool = False) -> str:
+        return f"{seconds * (hold_scale if hold else anim_scale):.2f}"
+
+    def wrapped_block(raw: str, width: int, max_lines: int) -> str:
+        """Wrap text into card-sized lines, marking any cut so it never reads as a broken sentence."""
+        lines = textwrap.wrap(raw, width=width)
+        if len(lines) > max_lines:
+            lines = lines[:max_lines]
+            lines[-1] = lines[-1].rsplit(" ", 1)[0].rstrip(",.;:!?") + "…"
+        return "\\n".join(lines) if lines else ""
+
     clean_topic = re.sub(r'["\\]', '', topic).strip()[:50]
     title_font_size = 36 if len(clean_topic) <= 28 else (30 if len(clean_topic) <= 42 else 24)
 
     clean_analogy = re.sub(r'["\\]', '', analogy).strip() if analogy else "Pedagojik Anlatım"
     # Wrap analogy into clean lines without clipping words or sentences
-    wrapped_analogy_lines = textwrap.wrap(clean_analogy, width=52)[:3]
-    wrapped_analogy_str = "\\n".join(wrapped_analogy_lines)
-    num_analogy_lines = max(1, len(wrapped_analogy_lines))
+    wrapped_analogy_str = wrapped_block(clean_analogy, 54, 4)
+    num_analogy_lines = max(1, wrapped_analogy_str.count("\\n") + 1)
     hook_box_height = max(1.25, 0.42 * num_analogy_lines + 0.45)
-    hook_font_size = 18 if num_analogy_lines <= 2 else 16
+    hook_font_size = 24 if num_analogy_lines <= 2 else 21
 
     # Terms and Descriptions wrapped cleanly
     term1 = re.sub(r'["\\]', '', terms[0].get("term", "Kavram 1")).strip()[:28] if len(terms) > 0 else "Kavram 1"
     desc1_raw = re.sub(r'["\\]', '', terms[0].get("explanation", "")).strip() if len(terms) > 0 else "Temel Tanım"
-    desc1_lines = textwrap.wrap(desc1_raw, width=28)[:3]
-    desc1_str = "\\n".join(desc1_lines)
+    desc1_str = wrapped_block(desc1_raw, 24, 4)
 
     term2 = re.sub(r'["\\]', '', terms[1].get("term", "Kavram 2")).strip()[:28] if len(terms) > 1 else "Kavram 2"
     desc2_raw = re.sub(r'["\\]', '', terms[1].get("explanation", "")).strip() if len(terms) > 1 else "Pratik Kural"
-    desc2_lines = textwrap.wrap(desc2_raw, width=28)[:3]
-    desc2_str = "\\n".join(desc2_lines)
+    desc2_str = wrapped_block(desc2_raw, 24, 4)
 
     code = f'''from manim import *
 
@@ -408,8 +590,8 @@ class ExplainerScene(Scene):
         underline = Line(LEFT * 4.2, RIGHT * 4.2, color="#818CF8", stroke_width=3)
         underline.next_to(title, DOWN, buff=0.18)
         
-        self.play(Write(title), GrowFromCenter(underline), run_time=1.3)
-        self.wait(0.4)
+        self.play(Write(title), GrowFromCenter(underline), run_time={beat(1.3)})
+        self.wait({beat(0.4, True)})
 
         # 2. Hook / Analogy Card with Full Multiline Text
         hook_box = RoundedRectangle(corner_radius=0.2, height={hook_box_height}, width=10.2, color="#6366F1")
@@ -419,17 +601,17 @@ class ExplainerScene(Scene):
         hook_text = Text("{wrapped_analogy_str}", font_size={hook_font_size}, line_spacing=0.85, color="#F8FAFC")
         hook_text.move_to(hook_box.get_center())
         
-        self.play(FadeIn(hook_box), Write(hook_text), run_time=1.4)
-        self.wait(0.8)
+        self.play(FadeIn(hook_box), Write(hook_text), run_time={beat(1.4)})
+        self.wait({beat(0.8, True)})
 
         # 3. Two Key Concept Visual Cards
         card1 = RoundedRectangle(corner_radius=0.15, height=2.6, width=4.9, color="#059669")
         card1.set_fill("#064E3B", opacity=0.8)
         card1.move_to(LEFT * 2.75 + DOWN * 1.6)
 
-        c1_title = Text("{term1}", font_size=20, weight=BOLD, color="#34D399")
+        c1_title = Text("{term1}", font_size=26, weight=BOLD, color="#34D399")
         c1_title.next_to(card1.get_top(), DOWN, buff=0.25)
-        c1_desc = Text("{desc1_str}", font_size=14, line_spacing=0.8, color="#E2E8F0")
+        c1_desc = Text("{desc1_str}", font_size=20, line_spacing=0.8, color="#E2E8F0")
         c1_desc.next_to(c1_title, DOWN, buff=0.25)
         group1 = VGroup(card1, c1_title, c1_desc)
 
@@ -437,24 +619,24 @@ class ExplainerScene(Scene):
         card2.set_fill("#78350F", opacity=0.8)
         card2.move_to(RIGHT * 2.75 + DOWN * 1.6)
 
-        c2_title = Text("{term2}", font_size=20, weight=BOLD, color="#FBBF24")
+        c2_title = Text("{term2}", font_size=26, weight=BOLD, color="#FBBF24")
         c2_title.next_to(card2.get_top(), DOWN, buff=0.25)
-        c2_desc = Text("{desc2_str}", font_size=14, line_spacing=0.8, color="#E2E8F0")
+        c2_desc = Text("{desc2_str}", font_size=20, line_spacing=0.8, color="#E2E8F0")
         c2_desc.next_to(c2_title, DOWN, buff=0.25)
         group2 = VGroup(card2, c2_title, c2_desc)
 
         # Arrow connecting concepts
         arrow = Arrow(card1.get_right(), card2.get_left(), buff=0.15, color="#CBD5E1", stroke_width=4)
 
-        self.play(FadeIn(group1, shift=RIGHT), run_time=1.2)
-        self.play(GrowArrow(arrow), run_time=0.8)
-        self.play(FadeIn(group2, shift=LEFT), run_time=1.2)
-        self.wait(1.5)
+        self.play(FadeIn(group1, shift=RIGHT), run_time={beat(1.2)})
+        self.play(GrowArrow(arrow), run_time={beat(0.8)})
+        self.play(FadeIn(group2, shift=LEFT), run_time={beat(1.2)})
+        self.wait({beat(1.5, True)})
 
         # 4. Golden Rule Highlight
         rule_box = SurroundingRectangle(group2, color="#F59E0B", buff=0.15, stroke_width=3)
-        self.play(Create(rule_box), run_time=1.0)
-        self.wait(1.8)
+        self.play(Create(rule_box), run_time={beat(1.0)})
+        self.wait({beat(1.8, True)})
 
         # 5. Outro Fade
         self.play(
@@ -464,13 +646,13 @@ class ExplainerScene(Scene):
             FadeOut(rule_box),
             FadeOut(hook_box),
             FadeOut(hook_text),
-            run_time=1.0
+            run_time={beat(1.0)}
         )
         
         final_msg = Text("Tebrikler! Konuyu Başarıyla Kavradınız.", font_size=26, color="#10B981")
         final_msg.move_to(DOWN * 0.8)
-        self.play(Write(final_msg), run_time=1.2)
-        self.wait(1.5)
+        self.play(Write(final_msg), run_time={beat(1.2)})
+        self.wait({beat(1.5, True)})
 '''
     return code
 
@@ -488,15 +670,114 @@ async def _synthesize_edge_tts_async(text: str, voice: str, out_path: Path) -> P
     return out_path
 
 
+def _synthesize_with_google_tts(text: str, out_path: Path, lang: str) -> bool:
+    """Synthesize the narration with Google's public TTS endpoint, which speaks Turkish correctly.
+
+    Used when the Edge neural voice throttles this machine to roughly one request per
+    minute. The endpoint caps how much text it accepts, so the narration is fetched in
+    chunks and the same-format MP3 frames are concatenated.
+    """
+    import requests
+
+    chunks = textwrap.wrap(text, width=_GOOGLE_TTS_CHUNK_CHARS) or [text]
+    audio = b""
+    try:
+        for idx, chunk in enumerate(chunks):
+            res = requests.get(
+                _GOOGLE_TTS_URL,
+                params={
+                    "ie": "UTF-8", "tl": str(lang).lower()[:2], "client": "tw-ob",
+                    "total": str(len(chunks)), "idx": str(idx),
+                    "q": chunk, "textlen": str(len(chunk)),
+                },
+                headers={"User-Agent": _GOOGLE_TTS_UA},
+                timeout=25,
+            )
+            if res.status_code != 200 or len(res.content) < 500:
+                logger.warning(
+                    "Google TTS rejected chunk %d/%d: HTTP %s", idx + 1, len(chunks), res.status_code
+                )
+                return False
+            audio += res.content
+    except Exception as exc:
+        logger.warning("Google TTS narration failed: %s", str(exc)[:160])
+        return False
+
+    out_path.write_bytes(audio)
+    return out_path.exists() and out_path.stat().st_size > 1000
+
+
+_SAPI_PS = r"""
+Add-Type -AssemblyName System.Speech
+$synth = New-Object System.Speech.Synthesis.SpeechSynthesizer
+$want = $env:EDUTERM_TTS_CULTURE
+$match = $synth.GetInstalledVoices() | Where-Object { $_.Enabled -and $_.VoiceInfo.Culture.Name -like "$want*" } | Select-Object -First 1
+if ($match) { $synth.SelectVoice($match.VoiceInfo.Name) }
+else { Write-Warning "No installed SAPI voice for culture '$want'; falling back to '$($synth.Voice.Name)'." }
+$synth.SetOutputToWaveFile($env:EDUTERM_TTS_WAV)
+Write-Output "$($synth.Voice.Name)|$($synth.Voice.Culture.Name)"
+Get-Content -Raw -Encoding UTF8 $env:EDUTERM_TTS_TXT | ForEach-Object { $synth.Speak($_) }
+$synth.Dispose()
+"""
+
+
+def _synthesize_with_windows_sapi(text: str, out_path: Path, lang: str = "tr") -> Optional[str]:
+    """Speak the narration with an installed OS voice; return the voice label or None.
+
+    The narration is passed through files rather than the command line, so
+    model-authored text can never be interpreted as shell input. The voice is chosen
+    by culture because a mismatched (e.g. English) voice mangles Turkish text, and
+    the label is reported so the caller can say so out loud instead of passing the
+    result off as the requested neural voice.
+    """
+    if os.name != "nt":
+        return None
+
+    txt = TEMP_DIR / f"{out_path.stem}.sapi.txt"
+    wav = TEMP_DIR / f"{out_path.stem}.sapi.wav"
+    try:
+        txt.write_text(text, encoding="utf-8")
+        env = {
+            **os.environ,
+            "EDUTERM_TTS_TXT": str(txt),
+            "EDUTERM_TTS_WAV": str(wav),
+            "EDUTERM_TTS_CULTURE": f"{str(lang).lower()[:2]}-",
+        }
+        res = subprocess.run(
+            ["powershell", "-NoProfile", "-NonInteractive", "-Command", _SAPI_PS],
+            env=env, capture_output=True, text=True, timeout=180,
+        )
+        if res.returncode != 0 or not wav.exists() or wav.stat().st_size < 5000:
+            logger.warning("Windows SAPI narration failed: %s", (res.stderr or "")[:200])
+            return None
+        subprocess.run(
+            ["ffmpeg", "-y", "-i", str(wav), "-codec:a", "libmp3lame", "-b:a", "128k", str(out_path)],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True, timeout=120,
+        )
+        if not (out_path.exists() and out_path.stat().st_size > 500):
+            return None
+        spoken = (res.stdout or "").strip().splitlines()
+        name, _, culture = (spoken[-1] if spoken else "").partition("|")
+        return f"{name} ({culture})" if name else "Windows SAPI5"
+    except Exception as exc:
+        logger.warning("Windows SAPI narration error: %s", exc)
+        return None
+    finally:
+        txt.unlink(missing_ok=True)
+        wav.unlink(missing_ok=True)
+
+
 def synthesize_narration_audio(
     script_text: str,
     lang: str = "tr",
     voice: Optional[str] = None,
     output_filename: Optional[str] = None,
-) -> Path:
-    """Generate synchronized voiceover audio (.mp3) using edge-tts.
+) -> Tuple[Path, Dict[str, str]]:
+    """Generate the voiceover (.mp3) and report which engine and voice really produced it.
 
-    Falls back to silent dummy audio if network or TTS fails.
+    Chain: Edge neural voice (retried once, because it throttles this machine) ->
+    Google TTS -> the offline system voice -> silence. Only the first two pronounce
+    the language reliably, so the engine is reported rather than assumed.
     """
     is_tr = str(lang).lower().startswith("tr")
     selected_voice = voice or (DEFAULT_VOICE_TR if is_tr else DEFAULT_VOICE_EN)
@@ -508,25 +789,33 @@ def synthesize_narration_audio(
     if not clean_text:
         clean_text = "Ders anlatımı tamamlandı."
 
-    try:
-        asyncio.run(_synthesize_edge_tts_async(clean_text, selected_voice, out_path))
-        if out_path.exists() and out_path.stat().st_size > 500:
-            return out_path
-    except Exception as exc:
-        logger.warning("Edge-TTS network error, attempting pyttsx3 or fallback: %s", exc)
+    for attempt, delay in enumerate(_EDGE_RETRY_WAS_S, 1):
+        if delay:
+            time.sleep(delay)
+        try:
+            asyncio.run(_synthesize_edge_tts_async(clean_text, selected_voice, out_path))
+            if out_path.exists() and out_path.stat().st_size > 500:
+                return out_path, {"narration_engine": "edge-tts", "narration_voice": selected_voice}
+            failure = "no audio bytes returned"
+        except Exception as exc:
+            failure = str(exc)[:160]
+        logger.warning("Edge-TTS attempt %d/%d failed: %s", attempt, len(_EDGE_RETRY_WAS_S), failure)
 
-    # Secondary fallback: pyttsx3 or synthetic silent audio
-    try:
-        import pyttsx3
-        engine = pyttsx3.init()
-        engine.save_to_file(clean_text, str(out_path))
-        engine.runAndWait()
-        if out_path.exists() and out_path.stat().st_size > 200:
-            return out_path
-    except Exception:
-        pass
+    if _synthesize_with_google_tts(clean_text, out_path, lang):
+        google_voice = f"Google TTS ({str(lang).lower()[:2]})"
+        logger.warning("Edge-TTS unavailable; narration used %s instead of %s.", google_voice, selected_voice)
+        return out_path, {"narration_engine": "google-tts", "narration_voice": google_voice}
 
-    # Create 5s silent mp3 via ffmpeg if all else fails
+    sapi_voice = _synthesize_with_windows_sapi(clean_text, out_path, lang)
+    if sapi_voice:
+        logger.warning(
+            "Edge-TTS unavailable; narration used the offline system voice %s instead of %s.",
+            sapi_voice, selected_voice,
+        )
+        return out_path, {"narration_engine": "sapi5-offline", "narration_voice": sapi_voice}
+
+    # Last resort: 5s of silence, so the render still completes without a voice track
+    logger.error("No text-to-speech engine produced audio; the video will be silent.")
     try:
         subprocess.run(
             ["ffmpeg", "-y", "-f", "lavfi", "-i", "anullsrc=r=24000:cl=mono", "-t", "5", str(out_path)],
@@ -537,7 +826,7 @@ def synthesize_narration_audio(
     except Exception as e:
         logger.error("FFmpeg silence creation failed: %s", e)
 
-    return out_path
+    return out_path, {"narration_engine": "silent", "narration_voice": ""}
 
 
 def get_media_duration_seconds(file_path: Path) -> float:
@@ -625,10 +914,29 @@ def _validate_manim_code(code: str) -> Tuple[bool, str]:
     return True, ""
 
 
+def _resolve_tier(quality: str) -> Dict[str, Any]:
+    """Map a quality name to its render settings, falling back to the default tier."""
+    return VIDEO_QUALITY_TIERS.get(str(quality).lower(), VIDEO_QUALITY_TIERS[DEFAULT_VIDEO_QUALITY])
+
+
+def _manim_render_cmd(work_dir: Path, script_path: Path, tier: Dict[str, Any]) -> List[str]:
+    """Build the Manim CLI call for one tier: explicit resolution and frame rate."""
+    width, height = tier["resolution"]
+    return [
+        sys.executable,
+        "-m", "manim",
+        "-r", f"{width},{height}",
+        "--fps", str(tier["fps"]),
+        "--media_dir", str(work_dir),
+        str(script_path),
+        "ExplainerScene",
+    ]
+
+
 def render_manim_scene(
     scene_code: str,
     output_name: str,
-    quality: str = "low_quality",  # "low_quality" (480p15, 1.2s) or "medium_quality" (720p30)
+    quality: str = DEFAULT_VIDEO_QUALITY,
 ) -> Optional[Path]:
     """Execute Python Manim code and render MP4 video file.
 
@@ -638,6 +946,7 @@ def render_manim_scene(
     work_dir = TEMP_DIR / f"job_{job_id}"
     work_dir.mkdir(parents=True, exist_ok=True)
 
+    tier = _resolve_tier(quality)
     current_code = scene_code
     script_path = work_dir / "scene.py"
 
@@ -648,18 +957,12 @@ def render_manim_scene(
     for attempt in range(2 if code_ok else 0):
         script_path.write_text(current_code, encoding="utf-8")
 
-        # Manim CLI rendering command
-        flag = "-ql" if quality == "low_quality" else "-qm"
-        cmd = [
-            sys.executable,
-            "-m", "manim",
-            flag,
-            "--media_dir", str(work_dir),
-            str(script_path),
-            "ExplainerScene",
-        ]
+        cmd = _manim_render_cmd(work_dir, script_path, tier)
 
-        logger.info("Rendering Manim scene (attempt %d)...", attempt + 1)
+        logger.info(
+            "Rendering Manim scene at %dx%d@%.0ffps (attempt %d)...",
+            tier["resolution"][0], tier["resolution"][1], tier["fps"], attempt + 1,
+        )
         res = subprocess.run(cmd, capture_output=True, text=True)
 
         if res.returncode == 0:
@@ -689,10 +992,7 @@ def render_manim_scene(
         terms=[{"term": "Kavram", "explanation": "Pedagojik özet"}],
     )
     script_path.write_text(fallback_code, encoding="utf-8")
-    subprocess.run(
-        [sys.executable, "-m", "manim", "-ql", "--media_dir", str(work_dir), str(script_path), "ExplainerScene"],
-        capture_output=True,
-    )
+    subprocess.run(_manim_render_cmd(work_dir, script_path, tier), capture_output=True)
     finals = [p for p in work_dir.glob("videos/**/*.mp4") if "partial_movie_files" not in str(p)]
     if finals:
         target_path = VIDEOS_DIR / f"{output_name}.mp4"
@@ -712,27 +1012,35 @@ def merge_video_and_narration(
     video_path: Path,
     audio_path: Path,
     final_output_path: Path,
+    quality: str = DEFAULT_VIDEO_QUALITY,
 ) -> Path:
     """Combine rendered video and TTS narration with ffmpeg.
 
-    If audio is longer than video, loops or slows video smoothly to match audio duration.
+    When the narration outlasts the animation the closing frame is held rather than
+    the clip being looped, so the viewer is not shown a restart mid-sentence.
     """
+    tier = _resolve_tier(quality)
     v_dur = get_media_duration_seconds(video_path)
     a_dur = get_media_duration_seconds(audio_path)
+    final_dur = a_dur + 0.5
+    hold_s = max(0.0, final_dur - v_dur)
 
     cmd = [
         "ffmpeg",
         "-y",
-        "-stream_loop", "-1",  # Loop video stream if audio is longer
         "-i", str(video_path),
         "-i", str(audio_path),
+        "-vf", f"tpad=stop_mode=clone:stop_duration={hold_s:.2f},fps={tier['fps']:g}",
         "-c:v", "libx264",
-        "-preset", "veryfast",
+        "-preset", tier["preset"],
+        "-crf", str(tier["crf"]),
+        "-profile:v", "high",
+        "-pix_fmt", "yuv420p",
+        "-movflags", "+faststart",
         "-c:a", "aac",
         "-b:a", "192k",
-        "-t", f"{a_dur + 0.5:.2f}",  # Match audio length + 0.5s pause
-        "-shortest",
-        "-pix_fmt", "yuv420p",
+        "-ar", "48000",
+        "-t", f"{final_dur:.2f}",
         str(final_output_path),
     ]
 
@@ -788,8 +1096,11 @@ def render_figure_walkthrough_video(
     figures: list[dict],
     narration_audio_path: Path,
     final_output_path: Path,
+    quality: str = DEFAULT_VIDEO_QUALITY,
 ) -> Path:
-    """Assemble PDF figures into a smooth 1080p narrated walkthrough video via ffmpeg."""
+    """Assemble PDF figures into a smooth narrated walkthrough video via ffmpeg."""
+    tier = _resolve_tier(quality)
+    width, height = tier["resolution"]
     a_dur = get_media_duration_seconds(narration_audio_path)
     fig_count = max(1, len(figures))
     per_fig_dur = a_dur / fig_count
@@ -817,13 +1128,21 @@ def render_figure_walkthrough_video(
         "-safe", "0",
         "-i", str(concat_txt),
         "-i", str(narration_audio_path),
-        "-vf", "scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2:color=black,fps=24",
+        "-vf", (
+            f"scale={width}:{height}:force_original_aspect_ratio=decrease:"
+            f"flags=lanczos,pad={width}:{height}:(ow-iw)/2:(oh-ih)/2:color=black,"
+            f"fps={tier['fps']:g}"
+        ),
         "-c:v", "libx264",
-        "-preset", "veryfast",
+        "-preset", tier["preset"],
+        "-crf", str(tier["crf"]),
+        "-profile:v", "high",
         "-c:a", "aac",
         "-b:a", "192k",
+        "-ar", "48000",
         "-shortest",
         "-pix_fmt", "yuv420p",
+        "-movflags", "+faststart",
         str(final_output_path),
     ]
 
@@ -836,6 +1155,16 @@ def render_figure_walkthrough_video(
 # 6. High-Level Master Generator Function
 # ---------------------------------------------------------------------------
 
+# Model-authored text reaches ffmpeg inside a drawtext filter, where these characters
+# would end the option or the filter chain.
+_CARD_TEXT_UNSAFE = re.compile(r"['\\:%;\[\],=]")
+
+
+def _card_text(value: str, limit: int) -> str:
+    """Make generated title/hook text safe for an ffmpeg drawtext filter."""
+    return _CARD_TEXT_UNSAFE.sub(" ", str(value or ""))[:limit].strip()
+
+
 def produce_student_explainer_video(
     topic: str,
     context: str = "",
@@ -844,42 +1173,59 @@ def produce_student_explainer_video(
     duration_s: int = 50,
     voice: Optional[str] = None,
     pdf_path: Optional[Path] = None,
-    use_local_qwen: bool = True,
-    model_id: str = "Qwen/Qwen3.5-4B",
+    backend: str = "evren",
+    evren_model: str = DEFAULT_EVREN_MODEL,
+    local_model_id: str = "Qwen/Qwen3.5-4B",
+    video_quality: str = DEFAULT_VIDEO_QUALITY,
 ) -> dict:
-    """Master pipeline: Concept/Context -> Qwen 3.5 -> Script -> TTS -> Manim/Walkthrough -> MP4 Video.
+    """Master pipeline: Concept/Context -> EVREN LLM -> Script -> TTS -> Manim/Walkthrough -> MP4 Video.
 
     Returns complete metadata, video URLs, subtitles, and extracted terminology.
     """
     with _RENDER_LOCK:
         start_time = time.time()
         video_id = f"explainer_{int(time.time())}_{uuid.uuid4().hex[:6]}"
+        tier = _resolve_tier(video_quality)
 
-        # Step 1: Script & Code Generation via Qwen 3.5
+        # Step 1: Script & Code Generation via EVREN (degrades to local Qwen, then heuristics)
         pdf_meta = {}
         if pdf_path and pdf_path.exists():
             pdf_meta = extract_pdf_figures_and_text(pdf_path)
             if not context:
                 context = pdf_meta.get("text", "")[:800]
 
-        spec = generate_explainer_script_qwen(
+        spec = generate_explainer_script(
             topic=topic,
             context=context,
             lang=lang,
             duration_s=duration_s,
-            model_id=model_id,
-            use_local_llm=use_local_qwen,
+            backend=backend,
+            evren_model=evren_model,
+            local_model_id=local_model_id,
         )
+        used_model = evren_model if spec.get("script_backend") == "evren" else local_model_id
 
         # Step 2: TTS Synthesis
         narration = spec.get("narration_script", "")
-        audio_file = synthesize_narration_audio(
+        audio_file, narration_info = synthesize_narration_audio(
             script_text=narration,
             lang=lang,
             voice=voice,
             output_filename=f"{video_id}.mp3",
         )
         audio_duration = get_media_duration_seconds(audio_file)
+
+        # The template scene has no model-authored timing, so pace it against the
+        # measured narration instead of the requested length. Model-authored code is
+        # left exactly as the LLM wrote it.
+        if spec.get("manim_code_source") == "template" and audio_duration > 0:
+            spec["manim_code"] = generate_default_manim_code(
+                topic=spec.get("title", topic),
+                analogy=spec.get("pedagogical_hook", ""),
+                terms=spec.get("terms", []),
+                lang=lang,
+                target_duration_s=audio_duration + 0.5,
+            )
 
         final_mp4_path = VIDEOS_DIR / f"{video_id}.mp4"
 
@@ -889,36 +1235,54 @@ def produce_student_explainer_video(
                 figures=pdf_meta["figures"],
                 narration_audio_path=audio_file,
                 final_output_path=final_mp4_path,
+                quality=video_quality,
             )
         else:
             # Default: Manim Animation Video
             raw_video = render_manim_scene(
                 scene_code=spec["manim_code"],
                 output_name=f"raw_{video_id}",
-                quality="low_quality",  # 480p15 for ultra-fast generation
+                quality=video_quality,
             )
             if raw_video and raw_video.exists():
-                merge_video_and_narration(raw_video, audio_file, final_mp4_path)
+                merge_video_and_narration(raw_video, audio_file, final_mp4_path, quality=video_quality)
                 raw_video.unlink(missing_ok=True)
             else:
                 # If Manim render could not produce output, generate dynamic title card video via ffmpeg
+                width, height = tier["resolution"]
                 cmd = [
                     "ffmpeg", "-y",
                     "-f", "lavfi",
-                    "-i", f"color=c=#0B0F19:s=1280x720:d={audio_duration:.2f}",
+                    "-i", f"color=c=#0B0F19:s={width}x{height}:d={audio_duration:.2f}",
                     "-i", str(audio_file),
-                    "-vf", f"drawtext=text='{spec.get('title', topic)}':fontcolor=white:fontsize=44:x=(w-text_w)/2:y=(h-text_h)/2-50,drawtext=text='{spec.get('pedagogical_hook', '')[:60]}':fontcolor=#38BDF8:fontsize=24:x=(w-text_w)/2:y=(h-text_h)/2+40",
-                    "-c:v", "libx264", "-c:a", "aac",
+                    "-vf", (
+                        f"drawtext=text='{_card_text(spec.get('title', topic), 60)}'"
+                        f":fontcolor=white:fontsize={int(height * 0.055)}:x=(w-text_w)/2:y=(h-text_h)/2-50,"
+                        f"drawtext=text='{_card_text(spec.get('pedagogical_hook', ''), 90)}'"
+                        f":fontcolor=#38BDF8:fontsize={int(height * 0.032)}:x=(w-text_w)/2:y=(h-text_h)/2+40,"
+                        f"fps={tier['fps']:g}"
+                    ),
+                    "-c:v", "libx264",
+                    "-preset", tier["preset"],
+                    "-crf", str(tier["crf"]),
+                    "-c:a", "aac", "-b:a", "192k",
+                    "-pix_fmt", "yuv420p",
+                    "-movflags", "+faststart",
                     "-shortest",
                     str(final_mp4_path),
                 ]
                 subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
 
         # Step 4: Subtitles & Scene Breakdown
+        # The authored per-scene durations are only a plan, so the timeline is spread
+        # over the real narration proportionally; otherwise a cue click seeks to a
+        # timestamp that the finished video never reaches.
+        planned = [max(0.1, float(s.get("duration_s", 10.0))) for s in spec.get("scenes", [])]
+        plan_total = sum(planned) or 1.0
         subtitles = []
         cur_t = 0.0
-        for s in spec.get("scenes", []):
-            s_dur = float(s.get("duration_s", 10.0))
+        for s, planned_dur in zip(spec.get("scenes", []), planned):
+            s_dur = (audio_duration + 0.5) * planned_dur / plan_total
             subtitles.append({
                 "start": cur_t,
                 "end": cur_t + s_dur,
@@ -945,4 +1309,11 @@ def produce_student_explainer_video(
             "duration_s": audio_duration,
             "generation_time_s": round(elapsed, 2),
             "video_style": video_style,
+            "script_backend": spec.get("script_backend", "heuristic"),
+            "script_backend_error": spec.get("script_backend_error"),
+            "llm_model": used_model,
+            "video_quality": video_quality,
+            "resolution": f"{tier['resolution'][0]}x{tier['resolution'][1]}",
+            "fps": tier["fps"],
+            **narration_info,
         }

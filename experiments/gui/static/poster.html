@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A3 Akademik Poster Sunumu — Boğaziçi Üniversitesi Bitirme Projesi</title>
+  <meta name="description" content="Çok Dilli Eğitim İçin Konuşma Tanıma (ASR), Büyük Dil Modeli (LLM) Tabanlı Terminoloji Çıkarma ve Üretken Video Canlandırma Katmanlarının Üç Katmanlı Değerlendirilmesi — A3 Akademik Poster Sunumu">
+  
+  <!-- Tipografi: SciFig şeması Arial ile dizilir; ağ yazı tipi bağımlılığı yoktur. -->
+  
+  <style>
+    /* ==========================================================================
+       ISO A3 Landscape Poster Dimensions & Print Configuration
+       A3 Landscape: 420mm x 297mm (Ratio 1.414 : 1)
+       ========================================================================== */
+    @page {
+      size: A3 landscape;
+      margin: 0;
+    }
+
+    /* ==========================================================================
+       SciFig open-template design tokens — "Classic" layout, Navy colour scheme.
+       Source: github.com/scifig-ai/scientific-poster-and-presentation-templates
+       Only the layout/colour scheme is adapted; no template file is copied here.
+       ========================================================================== */
+    :root {
+      --navy: #1b365d;          /* accent1: band, section bars, table heads */
+      --navy-deep: #142846;     /* key-results strip */
+      --khaki: #8a7b5c;         /* accent2: second data colour */
+      --khaki-pale: #c8b894;    /* accent2 on navy */
+      --khaki-wash: #f2eee6;    /* withdrawal notes */
+      --ink: #1a1a1a;           /* dk1 body text */
+      --slate: #5a5f66;         /* dk2 secondary text */
+      --muted: #70767d;         /* captions */
+      --wash: #f4f5f7;          /* lt2 tinted panels, zebra rows */
+      --rule: #c4c8cf;          /* panel outline */
+      --rule-light: #e8eaee;    /* inner grid lines */
+      --on-navy: #a9bbd0;       /* affiliation lines on navy */
+      --on-navy-strong: #dce3ec;/* strip text on navy */
+      --font-body: Arial, Helvetica, "Liberation Sans", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background-color: #4b5563;
+      color: var(--ink);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 0 48px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Screen Action Toolbar (Hidden in Print) */
+    .screen-toolbar {
+      position: sticky;
+      top: 12px;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(20, 40, 70, 0.94);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      padding: 10px 20px;
+      border-radius: 4px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      margin-bottom: 20px;
+    }
+
+    .toolbar-title {
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .toolbar-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.45);
+      color: #ffffff;
+      padding: 6px 14px;
+      border-radius: 3px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .toolbar-btn:hover {
+      background: rgba(255, 255, 255, 0.14);
+      border-color: #ffffff;
+    }
+
+    .toolbar-btn.primary {
+      background: var(--khaki);
+      border-color: var(--khaki-pale);
+    }
+
+    .toolbar-btn.primary:hover {
+      background: #776a4e;
+    }
+
+    /* A3 Landscape Poster Canvas Container */
+    .poster-canvas {
+      width: 420mm;
+      height: 297mm;
+      background: #ffffff;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      transform-origin: top center;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+
+    /* Classic header: solid navy band, centred title block */
+    .poster-header {
+      background: var(--navy);
+      color: #ffffff;
+      padding: 9px 30px 8px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .header-institution {
+      color: var(--on-navy);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .header-title {
+      font-size: 1.26rem;
+      font-weight: 700;
+      line-height: 1.22;
+      color: #ffffff;
+      margin-bottom: 4px;
+    }
+
+    .header-subtitle {
+      font-size: 0.74rem;
+      color: var(--rule);
+      font-style: italic;
+      margin-bottom: 4px;
+    }
+
+    .header-meta {
+      display: flex;
+      justify-content: center;
+      align-items: baseline;
+      gap: 14px;
+      font-size: 0.72rem;
+      color: var(--on-navy);
+    }
+
+    .header-meta strong {
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    .header-meta span {
+      color: var(--khaki-pale);
+      font-weight: 400;
+    }
+
+    /* Key-results strip: three headline figures, restated from the body cards */
+    .poster-strip {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      background: var(--navy-deep);
+      border-top: 1.5px solid var(--khaki);
+      border-bottom: 2.5px solid var(--khaki);
+      color: var(--on-navy-strong);
+      font-size: 0.7rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .strip-cell {
+      padding: 5px 12px;
+      text-align: center;
+    }
+
+    .strip-cell + .strip-cell {
+      border-left: 1px solid rgba(169, 187, 208, 0.45);
+    }
+
+    .strip-cell strong {
+      color: var(--khaki-pale);
+    }
+
+    /* 3-Column Poster Body Layout */
+    .poster-body {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+      padding: 10px 24px;
+      min-height: 0;
+    }
+
+    .poster-column {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      min-height: 0;
+    }
+
+    /* Section panel: solid navy heading bar over a white body.
+       Cards share each column's leftover height so all three columns end flush. */
+    .card {
+      background: #ffffff;
+      border: 1px solid var(--rule);
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: baseline;
+      gap: 9px;
+      background: var(--navy);
+      color: #ffffff;
+      padding: 3px 8px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .card-num {
+      color: var(--khaki-pale);
+      font-weight: 700;
+    }
+
+    .card-content {
+      padding: 6px 9px 7px;
+      font-size: 0.655rem;
+      line-height: 1.28;
+      color: var(--ink);
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .card-content p {
+      text-align: justify;
+    }
+
+    .card-content code {
+      font-family: "Courier New", monospace;
+      font-size: 0.7rem;
+    }
+
+    /* Key-message callouts */
+    .highlight-box {
+      background: var(--wash);
+      border-left: 3px solid var(--navy);
+      padding: 4px 7px;
+      font-size: 0.63rem;
+      font-style: italic;
+      color: var(--ink);
+    }
+
+    .gold-box {
+      background: var(--khaki-wash);
+      border-left: 3px solid var(--khaki);
+      padding: 4px 7px;
+      font-size: 0.63rem;
+      font-style: italic;
+      color: var(--ink);
+    }
+
+    /* Flow Diagrams */
+    .diagram-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 4px;
+      background: var(--wash);
+      border: 1px solid var(--rule);
+      padding: 5px 7px;
+      margin: 2px 0;
+    }
+
+    .diag-box {
+      flex: 1;
+      background: #ffffff;
+      border: 1px solid var(--rule);
+      padding: 3px;
+      text-align: center;
+      font-size: 0.6rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .diag-box.k1 { border-color: var(--navy); color: var(--navy); }
+    .diag-box.k2 { border-color: var(--khaki); color: var(--khaki); }
+    .diag-box.k3 { border-color: var(--slate); color: var(--slate); }
+
+    .diag-arrow {
+      color: var(--slate);
+      font-weight: 700;
+      font-size: 0.7rem;
+    }
+
+    /* Tables: navy head row, thin light grid, zebra rows */
+    .poster-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.615rem;
+      margin: 2px 0;
+    }
+
+    .poster-table th {
+      background: var(--navy);
+      color: #ffffff;
+      font-weight: 700;
+      padding: 3px 4px;
+      text-align: center;
+      border: 1px solid var(--navy);
+    }
+
+    .poster-table td {
+      padding: 2.5px 4px;
+      border: 1px solid var(--rule-light);
+      text-align: center;
+      color: var(--ink);
+    }
+
+    .poster-table tr:nth-child(even) {
+      background: var(--wash);
+    }
+
+    .poster-table td.left {
+      text-align: left;
+    }
+
+    .poster-table .bold {
+      font-weight: 700;
+    }
+
+    .poster-table .success {
+      color: var(--navy);
+      font-weight: 700;
+    }
+
+    /* Footer: light band with a single navy rule above */
+    .poster-footer {
+      background: var(--wash);
+      border-top: 2px solid var(--navy);
+      color: var(--ink);
+      font-size: 0.68rem;
+      padding: 4px 28px 5px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex-shrink: 0;
+    }
+
+    .footer-line {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .poster-footer a {
+      color: var(--navy);
+      text-decoration: none;
+    }
+
+    .footer-credit {
+      width: 100%;
+      text-align: center;
+      font-size: 0.6rem;
+      font-style: italic;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* Print Overrides */
+    @media print {
+      body {
+        background: transparent !important;
+        padding: 0 !important;
+      }
+      .screen-toolbar {
+        display: none !important;
+      }
+      .poster-canvas {
+        width: 420mm !important;
+        height: 297mm !important;
+        box-shadow: none !important;
+        page-break-after: avoid;
+        page-break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Screen Presentation Controls -->
+  <header class="screen-toolbar">
+    <div class="toolbar-title">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c8b894" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/>
+        <path d="M22 10v6"/>
+        <path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/>
+      </svg>
+      A3 Poster Sunumu (420 × 297 mm)
+    </div>
+    <button class="toolbar-btn primary" onclick="window.print()">
+      🖨️ Yazdır / PDF Kaydet (Ctrl+P)
+    </button>
+    <a href="/api/download/poster-pdf" class="toolbar-btn" download="Bitirme_Projesi_A3_Posteri.pdf">
+      📥 Vektörel PDF İndir (ReportLab)
+    </a>
+    <button class="toolbar-btn" onclick="toggleFullScreen()">
+      🖥️ Tam Ekran
+    </button>
+    <a href="/" class="toolbar-btn">
+      🏠 EduTerm AI Stüdyo
+    </a>
+  </header>
+
+  <!-- ISO A3 Landscape Printable Canvas -->
+  <main class="poster-canvas" id="posterArea">
+
+    <!-- Top Academic Header Banner -->
+    <header class="poster-header">
+      <div class="header-institution">
+        Boğaziçi Üniversitesi • Bilgisayar Mühendisliği Bölümü • Lisans Bitirme Projesi
+      </div>
+      <h1 class="header-title">
+        Çok Dilli Eğitim İçin Konuşma Tanıma (ASR), LLM Tabanlı Terminoloji Çıkarma ve Üretken Video Canlandırma Katmanlarının Üç Katmanlı Değerlendirilmesi
+      </h1>
+      <div class="header-subtitle">
+        A Three-Layer Evaluation of Speech-to-Text, LLM-Based Terminology Extraction, and Generative Video-Animation Systems for Multilingual Education (EduTerm AI)
+      </div>
+      <div class="header-meta">
+        <div>Yazar: <strong>Ali Ayhan Günder</strong></div>
+        <span>|</span>
+        <div>Danışmanlık: <strong>Bitirme Projesi Komisyonu</strong></div>
+        <span>|</span>
+        <div>Donanım: <strong>RTX 5060 Laptop GPU (CUDA 13.0)</strong></div>
+        <span>|</span>
+        <div>Tarih: <strong>Eylül 2026</strong></div>
+      </div>
+    </header>
+
+    <!-- Key-results strip: her üç değer aşağıdaki kutulardan yeniden söylenir -->
+    <div class="poster-strip">
+      <div class="strip-cell">En iyi makro WER: <strong>0,021 TR / 0,010 EN</strong> (Whisper Large-v3)</div>
+      <div class="strip-cell">Large-v3 → Turbo hızlanması: <strong>3,4× TR / 7,7× EN</strong> (havuzlanmış duvar saati)</div>
+      <div class="strip-cell">İki değerlendirici (N = 115): <strong>κ_R = 0,782</strong> — belirgin uyum</div>
+    </div>
+
+    <!-- 3-Column Poster Body -->
+    <div class="poster-body">
+
+      <!-- ================= SÜTUN 1: GİRİŞ & MİMARİ ================= -->
+      <section class="poster-column">
+
+        <!-- Kutu 1: Problem & Motivasyon -->
+        <article class="card">
+          <div class="card-header"><span class="card-num">01</span>Motivasyon ve Problem Tanımı</div>
+          <div class="card-content">
+            <p>
+              <strong>Eğitimde Bilişsel Yük ve 2-Sigma Problemi:</strong> Çevrimiçi video dersler geniş kitlelere eğitim sunmakla birlikte, uzmanlık jargonu başlangıç (beginner) düzeyindeki öğrenciler için terminolojik anlama engelleri oluşturmaktadır. Benjamin Bloom'un ünlü <strong>2-Sigma Problemi</strong> (1984), bire bir öğretmen rehberliğindeki öğrencilerin sınıf ortamına kıyasla 2 standart sapma daha başarılı olduğunu ortaya koymuştur.
+            </p>
+            <p>
+              Bu bitirme projesinde; ses sinyalini çözümleyen, zorlayıcı terimleri yakalayıp <strong>CEFR B1 düzeyinde</strong> sadeleştiren ve öğrencinin zorlandığı anda kişiselleştirilmiş animasyon videosu üreten yapay zekâ boru hattı bilimsel titizlikle geliştirilmiş ve değerlendirilmiştir.
+            </p>
+          </div>
+        </article>
+
+        <!-- Kutu 2: Araştırma Soruları -->
+        <article class="card">
+          <div class="card-header"><span class="card-num">02</span>Araştırma Soruları (RQs)</div>
+          <div class="card-content">
+            <p>• <strong>RQ1 (ASR Doğruluğu & Verimlilik):</strong> Çok dilli ASR modelleri (Whisper, Qwen3-ASR, Nemotron) Türkçe ve İngilizce eğitim konuşmalarında WER, CER ve RTF açısından nasıl performans sergiler?</p>
+            <p>• <strong>RQ2 (LLM Semantik Kapsamı):</strong> Transkriptler verildiğinde ticari (GPT-4.1) ve açık ağırlıklı modeller (Qwen 3.5), terim yakalama kapsamı ve B1 açıklama kalitesinde nasıl farklılaşır?</p>
+            <p>• <strong>RQ3 (Uçtan Uca Entegrasyon):</strong> Doğruluk ve hız odaklı dağıtımlarda hangi ASR+LLM ikilileri seçilmelidir? Whisper transkriptleri semantik tutarlılığı korur mu?</p>
+          </div>
+        </article>
+
+        <!-- Kutu 3: Çok Katmanlı Sistem Mimarisi -->
+        <article class="card">
+          <div class="card-header"><span class="card-num">03</span>Çok Katmanlı Sistem Mimarisi</div>
+          <div class="card-content">
+            <div class="diagram-row">
+              <div class="diag-box">[Ham Ses/Video]<br/><font size="1" color="#5a5f66">16 kHz Mono</font></div>
+              <span class="diag-arrow">➔</span>
+              <div class="diag-box k1">Katman 1: ASR<br/><font size="1">Whisper / Qwen3</font></div>
+              <span class="diag-arrow">➔</span>
+              <div class="diag-box k2">Katman 2: LLM<br/><font size="1">Qwen 3.5 / GPT-4</font></div>
+              <span class="diag-arrow">➔</span>
+              <div class="diag-box k3">Katman 3: Video<br/><font size="1">Manim + Edge-TTS</font></div>
+            </div>
+            <p>
+              <strong>Katman 1 (ASR):</strong> 16 kHz Mono WAV sesten tam ses üzerinden (Whisper) veya modele göre 30&ndash;60 sn pencerelerle transkripsiyon; arayüz yolu her zaman sabit 30 sn dilim kullanır. Enerji tabanlı VAD parçalayıcısı <em>ölçüldü ve kapatıldı</em>: yedi klibin yedisinde WER'i yükselttiği için varsayılan boru hattında devre dışıdır ve GUI onu hiç çağırmaz.<br/>
+              <strong>Katman 2 (LLM):</strong> Sabit yönlendirmeyle çok kelimeli alana özgü terim tespiti ve CEFR B1 düzeyinde JSON formatında açıklama üretimi.<br/>
+              <strong>Katman 3 (Manimator):</strong> Anlaşılmayan anda son 45 sn bağlamı yakalayarak yerel Qwen 3.5 analoji senaryosu ve Manim ile MP4 üretimi. Diskteki yedi render 22,3&ndash;41,8 sn uzunluğundadır (854&times;480@15 fps, ffprobe ile ölçüldü); &ldquo;30&ndash;90 sn&rdquo; bir tasarım hedefiydi, ölçüm değil.
+            </p>
+          </div>
+        </article>
+
+        <!-- Kutu 4: Akustik Ön-İşleme & İyileştirmeler -->
+        <article class="card">
+          <div class="card-header"><span class="card-num">04</span>Akustik İyileştirme Müdahaleleri (Ölçülmüş, Olumsuz Sonuç)</div>
+          <div class="card-content">
+            <table class="poster-table">
+              <thead>
+                <tr>
+                  <th>Boru Hattı Yapılandırması</th>
+                  <th>TR WER</th>
+                  <th>EN WER</th>
+                  <th>Geçiş Kapsamı (TR / EN)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="left bold">(1) Ham Whisper Large-v3</td>
+                  <td class="bold">0.0207</td>
+                  <td class="bold">0.0101</td>
+                  <td>%87.5 / %96.9</td>
+                </tr>
+                <tr>
+                  <td class="left bold">(2) + Enerji Tabanlı VAD</td>
+                  <td>0.0412</td>
+                  <td>0.0262</td>
+                  <td>%87.5 / %96.9</td>
+                </tr>
+                <tr>
+                  <td class="left bold">(3) + Terim Alan Koşullama</td>
+                  <td>0.0822</td>
+                  <td>0.0431</td>
+                  <td>%87.5 / %100.0 (sızdırılmış)</td>
+                </tr>
+                <tr>
+                  <td class="left bold">(4) + LLM ASR Düzeltme</td>
+                  <td>0.1339</td>
+                  <td>0.0418</td>
+                  <td>%84.4 / %100.0</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="highlight-box">
+              <strong>Olumsuz sonuç, sonuçtur:</strong> Ölçülen hiçbir kademe makro WER'i tabanın aşağısına
+              indirmemiştir; iki dilde de her müdahale hatayı artırmıştır (TR 0,021 → 0,134). Düzeltme
+              kademesi yedi klibin dördünde kendi girdisine göre hatayı düşürür, ancak hiçbir klip ham
+              tabanının altına dönemez. <code>outputs/interventions_summary.json</code> tek kaynaktır.
+              Kapsam sütunu <em>terim anma kapsamıdır, F1 değildir</em>; koşullama kademesi altın listeyi
+              <code>prompt_ids</code> ile enjekte ettiği için o hücre sızıntıdır.
+            </div>
+            <div class="highlight-box">
+              <strong>Geri çekilen sayılar:</strong> Bu panonun önceki sürümünde yayımlanan 0,129 TR temeli,
+              −%83,7 / −%12,4 / −%22,2 azalma satırları, %74,4 → %76,2 → %80,5 &ldquo;Terim F1&rdquo; serisi,
+              &ldquo;-40 dBFS&rdquo; eşiği ve &ldquo;%26,3 simüle gürültüde +%29,8 F1&rdquo; stres testi
+              diskteki hiçbir artefaktla yeniden üretilemez; tümü geri çekilmiştir. Stres testi çifti
+              <code>asr_post_correction.py --test</code> sınama örneğinden gelir (orada &ldquo;düzeltilmiş&rdquo;
+              dizim altın referansın kendisidir, WER %0,0 çıkar).
+            </div>
+          </div>
+        </article>
+
+      </section>
+
+      <!-- ================= SÜTUN 2: VERİ KÜMESİ & ASR ================= -->
+      <section class="poster-column">
+
+        <!-- Kutu 5: Veri Kümesi & Doğrulama -->
+        <article class="card">
+          <div class="card-header"><span class="card-num">05</span>Veri Kümesi ve Doğrulama Protokolü</div>
+          <div class="card-content">
+            <p>
+              <strong>Çok Dilli Eğitim Külliyatı:</strong> 7 video dersi (yerel WAV'lar 95,6 dk; altın referanslarda
+              <strong>13.467 kelime</strong> — klip klip 1.256 ile 3.459 arasında), 5 disiplin.
+              TR-1: Proje Yönetimi (12:01), TR-2: Turizm (11:17), TR-3: Veri Bilimi (14:15),
+              EN-1: Çevik Yöntemler (13:17), EN-2: Sürdürülebilirlik (09:16), EN-3: Üretken YZ (17:57), EN-4: Isı Transferi (17:33).
+              &ldquo;Dengeli terminolojik yük&rdquo; ifadesinin nasıl ölçüldüğü kayıtlı değildir ve yeniden ölçülmemiştir;
+              seçim ölçülmüş bir yoğunluk dengesine değil disiplin çeşitliliğine dayanır.
+            </p>
+            <div class="gold-box">
+              <strong>Akademik Dürüstlük Notu (Dataset Card):</strong> Referanslar sıfırdan çift-kör insan transkripsiyonu değil, otomatik taslakların insan denetiminde terim/noktalama düzeltmeleridir (post-editing). Whisper stiline hafif biçimsel yakınlık taşıyabileceği jüriye açıkça sunulmuştur.
+            </div>
+          </div>
+        </article>
+
+        <!-- Kutu 6: ASR GPU Benchmark -->
+        <article class="card">
+          <div class="card-header"><span class="card-num">06</span>ASR GPU Benchmark ve Hız Kıyaslaması</div>
+          <div class="card-content">
+            <p>Altın referanslar üzerinde <strong>RTX 5060 Laptop GPU</strong> ortamında doğrulanmış sonuçlar:</p>
+            <table class="poster-table">
+              <thead>
+                <tr>
+                  <th>Model</th>
+                  <th>Diller</th>
+                  <th>TR WER</th>
+                  <th>EN WER</th>
+                  <th>TR RTF</th>
+                  <th>EN RTF</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="left bold">Whisper Medium</td>
+                  <td>tr+en</td>
+                  <td>0.049</td>
+                  <td>0.011</td>
+                  <td>0.296</td>
+                  <td>0.321</td>
+                </tr>
+                <tr>
+                  <td class="left bold">Whisper Large-v3</td>
+                  <td>tr+en</td>
+                  <td class="success">0.021</td>
+                  <td class="success">0.010</td>
+                  <td>0.151</td>
+                  <td>0.216</td>
+                </tr>
+                <tr>
+                  <td class="left bold">Whisper Large-v3 Turbo</td>
+                  <td>tr+en</td>
+                  <td>0.037</td>
+                  <td>0.011</td>
+                  <td class="success">0.044</td>
+                  <td class="success">0.025</td>
+                </tr>
+                <tr>
+                  <td class="left bold">selimc/whisper-turbo-tr</td>
+                  <td>tr</td>
+                  <td>0.082</td>
+                  <td>—</td>
+                  <td>0.076</td>
+                  <td>—</td>
+                </tr>
+                <tr>
+                  <td class="left bold">Qwen3-ASR-0.6B</td>
+                  <td>tr+en</td>
+                  <td>0.134</td>
+                  <td>0.021</td>
+                  <td>0.180</td>
+                  <td>0.118</td>
+                </tr>
+                <tr>
+                  <td class="left bold">Qwen3-ASR-1.7B</td>
+                  <td>tr+en</td>
+                  <td>0.061</td>
+                  <td>0.015</td>
+                  <td>0.382</td>
+                  <td>0.203</td>
+                </tr>
+                <tr>
+                  <td class="left bold">NVIDIA Nemotron 3.5</td>
+                  <td>tr+en</td>
+                  <td>0.214</td>
+                  <td>0.035</td>
+                  <td>0.242</td>
+                  <td>0.176</td>
+                </tr>
+                <tr>
+                  <td class="left bold">Wav2Vec 2.0 / SpeechBrain</td>
+                  <td>en</td>
+                  <td>—</td>
+                  <td>—</td>
+                  <td>—</td>
+                  <td>—</td>
+                </tr>
+              </tbody>
+            </table>
+            <p>
+              <strong>Bulgular:</strong> <strong>Whisper Large-v3</strong> en yüksek doğruluğu sağlarken (TR %2.1 / EN %1.0), <strong>Large-v3 Turbo</strong> aynı ana makinede havuzlanmış duvar saati süresine göre Türkçede <strong>3,4×</strong> (110,56 sn → 32,53 sn), İngilizcede <strong>7,7×</strong> (170,72 sn → 22,10 sn) daha hızlıdır ve RTF 0,025 (EN) / 0,044 (TR) seviyesine ulaşır; bedeli Türkçede WER'in 0,021'den 0,037'ye çıkmasıdır. Ağırlıksız klip-RTF oranları 3,4× / 8,5×'tir; fark, ağırlıksız ortalamın kısa kliplere daha çok ağırlık vermesinden kaynaklanır. Üretici kaynaklı &ldquo;4–8 kat&rdquo; aralığı bu çalışmada ölçülmediği için kullanılmamıştır. Wav2Vec 2.0 ve SpeechBrain GPU altın kümesinde yeniden koşurulmadığından (Türkçe desteklenmiyor) hücreler '<code>—</code>' bırakılmıştır. TR–EN WER farkı $n=7$ ağırlıksız ortalamaya dayanır; <strong>&ldquo;Türkçe daha zordur&rdquo; genellemesi yapılamaz</strong> ve hiçbir akustik koşul ölçülmedi.
+            </p>
+          </div>
+        </article>
+
+        <!-- Kutu 7: Manimator Katmanı -->
+        <article class="card">
+          <div class="card-header"><span class="card-num">07</span>Katman 3: Manimator Dinamik Video Üretimi</div>
+          <div class="card-content">
+            <p>
+              <strong>"Takıldığım Yeri Öğret" Remediye Modülü (çevrimdışı/batch üretim, "anlık" değil):</strong> Öğrenci dersi izlerken anlamadığı bir noktayı işaretlediğinde, <code>[t&minus;45 sn, t+10 sn]</code> penceresindeki transkript kesiti yerel Qwen 3.5'e aktarılır:
+            </p>
+            <p>• CEFR B1 düzeyinde kavram özeti ve günlük hayattan somut analoji kurgusu,<br/>
+               • seslendirme senaryosu ve yürütülebilir Python Manim animasyon kodu (tasarım hedefi 30-90 sn; <strong>ölçülen çıktı süresi 22,3-41,8 sn</strong>, yedi üretimden dördü 30 sn altında),<br/>
+               • Microsoft Edge Neural TTS ve FFmpeg ile altyazılı (.vtt) MP4 derlemesi — ses-görüntü senkronu <strong>ölçülmemiştir</strong>,<br/>
+               • <strong>Self-Healing Engine:</strong> regex düzeltmeleri + <code>ast</code> allow-list denetimi, azami 2 kendini-onarma denemesi (<code>gui/manimator.py</code>).
+            </p>
+            <table class="poster-table">
+              <thead>
+                <tr>
+                  <th>Özellik</th>
+                  <th>Orijinal Manimator</th>
+                  <th>EduTerm AI Uyarlaması</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="left bold">Model Bağımlılığı</td>
+                  <td>Ücretli Bulut API (Claude/GPT-4)</td>
+                  <td class="success">Yerel Açık Ağırlıklı Qwen 3.5</td>
+                </tr>
+                <tr>
+                  <td class="left bold">Girdi Kaynağı</td>
+                  <td>Yalnızca statik PDF belgesi</td>
+                  <td class="success">Videodan kesit penceresi (t&minus;45 s &rarr; t+10 s)</td>
+                </tr>
+                <tr>
+                  <td class="left bold">Ses & Senkron</td>
+                  <td>Harici TTS / Manuel birleşim</td>
+                  <td class="success">Nöral Edge-TTS + VTT Altyazı Eşleme</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+      </section>
+
+      <!-- ================= SÜTUN 3: SEMANTİK & SONUÇ ================= -->
+      <section class="poster-column">
+
+        <!-- Kutu 8: Semantik Çıkarım & Ablasyon -->
+        <article class="card">
+          <div class="card-header"><span class="card-num">08</span>Semantik Çıkarım ve Ablasyon</div>
+          <div class="card-content">
+            <p>Sabit açık ağırlıklı LLM (<strong>Qwen 3.5-4B</strong>) altında ASR hipotezlerinin semantik tutarlılığı:</p>
+            <table class="poster-table">
+              <thead>
+                <tr>
+                  <th>ASR Kaynağı</th>
+                  <th>Dil</th>
+                  <th>Terim</th>
+                  <th>R1% (Bağlam)</th>
+                  <th>D1% (Doğruluk)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="left bold">Whisper Medium</td>
+                  <td>TR / EN</td>
+                  <td>28 / 48</td>
+                  <td>%89.3 / %97.9</td>
+                  <td>%92.9 / %100.0</td>
+                </tr>
+                <tr>
+                  <td class="left bold">Whisper Large-v3</td>
+                  <td>TR / EN</td>
+                  <td>31 / 51</td>
+                  <td class="bold">%90.3 / %98.0</td>
+                  <td class="bold">%93.5 / %100.0</td>
+                </tr>
+                <tr>
+                  <td class="left bold">Whisper Turbo</td>
+                  <td>TR / EN</td>
+                  <td>27 / 48</td>
+                  <td>%96.3 / %95.8</td>
+                  <td>%96.3 / %97.9</td>
+                </tr>
+                <tr>
+                  <td class="left bold">Qwen3-ASR 0.6B</td>
+                  <td>TR / EN</td>
+                  <td>35 / 56</td>
+                  <td>%88.6 / %100.0</td>
+                  <td>%100.0 / %100.0</td>
+                </tr>
+                <tr>
+                  <td class="left bold">Nemotron 3.5</td>
+                  <td>TR / EN</td>
+                  <td>29 / 51</td>
+                  <td>%93.1 / %100.0</td>
+                  <td>%100.0 / %100.0</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="highlight-box">
+              İngilizcede ASR gürültüsüne rağmen %100 semantik kararlılık korunmuştur. Türkçede harf kaymaları terim sınırlarını marjinal etkilese de B1 tanımları %93+ tutarlıdır.
+            </div>
+          </div>
+        </article>
+
+        <!-- Kutu 9: Cohen's Kappa Doğrulaması -->
+        <article class="card">
+          <div class="card-header"><span class="card-num">09</span>Çift Etiketleme ve Cohen's Kappa (κ)</div>
+          <div class="card-content">
+            <p><strong>İki Bağımsız Değerlendirici ile Çift Etiketleme (N = 115):</strong></p>
+            <p>• <strong>Bağlam Uyumluluğu (R):</strong> %96.5 ham anlaşma (111/115), <strong>κ_R = 0.782 (Belirgin Uyum / Substantial Agreement)</strong>. Negatif sınıfın temsili (8-12 negatif) ve 4 sınır anlaşmazlık sayesinde değerlendirici tarafsızlığını tescilleyen <strong>asıl kilit metrik</strong>tir.</p>
+            <p>• <strong>Açıklama Doğruluğu (D):</strong> %100.0 ham anlaşma, <strong>κ_D = 1.000 (Mükemmel Uyum)</strong>.</p>
+            <div class="gold-box">
+              <strong>Kappa Paradoksu (Prevalence Paradox):</strong> 112 pozitif / 3 negatif dağılımında şans eseri beklenen uyum zaten %95'tir (Pe ≈ 0.949); bu nedenle κ_D = 1.000 matematiksel bir sonuçtur; asıl kanıt varyans barındıran κ_R = 0.782'dir.
+            </div>
+          </div>
+        </article>
+
+        <!-- Kutu 10: Aday Yapılandırmalar & Demo Stüdyo -->
+        <article class="card">
+          <div class="card-header"><span class="card-num">10</span>Aday Boru Hattı Yapılandırmaları ve Yerel Demo Stüdyo</div>
+          <div class="card-content">
+            <p>
+              Aşağıdaki iki eşleştirme <strong>dağıtılmış bir sistem değil, diskteki ölçümlerden türetilmiş aday
+              yapılandırma önerisidir</strong>; hiçbirinin yük testi, eşzamanlı oturum testi veya saha
+              değerlendirmesi yapılmamıştır.<br/>
+              • <strong>Doğruluk-Öncelikli Aday:</strong> Whisper Large-v3 (TR makro WER 0,021) + GPT-4.1
+              (EVREN üzerinden; harici aktarım ve KVKK onayı insan kararıdır) veya Qwen 3.5-9B. 9B koşusunun
+              girdi dizimi <code>llm-20260913-210556.jsonl</code> içinde kayıtlı değildir, bu nedenle 9B hücresi
+              bir ön uç etkisi olarak okunamaz.<br/>
+              • <strong>Hız-Öncelikli Aday:</strong> Whisper Large-v3 Turbo (ölçülen RTF 0,025 EN / 0,044 TR;
+              havuzlanmış duvar saati hızlanması 3,4× TR / 7,7× EN) + Qwen 3.5-4B (8 GB kartta konaklama
+              belleğine sayfladı, tepe yerel kullanım 5,3 GB).
+            </p>
+            <p>
+              • <strong>EduTerm AI Demo Stüdyosu (yerel PoC):</strong> FastAPI + Vanilla JS arayüzü, YouTube
+              oynatıcısıyla senkronize terim kartları, sınav/flashcard motoru ve Katman 3 animasyon üretimini
+              <em>aynı süreçte</em> gösterir. Göz takibi yolunun diskteki durumu kod düzeyindedir:
+              <code>gui/static/app.js</code> içinde <code>getUserMedia</code> + MediaPipe FaceMesh kurulur
+              (<code>setupEyeTracker</code>, <code>onFaceMeshResults</code>) ve &ldquo;DISTRACTED&rdquo;
+              durumuna geçiş <code>pauseActiveMedia</code> ile oynatıcıyı duraklatır; kameraya erişilemediğinde
+              <code>isSimulationMode</code> sınırına düşer ve sekme/pencere odağı yordamı ayrı bir dikkat
+              sinyali üretir. Yüzlük eşikleri elle seçilmiş yapılandırma sabitleridir, kalibre edilmemiştir.
+            </p>
+            <div class="highlight-box">
+              <strong>Bu panonun iddia etmedikleri:</strong> göz kırpma/bakış doğruluğu, oto-duraklamanın dikkat
+              üzerindeki etkisi ve animasyon remediyesinin öğrenmeye katkısı <strong>ölçülmemiştir</strong>;
+              uyum/hakem doğrulaması ve öğrenme-sonucu çalışması diskte yoktur. Katman 3 &ldquo;anlık&rdquo;
+              değildir: yedi render <code>ffprobe</code> ile 22,3–41,8 sn üretilmiştir (854×480@15).
+              FaceMesh, <code>cdn.jsdelivr.net</code> üzerinden yüklendiği için o istemci ayağı çevrimdışı
+              değildir ve webcam kareleri kişisel veridir — KVKK/GDPR bakımından stüdyodaki en hassas
+              yüzeydir, kod varsayılan olarak kamera izni ister ve hiçbir kare diske yazılmaz.
+            </div>
+          </div>
+        </article>
+
+        <!-- Kutu 11: Sonuç & Kaynakça -->
+        <article class="card">
+          <div class="card-header"><span class="card-num">11</span>Sonuç ve Kilit Kaynakça</div>
+          <div class="card-content">
+            <p>
+              <strong>Sonuç:</strong> Üç katmanlı boru hattının ölçülebilir iki katmanı kıyaslandı. Yedi klip ve tek bir GPU üzerinde hiçbir akustik ön-işleme müdahalesi (enerji VAD, sözlük koşullama, LLM düzeltme) makro WER'i ham tabanın aşağısına <strong>indiremedi</strong>; sözlük koşullaması ayrıca altın listeyi girdiye enjekte ettiği için ölçümü sızdırır. Semantik katmanda kapalı altın kapsam düşük kalmıştır (TR-1 en iyi %28,1 anma, EN-1 %56,2), yani darboğaz kesinlik değil <strong>kapsamdır</strong>; bu nedenle &ldquo;yeni başlayanlar için erişilebilir kıldı&rdquo; iddiası ölçülmemiştir. Düşük WER rejiminde ($&lt;$%5) sabit-LLM ablasyonu $R1$ tutarlılığının çökmediğini gösterir, ancak bu gözlem ilişkisel bir bulgudur, nedesellik değil. Katman 3 (Manimator) yalnız işlerlik kanıtıdır: üretim gecikmesi, ses-görüntü senkronu ve öğrenme etkisi ölçülmemiştir; Bloom 2-Sigma ölçeklemesi bu çalışmanın değil gelecek çalışmanın iddiasıdır.
+            </p>
+            <p style="font-size: 0.6rem; color: var(--muted); line-height: 1.22;">
+              [1] Bloom, <em>Educ. Res.</em> 1984. [2] Radford et al., <em>ICML</em> 2023. [3] Wang et al., <em>Qwen3</em> 2026. [4] Cohen, <em>Educ. Psych. Meas.</em> 1960. [5] Vanzo et al., <em>ACL</em> 2025. [6] Tran et al., <em>ACM CSUR</em> 2026.
+            </p>
+          </div>
+        </article>
+
+      </section>
+
+    </div>
+
+    <!-- Bottom Metadata Footer Banner -->
+    <footer class="poster-footer">
+      <div class="footer-line">
+        <div>Boğaziçi Üniversitesi Lisans Bitirme Projesi Poster Sunumu • EduTerm AI Studio (FastAPI + Whisper + Qwen 3.5 + Manimator)</div>
+        <div>Kod & Veri Seti: <a href="https://github.com/aliayhangunder/Bitirme-Projesi">github.com/aliayhangunder/Bitirme-Projesi</a> • İletişim: ali.gunder@boun.edu.tr</div>
+      </div>
+      <div class="footer-credit">Düzen ve renk şeması SciFig AI açık poster şablonlarından (Classic / Navy) uyarlanmıştır; şablon dosyaları bu ürüne kopyalanmamıştır.</div>
+    </footer>
+
+  </main>
+
+  <script>
+    function toggleFullScreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+  </script>
+</body>
+</html>

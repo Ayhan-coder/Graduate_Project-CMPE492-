@@ -897,12 +897,15 @@
       <!-- SLIDE 1: Başlık -->
       <section class="slide active" data-title="Başlık ve Karşılama">
         <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
-          <div class="slide-badge">Bitirme Projesi Savunması — Eylül 2026</div>
+          <div class="slide-badge">Bitirme Projesi Savunması — Ekim 2026</div>
           <h1 class="slide-title" style="font-size: 38px; max-width: 1100px;">
-            Çok Dilli Eğitim İçin Konuşma Tanıma (ASR) ve Büyük Dil Modeli (LLM) Tabanlı Terminoloji Çıkarma Sistemlerinin İki Katmanlı Değerlendirilmesi
+            Çok Dilli Eğitim İçin Konuşma Tanıma (ASR), Büyük Dil Modeli (LLM) Tabanlı Terminoloji Çıkarma ve İsteğe Bağlı Animasyon Üretimi Sistemlerinin Üç Katmanlı Değerlendirilmesi
           </h1>
           <p class="slide-subtitle" style="font-size: 19px; max-width: 900px; margin-top: 10px; color: #94a3b8;">
-            <em>A Two-Layer Evaluation of Speech-to-Text and LLM-Based Terminology Extraction Systems for Multilingual Education</em>
+            <em>A Three-Layer Evaluation of Speech-to-Text, LLM-Based Terminology Extraction, and Generative Video-Animation Systems for Multilingual Education</em>
+          </p>
+          <p style="font-size: 14px; max-width: 900px; margin-top: 14px; color: #64748b;">
+            Şeffaflık notu: Katman 1 ve Katman 2 <strong>ölçülmüş</strong> kıyaslamalardır; Katman 3 (animasyon üretimi) uçtan uca çalıştığı gösterilmiş, algısal kalitesi <strong>ölçülmemiş</strong> bir prototiptir.
           </p>
 
           <div style="margin-top: 36px; display: flex; gap: 40px; text-align: left;">
@@ -910,6 +913,12 @@
               <div style="font-size: 12px; text-transform: uppercase; color: var(--accent-blue); font-weight: bold;">Araştırmacı ve Yazar</div>
               <div style="font-size: 16px; font-weight: 600; margin-top: 6px;">Ali Ayhan Günder</div>
               <div style="font-size: 14px; color: #cbd5e1; margin-top: 4px;">Bilgisayar Mühendisliği Lisans Tezi</div>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.03); padding: 18px 24px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
+              <div style="font-size: 12px; text-transform: uppercase; color: var(--accent-purple); font-weight: bold;">Tez Danışmanı</div>
+              <div style="font-size: 16px; font-weight: 600; margin-top: 6px;">Prof. Fatih Alagöz</div>
+              <div style="font-size: 14px; color: #cbd5e1; margin-top: 4px;">Bilgisayar Mühendisliği Bölümü</div>
             </div>
 
             <div style="background: rgba(255,255,255,0.03); padding: 18px 24px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
@@ -941,7 +950,7 @@
             <div class="card-title">🎯 Benjamin Bloom'un 2-Sigma Problemi (1984)</div>
             <div class="card-desc">
               • Bire bir öğretmen ve uyarlanabilir usta öğrenimi (mastery learning), geleneksel sınıfa kıyasla <strong>iki standart sapma (+2σ)</strong> başarı artışı sağlar.<br><br>
-              • <strong>Amacımız:</strong> İki katmanlı yapay zekâ hattıyla, video içindeki teknik kavramları otomatik tespit edip öğrencinin düzeyine (CEFR B1) uygun anlık açıklamalarla dijital bir özel öğretmen deneyimi sunmaktır.
+              • <strong>Amacımız:</strong> Üç katmanlı yapay zekâ hattıyla, video içindeki teknik kavramları otomatik tespit edip öğrencinin düzeyine (CEFR B1) uygun anlık açıklamalar sunmak ve istendiğinde kavramın kısa animasyonlu anlatımını üreterek dijital bir özel öğretmen deneyimi sağlamaktır.
             </div>
           </div>
         </div>
@@ -978,12 +987,17 @@
             <div class="tag tag-amber" style="align-self: flex-start;">Uçtan Uca Boru Hattı</div>
           </div>
         </div>
+
+        <div style="font-size: 13.5px; color: #94a3b8; margin-top: 10px;">
+          RQ3 bu çalışmada <strong>kısmen</strong> yanıtlanır: ölçüm doğruluğu-gecikme takasına dayanır, öğrenme çıktısına değil (öğrenci çalışması yapılmamıştır).
+          <strong>Katman 3 (isteğe bağlı animasyon üretimi)</strong> ise bir araştırma sorusu değil, işlerlik kanıtıdır: 7 klip için video üretilmiştir, gecikme/fallback enstrümantasyonu ve algısal değerlendirme yoktur.
+        </div>
       </section>
 
-      <!-- SLIDE 4: İki Katmanlı Sistem Mimarisi -->
+      <!-- SLIDE 4: Üç Katmanlı Sistem Mimarisi -->
       <section class="slide" data-title="Sistem Mimarisi">
         <div class="slide-badge">Bölüm 2: Mimari Tasarım</div>
-        <h2 class="slide-title">İki Katmanlı Bağımsız Boru Hattı Mimarisi</h2>
+        <h2 class="slide-title">Üç Katmanlı Bağımsız Boru Hattı Mimarisi</h2>
         <p class="slide-subtitle">Bileşenlere tıklayarak katmanlar arası veri akışını ve teknik detayları inceleyebilirsiniz.</p>
 
         <div class="pipeline-interactive">
@@ -1005,6 +1019,12 @@
             <div style="font-size: 11px; color: #818cf8;">Qwen3.5 / GPT-4.1</div>
           </div>
           <div class="pipeline-arrow">➔</div>
+          <div class="pipeline-node" onclick="selectNode(this, 'node-anim')">
+            <div style="font-size: 24px;">🎬</div>
+            <div style="font-weight: bold; margin-top: 4px;">Katman 3: Animasyon</div>
+            <div style="font-size: 11px; color: #fbbf24;">Manim -ql · Edge-TTS (prototip)</div>
+          </div>
+          <div class="pipeline-arrow">➔</div>
           <div class="pipeline-node" onclick="selectNode(this, 'node-gui')">
             <div style="font-size: 24px;">💻</div>
             <div style="font-weight: bold; margin-top: 4px;">EduTerm AI Studio</div>
@@ -1015,8 +1035,13 @@
         <div id="node-detail-box" class="card" style="min-height: 120px;">
           <div class="card-title" id="node-detail-title">🎵 Ses İçe Alma (Audio Ingestion)</div>
           <div class="card-desc" id="node-detail-desc">
-            YouTube video URL'si veya yerel dosya alınır. `yt-dlp` ile ses akışı çekilir ve `ffmpeg` yardımıyla 16 kHz Mono 16-bit PCM WAV biçimine normalize edilir. Silero VAD (Ses Aktivite Algılama) ile doğal konuşma duraklarından bölünür.
+            YouTube video URL'si veya yerel dosya alınır. <code>yt-dlp</code> ile ses akışı çekilir ve <code>ffmpeg</code> yardımıyla 16 kHz Mono 16-bit PCM WAV biçimine normalize edilir. Arayüz uzun sesleri <strong>sabit, örtüşmesiz 30 saniyelik</strong> pencerelere böler (<code>gui/pipeline.py:764</code>, <code>CHUNK_S = 30.0</code>); enerji tabanlı VAD parçalayıcısı (<code>vad_chunker.py</code>: 30 ms çerçeveler, kesim çizgisi <code>max(1e-4, 2,2 × gürültü tabanı 25. percentil)</code>, ≤200 ms boşluk kapatma, &gt;0,4 s duraklarda sınır arama, 12-28 s pencereler) yalnızca kıyaslama koşumlarında <code>run_asr.py --use-vad</code> anahtarıyla kullanılır (sözlük koşullama ayrı bir <code>--prompt-glossary</code> anahtarıdır) ve <strong>arayüzün transkripsiyon yolu VAD'i hiç çağırmaz</strong>. Ölçülmüş etki: 7 klipte enerji VAD'i WER'i tüm kliplerde kötüleştirdi (TR makro 0,0207 → 0,0412; EN 0,0101 → 0,0262). Daha önce raporlarda yazılan <code>-40 dBFS</code> eşiği bu kodun eşik tanımı değildir; ölçülen merdivenle birlikte geri çekilmiştir.
           </div>
+        </div>
+
+        <div style="font-size: 13px; color: #94a3b8; margin-top: 8px;">
+          • <strong>Katman 1 ve 2 ölçülmüştür</strong> (Slayt 6-10). <strong>Katman 3 uçtan uca çalışır ama kıyaslanması yapılmamıştır</strong> (Slayt 13-14).
+          • Katman 2 şemasındaki sözlük destekli RAG kolu uygulamada var, değerlendirmede yok: altın listeyle beslendiği için ölçümü döngüsel olurdu (Slayt 9).
         </div>
       </section>
 
@@ -1024,7 +1049,7 @@
       <section class="slide" data-title="Altın Veri Kümesi">
         <div class="slide-badge">Bölüm 3: Veri & Metodoloji</div>
         <h2 class="slide-title">Altın Standart Transkripsiyon Veri Kümesi</h2>
-        <p class="slide-subtitle">7 ders videosu, ~95 dakika toplam süre, 13.599 kelime, Türkçe ve İngilizce 5 akademik disiplin.</p>
+        <p class="slide-subtitle">7 ders videosu, ~95 dakika toplam süre, 13.467 kelime, Türkçe ve İngilizce 5 akademik disiplin.</p>
 
         <div class="data-table-wrapper">
           <table class="data-table">
@@ -1044,7 +1069,7 @@
                 <td><span class="tag tag-rose">TR</span></td>
                 <td>AÖF Proje Yönetimi - Ünite 7</td>
                 <td>12:00</td>
-                <td>1.466</td>
+                <td>1.256</td>
                 <td>Altyazı taslağı + İnsan denetimli terim düzeltmesi</td>
               </tr>
               <tr>
@@ -1052,7 +1077,7 @@
                 <td><span class="tag tag-rose">TR</span></td>
                 <td>Turist Rehberleri İçin Turizm Eğitimi</td>
                 <td>11:17</td>
-                <td>1.489</td>
+                <td>1.464</td>
                 <td>YouTube altyazısı + İnsan düzeltmeli (MICE, UKTKG vb.)</td>
               </tr>
               <tr>
@@ -1060,7 +1085,7 @@
                 <td><span class="tag tag-rose">TR</span></td>
                 <td>Tirendaz AI Veri Bilimi & Python</td>
                 <td>14:15</td>
-                <td>1.841</td>
+                <td>1.583</td>
                 <td>Sesten doğrudan transkripsiyon taslağı + İnsan kontrolü</td>
               </tr>
               <tr>
@@ -1068,7 +1093,7 @@
                 <td><span class="tag tag-blue">EN</span></td>
                 <td>Grow with Google: Agile Project Mgmt</td>
                 <td>13:17</td>
-                <td>2.137</td>
+                <td>2.168</td>
                 <td>Resmi temizlenmiş insan altyazısı (Coursera)</td>
               </tr>
               <tr>
@@ -1076,7 +1101,7 @@
                 <td><span class="tag tag-blue">EN</span></td>
                 <td>What is Sustainable Tourism?</td>
                 <td>09:16</td>
-                <td>1.424</td>
+                <td>1.267</td>
                 <td>YouTube altyazısı + İnsan düzeltmeli (Brundtland vb.)</td>
               </tr>
               <tr>
@@ -1084,7 +1109,7 @@
                 <td><span class="tag tag-blue">EN</span></td>
                 <td>Generative AI in a Nutshell</td>
                 <td>17:57</td>
-                <td>2.875</td>
+                <td>3.459</td>
                 <td>YouTube altyazısı + İnsan düzeltmeli (Prompt, Kanban)</td>
               </tr>
               <tr>
@@ -1092,7 +1117,7 @@
                 <td><span class="tag tag-blue">EN</span></td>
                 <td>Understanding Thermal Radiation</td>
                 <td>17:33</td>
-                <td>2.367</td>
+                <td>2.270</td>
                 <td>İnsan üretimi altyazı (Stefan-Boltzmann, Planck)</td>
               </tr>
             </tbody>
@@ -1114,10 +1139,11 @@
           <div class="card">
             <div class="card-title">🖥️ Donanım ve Çıkarım Profili</div>
             <div class="card-desc">
-              • <strong>GPU:</strong> NVIDIA GeForce RTX 5060 Laptop GPU (8 GB GDDR6, CUDA 13.0, Driver 616.56)<br>
+              • <strong>GPU:</strong> NVIDIA GeForce RTX 5060 Laptop GPU (8.151 MiB GDDR6, CUDA 13.0, Sürücü 617.42)<br>
               • <strong>CPU & RAM:</strong> Intel Core i7-14650HX (16 Çekirdek, 24 Thread), 32 GB DDR5 RAM<br>
-              • <strong>Ortam:</strong> Python 3.12, PyTorch 2.12.0+cu130, HuggingFace Transformers ≥5.13<br>
-              • <strong>Kod Çözme:</strong> Sequential `generate()`, `max_new_tokens=440`, `condition_on_prev_tokens=True`
+              • <strong>Ortam:</strong> Python 3.12.9, PyTorch 2.12.0+cu130, Transformers 5.16.1 (yeniden doğrulama: <code>python experiments/check_env.py</code>)<br>
+              • <strong>Kod Çözme:</strong> Sequential <code>generate()</code>, <code>max_new_tokens=440</code>; <code>prompt_ids</code> verildiğinde <code>448 − önek − 16</code> bütçesine kırpılır<br>
+              • <strong>Pencereleme:</strong> Whisper tüm ses üzerinde sıralı; Qwen3-ASR 30 s, Nemotron 60 s dilim; arayüz yolu her zaman sabit 30 s
             </div>
           </div>
 
@@ -1230,7 +1256,67 @@
         </div>
 
         <div class="guardrail-alert">
-          🛡️ <strong>Guardrail 4 & 7:</strong> n=7 video ile "Türkçe ASR için daha zordur" genellemesi yapılamaz (akustik farklar mevcuttur). GPU'da çalıştırılmayan modeller tablolarda dürüstçe `—` olarak korunmuştur.
+          🛡️ <strong>Guardrail 4 &amp; 7:</strong> n=7 video ile "Türkçe ASR için daha zordur" genellemesi yapılamaz.
+          Kayıtların yedisinde de hiçbir akustik nicelik ölçülmedi (yankılanma, gürültü tabanı, kanal/hız sıkıştırma
+          ölçümü yok); <code>experiments/data/DATASET_CARD.md</code> yediyi de hazırlanmış, tek konuşmacılı,
+          senaryolu eğitici videolar olarak kaydeder. TR-3'ün her checkpoint'te en zor klip olması bu nedenle
+          <em>açıklanmış</em> değil, <em>gözlenmiş</em> bir klip özelliğidir. GPU'da çalıştırılmayan modeller
+          tablolarda dürüstçe <code>—</code> olarak korunmuştur.
+        </div>
+      </section>
+
+      <!-- SLIDE 7B: Olculemus mudahale merdiveni -->
+      <section class="slide" data-title="Ölçülmüş Müdahale Merdiveni">
+        <div class="slide-badge">Bölüm 4: ASR Kıyaslaması</div>
+        <h2 class="slide-title">Katman 1: Akustik Müdahale Merdiveni — Ölçüldü, Olumsuz Çıktı</h2>
+        <p class="slide-subtitle">Aynı 7 klip, aynı Large-v3 ağırlıkları; tek değişen boru hattı kademesi. Kaynak: <code>outputs/interventions_summary.json</code>.</p>
+
+        <div class="data-table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Kademe</th>
+                <th>TR WER</th>
+                <th>EN WER</th>
+                <th>Geçiş Kapsamı (TR / EN)</th>
+                <th>Ölçülen Sonuç</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>(1) Ham taban (GPU)</strong></td>
+                <td>0.0207</td>
+                <td>0.0101</td>
+                <td>0.875 / 0.969</td>
+                <td>Sökülecek tekrar döngüsü yok: 8-gram tekrarı 0,0122 / 0,0000</td>
+              </tr>
+              <tr>
+                <td><strong>(2) + Enerji VAD parçalama</strong></td>
+                <td>0.0412 <span style="color:#fb7185;">(+%99,6)</span></td>
+                <td>0.0262 <span style="color:#fb7185;">(+%160,1)</span></td>
+                <td>0.875 / 0.969</td>
+                <td>7 klipte de kötüleşme; arayüz bunu hiç çağırmıyor (sabit 30 s dilim)</td>
+              </tr>
+              <tr>
+                <td><strong>(3) + Sözlük koşullama</strong></td>
+                <td>0.0822 <span style="color:#fb7185;">(+%99,4)</span></td>
+                <td>0.0431 <span style="color:#fb7185;">(+%64,4)</span></td>
+                <td>0.875 / <strong>1.000 (sızıntı)</strong></td>
+                <td>Yalnız TR-1/EN-1: 0,0333→0,1562 ve 0,0194→0,0869; 55→398 sn; diğer 5 klip bayt düzeyinde aynı</td>
+              </tr>
+              <tr>
+                <td><strong>(4) + LLM düzeltme (4B)</strong></td>
+                <td>0.1339 <span style="color:#fb7185;">(+%62,9)</span></td>
+                <td>0.0418 <span style="color:#34d399;">(−%2,9)</span></td>
+                <td>0.844 / 1.000</td>
+                <td>4/7 klipte iyileşme, <strong>0/7 klip ham tabanın altında</strong>; TR-1 0,1562→0,3236</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="guardrail-alert">
+          🛡️ <strong>Guardrail 8, 9 &amp; 11:</strong> −%83,7 / −%12,4 / −%22,2 satırları, 0,129 TR temeli, "-40 dBFS" eşiği, %80,5 Terim F₁ ve "%26,3 gürültüde +29,8 F₁" stres testi geri çekildi; son ikisi <code>asr_post_correction.py --test</code> kendi sınamasından geliyor (orada "düzeltilmiş" dizim altın referansın kendisi, WER %0,0). Olumsuz sonuç da bir bulgudur.
         </div>
       </section>
 
@@ -1256,51 +1342,63 @@
           </div>
 
           <div class="card">
-            <div class="card-title">📊 Prompt Stratejileri Başarımı (N=12 Altın Kavram)</div>
+            <div class="card-title">📊 Prompt Stratejileri: Gerçekten Koşan İki Kol (Kapalı Altın Liste N=32/klip)</div>
             <div class="data-table-wrapper" style="margin-top: 0;">
               <table class="data-table">
                 <thead>
                   <tr>
+                    <th>Koşum</th>
                     <th>Strateji</th>
                     <th>Terim</th>
                     <th>Precision</th>
                     <th>Recall</th>
                     <th>F1 Skoru</th>
-                    <th>Gecikme</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
+                    <td>TR-1</td>
                     <td>Zero-Shot</td>
-                    <td>11</td>
-                    <td>55.6%</td>
-                    <td>41.7%</td>
-                    <td>47.6%</td>
-                    <td>3.42 s</td>
+                    <td>8</td>
+                    <td>100.0%</td>
+                    <td>25.0%</td>
+                    <td>40.0%</td>
                   </tr>
                   <tr>
+                    <td>TR-1</td>
                     <td>CoT</td>
-                    <td>15</td>
-                    <td>63.6%</td>
-                    <td>58.3%</td>
-                    <td>60.9%</td>
-                    <td>6.85 s</td>
+                    <td>11</td>
+                    <td>100.0%</td>
+                    <td>34.4%</td>
+                    <td class="val-best">51.2%</td>
                   </tr>
-                  <tr style="background: rgba(56, 189, 248, 0.1);">
-                    <td><strong>RAG (Sözlük)</strong></td>
-                    <td><strong>18</strong></td>
-                    <td class="val-best">76.9%</td>
-                    <td class="val-best">76.9%</td>
-                    <td class="val-best">76.9%</td>
-                    <td><strong>4.15 s</strong></td>
+                  <tr>
+                    <td>EN-1</td>
+                    <td>Zero-Shot</td>
+                    <td>18</td>
+                    <td>88.9%</td>
+                    <td>50.0%</td>
+                    <td class="val-best">64.0%</td>
+                  </tr>
+                  <tr>
+                    <td>EN-1</td>
+                    <td>CoT</td>
+                    <td>0</td>
+                    <td>—</td>
+                    <td>—</td>
+                    <td class="val-warn">0.0%</td>
                   </tr>
                 </tbody>
               </table>
             </div>
             <div style="font-size: 12px; color: #94a3b8; margin-top: 6px;">
-              • Sözlük Destekli RAG, terim çekirdeği sağlayarak halüsinasyonu önlemiş ve F1'i %76.9'a taşımıştır.
+              • <strong>Ölçülen:</strong> Türkçede CoT, Zero-Shot'u F1'de %40.0 → %51.2'ye çıkarıyor; İngilizcede CoT koşumu ayrıştırılabilir JSON döndürmedi (0 terim). Her çağrı 71-81 sn sürdü (yerel 4-bit). Tek klip/dil, tek koşum: bu üç kollu bir benchmark değil, iki kolluk bir prob.
             </div>
           </div>
+        </div>
+
+        <div class="guardrail-alert">
+          ⚠️ <strong>Düzeltme (geri çekilen tablo):</strong> Bu slaytta daha önce "Zero-Shot %47.6 → RAG %76.9, 3.42-6.85 sn" satırları vardı. <code>prompt_strategies.py --test</code> bu üç F1 değerini birebir üretiyor: sahte kol altın listenin ilk 10/14/20 terimini veriyor ve kesinliği 1.0'a zorluyor — sayılar modelin değil fixture'ın özelliğiydi. Sözlük destekli RAG kolu ayrıca döngüsel: beslendiği <code>data/gold_terms.json</code> puanlamada kullanılan dosyanın kendisi; kovuşturma artık saklı tutulmuş bir <code>data/glossary_&lt;KLİP&gt;.json</code> olmadan koşmuyor ve böyle bir dosya hiç etiketlenmedi.
         </div>
       </section>
 
@@ -1308,34 +1406,38 @@
       <section class="slide" data-title="Pedagojik Okunabilirlik">
         <div class="slide-badge">Bölüm 5: Pedagojik Seviye</div>
         <h2 class="slide-title">Pedagojik Okunabilirlik ve Sözlük Doğruluğu</h2>
-        <p class="slide-subtitle">Açıklamaların başlangıç seviyesine (CEFR B1) uygunluğu iki bağımsız formülle doğrulanmıştır.</p>
+        <p class="slide-subtitle">Açıklamaların başlangıç seviyesine uygunluğu <code>eval_semantic.py</code> ile 807 açıklama üzerinde ölçülmüştür; ortalamalar hedef bandı gösterir, tek tek açıklamaların bandı tutturma oranı ayrıdır.</p>
 
         <div class="grid-2">
           <div class="card">
             <div class="card-title">🇹🇷 Türkçe Çıktılar: Ateşman Okunabilirlik İndeksi</div>
             <div class="card-desc">
-              <div style="font-size: 26px; font-weight: bold; color: var(--accent-blue); margin: 6px 0;">
-                58.4 – 61.4 <span style="font-size: 15px; color: #34d399;">(Orta Güçlükte / CEFR B1)</span>
+              <div style="font-size: 22px; font-weight: bold; color: var(--accent-blue); margin: 6px 0;">
+                Hedef aralık: 50 – 69 <span style="font-size: 15px; color: #34d399;">(Orta Güçlükte)</span>
               </div>
-              • <strong>GPT-4.1:</strong> 61.4 | <strong>BERTScore (TDK):</strong> 0.842<br>
-              • <strong>Qwen3.5-4B:</strong> 58.4 | <strong>BERTScore (TDK):</strong> 0.828<br>
-              • <em>Hedef Aralık:</em> 50 – 70 (Lise ve Üniversite başlangıç seviyesi)<br>
-              • Hece ve kelime uzunluğu analizi açıklamaların yalın tutulduğunu gösterir.
+              • <strong>EVREN Qwen 3.8 Flash</strong> (53 açıklama): ort. <strong>56.4</strong> · bandın içi <strong>%45.3</strong> · leksik vekil $F_1$ <strong>30.8</strong><br>
+              • <strong>EVREN DeepSeek V4.1 Flash</strong> (107): ort. <strong>65.8</strong> · bandın içi <strong>%39.2</strong> · vekil <strong>24.1</strong><br>
+              • <strong>Qwen3.5-4B yerel 4-bit</strong> (179): ort. <strong>48.0</strong> (hücre ort. 42.1–53.6) · bandın içi <strong>%41.9</strong> · vekil <strong>30.5</strong><br>
+              • Yerel modelin havuzlanmış ortalaması hedef bandının <em>altında</em> kalıyor.
             </div>
           </div>
 
           <div class="card">
             <div class="card-title">🇬🇧 İngilizce Çıktılar: Flesch Reading Ease</div>
             <div class="card-desc">
-              <div style="font-size: 26px; font-weight: bold; color: var(--accent-indigo); margin: 6px 0;">
-                64.2 – 65.8 <span style="font-size: 15px; color: #34d399;">(Standard / CEFR B1)</span>
+              <div style="font-size: 22px; font-weight: bold; color: var(--accent-indigo); margin: 6px 0;">
+                Hedef aralık: 60 – 70 <span style="font-size: 15px; color: #34d399;">(Standard)</span>
               </div>
-              • <strong>GPT-4.1:</strong> 65.8 | <strong>BERTScore (Oxford):</strong> 0.865<br>
-              • <strong>Qwen3.5-4B:</strong> 64.2 | <strong>BERTScore (Oxford):</strong> 0.851<br>
-              • <em>Hedef Aralık:</em> 60 – 70 (Plain English / 8th-9th Grade)<br>
-              • Her iki model de profesyonel sözlüklerle yüksek anlamsal örtüşme sağlamıştır.
+              • <strong>EVREN Qwen 3.8 Flash</strong> (72 açıklama): ort. <strong>56.7</strong> · bandın içi <strong>%18.1</strong> · leksik vekil $F_1$ <strong>29.6</strong><br>
+              • <strong>EVREN DeepSeek V4.1 Flash</strong> (142): ort. <strong>56.0</strong> · bandın içi <strong>%28.9</strong> · vekil <strong>26.7</strong><br>
+              • <strong>Qwen3.5-4B yerel 4-bit</strong> (254): ort. <strong>56.2</strong> (hücre ort. 52.4–61.3) · bandın içi <strong>%28.7</strong> · vekil <strong>28.9</strong><br>
+              • Hiçbir sistem çıktuların çoğunu madde madde bandın içine sokmuyor: "tamamen B1" iddiası ölçümle desteklenmiyor.
             </div>
           </div>
+        </div>
+
+        <div class="guardrail-alert">
+          ⚠️ <strong>Düzeltme:</strong> Bu slaytta daha önce yayılan GPT-4.1 61.4 / Qwen3.5-4B 58.4 değerleri ve "BERTScore 0.842/0.828" sütunu diskte hiçbir artefakta dayanmıyordu. <code>bert_score</code> paketi kurulu olmadığından metrik bağlamsal BERTScore değil, karakter trigram kosinüs + kelime örtüşmesi tabanlı <strong>leksik bir vekildir</strong>. Ticari API çıktıları yapılandırılmamış Markdown olarak saklandığı için okunabilirlikleri ölçülememiştir; hücreler tahmin edilmemiş, yayından çıkarılmıştır.
         </div>
 
         <div class="guardrail-alert">
@@ -1347,7 +1449,7 @@
       <section class="slide" data-title="Değerlendirici Uyumu">
         <div class="slide-badge">Bölüm 6: İstatistiksel Güvenilirlik</div>
         <h2 class="slide-title">Değerlendirici Uyumu & Prevalans Paradoksu</h2>
-        <p class="slide-subtitle">İki bağımsız insan değerlendirici (N=115) ve LLM-as-a-Judge (N=233) uzlaşma analizi.</p>
+        <p class="slide-subtitle">Diskte desteklenen tek uyum istatistiği: iki bağımsız insan değerlendirici, N=115 çift. LLM hakemin kullanımı ve ölçülemeyen doğrulaması aşağıda ayrılmıştır.</p>
 
         <div class="grid-2">
           <div class="card">
@@ -1370,18 +1472,18 @@
           </div>
 
           <div class="card">
-            <div class="card-title">🤖 LLM-as-a-Judge Doğrulaması (N=233 Çift)</div>
+            <div class="card-title">🤖 LLM-as-a-Judge: Ne İddia Ediyoruz, Ne Edemiyoruz</div>
             <div class="card-desc">
-              • İnsan Etiketleyici vs. LLM Hakem Uyum: <strong>%97.42</strong><br>
-              • Ham Kappa: <em>0.490</em> (yüksek pozitif prevalans önyargısı)<br>
-              • <strong>PABAK (Prevalence-Adjusted Bias-Adjusted Kappa):</strong> <span class="val-best" style="font-size: 17px;">0.948</span><br><br>
-              PABAK katsayısı, marjinal asimetriyi düzelterek insan ile model hakem arasındaki uzlaşmanın %94.8 olduğunu kanıtlamıştır.
+              • <strong>Artefaktı olan kullanım:</strong> Hakem <code>Qwen3.5-4B</code> rubrik çağrıları iki grup için madde bazında diskte — 2026 ASR ablasyonu (<code>labels_ablation_real_judge.csv</code>, 200 çift) ve EVREN hücreleri (<code>labels_evren_judge.csv</code>, 374 çift).<br>
+              • <strong>Geri çekildi:</strong> "İnsan etiketleyici vs. LLM hakem uyumu P<sub>o</sub>=%97.42, κ<sub>D</sub>=0.490 → PABAK=0.948" satırı. 233 çiftlik insan seti üzerinde hiçbir madde-bazlı hakem tahmini saklanmadığı için karşılaştırma yeniden üretilemez.<br>
+              • Diskteki tek <strong>0.974</strong> değeri D boyutunun <strong>olumlu prevalansıdır</strong> (P<sub>e</sub>=0.949'u üreten nicelik), bir uyum oranı değildir.<br>
+              • Sonuç: hakem türevli R1%/D1% hücreleri (EVREN %100 dahil) ölçülmemiş bir hoşgörü taşır ve <strong>üst sınır</strong> olarak okunmalıdır.
             </div>
           </div>
         </div>
 
         <div class="guardrail-alert">
-          🛡️ <strong>Guardrail 2:</strong> κ_D = 1.000 göründüğünden daha zayıf bir kanıttır (Prevalence Paradox). Jüriye savunmada asıl ayırt edici güvenilirlik metriğinin κ_R = 0.782 olduğu aktarılmalıdır.
+          🛡️ <strong>Guardrail 2:</strong> κ_D = 1.000 göründüğünden daha zayıf bir kanıttır (Prevalence Paradox, P<sub>e</sub>=0.949). Asıl ayırt edici güvenilirlik metriği κ_R = 0.782 (PABAK_R = 0.930) değeridir.
         </div>
       </section>
 
@@ -1389,7 +1491,7 @@
       <section class="slide" data-title="Hata Yayılımı">
         <div class="slide-badge">Bölüm 7: Çapraz Katman Analizi</div>
         <h2 class="slide-title">ASR ➔ LLM Hata Yayılımı & Ablasyon</h2>
-        <p class="slide-subtitle">Sabit LLM (Qwen3.5-4B) transkript duyarlılığı ve sentetik gürültü degradasyon eğrisi.</p>
+        <p class="slide-subtitle">Sabit LLM (Qwen3.5-4B) transkript duyarlılığı ve modellenmiş WER → F1 bozulma merdiveni.</p>
 
         <div class="grid-2">
           <div class="card">
@@ -1431,12 +1533,13 @@
               </table>
             </div>
             <div style="font-size: 12px; color: #94a3b8; margin-top: 6px;">
-              • <strong>Bulgu:</strong> WER &lt; %5 rejiminde ASR modelleri arasında terim kalitesi açısından kritik bir fark oluşmamaktadır.
+              • <strong>Bulgu:</strong> WER &lt; %5 rejiminde ASR modelleri arasında terim kalitesi açısından kritik bir fark oluşmamaktadır.<br>
+              • <strong>Etiket kaynağı:</strong> bu altı Whisper hücresi insan etiketleyici 1 (<code>labels_a1.csv</code>, 233 çift); 2026 checkpoint hücreleri yerel LLM hakemdir — iki kaynak tabloda ayrı tutulur.
             </div>
           </div>
 
           <div class="card">
-            <div class="card-title">📉 Sentetik Fonetik Gürültü Eğrisi (F1 vs WER)</div>
+            <div class="card-title">📉 F1 vs WER: Modellenmiş Merdiven + Ölçülen Noktalar</div>
             <div style="flex: 1; display: flex; align-items: center; justify-content: center;">
               <svg width="100%" height="160" viewBox="0 0 400 160">
                 <!-- Axes -->
@@ -1458,17 +1561,18 @@
                 <circle cx="200" cy="85" r="5" fill="#fbbf24"/>
                 <circle cx="380" cy="126" r="4" fill="#f43f5e"/>
 
-                <text x="210" y="80" fill="#fbbf24" font-size="10">Kritik Kırılma (WER > %20)</text>
+                <text x="205" y="78" fill="#fbbf24" font-size="10">Analitik model (LLM çağrılmadı)</text>
               </svg>
             </div>
             <div style="font-size: 12px; color: #94a3b8;">
-              • WER %20'yi aştığında F1 skoru %40'ın altına düşmektedir.
+              • Mavi eğri <strong>modelledir</strong>: altın liste enjekte WER ile yeniden örneklenir (%0 WER'de F1 = 1.000 tanım gereği), LLM hiç çağrılmaz. Uçlar: %39 enjekte hatada TR 0.458, EN 0.604.<br>
+              • <strong>Ölçülen</strong> 11 gerçek ASR hipotezi (kapalı altın liste, 32 terim/klip, tek klip/dil) TR'de F1 0.238–0.439, EN'de 0.565–0.679 aralığında ve sıralama WER'e göre monoton değil: TR-1'de en iyi F1 (0.439) Nemotron'un 0.117 WER'inden, en kötüsü (0.238) Qwen3-ASR'ın 0.136'sından geliyor.
             </div>
           </div>
         </div>
 
         <div class="guardrail-alert">
-          🛡️ <strong>Guardrail 5:</strong> Whisper ablasyonu bir hata yayılım eğrisi değildir (hepsi düşük WER'dir). Sürekli hata eğrisi kontrollü sentetik gürültü deneyiyle gösterilmiştir.
+          🛡️ <strong>Guardrail 5:</strong> Whisper ablasyonu bir hata yayılım eğrisi değildir (hepsi düşük WER rejiminde). Sürekli bozulma eğrisi <em>ölçülmemiş</em>, altın listenin yeniden örneklenmesiyle modellenmiştir; ölçülen yayılım tek klip/dil ile sınırlıdır ve popülasyon tahmini değildir.
         </div>
       </section>
 
@@ -1486,7 +1590,9 @@
               • <strong>Frontend:</strong> Vanilla CSS & JS, Koyu Cam Efekti (Glassmorphism), İnteraktif DAG<br>
               • <strong>Uyarlanabilir Öğrenci:</strong> Aralıklı tekrar (spaced repetition) ile ustalık kazancı/kaybı<br>
               • <strong>Sınav Motoru:</strong> Terimlerden otomatik 4 seçenekli MCQ ve bilgi kartı (Flashcard) üretimi<br>
-              • <strong>Yardımcı Slaytlar:</strong> Terim hiyerarşisi ve Mermaid akış şeması sentezi
+              • <strong>Yardımcı Slaytlar:</strong> Terim hiyerarşisi ve Mermaid akış şeması sentezi<br>
+              • <strong>Katman 3 (animasyon üretimi):</strong> terim kartından <code>[t-45 s, t+10 s]</code> bağlam penceresi → Qwen3.5-4B senaryo + Manim kodu → AST allow-list denetimi (azami 2 kendini-onarma denemesi) → <code>manim -ql</code> 480p15 → Edge-TTS → FFmpeg mux. Diskte 7 klip için üretilmiş video var (22.3-41.8 sn, ~211 sn toplam, 417-818 kB); üretim <strong>çevrimdışı/ batch</strong>'tir, "canlı" değildir — ses-görüntü senkronu ve üretim gecikmesi ölçülmemiştir.<br>
+              • <strong>Dikkat denetimi (webcam):</strong> <code>gui/static/app.js</code> içinde <code>getUserMedia</code> + MediaPipe FaceMesh ile EAR/yaw/pitch/iris kuralları oynatıcıyı duraklatır; kareler tarayıcıda kalır, sunucuya yazılmaz. Model ayağı <code>cdn.jsdelivr.net</code>'ten geldiği için o bileşen çevrimdışı değildir ve kareler kişisel veridir (KVKK/GDPR). Bakış doğruluğu ve oto-duraklamanın dikkat üzerindeki etkisi <strong>ölçülmemiştir</strong>; kameraya erişilemezse kod simülasyon moduna düşer.
             </div>
           </div>
 
@@ -1513,18 +1619,19 @@
       <section class="slide" data-title="Test ve Güvenilirlik">
         <div class="slide-badge">Bölüm 8: Mühendislik Standartları</div>
         <h2 class="slide-title">Yazılım Mühendisliği & Test Güvenilirliği</h2>
-        <p class="slide-subtitle">226 otomatik birim test ile Ar-Ge kalitesi ve güvenilirliği kanıtlanmıştır.</p>
+        <p class="slide-subtitle">254 otomatik birim test koşumu kapsar; tamamı geçiyor (4,9 sn). Aşağıda testin yakalayıp giderdiğimiz bir varsayılan model tutarsızlığı açıkça raporlanıyor.</p>
 
         <div class="grid-2">
           <div class="card">
-            <div class="card-title">🧪 226 Kapsamlı Birim Test (%100 Geçiş)</div>
+            <div class="card-title">🧪 254 Birim Test — Tamamı Geçiyor</div>
             <div class="card-desc">
               • <strong>Pipeline:</strong> ASR/LLM iptal edilebilir iş kuyruğu ve bellek yönetimi<br>
               • <strong>API & WebSocket:</strong> REST uç noktaları, SSE olayları ve durum raporlama<br>
               • <strong>Uyarlanabilir Öğrenci:</strong> Aralıklı tekrar formülleri, tavan/taban sınırları<br>
               • <strong>Sınav Üretimi:</strong> 4 seçenekli MCQ doğruluğu, çeldirici ayrımı<br>
               • <strong>Yardımcı Slayt:</strong> Mermaid şablon sentezi ve acil durum şablonları<br>
-              • <em>Komut:</em> `python -m unittest discover -s experiments/tests` (5.1 sn)
+              • <em>Komut:</em> <code>python -m unittest discover -s experiments/tests</code> (~5.6 sn)<br>
+              • <strong>Bir dönem yakalanan tutarsızlık (gizlenmiyor):</strong> <code>test_gui_api.test_models</code> varsayılan LLM olarak <code>Qwen/Qwen3.5-4B</code> bekliyordu; arayüz bir dönem <code>evren/qwen3.8-flash-next</code> ile açılıyordu ve test kırmızıydı. Bulut varsayılanı ücretli kredi + <code>EVREN_ACCEPT_TERMS=1</code> opt-in'i gerektirdiği için yerel model varsayılana döndürüldü, EVREN seçenek olarak kaldı; son koşumda 254/254 geçiyor.
             </div>
           </div>
 
@@ -1533,7 +1640,7 @@
             <div class="card-desc">
               • <strong>Otomatik Port Bulma (Port Hunting):</strong> 7860 meşgulse çökmeden 7861'e otomatik geçiş.<br><br>
               • <strong>Erişim Belirteci (Token Auth):</strong> Dış ağa bağlanıldığında (`0.0.0.0`) URL'e zorunlu güvenlik tokeni eklenmesi.<br><br>
-              • <strong>VRAM Taşma Önleme:</strong> GPU OOM anında kural tabanlı acil durum şablonuna otomatik geri düşüş (fallback).
+              • <strong>Bellek Yönetimi:</strong> her aşama sonunda <code>clear_gpu_memory()</code> ile Whisper/LLM ağırlıkları tahliye edilir; LLM çağrısı hata verirse kural tabanlı şablona düşülür (<code>manimator.py:195</code>, <code>socratic.py:195</code>). Ayrılmış tepe VRAM işaretleme ile ölçülmemiştir; bu yüzden burada bir kapasite sayısı iddia edilmiyor.
             </div>
           </div>
         </div>
@@ -1547,24 +1654,24 @@
 
         <div class="grid-2">
           <div class="card" style="border-color: rgba(52, 211, 153, 0.4);">
-            <div class="card-title" style="color: var(--accent-emerald);">🎯 Doğruluk-Öncelikli Dağıtım</div>
+            <div class="card-title" style="color: var(--accent-emerald);">🎯 Doğruluk/Kapsama-Öncelikli Dağıtım</div>
             <div class="card-desc">
-              • <strong>ASR:</strong> Whisper Large-v3 (TR WER 0.021 / EN WER 0.010)<br>
-              • <strong>LLM:</strong> Qwen3.5-9B veya GPT-4.1<br>
-              • <strong>Özellik:</strong> Maksimum terminolojik kapsam (105+ terim), kusursuz transkripsiyon.<br>
-              • <strong>Kullanım Alanı:</strong> Resmi ders arşivleme, çeviri, akredite ders kitabı sözlükleri.<br>
-              • <strong>Donanım:</strong> Yüksek GPU VRAM veya bulut API bütçesi.
+              • <strong>ASR:</strong> Whisper Large-v3 (TR WER 0.021 / EN WER 0.010, %95 güven aralıklı)<br>
+              • <strong>LLM:</strong> EVREN DeepSeek V4.1 Flash — en yüksek terim kapsamı (107 TR / 142 EN), R1% 94.4 / 99.3 (yalnız LLM hakem, üst sınır)<br>
+              • <strong>Bedeli:</strong> 27.68 s TR / 19.44 s EN — yani her iki ticari API'den yavaş; bu bir kapsama seçimi, hız seçimi değil<br>
+              • <strong>Alternatif:</strong> GPT-4.1 pilotu 105 EN / 78 TR terim üretir ama hiçbir madde-bazlı etiket sayfası olmadığı için kalite iddiası taşımaz<br>
+              • <strong>Qwen3.5-9B:</strong> yalnızca host belleğine taşırılmış yapılandırmada koştu (513.19 s/klip, n=2) — önerimiz batch ölçümüne dayanır, GPU boyutlandırmasına değil
             </div>
           </div>
 
           <div class="card" style="border-color: rgba(56, 189, 248, 0.4);">
             <div class="card-title" style="color: var(--accent-blue);">⚡ Hız/Gecikme-Öncelikli Dağıtım</div>
             <div class="card-desc">
-              • <strong>ASR:</strong> Whisper Large-v3 Turbo (TR RTF 0.044 / EN RTF 0.025)<br>
-              • <strong>LLM:</strong> Qwen3.5-4B veya GPT-4o-mini<br>
-              • <strong>Özellik:</strong> 4-8 kat hızlı işlem, anlık etkileşim (&lt;4 sn yanıt).<br>
-              • <strong>Kullanım Alanı:</strong> Eşzamanlı canlı ders altyazılama, video içi anlık terim kartı gösterimi.<br>
-              • <strong>Donanım:</strong> RTX 5060 8GB VRAM (4-bit nicemleme ile yerel maliyetsiz).
+              • <strong>ASR:</strong> Whisper Large-v3 Turbo (TR RTF 0.044 / EN RTF 0.025) — Large-v3'e göre ölçülen havuzlanmış duvar saati avantajı 3,4× (TR: 110,6 sn → 32,5 sn) / 7,7× (EN: 170,7 sn → 22,1 sn)<br>
+              • <strong>LLM:</strong> EVREN Qwen 3.8 Flash, ölçülen en hızlı semantik kol: 6.11 s TR / 4.92 s EN ort.<br>
+              • <strong>Yerel eşdeğer:</strong> Qwen3.5-4B 4-bit, TR Large-v3 beslemesinde 39.55 s ort. (ayni girdi seçimi 39.55-138.48 s aralığını üretiyor)<br>
+              • <strong>Düzeltme:</strong> "&lt;4 sn anlık yanıt" iddiası geri çekildi; diskteki hiçbir ölçüm bu eşiği desteklemiyor<br>
+              • <strong>Not:</strong> semantik katman buluta taşınsa da ASR katmanı yerel çalışır; tepe VRAM ölçülmediği için "maliyetsiz/düşük kaynak" sayısal olarak iddia edilmiyor. KVKK yerine: yerli operatör bir veri uydukluğu (data-residency) posturusudur, alınmış işlem/saklama koşulu yoktur.
             </div>
           </div>
         </div>
@@ -1582,7 +1689,10 @@
             <div class="card-desc">
               • <strong>Veri Büyüklüğü:</strong> 7 video sınırlı bir kümedir; dil genellemesi yapılmamalıdır.<br><br>
               • <strong>Altın Transkript:</strong> Sıfırdan bağımsız değil, insan denetimli post-edittir.<br><br>
-              • <strong>Kapalı Sözlük Yokluğu:</strong> R1% bir kesinlik metriğidir; tam duyarlılık ölçülmemiştir.
+              • <strong>Kapalı Sözlük Yokluğu:</strong> R1% bir kesinlik metriğidir; tam duyarlılık ölçülmemiştir.<br><br>
+              • <strong>Hakem Doğrulaması Yok:</strong> LLM hakemin insanlarla uyumu madde bazında saklanmadığı için hakem türevli hücreler üst sınır olarak okunur; sözlük destekli RAG kolu ölçülemez (döngüsel) ve saklı tutulmuş glossary hiç etiketlenmedi.<br><br>
+              • <strong>Ölçülmüş ama Olumsuz Müdahale:</strong> Üç müdahalenin merdiveni 7 klipte ve aynı Large-v3 ağırlıklarıyla gerçekten koşuldu (<code>outputs/interventions_summary.json</code>). Enerji tabanlı VAD parçalama WER'i <em>tüm</em> kliplerde yükseltti (TR makro 0,0207 → 0,0412; EN 0,0101 → 0,0262); GPU temel koşumunda sökülecek tekrar döngüsü yoktu (8-gram tekrarı 0,0122/0,0000). Eski &quot;−%83,7&quot; satırı, 0,129 TR temeli ve &quot;-40 dBFS&quot; eşiği geri çekildi. Terminoloji biasing'i altın listeden beslendiği için <strong>sızıntılıdır</strong> ve yalnız TR-1/EN-1'i etkiler: TR-1 0,0333 → 0,1562 (68 kelimelik önek yankısı), EN-1 0,0194 → 0,0869 ve 55 sn → 398 sn; yayınlanan satırı ayrıca hiç üretilemezdi (glossary öneki Whisper'ın 448 konum bütçesini taşırdığı için <code>generate()</code> her klipte hata veriyordu). LLM düzeltme (<code>Qwen3.5-4B</code>) 4 klipte hatayı düşürür ama <strong>hiçbir klipti ham tabanın altına döndüremez</strong>; TR-1'de hatayı yeniden iki katına çıkarır (0,1562 → 0,3236) ve yinelemeyi artırır (0,1361 → 0,2723). &quot;%26,3 gürültüde +29,8 puan F₁&quot; stres testi de geri çekildi: sayılar <code>asr_post_correction.py --test</code> kendi sınamasından gelir (orada &quot;düzeltilmiş&quot; dizim altın referansın kendisidir, WER %0,0 çıkar).<br><br>
+              • <strong>Ölçülmemiş Olanlar:</strong> checkpoint başına tepe VRAM, Katman 3 üretim gecikmesi/fallback oranı ve öğrenci kazanım çalışması. <code>manim</code> ve <code>edge-tts</code> kilitli ortamda (<code>requirements.txt</code>) bağımlılık olarak listelenmemiştir.
             </div>
           </div>
 
@@ -1592,7 +1702,8 @@
               • <strong>LMS Entegrasyonu:</strong> Moodle veya Canvas için LTI/SCORM uyumlu eklenti geliştirilmesi.<br><br>
               • <strong>Derin Öğrenci Bilgi Takibi (DKT):</strong> Öğrencinin geçmiş sınav ve duraklatma verilerinden beslenen BKT/DKT modelleri.<br><br>
               • <strong>Üretime Taşınma:</strong> Docker konteyneri, Redis iş kuyruğu ve PostgreSQL kalıcı veri tabanı.<br><br>
-              • <strong>Genişletilmiş Korpus:</strong> 30+ saatlik tam çift-kör bağımsız etiketli veri kümesi.
+              • <strong>Genişletilmiş Korpus:</strong> 30+ saatlik tam çift-kör bağımsız etiketli veri kümesi.<br><br>
+              • <strong>Ölçüm Borçları:</strong> 233 insan etiketli çift üzerinde hakemi yeniden koşup madde-bazlı tahmini saklamak (κ + bootstrap aralığı), klip başına saklı tutulmuş <code>glossary_&lt;KLİP&gt;.json</code> etiketleyip RAG kolunu döngüsüz ölçmek, checkpoint başına tepe VRAM ve Katman 3 gecikme/fallback/deneme işaretleme. <strong>Kapatılan borç:</strong> VAD + terminoloji biasing + LLM düzeltme merdiveni 7 klipte gerçekten koşuldu ve <code>outputs/interventions_summary.json</code> içinden yeniden üretiliyor.
             </div>
           </div>
         </div>
@@ -1601,7 +1712,7 @@
       <!-- SLIDE 16: Kapanış ve Teşekkür -->
       <section class="slide" data-title="Kapanış & Teşekkür">
         <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
-          <div class="slide-badge">Bitirme Projesi Savunması — Eylül 2026</div>
+          <div class="slide-badge">Bitirme Projesi Savunması — Ekim 2026</div>
           <h1 class="slide-title" style="font-size: 42px; margin-bottom: 12px;">Teşekkür Ederiz</h1>
           <p class="slide-subtitle" style="font-size: 20px; color: var(--accent-blue);">
             Sorularınız ve Değerlendirmeleriniz?
@@ -1690,7 +1801,7 @@
   <!-- Overview Grid Modal -->
   <div id="overview-modal" onclick="if(event.target===this) toggleOverview()">
     <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto 24px auto;">
-      <h2 style="font-size: 24px; color: var(--accent-blue);">Slayt Dizin Kataloğu (16 Slayt)</h2>
+      <h2 style="font-size: 24px; color: var(--accent-blue);">Slayt Dizin Kataloğu (17 Slayt)</h2>
       <button class="btn-nav" onclick="toggleOverview()">Kapat (ESC)</button>
     </div>
     <div class="overview-grid" id="overview-grid-container"></div>
@@ -1701,63 +1812,67 @@
     // Speaker notes and defense Q&A for each slide
     const SLIDE_METADATA = [
       {
-        notes: "Sayın Jüri Üyeleri ve Değerli Hocalarım, hoş geldiniz.\nBugün Boğaziçi Üniversitesi bünyesinde yürüttüğümüz, eğitim konuşmalarını yeni başlayan öğrenciler için anlık olarak erişilebilir kılmayı amaçlayan iki katmanlı yapay zekâ değerlendirme çalışmamızı sunacağız.",
-        qa: "Klasik Jüri Açılış Sorusu: 'Projenin ana motivasyonu nedir?'\nYanıt: Çok dilli eğitim videolarında teknik terminolojiyi yeni başlayan öğrenciler için anlık olarak erişilebilir kılmak ve üçüncü katman olarak pedagojik animasyon videoları (Manimator) üretmektir."
+        notes: "Sayın Jüri Üyeleri ve Değerli Hocalarım, hoş geldiniz.\nBugün Boğaziçi Üniversitesi bünyesinde yürüttüğümüz, eğitim konuşmalarını yeni başlayan öğrenciler için anlık olarak erişilebilir kılmayı amaçlayan üç katmanlı yapay zekâ değerlendirme çalışmamızı sunacağız. Şeffaflık adına baştan netleştirelim: Katman 1 ve 2 ölçülmüş kıyaslamalardır; Katman 3 (istendiğinde üretilen kısa animasyon) uçtan uca çalıştığı gösterilmiş ama algısal kalitesi ölçülmemiş bir prototiptir.",
+        qa: "Klasik Jüri Açılış Sorusu: 'Projenin ana motivasyonu nedir?'\nYanıt: Çok dilli eğitim videolarında teknik terminolojiyi yeni başlayan öğrenciler için anlık olarak erişilebilir kılmak ve istendiğinde kavramın kısa animasyonlu anlatımını (Manimator) üretmektir."
       },
       {
         notes: "Eğitim videolarında bilgi ses sinyaline gömülüdür. Başlangıç düzeyindeki bir öğrenci, eğitmenin varsaydığı teknik bir kavramla karşılaştığında videoyu durdurup harici kaynak aramak zorunda kalır.\nBu durum bilişsel yükü (cognitive load) artırır ve öğrenme akışını kesintiye uğratır. Bloom'un 2-Sigma problemi bire bir özel rehberliğin iki standart sapma başarı getirdiğini gösterir.",
-        qa: "'Bloom'un 2-Sigma çalışması 1984 yılına ait, modern yapay zekâ çağında geçerli mi?'\nYanıt: Evet, Vanzo ve ark. (ACL 2025) güncel çalışmalarında LLM tabanlı uyarlanabilir rehberliğin öğrenci etkileşimini doğrudan artırdığını deneysel olarak kanıtlamıştır."
+        qa: "'Bloom'un 2-Sigma çalışması 1984 yılına ait, modern yapay zekâ çağında geçerli mi?'\nYanıt: Kısmen. Vanzo ve ark. (ACL 2025) GPT-4 tabanlı ev ödevi rehberliğinin öğrenci katılımını belirgin şekilde artırdığını deneysel olarak göstermiştir; yani bire bir rehberliğin erişilebilirliği konusunda güncel kanıt vardır. Biz bu bulguyu kendi sistemimizin öğrenme kazanımı iddiası olarak kullanmıyoruz: öğrenci kazanımı çalışması (kullanıcı deneyi) yapmadık, bu gelecek çalışmadır."
       },
       {
-        notes: "Çalışmamız 3 ana araştırma sorusuna yanıt arar:\nRQ1: ASR modellerinin Türkçe ve İngilizcedeki akustik ve işlem verimliliği.\nRQ2: LLM'lerin terim çıkarma kapsamı, bağlamsal uyumu (R1) ve CEFR B1 okunabilirlik seviyesi.\nRQ3: Doğruluk vs hız senaryolarında hangi ASR+LLM çiftlerinin seçilmesi gerektiği.",
-        qa: "'Ablasyon çalışmasında neden sadece Whisper transkriptleri kullanıldı?'\nYanıt: Bu RQ3'ün önemli bir bulgusudur. Whisper Medium, Large ve Turbo modellerinin hepsi WER <%5 rejimindedir; bu sebeple çalışmamız düşük WER rejimindeki kararlılığı gösterir."
+        notes: "Çalışmamız 3 ana araştırma sorusuna yanıt arar:\nRQ1: ASR modellerinin Türkçe ve İngilizcedeki akustik doğruluk ve işlem verimliliği (WER/CER, RTF, duvar saati) — bu ölçüldü.\nRQ2: LLM'lerin terim çıkarma kapsamı, bağlamsal uyumu (R1) ve okunabilirliği — insan etiketli ve hakem etiketli hücreler ayrı ayrı işaretlenerek ölçüldü.\nRQ3: Doğruluk vs hız senaryolarında hangi ASR+LLM çiftlerinin seçileceği ve hatanın katmanlar arası yayılımı — bu kısmen yanıtlandı: ASR+LLM eşleşme maliyetleri ölçüldü, ama yayılım tek klip/tek dil probu ve LLM'siz analitik modeldir. Katman 3 (animasyon) ise araştırma sorusu değil, işlerlik kanıtıdır.",
+        qa: "'Çapraz katman ablasyonunda neden sadece Whisper transkriptleri var?'\nYanıt: Çünkü sabit bir dil modeline farklı akustik hipotezler verme deneyi Whisper ailesi içinde yapılandırıldı ve üç modelin tamamı düşük WER (&lt;%5) rejiminde; bu yüzden tablo bir çöküş eğrisi değil, düşük hata rejimindeki kararlılığı gösteriyor. 2026 checkpoint hücreleri ise ayrı bir etiket kaynağıyla (yerel LLM hakem) ve ayrı işaretlenerek eklendi."
       },
       {
-        notes: "Mimarimiz iki gevşek bağlantılı (decoupled) katmandan oluşur. Ses yt-dlp ile çekilir, ffmpeg ile 16 kHz mono WAV'a çevrilir. Katman 1 transkripsiyonu üretir, Katman 2 ise terimleri yakalayıp CEFR B1 düzeyinde açıklar. Bu yapı EduTerm AI Web Studio arayüzümüzle canlı olarak görselleştirilmiştir.",
-        qa: "'Neden uçtan uca tek bir multimodal model değil de 2 katmanlı mimari seçtiniz?'\nYanıt: İki katmanlı yapı modülerlik sağlar. ASR veya LLM tarafında yeni ve daha verimli bir model çıktığında boru hattının geri kalanını bozmadan bağımsızca güncelleyebiliriz."
+        notes: "Mimarimiz birbirinden gevşek bağlantılı (decoupled) üç katmandan oluşur. Ses yt-dlp ile çekilir, ffmpeg ile 16 kHz mono WAV'a çevrilir. Katman 1 transkripsiyonu üretir, Katman 2 terimleri yakalayıp CEFR B1 hedefli açıklar, Katman 3 ise istek üzerine terim kartından kısa Manim animasyonu üretir. Şeffaflık: Katman 1 ve 2 ölçülmüş kıyaslamalardır; Katman 3 uçtan uca çalıştığı gösterilmiş ama üretim gecikmesi ve algısal kalitesi ölçülmemiş bir prototiptir.",
+        qa: "'Neden uçtan uca tek bir multimodal model değil de 3 katmanlı mimari seçtiniz?'\nYanıt: Katmanlı yapı modülerlik ve ölçülebilirlik sağlar. ASR veya LLM tarafında daha verimli bir model çıktığında boru hattının geri kalanını bozmadan değiştirebiliriz; ayrıca her katmanın hatası ayrı metrikle (WER, F1/R1, işlerlik) izole ölçülebiliyor."
       },
       {
-        notes: "Veri kümemiz 5 alandan 7 dersten ve ~95 dakika sesten oluşur. Burada kritik bir bilimsel guardrail vurgulamak isteriz: Referans metinlerimiz sıfırdan bağımsız çift-kör transkripsiyon değildir; insan kontrolünde düzeltilmiş altyazı ve ASR taslaklarıdır.",
+        notes: "Veri kümemiz 5 akademik alandan 7 ders videosu, 95,6 dakika ses ve altın referans metinlerinde 13.467 kelime içeriyor (klip klip 1.256 ile 3.459 arasında). Burada kritik bir bilimsel guardrail vurgulamak isteriz: Referans metinlerimiz sıfırdan bağımsız çift-kör transkripsiyon değildir; insan kontrolünde düzeltilmiş altyazı ve ASR taslaklarıdır.",
         qa: "Guardrail 1: 'Altın referanslar Whisper stiline yanlı (biased) olabilir mi?'\nYanıt: Evet, post-editing altyazı formatına biçimsel bir yakınlık yaratabilir. Bu sebeple %1-2'lik WER skorlarını mutlak bir tavan skordan ziyade post-edit referansına karşı göreli bir kıyaslama olarak sunuyoruz."
       },
       {
-        notes: "Deneylerimizi RTX 5060 Laptop GPU üzerinde gerçekleştirdik. Whisper Medium, Large-v3, Turbo ve 2026 modellerinden Qwen3-ASR 0.6B ve 1.7B'yi değerlendirdik. Sequential generate decoding parametreleriyle deterministik sonuçlar aldık.",
-        qa: "'RTX 5060 8GB VRAM modeller için yeterli oldu mu?'\nYanıt: Whisper Large-v3 ve Turbo fp16/bf16 olarak sorunsuz sığdı. LLM katmanında Qwen3.5-4B modeli 4-bit nicemleme (bitsandbytes) ile çalıştırılarak VRAM kullanımı 4.5 GB altında tutuldu."
+        notes: "Deneylerimizi RTX 5060 Laptop GPU üzerinde gerçekleştirdik. Whisper Medium, Large-v3, Turbo ve 2026 modellerinden Qwen3-ASR 0.6B ve 1.7B'yi değerlendirdik. Sequential generate decoding parametreleriyle deterministik sonuçlar aldık. Kaynak kullanımını tahminle değil işaretlemeyle ölçtük: yerel semantik model için çıkan tek doğrulanmış bellek rakamı <code>outputs/local_vram_probe.json</code> dosyasındadır.",
+        qa: "'RTX 5060 8GB VRAM modeller için yeterli oldu mu?'\nYanıt: Whisper Large-v3 ve Turbo fp16/bf16 olarak sorunsuz sığdı. LLM katmanında Qwen3.5-4B modelinin 4-bit (nf4 double-quant) hâlini doğrudan ölçtük: ağırlıklar 3,08 GB sabit, tepe torch ayırıcısı 4,72 GB, toplam cihaz doluluğu 5,26 GB — 8,12 GB'lık kart üzerinde, tam bir klip çağrısı sırasında. Diğer checkpointlerin tepe belleği işaretlemeyle ölçülmediği için onlara sayı vermiyoruz; 8B/9B rakamlarımız ölçekleme tahminidir."
       },
       {
-        notes: "Tablomuz net bir ayrım gösterir: Whisper Large-v3 mutlak doğrulukta %2.1 TR ve %1.0 EN WER ile liderdir. Ancak Whisper Turbo modeli 0.025 RTF ile sesi gerçek zamandan 40 kat hızlı çözerek canlı uygulamalar için devasa bir hız avantajı sağlar.",
+        notes: "Tablomuz net bir ayrım gösterir: Whisper Large-v3 mutlak doğrulukta 0,021 TR ve 0,010 EN normalleştirilmiş WER ile liderdir. Whisper Turbo ise 0,044 TR / 0,025 EN RTF ile aynı 8 GB kartta duvar saati bazında ölçülen yaklaşık 3,4 kat (TR) ve 7,7 kat (EN) hız sağlar; bedeli Türkçede WER'in 0,021'den 0,037'ye çıkmasıdır.",
         qa: "Guardrail 4 & 7: 'Türkçe ASR için İngilizceden daha zordur diyebilir miyiz? Boş hücreler neden var?'\nYanıt: Hayır, n=7 video akustik ve konuşmacı farkları içerir, dil genellemesi yapılamaz. GPU altın kümesinde koşturulmayan modeller uydurma verilerle değil, dürüstçe '—' olarak bırakılmıştır."
       },
       {
-        notes: "İkinci katmanda LLM istem mühendisliğini 3 stratejiyle test ettik. Zero-shot %47.6 F1'de kalırken, Sözlük Destekli RAG yaklaşımı kavram tohumları sağlayarak halüsinasyonu engellemiş ve F1'i %76.9'a çıkarmıştır. Üstelik 4.15 sn ile CoT'a göre çok daha hızlıdır.",
-        qa: "'RAG yaklaşımında sözlük tohumları nereden sağlanıyor?'\nYanıt: Müfredat konu başlıkları veya ders izlencesindeki ana kavramlardan (örneğin TDK/Oxford eğitimsel kavram listeleri) çekilen hafif bir terim indeksi isteme enjekte edilmektedir."
+        notes: "Bu slaytta üç akustik müdahaleyi gerçekten koşturduğumuz merdiveni gösteriyoruz ve sonuç olumsuz: hiçbir kademe ham tabanın altına inmiyor. Enerji VAD'i 7 klipte de WER'i yükseltti, çünkü GPU temel koşumunda sökülecek tekrar döngüsü yoktu. Sözlük koşullaması yalnız altın listesi olan TR-1/EN-1'i etkiliyor ve orada önek yankısı yapıyor (TR-1 0,0333→0,1562); kapsam artışı enjekte edilen listenin geri gelmesi, yani sızıntı. LLM düzeltme 4/7 klipte hatayı düşürüyor ama hiçbir klipti tabana döndüremiyor ve bozuk girdiyi onarmak yerine tekrar ediyor (TR-1 0,1562→0,3236). Eski −%83,7 satırı, 0,129 temeli, -40 dBFS eşiği, %80,5 Terim F1 ve %26,3 gürültüde +29,8 F1 stres testi geri çekildi; son ikisi asr_post_correction.py --test fixture'ından geliyor.",
+        qa: "'Müdahaleleriniz başarısız olduysa neden çalışmaya dahil?'\nYanıt: Çünkü ölçülmüş olumsuzluk bulgudur ve yayınlanan sayıların hepsi artık diskteki artefakta bağlı. Eski merdiven hiçbir JSONL'den yeniden üretilemiyordu; biasing satırı ise 448 konum bütçesi taşırdığı için kod yoluyla hiç üretilemezdi (arşiv: outputs/*.positions-crash-attempt1). Altın listesi olmayan 5 klip koşullama kademesinde bayt düzeyinde değişmiyor, bu da karşılaştırmanın determinizm kontrolü."
       },
       {
-        notes: "Üretilen tanımların pedagojik düzeyini Ateşman (TR: 58-61) ve Flesch (EN: 64-66) indeksleriyle ölçtük. Her iki dilde de tam olarak CEFR B1 (Orta güçlükte) seviyesine oturduğunu ve TDK/Oxford sözlükleriyle BERTScore > 0.82 örtüşme yakaladığımızı kanıtladık.",
-        qa: "Guardrail 3: 'R1% neden Duyarlılık (Recall) değildir?'\nYanıt: Eğitim konuşmalarında terimsellik sürekli bir spektrumdur ve kapalı bir sözlük yoktur. R1% üretilen terimlerin video bağlamıyla uyumunu ölçen bir kesinlik (precision) metriğidir."
+        notes: "İkinci katmanda istem stratejilerini kapalı altın liste (klip başına 32 terim) üzerinde gerçekten koşturduk. Türkçede CoT, Zero-Shot'u F1'de %40,0'dan %51,2'ye çıkarıyor; İngilizcede Zero-Shot %64,0 F1 verirken CoT kol ayrıştırılabilir JSON döndürmedi ve 0 terim üretti. Her çağrı yerel 4-bit modelde 71-81 saniye sürdü. Buradan yaygın bir genelleme yapmıyoruz: bu, tek klip ve tek koşumla iki kolluk bir probdur.",
+        qa: "'Sözlük destekli RAG kolunuz neden tabloda yok?'\nYanıt: Döngüsel olduğu için. Kola beslenen kavram tohumları puanlamada kullanılan data/gold_terms.json dosyasının kendisiydi; yani model değil fixture puanlanıyordu. Kovuşturma artık klip bazında saklı tutulmuş data/glossary_<KLİP>.json istiyor, böyle bir etiket hiç üretilmedi. Gelecek çalışmada saklı tutulmuş sözlükleri etiketleyip kolu döngüsüz ölçeceğiz."
       },
       {
-        notes: "Çift değerlendirici insan analizinde tanım doğruluğunda kappa 1.000 çıksa da bunu prevalans paradoksu olarak literatüre uygun şekilde açıkladık (112 pozitif, 3 negatif, Pe ≈ 0.95). Asıl güvenilirlik kanıtımız sınır vakaları temsil eden κ_R = 0.782 skorudur. LLM hakem testinde de PABAK %94.8 çıkmıştır.",
+        notes: "Okunabilirliği 807 açıklama üzerinde madde madde ölçtük. Türkçede Ateşman ortalaması EVREN Qwen 3.8 Flash'ta 56,4, DeepSeek'te 65,8, yerel 4-bit 4B'de 48,0; İngilizcede Flesch ortalamaları 56,0-56,7 bandında. Ancak madde bazında hedef bandın içinde kalan oran Türkçede %39-45, İngilizcede %18-29. Yani ortalamalar hedef bandı gösteriyor, 'çıktıların tamamı B1' iddiasını ölçüm desteklemiyor; yerel modelin havuzlanmış ortalaması bandın da altında kalıyor.",
+        qa: "Guardrail 3: 'R1% neden Duyarlılık (Recall) değildir?'\nYanıt: Eğitim konuşmalarında terimsellik sürekli bir spektrumdur ve kapalı bir sözlük yoktur. R1% üretilen terimlerin video bağlamıyla uyumunu ölçen bir kesinlik (precision) metriğidir. Sözlük örtüşmesi tarafında da bir düzeltimiz var: bert_score paketi kurulu olmadığı için yayınladığımız metrik bağlamsal BERTScore değil, karakter trigram kosinüs + kelime örtüşmesi tabanlı leksik bir vekildir (F1 ~24-31)."
+      },
+      {
+        notes: "Diskte desteklenen tek uyum istatistiği iki bağımsız insan değerlendiricinin N=115 çiftlik etiketleridir. Tanım doğruluğunda kappa 1,000 çıkıyor ama bunu prevalans paradoksu olarak literatüre uygun şekilde açıklıyoruz (112 pozitif, 3 negatif, beklenen uyum Pe ≈ 0,949). Asıl güvenilirlik kanıtımız sınır vakaları ve 4 uyuşmazlığı temsil eden κ_R = 0,782 (PABAK_R = 0,930) skorudur. LLM hakemin insanlarla uyumuna dair daha önce yayınladığımız PABAK = 0,948 sayısı ise madde bazında saklanmadığı için geri çekildi; o yüzden hakem türevli R1%/D1% hücrelerini üst sınır olarak okuyoruz.",
         qa: "Guardrail 2: 'Kappa 1.000 çıkması şüpheli değil mi?'\nYanıt: Kesinlikle şüphelidir ve biz de bunu raporda Prevalans Paradoksu olarak belirttik. Şans eseri beklenen uyum %95 olduğunda kappa formülü marjinal asimetri nedeniyle 1.000 çıkar; asıl güvenilirlik κ_R = 0.782'dedir."
       },
       {
-        notes: "Sabit bir dil modeline Whisper transkriptlerini verdiğimizde terim çıkarımında bozulma görmedik çünkü tüm modeller düşük WER rejimindedir. Gerçek hata yayılımını görmek için yaptığımız kontrollü sentetik gürültü deneyinde, WER %20'yi aştığında F1'in hızla %40'ın altına çöktüğünü gösterdik.",
-        qa: "Guardrail 5: 'Ablasyon tablosu bir hata yayılım eğrisi midir?'\nYanıt: Hayır, ablasyon tablosu düşük WER rejimindeki stabilitedir. Geniş hata yayılımı ise sentetik fonetik hata enjeksiyonu deneyiyle modellenmiştir."
+        notes: "Sabit bir dil modeline Whisper transkriptlerini verdiğimizde terim çıkarımında kritik bir bozulma görmedik çünkü üç model de düşük WER rejiminde; bu altı hücrenin etiketleri insan değerlendiriciden (labels_a1.csv) geliyor. Geniş hata yayılımını ise ölçmedik, modelledik: merdiven altın listenin enjekte WER ile yeniden örneklenmesinden üretiliyor, %0 WER'de F1 = 1,000 tanım gereği ve LLM hiç çağrılmıyor. Gerçek ölçtüğümüz 11 ASR hipotezi TR'de 0,238-0,439, EN'de 0,565-0,679 F1 aralığında ve sıralama WER'e monoton değil.",
+        qa: "Guardrail 5: 'Ablasyon tablosu bir hata yayılım eğrisi midir?'\nYanıt: Hayır, ablasyon tablosu düşük WER rejimindeki stabilitedir. Sürekli bozulma eğrisi altın listenin yeniden örneklenmesiyle modellenmiştir; ölçülen yayılım tek klip/dil ile sınırlıdır ve popülasyon tahmini olarak sunulmaz. Etiket kaynakları (insan vs LLM hakem) tabloda ayrı işaretlenir."
       },
       {
-        notes: "Çalışmamızı sadece teoride bırakmadık; FastAPI ve modern Vanilla web arayüzüyle EduTerm AI Studio adında yerel bir web prototipi geliştirdik. Sistem YouTube linkinden dinamik terim kartları, uyarlanabilir öğrenci profili ve pratik sınavlar üretebilmektedir.",
+        notes: "Çalışmamızı sadece teoride bırakmadık; FastAPI ve modern Vanilla web arayüzüyle EduTerm AI Studio adında yerel bir web prototipi geliştirdik. Sistem YouTube linkinden dinamik terim kartları, uyarlanabilir öğrenci profili ve pratik sınavlar üretebiliyor; istek üzerine Katman 3 zincirini de çalıştırıyor. Diskte 7 klip için üretilmiş 22-42 saniyelik animasyonlar var, ancak üretim gecikmesi ve kendini-onarma başarısı işaretlemeyle ölçülmedi.",
         qa: "Guardrail 6: 'EduTerm AI Studio canlıda çalışan bir ürün mü?'\nYanıt: Hayır, yerel Ar-Ge PoC demo stüdyosudur. İş kuyruğu bellek içi sözlüktedir, geçici WAV dosyaları tutar ve yetkilendirme içermez; laboratuvar konsept kanıtıdır."
       },
       {
-        notes: "Yazılım mühendisliği açısından projemiz 226 bağımsız birim testten %100 başarıyla geçmektedir. Port çakışmalarında otomatik port bulma (port hunting), dış bağlantılarda zorunlu token güvenliği, YouTube kısıtlı video hata yakalama (fallback) ve GPU OOM anında acil durum geri düşüşü mevcuttur.",
-        qa: "'226 test GPU gerektiriyor mu?'\nYanıt: Hayır, testlerin tamamı mock nesnelerle ve hafif girdi matrisleriyle tasarlanmıştır. Bu sayede CI/CD ortamında sadece saniyeler içinde koşulabilmektedir."
+        notes: "Yazılım mühendisliği açısından projemizde 254 bağımsız birim test var ve son koşumda tamamı geçiyor (yaklaşık 5 saniye). Port çakışmalarında otomatik port bulma (port hunting), dış bağlantılarda zorunlu token güvenliği, YouTube kısıtlı video hata yakalama (fallback) ve her aşama sonunda GPU tahliyesi ile şablon geri düşüşü mevcuttur. Testin bir dönem yakaladığı varsayılan model tutarsızlığını da slaytta açıkça raporluyoruz; ayrılmış tepe VRAM işaretlemeyle ölçülmediği için burada hiçbir kapasite sayısı iddia etmiyoruz.",
+        qa: "'254 test GPU gerektiriyor mu?'\nYanıt: Hayır, testlerin tamamı mock nesnelerle ve hafif girdi matrisleriyle tasarlanmıştır. Bu sayede CI/CD ortamında sadece saniyeler içinde koşulabilmektedir."
       },
       {
-        notes: "Uygulama dünyasına iki net reçete sunuyoruz: Resmi arşivleme ve ders kitabı sözlüklerinde Whisper Large-v3 ve yüksek kapasiteli LLM önerirken; canlı dersler ve sınıf içi etkileşimli sistemlerde Whisper Turbo ve Qwen 4B ikilisiyle 4-8 kat hız ve minimum donanım maliyeti elde edilmektedir.",
+        notes: "Uygulama dünyasına iki ölçüm destekli reçete sunuyoruz: doğruluk ve kapsam öncelikli dağıtımda Whisper Large-v3 (0,021/0,010 WER) ile en yüksek terim kapsamını veren EVREN DeepSeek önerilir, ancak bu kol 27,68 sn TR / 19,44 sn EN ile iki ticari API'den yavaştır — bu bir kapsam tercihi, hız tercihi değildir. Hız öncelikli dağıtımda Whisper Turbo (RTF 0,044/0,025) ve ölçülen en hızlı semantik kol olan EVREN Qwen 3.8 Flash (6,11/4,92 sn) birlikte çalışır; yerel eşdeğer 4B 39,55 sn ortalamadadır.",
         qa: "'Hangi durumda Whisper Turbo tercih edilmemeli?'\nYanıt: Tıbbi, hukuki veya resmi akreditasyon gerektiren ders arşivlemelerinde, %1.6'lık hata farkı tolere edilemeyeceğinden Whisper Large-v3 zorunludur."
       },
       {
-        notes: "Metodolojik kısıtlarımızın farkındayız: 7 video sınırlı bir kümedir. Gelecek vizyonumuzda boru hattını Moodle/Canvas LMS sistemlerine LTI standardıyla bağlamak ve derin bilgi takibi (Knowledge Tracing) algoritmaları geliştirmek yer almaktadır.",
+        notes: "Metodolojik kısıtlarımızın farkındayız: 7 video sınırlı bir kümedir, altın metinler post-edit'tir ve kapalı bir terim sözlüğü yoktur. Ölçüm borçlarımızı da açıkça listeliyoruz: checkpoint başına tepe VRAM, Katman 3 üretim gecikmesi ve fallback oranı, hakem-insan uyumunun madde bazında yeniden üretimi. Gelecek vizyonumuzda boru hattını Moodle/Canvas LMS sistemlerine LTI standardıyla bağlamak, derin bilgi takibi algoritmaları geliştirmek ve 30+ saatlik çift-kör korpus kurmak yer almaktadır.",
         qa: "'LMS entegrasyonu teknik olarak nasıl çalışacak?'\nYanıt: LTI 1.3 standardı üzerinden ders kaydı tamamlandığında arka planda webhook tetiklenecek; terim kartları ve sınav soruları ders modülüne otomatik yüklenecektir."
       },
       {
@@ -1908,15 +2023,19 @@
     const nodeDetails = {
       'node-audio': {
         title: '🎵 Ses İçe Alma (Audio Ingestion)',
-        desc: 'YouTube video URL\'si veya yerel ses dosyası sisteme aktarılır. yt-dlp ile ses akışı çekilir ve ffmpeg yardımıyla 16 kHz Mono 16-bit PCM WAV biçimine normalize edilir. Silero VAD (Ses Aktivite Algılama) ile doğal konuşma duraklarından dinamik segmentasyon yapılır.'
+        desc: 'YouTube video URL\'si veya yerel ses dosyası sisteme aktarılır. yt-dlp ile ses akışı çekilir ve ffmpeg yardımıyla 16 kHz Mono 16-bit PCM WAV biçimine normalize edilir. Arayüz uzun sesleri sabit, örtüşmesiz 30 saniyelik pencerelere böler (gui/pipeline.py:764, CHUNK_S = 30.0). Enerji tabanlı VAD parçalayıcısı (vad_chunker.py, >0.4 s durak, 12-28 s pencereler; Silero gibi öğrenmeli bir VAD değildir) yalnızca kıyaslama koşumlarında run_asr.py --use-vad ile çağrılır; arayüzün transkripsiyon yolu VAD\'i hiç çağırmaz.'
       },
       'node-asr': {
         title: '🎙️ Katman 1: Konuşma Tanıma (ASR)',
-        desc: 'Whisper Medium/Large-v3/Turbo veya Qwen3-ASR modelleri GPU VRAM önbelleğinde tutulur. 30 saniyelik pencereler veya VAD parçaları paralel/sıralı olarak transkribe edilir. Kelime düzeyinde zaman damgalı transkript üretilir.'
+        desc: 'Whisper Medium/Large-v3/Turbo veya Qwen3-ASR modelleri GPU VRAM önbelleğinde tutulur. Arayüz yolunda ses 30 saniyelik sabit pencerelere bölünüp sırayla transkribe edilir; VAD güdümlü pencereleme yalnızca deney betiklerinde ölçülmüştür ve 7 kliplik ölçümde enerji VAD\'i WER\'i tüm kliplerde kötüleştirmiştir (TR 0,0207 → 0,0412; EN 0,0101 → 0,0262). Kelime düzeyinde zaman damgalı transkript üretilir.'
       },
       'node-llm': {
         title: '🧠 Katman 2: Semantik Terminoloji ve Pedagoji (LLM)',
         desc: 'Transkript Qwen3.5-4B (4-bit yerel) veya GPT modellerine beslenir. İstem (prompt) yönergeleri doğrultusunda metindeki teknik terimler ayrıştırılır ve her biri için CEFR B1 düzeyinde başlangıç seviyesine uygun pedagojik açıklamalar JSON formatında üretilir.'
+      },
+      'node-anim': {
+        title: '🎬 Katman 3: İsteğe Bağlı Animasyon Üretimi',
+        desc: 'Seçilen terimin [t-45 s, t+10 s] bağlam penceresi Qwen3.5-4B\'ye verilir; model kısa bir senaryo ve Manim kodu üretir. Kod AST allow-list ile doğrulanır, azami iki kendini-onarma denemesiyle manim -ql (480p15) render edilir, Edge-TTS seslendirmesi FFmpeg ile mux edilir. Durum: diskte 7 klip için üretilmiş video var; gecikme ve fallback enstrümantasyonu ile algısal/öğrenme değerlendirmesi yapılmamıştır, bu yüzden Katman 3 işlerlik kanıtıdır, ölçülmüş kıyaslama değildir.'
       },
       'node-gui': {
         title: '💻 EduTerm AI Studio & Uyarlanabilir Öğrenme',

@@ -1,7 +1,21 @@
+# Environment secrets
+.env
+experiments/.env
+*.env
+
 # Local data and model weights
-experiments/data/*.wav
-experiments/data/*.mp3
-experiments/data/*.mp4
+models/
+experiments/finetune/checkpoints/*
+!experiments/finetune/checkpoints/**/
+!experiments/finetune/checkpoints/**/*.json
+!experiments/finetune/checkpoints/**/*.md
+experiments/finetune/checkpoints/**/*.safetensors
+experiments/finetune/checkpoints/**/*.bin
+experiments/data/audio/
+experiments/finetune/data/external/asr_audio/
+*.wav
+*.mp3
+*.mp4
 experiments/data/raw/
 experiments/data/smoke/
 experiments/data/_work/
@@ -29,13 +43,19 @@ Thumbs.db
 .idea/
 .vscode/
 
-# LaTeX
-paper/*.aux
-paper/*.bbl
-paper/*.blg
-paper/*.log
-paper/*.out
-paper/*.synctex.gz
-paper/*.toc
-paper/*.fdb_latexmk
-paper/*.fls
+# Scratch scripts and temporary files
+scratch/
+
+# LaTeX intermediates
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.nav
+*.snm
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.backup*.pdf

@@ -36,6 +36,18 @@ class StaticFilesServingTests(unittest.TestCase):
         self.assertIn("text/css", res.headers.get("content-type", ""))
         self.assertIn(":root", res.text)
 
+    def test_serve_poster(self):
+        res = client.get("/poster")
+        self.assertEqual(res.status_code, 200)
+        self.assertIn("text/html", res.headers.get("content-type", ""))
+        self.assertIn("A3 Akademik Poster Sunumu", res.text)
+
+    def test_download_poster_pdf(self):
+        res = client.get("/api/download/poster-pdf")
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.headers.get("content-type", ""), "application/pdf")
+        self.assertGreater(len(res.content), 10000)
+
 
 class HtmlStructureTests(unittest.TestCase):
     def setUp(self):

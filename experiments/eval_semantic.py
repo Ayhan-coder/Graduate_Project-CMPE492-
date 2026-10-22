@@ -49,6 +49,27 @@ def load_references(ref_path: Path) -> dict[str, str]:
     return {normalize_term(k): str(v).strip() for k, v in raw.items()}
 
 
+LANG_ALIASES = {
+    "tr": "tr", "turk": "tr", "turkish": "tr", "türkçe": "tr", "turkce": "tr",
+    "en": "en", "engl": "en", "english": "en", "ingilizce": "en",
+}
+
+
+def lang_code(value: str | None, clip_id: str = "") -> str:
+    """Map 'tr' / 'Turkish' / 'English' / 'en' to a two-letter code.
+
+    A plain startswith("tr") test silently classifies "Turkish" as English, which
+    merges the two language groups, so full names are matched on explicit aliases.
+    """
+    v = str(value or "").strip().lower()
+    for ch, ascii_ in (("ü", "u"), ("ş", "s"), ("ı", "i"), ("ğ", "g"), ("ö", "o"), ("ç", "c")):
+        v = v.replace(ch, ascii_)
+    for key, code in LANG_ALIASES.items():
+        if v.startswith(key):
+            return code
+    return ("tr" if str(clip_id).upper().startswith("TR") else "en") if clip_id else "en"
+
+
 def _ngram_vector(text: str, n: int = 3) -> Counter:
     """Character n-gram frequency counter for robust fallback similarity."""
     cleaned = re.sub(r"\s+", " ", text.lower().strip())
@@ -79,16 +100,17 @@ def compute_bert_score(
     references: Sequence[str],
     lang: str = "en",
     model_name: str | None = None,
-) -> tuple[list[float], list[float], list[float]]:
-    """Compute semantic similarity (Precision, Recall, F1) for candidate-reference pairs.
+) -> tuple[list[float], list[float], list[float], str]:
+    """Compute semantic similarity (P, R, F1) plus the backend that produced them.
 
-    Defaults to fast, robust n-gram token overlap cosine similarity.
-    If model_name or bert_score package is specified, uses contextual embeddings.
+    Strategy 1 (true BERTScore) only runs when the optional ``bert_score`` package is
+    importable; otherwise Strategy 2's character-3-gram cosine + word-overlap proxy is
+    used, and callers must report it as a lexical proxy rather than a transformer metric.
     """
     if len(candidates) != len(references):
         raise ValueError("Candidates and references must have the same length")
     if not candidates:
-        return [], [], []
+        return [], [], [], "none"
 
     # Strategy 1: bert_score official package if requested or available
     if model_name or "bert_score" in sys.modules:
@@ -103,7 +125,12 @@ def compute_bert_score(
                 rescale_with_baseline=False,
                 verbose=False,
             )
-            return [round(float(v), 4) for v in P], [round(float(v), 4) for v in R], [round(float(v), 4) for v in F1]
+            return (
+                [round(float(v), 4) for v in P],
+                [round(float(v), 4) for v in R],
+                [round(float(v), 4) for v in F1],
+                f"bert_score::{m_id}",
+            )
         except Exception:
             pass
 
@@ -135,7 +162,7 @@ def compute_bert_score(
         r_list.append(round(min(1.0, max(0.0, r_val)), 4))
         f1_list.append(round(min(1.0, max(0.0, f1_val)), 4))
 
-    return p_list, r_list, f1_list
+    return p_list, r_list, f1_list, "lexical-proxy::char3gram-cosine+word-overlap"
 
 
 def evaluate_explanations(
@@ -154,8 +181,8 @@ def evaluate_explanations(
             cid = row.get("id", "unknown")
             mid = row.get("model", "unknown").replace("Qwen/", "")
             asr_m = row.get("asr_model", "gold").replace("openai/", "")
-            lang = (row.get("lang") or ("tr" if cid.startswith("TR") else "en")).lower()
-            refs = tr_refs if lang.startswith("tr") else en_refs
+            lang = lang_code(row.get("lang"), cid)
+            refs = tr_refs if lang == "tr" else en_refs
 
             terms = row.get("terms", [])
             for item in terms:
@@ -179,7 +206,7 @@ def evaluate_explanations(
                     "clip": cid,
                     "model": mid,
                     "asr": asr_m,
-                    "lang": "TR" if lang.startswith("tr") else "EN",
+                    "lang": "TR" if lang == "tr" else "EN",
                     "term": t_raw,
                     "term_norm": t_norm,
                     "candidate_expl": expl,
@@ -189,16 +216,23 @@ def evaluate_explanations(
                     "readability_level": readability["level"],
                 })
 
-    # Batch compute semantic similarity for all items that have references
+    # Batch compute semantic similarity per language group, so an aggregate run over
+    # mixed Turkish/English files cannot score one language's pairs with the other's model.
     matched_indices = [i for i, r in enumerate(records) if r["has_reference"]]
-    if matched_indices:
-        cands = [records[i]["candidate_expl"] for i in matched_indices]
-        refs = [records[i]["reference_def"] for i in matched_indices]
-        p_scores, r_scores, f1_scores = compute_bert_score(cands, refs, lang="tr" if any(records[i]["lang"] == "TR" for i in matched_indices) else "en")
-        for idx, p_val, r_val, f1_val in zip(matched_indices, p_scores, r_scores, f1_scores):
+    for group in ("TR", "EN"):
+        idxs = [i for i in matched_indices if records[i]["lang"] == group]
+        if not idxs:
+            continue
+        cands = [records[i]["candidate_expl"] for i in idxs]
+        refs = [records[i]["reference_def"] for i in idxs]
+        p_scores, r_scores, f1_scores, backend = compute_bert_score(
+            cands, refs, lang="tr" if group == "TR" else "en"
+        )
+        for idx, p_val, r_val, f1_val in zip(idxs, p_scores, r_scores, f1_scores):
             records[idx]["bert_precision"] = p_val
             records[idx]["bert_recall"] = r_val
             records[idx]["bert_f1"] = f1_val
+            records[idx]["similarity_backend"] = backend
 
     return records
 
@@ -221,6 +255,10 @@ def summarize_evaluation(records: list[dict]) -> list[dict]:
         avg_bert_r = (sum(it["bert_recall"] for it in with_ref) / n_matched) if n_matched > 0 else 0.0
 
         avg_readability = sum(it["readability_score"] for it in items) / n_total if n_total > 0 else 0.0
+        # Target pedagogical band: Ateşman 50-69 (TR) / Flesch 60-70 (EN) ~ CEFR B1.
+        in_target = [it for it in items if 50.0 <= it["readability_score"] <= 69.0] if lang == "TR" \
+            else [it for it in items if 60.0 <= it["readability_score"] <= 70.0]
+        backends = sorted({it.get("similarity_backend", "none") for it in with_ref})
 
         summary.append({
             "model": model,
@@ -233,6 +271,8 @@ def summarize_evaluation(records: list[dict]) -> list[dict]:
             "bert_f1": round(avg_bert_f1 * 100, 2),
             "readability_avg": round(avg_readability, 2),
             "readability_metric": "Ateşman" if lang == "TR" else "Flesch",
+            "readability_pct_in_target": round(100.0 * len(in_target) / n_total, 2) if n_total else 0.0,
+            "similarity_backend": backends[0] if len(backends) == 1 else "+".join(backends),
         })
     return summary
 

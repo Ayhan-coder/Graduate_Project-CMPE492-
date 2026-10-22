@@ -1,0 +1,43 @@
+{
+  "updated_utc": "2026-10-17T21:31:13Z",
+  "base_model": "openai/whisper-small",
+  "device": "cuda",
+  "dtype": "float16",
+  "train_clips": 1028,
+  "validation_clips": 54,
+  "train_hours": 1.444,
+  "global_steps": 12,
+  "loss_curve": [
+    {
+      "step": 8,
+      "mean_loss": 4.3679,
+      "wer_probe": {
+        "count": 4,
+        "wer": 0.1579
+      }
+    },
+    {
+      "step": 12,
+      "final": true,
+      "wer_probe": {
+        "count": 4,
+        "wer": 0.1579
+      }
+    }
+  ],
+  "losses": [
+    4.85156,
+    3.15234,
+    5.62109,
+    4.51172,
+    3.5,
+    3.94336,
+    5.63281,
+    3.73047,
+    3.07617,
+    5.21094,
+    3.16016,
+    1.9707
+  ],
+  "elapsed_s": 20.7
+}

@@ -44,8 +44,14 @@ def _find_active_concept(user_msg: str, terms: list[dict], current_time_s: Optio
     
     # 1. Direct term match
     for t in (terms or []):
-        t_name = (t.get("term") or "").lower()
-        if t_name and (t_name in msg_low or any(w in msg_low for w in t_name.split() if len(w) >= 4)):
+        t_name = (t.get("term") or "").strip()
+        if not t_name:
+            continue
+        t_low = t_name.lower()
+        if t_low in msg_low:
+            return t
+        words = [w for w in re.findall(r"\w+", t_low) if len(w) >= 2]
+        if words and any(re.search(r"\b" + re.escape(w) + r"\b", msg_low) for w in words):
             return t
 
     # 2. Key phrases
@@ -109,7 +115,7 @@ def _build_llm_context(
     return "\n".join(parts) or "Bağlam bulunamadı; genel çalışma desteği ver."
 
 
-def _parse_llm_reply(raw: str) -> dict:
+def _parse_llm_reply(raw: str, is_tr: bool = True) -> dict:
     """Split model output into reply text and [SEÇENEKLER] suggestions."""
     text = raw.strip()
     if "</think>" in text:
@@ -119,13 +125,23 @@ def _parse_llm_reply(raw: str) -> dict:
         text, options_part = text.split("[SEÇENEKLER]", 1)
         suggested = [o.strip() for o in options_part.replace("\n", ",").split(",") if o.strip()][:3]
     text = text.strip()
-    questions = [s.strip() + "?" for s in text.split("?") if s.strip()][-2:]
+    if "?" in text:
+        questions = [s.strip() + "?" for s in text.split("?") if s.strip()][-2:]
+    else:
+        questions = [text[-120:] + "?"] if text else []
     if not suggested:
-        suggested = [
-            "Günlük hayattan bir örnek verir misin?",
-            "Bu konuyu formülle açıklar mısın?",
-            "Videoda bu kavram nerede anlatılıyor?",
-        ]
+        if is_tr:
+            suggested = [
+                "Günlük hayattan bir örnek verir misin?",
+                "Bu konuyu formülle açıklar mısın?",
+                "Videoda bu kavram nerede anlatılıyor?",
+            ]
+        else:
+            suggested = [
+                "Could you give a real-world example?",
+                "How does this formula work?",
+                "Where is this discussed in the video?",
+            ]
     return {
         "status": "ok",
         "reply": text,
@@ -151,16 +167,23 @@ def _try_llm_socratic_response(
     try:
         from run_llm import generate_hf
 
+        is_tr = str(lang).lower().startswith("tr")
         prompt = SOCRATIC_SYSTEM_PROMPT.format(
             CONTEXT=_build_llm_context(active_term, terms, segments, history, current_time_s),
             QUESTION=user_message,
         )
-        if not str(lang).lower().startswith("tr"):
-            prompt += "\n\n(Answer in English at CEFR B1 level.)"
-        raw = generate_hf("Qwen/Qwen3.5-4B", prompt, max_new_tokens=350).strip()
+        if not is_tr:
+            prompt += "\n\n(Answer strictly in English at CEFR B1 level.)"
+
+        try:
+            from evren_llm import generate_evren
+            raw = generate_evren("qwen3.8-flash-next", prompt, max_tokens=350).strip()
+        except Exception as exc:
+            logger.warning("EVREN tutor unavailable (%s), falling back to local Qwen3.5-4B", exc)
+            raw = generate_hf("Qwen/Qwen3.5-4B", prompt, max_new_tokens=350).strip()
         if not raw:
             return None
-        parsed = _parse_llm_reply(raw)
+        parsed = _parse_llm_reply(raw, is_tr=is_tr)
         if active_term:
             parsed["related_term"] = active_term.get("term", "")
             term_start = active_term.get("start_s")
@@ -189,6 +212,7 @@ def generate_socratic_response(
     """
     msg_clean = (user_message or "").strip()
     msg_low = msg_clean.lower()
+    is_tr = str(lang).lower().startswith("tr")
     active_term = _find_active_concept(msg_clean, terms or [], current_time_s)
 
     if use_llm:
@@ -204,16 +228,24 @@ def generate_socratic_response(
         if llm_result:
             return llm_result
 
-    term_name = active_term.get("term", "Kazanılmış Değer") if active_term else "Kazanılmış Değer"
+    term_name = active_term.get("term", "") if active_term else ""
+    if not term_name:
+        term_name = "Temel Kavram" if is_tr else "Key Concept"
     term_expl = active_term.get("explanation", "") if active_term else ""
     term_time = active_term.get("timestamp", "--:--") if active_term else "--:--"
     term_start = active_term.get("start_s") if active_term else None
 
+    # Check whether the lecture or active term is specifically about project management / EVM
+    is_evm_topic = any(
+        k in term_name.lower() or k in term_expl.lower()
+        for k in ["kazanılmış değer", "maliyet sapması", "çizelge sapması", "earned value", "cost variance", "schedule variance", "cpi", "spi"]
+    ) or any(k in msg_low for k in ["cv", "sv", "cpi", "spi", "maliyet sapması", "çizelge sapması"])
+
     # Check for student's direct answers to prior Socratic questions
-    is_answering_negative = any(w in msg_low for w in ["negatif", "eksi", "< 0", "küçük", "zarar", "aşım", "aştı", "kötü", "bütçe aşımı"])
-    is_answering_positive = any(w in msg_low for w in ["pozitif", "artı", "> 0", "büyük", "kâr", "tasarruf", "iyi"])
-    is_asking_for_hint = any(w in msg_low for w in ["ipucu", "anlamadım", "yardım", "örnek", "nasıl", "neden"])
-    is_asking_formula = any(w in msg_low for w in ["formül", "formula", "hesap", "cv", "sv", "cpi", "spi"])
+    is_answering_negative = any(w in msg_low for w in ["negatif", "eksi", "< 0", "küçük", "zarar", "aşım", "aştı", "kötü", "bütçe aşımı", "negative", "less", "behind", "over budget"])
+    is_answering_positive = any(w in msg_low for w in ["pozitif", "artı", "> 0", "büyük", "kâr", "tasarruf", "iyi", "positive", "ahead", "under budget", "greater"])
+    is_asking_for_hint = any(w in msg_low for w in ["ipucu", "anlamadım", "yardım", "örnek", "nasıl", "neden", "hint", "help", "example", "why", "how"])
+    is_asking_formula = any(w in msg_low for w in ["formül", "formula", "hesap", "equation", "calculate"])
 
     reply_text = ""
     guiding_questions = []
@@ -221,96 +253,255 @@ def generate_socratic_response(
     pedagogical_phase = "scaffold"
 
     # Evaluation branch: Student answers "Negatif"
-    if is_answering_negative and ("maliyet" in msg_low or "cv" in msg_low or "sapma" in msg_low or not is_asking_for_hint):
-        reply_text = (
-            f"🎯 **Tebrikler, harika bir akıl yürütme! Tam üzerine bastın.**\n\n"
-            f"Eğer cebinden çıkan para (Gerçekleşen Maliyet / AC), tamamlanan işin değerinden (Kazanılmış Değer / EV) "
-            f"büyükse, formüldeki çıkarma işlemi **$CV = EV - AC$ negatif çıkar**.\n\n"
-            f"Bu da bütçenin aşıldığını ve kasadan planlanandan fazla para çıktığını gösterir."
-        )
-        guiding_questions = [
-            "Peki aynı mantıkla düşünürsek, zaman çizelgesi sapmasında ($SV = EV - PV$) sonucun negatif çıkması sence ne anlama gelir?",
-            "Proje takvimin ilerisinde midir, yoksa gerisinde mi kalmıştır?"
-        ]
-        suggested_replies = [
-            "Takvimin gerisindedir (Gecikme)",
-            "Takvimin ilerisindedir (Hızlı)",
-            "Bu durumu düzeltmek için ne yapılır?"
-        ]
+    if is_answering_negative and (is_evm_topic or not is_asking_for_hint):
+        if is_tr:
+            if is_evm_topic:
+                reply_text = (
+                    f"🎯 **Tebrikler, harika bir akıl yürütme! Tam üzerine bastın.**\n\n"
+                    f"Eğer cebinden çıkan para (Gerçekleşen Maliyet / AC), tamamlanan işin değerinden (Kazanılmış Değer / EV) "
+                    f"büyükse, formüldeki çıkarma işlemi **$CV = EV - AC$ negatif çıkar**.\n\n"
+                    f"Bu da bütçenin aşıldığını ve kasadan planlanandan fazla para çıktığını gösterir."
+                )
+                guiding_questions = [
+                    "Peki aynı mantıkla düşünürsek, zaman çizelgesi sapmasında ($SV = EV - PV$) sonucun negatif çıkması sence ne anlama gelir?",
+                    "Proje takvimin ilerisinde midir, yoksa gerisinde mi kalmıştır?"
+                ]
+                suggested_replies = [
+                    "Takvimin gerisindedir (Gecikme)",
+                    "Takvimin ilerisindedir (Hızlı)",
+                    "Bu durumu düzeltmek için ne yapılır?"
+                ]
+            else:
+                reply_text = (
+                    f"🎯 **Tebrikler, çok doğru bir çıkarım!**\n\n"
+                    f"'{term_name}' kavramını incelerken durumun bu yönde değişmesi beklenen kritik bir eşiktir. "
+                    + (f"Tanımı hatırlayalım: *{term_expl}*" if term_expl else "")
+                )
+                guiding_questions = [
+                    f"Bu sonucun ortaya çıkması sence sistemin hangi bileşenini doğrudan etkiler?",
+                    f"Sence bu durumu dengelemek için nasıl bir önlem alınabilir?"
+                ]
+                suggested_replies = [
+                    "Bunu somut bir örnekle pekiştirelim",
+                    "Videodaki ilgili saniyeye gidelim",
+                    "Bu kavramın karşıtı nedir?"
+                ]
+        else:
+            reply_text = (
+                f"🎯 **Excellent reasoning! You hit the nail on the head.**\n\n"
+                f"When looking at **{term_name}**, reaching this outcome indicates a key threshold. "
+                + (f"Remember: *{term_expl}*" if term_expl else "")
+            )
+            guiding_questions = [
+                f"How does this outcome affect the core behavior of {term_name}?",
+                f"What corrective step would an expert take at this stage?"
+            ]
+            suggested_replies = [
+                "Could you give a concrete example?",
+                "Jump to the lecture timestamp",
+                "What is the next step?"
+            ]
         pedagogical_phase = "praise_and_deepen"
 
     # Evaluation branch: Student answers "Pozitif"
     elif is_answering_positive and not is_asking_for_hint:
-        reply_text = (
-            f"Birlikte tekrar test edelim: Diyelim ki elindeki tamamlanan işin değeri 100 TL ($EV = 100$), "
-            f"fakat bu işi yaparken ustaya 130 TL ödedin ($AC = 130$).\n\n"
-            f"Küçük sayıdan büyük sayıyı çıkardığımızda ($100 - 130$), sence sonuç pozitif mi olur yoksa negatif mi?"
-        )
-        guiding_questions = [
-            "100'den 130'u çıkardığında cebindeki para azalmış mıdır, artmış mıdır?",
-            "O halde maliyet sapması (CV) sence eksi (-) mi olmalı, artı (+) mı?"
-        ]
-        suggested_replies = [
-            "Negatif olur (-30 TL), bütçe aşımı!",
-            "Şimdi anladım, teşekkürler",
-            "Bir ipucu daha verebilir misin?"
-        ]
+        if is_tr:
+            if is_evm_topic:
+                reply_text = (
+                    f"Birlikte tekrar test edelim: Diyelim ki elindeki tamamlanan işin değeri 100 TL ($EV = 100$), "
+                    f"fakat bu işi yaparken ustaya 130 TL ödedin ($AC = 130$).\n\n"
+                    f"Küçük sayıdan büyük sayıyı çıkardığımızda ($100 - 130$), sence sonuç pozitif mi olur yoksa negatif mi?"
+                )
+                guiding_questions = [
+                    "100'den 130'u çıkardığında cebindeki para azalmış mıdır, artmış mıdır?",
+                    "O halde maliyet sapması (CV) sence eksi (-) mi olmalı, artı (+) mı?"
+                ]
+                suggested_replies = [
+                    "Negatif olur (-30 TL), bütçe aşımı!",
+                    "Şimdi anladım, teşekkürler",
+                    "Bir ipucu daha verebilir misin?"
+                ]
+            else:
+                reply_text = (
+                    f"Birlikte adım adım düşünelim: '{term_name}' için bu durum gerçekleştiğinde "
+                    f"sonucun yönünü belirleyen temel faktör nedir?\n\n"
+                    + (f"Hatırlatma: *{term_expl}*" if term_expl else "")
+                )
+                guiding_questions = [
+                    f"Sence bu durumda sistem beklenen dengede kalır mı, yoksa bir sapma oluşur mu?",
+                    f"Bunu günlük hayattan bir örnekle nasıl sınayabiliriz?"
+                ]
+                suggested_replies = [
+                    "Bir ipucu daha verebilir misin?",
+                    "Şimdi anladım, peki sonraki adım?",
+                    "Günlük hayattan örnek ver"
+                ]
+        else:
+            reply_text = (
+                f"Let's test this together step by step for **{term_name}**.\n\n"
+                + (f"Context: *{term_expl}*" if term_expl else "")
+            )
+            guiding_questions = [
+                f"Does this condition drive the system toward balance or an imbalance?",
+                f"How can we verify this using a simple example?"
+            ]
+            suggested_replies = [
+                "Give me one more hint",
+                "I see it now, thank you",
+                "Show an intuitive analogy"
+            ]
         pedagogical_phase = "gentle_reorientation"
 
     # Inquiring branch: Formula / Concept confusion
-    elif is_asking_formula or "formül" in msg_low:
-        reply_text = (
-            f"Harika bir soru! Formülü ezberlemek yerine zihninde somutlaştıralım.\n\n"
-            f"💡 **Düşünelim:** Bir inşaatta duvar ördüğünü hayal et. 100 tuğlalık iş yaptın (Kazanılmış Değer / EV = 100). "
-            f"Ama işverenden 120 tuğlalık para harcadın (Gerçekleşen Maliyet / AC = 120).\n\n"
-            f"Sence maliyet sapmasını ($CV = EV - AC$) hesapladığımızda:"
-        )
-        guiding_questions = [
-            "Harcanan para yapılan işin değerini aştığında sonuç sence pozitif mi çıkar, negatif mi?",
-            "Ve bir proje yöneticisi için sonucun eksi (-) çıkması sevindirici midir, yoksa alarm zili midir?"
-        ]
-        suggested_replies = [
-            "Negatif çıkar, yani bütçe aşımı!",
-            "Pozitif çıkar, tasarruf ettik",
-            "Günlük hayattan başka bir örnek ver"
-        ]
+    elif is_asking_formula or ("formül" in msg_low or "formula" in msg_low):
+        if is_tr:
+            if is_evm_topic:
+                reply_text = (
+                    f"Harika bir soru! Formülü ezberlemek yerine zihninde somutlaştıralım.\n\n"
+                    f"💡 **Düşünelim:** Bir inşaatta duvar ördüğünü hayal et. 100 tuğlalık iş yaptın (Kazanılmış Değer / EV = 100). "
+                    f"Ama işverenden 120 tuğlalık para harcadın (Gerçekleşen Maliyet / AC = 120).\n\n"
+                    f"Sence maliyet sapmasını ($CV = EV - AC$) hesapladığımızda:"
+                )
+                guiding_questions = [
+                    "Harcanan para yapılan işin değerini aştığında sonuç sence pozitif mi çıkar, negatif mi?",
+                    "Ve bir proje yöneticisi için sonucun eksi (-) çıkması sevindirici midir, yoksa alarm zili midir?"
+                ]
+                suggested_replies = [
+                    "Negatif çıkar, yani bütçe aşımı!",
+                    "Pozitif çıkar, tasarruf ettik",
+                    "Günlük hayattan başka bir örnek ver"
+                ]
+            else:
+                reply_text = (
+                    f"Harika bir soru! '{term_name}' ilişkisini ezberlemek yerine mantığını kuralım.\n\n"
+                    + (f"💡 **Tanım:** *{term_expl}*\n\n" if term_expl else "")
+                    + f"Bu kavram temel bir girdi ile çıktı arasındaki dönüşümü inceler."
+                )
+                guiding_questions = [
+                    f"Girdi değerleri arttığında '{term_name}' değeri sence nasıl tepki verir?",
+                    f"Bu ilişkiyi bir terazinin iki kefesi gibi düşünebilir miyiz?"
+                ]
+                suggested_replies = [
+                    "Doğru orantılı artar",
+                    "Ters orantılı azalır",
+                    "Günlük hayattan bir örnek ver"
+                ]
+        else:
+            reply_text = (
+                f"Great question! Rather than memorizing formulas for **{term_name}**, let's build an intuitive picture.\n\n"
+                + (f"💡 **Concept:** *{term_expl}*\n\n" if term_expl else "")
+                + f"This principle relates inputs directly to observed outcomes."
+            )
+            guiding_questions = [
+                f"When the underlying input increases, does {term_name} increase or decrease?",
+                f"Can you think of this as a balance between two opposing forces?"
+            ]
+            suggested_replies = [
+                "It increases proportionally",
+                "It decreases (inverse relationship)",
+                "Give a daily life analogy"
+            ]
         pedagogical_phase = "socratic_inquiry"
 
     # Analogy or general request
-    elif any(k in msg_low for k in ["örnek", "analoji", "benzetme", "günlük"]):
-        reply_text = (
-            f"🚗 **Günlük Hayattan Bir Benzetme Yapalım:**\n\n"
-            f"Tatile çıkarken navigasyonun sana '3 saatte varacaksın ve 500 TL benzin yakacaksın' dediğini düşün (Bu senin Temel Çizgin / Baseline).\n"
-            f"2 saat sonra baktın ki 600 TL harcamışsın ama yolun henüz üçte birindesin!\n\n"
-            f"Burada Kazanılmış Değer analizi (EVM), hız göstergen ile benzin cüzdanını aynı anda kıyaslayan akıllı göstergedir."
-        )
-        guiding_questions = [
-            "Sence bu yolculukta hedefe varmak için gaza daha mı çok basmalısın, yoksa harcamaları kısıp rotayı mı kontrol etmelisin?",
-            "Projedeki 'Düzeltici Eylem' sence hangi adıma karşılık gelir?"
-        ]
-        suggested_replies = [
-            "Rotayı kontrol edip tasarruf etmeli",
-            "Peki CPI ve SPI neyi gösterir?",
-            "Videoda formülün geçtiği saniyeye gidelim"
-        ]
+    elif any(k in msg_low for k in ["örnek", "analoji", "benzetme", "günlük", "example", "analogy"]):
+        if is_tr:
+            if is_evm_topic:
+                reply_text = (
+                    f"🚗 **Günlük Hayattan Bir Benzetme Yapalım:**\n\n"
+                    f"Tatile çıkarken navigasyonun sana '3 saatte varacaksın ve 500 TL benzin yakacaksın' dediğini düşün (Bu senin Temel Çizgin / Baseline).\n"
+                    f"2 saat sonra baktın ki 600 TL harcamışsın ama yolun henüz üçte birindesin!\n\n"
+                    f"Burada Kazanılmış Değer analizi (EVM), hız göstergen ile benzin cüzdanını aynı anda kıyaslayan akıllı göstergedir."
+                )
+                guiding_questions = [
+                    "Sence bu yolculukta hedefe varmak için gaza daha mı çok basmalısın, yoksa harcamaları kısıp rotayı mı kontrol etmelisin?",
+                    "Projedeki 'Düzeltici Eylem' sence hangi adıma karşılık gelir?"
+                ]
+                suggested_replies = [
+                    "Rotayı kontrol edip tasarruf etmeli",
+                    "Peki CPI ve SPI neyi gösterir?",
+                    "Videoda formülün geçtiği saniyeye gidelim"
+                ]
+            else:
+                reply_text = (
+                    f"🌱 **Günlük Hayattan Bir Benzetme:**\n\n"
+                    f"'{term_name}' kavramını günlük hayatta bir akıllı termostata veya denge mekanizmasına benzetebiliriz.\n\n"
+                    + (f"Ders bağlamındaki anlamı: *{term_expl}*" if term_expl else "")
+                )
+                guiding_questions = [
+                    f"Bu benzetmeyi düşündüğünde, '{term_name}' olmasaydı süreçte nasıl bir aksaklık yaşanırdı?",
+                    f"Bunun gerçek dünyadaki en yakın uygulaması sence nedir?"
+                ]
+                suggested_replies = [
+                    "Süreç kontrolsüz kalır ve sapmalar fark edilemezdi",
+                    "Peki bunu formülle açıklar mısın?",
+                    "Videoda bu kavram nerede anlatılıyor?"
+                ]
+        else:
+            reply_text = (
+                f"🌱 **An Intuitive Real-World Analogy:**\n\n"
+                f"Think of **{term_name}** like a smart thermostat or feedback loop maintaining balance.\n\n"
+                + (f"In this lecture: *{term_expl}*" if term_expl else "")
+            )
+            guiding_questions = [
+                f"Without {term_name}, what failure would occur in the process?",
+                f"How would a practitioner observe this in practice?"
+            ]
+            suggested_replies = [
+                "The process would run unchecked",
+                "Explain the formula or mechanism",
+                "Jump to the lecture timestamp"
+            ]
         pedagogical_phase = "analogy_scaffolding"
 
     # Default Socratic Guidance
     else:
-        reply_text = (
-            f"'{term_name}' kavramı bu dersin en kritik bilişsel bağlantılarından biri.\n\n"
-            f"Doğrudan ezberlemek yerine şu soruyla başlayalım: Bir projede sadece 'ne kadar harcandığına' (AC) bakmak "
-            f"neden o projenin başarılı olup olmadığını anlamaya yetmez?"
-        )
-        guiding_questions = [
-            "Sence harcanan paranın ne kadarlık 'tamamlanmış iş' ürettiğini (EV) bilmek neden zorunludur?",
-            "Bunu bilmeden bütçenin doğru kullanıldığını söyleyebilir miyiz?"
-        ]
-        suggested_replies = [
-            "Yetmez, çünkü ne kadar iş bittiğini bilmeliyiz!",
-            "Bu konuyu formülle açıklar mısın?",
-            "Videoda bu kavram nerede anlatılıyor?"
-        ]
+        if is_tr:
+            if is_evm_topic:
+                reply_text = (
+                    f"'{term_name}' kavramı bu dersin en kritik bilişsel bağlantılarından biri.\n\n"
+                    f"Doğrudan ezberlemek yerine şu soruyla başlayalım: Bir projede sadece 'ne kadar harcandığına' (AC) bakmak "
+                    f"neden o projenin başarılı olup olmadığını anlamaya yetmez?"
+                )
+                guiding_questions = [
+                    "Sence harcanan paranın ne kadarlık 'tamamlanmış iş' ürettiğini (EV) bilmek neden zorunludur?",
+                    "Bunu bilmeden bütçenin doğru kullanıldığını söyleyebilir miyiz?"
+                ]
+                suggested_replies = [
+                    "Yetmez, çünkü ne kadar iş bittiğini bilmeliyiz!",
+                    "Bu konuyu formülle açıklar mısın?",
+                    "Videoda bu kavram nerede anlatılıyor?"
+                ]
+            else:
+                reply_text = (
+                    f"'{term_name}' kavramı bu dersin en temel yapı taşlarından biridir.\n\n"
+                    + (f"Ders tanımı: *{term_expl}*\n\n" if term_expl else "")
+                    + f"Bunu doğrudan ezberlemek yerine şu soruyla keşfedelim: Bu kavram bu konuda neden vazgeçilmez bir role sahiptir?"
+                )
+                guiding_questions = [
+                    f"'{term_name}' olmasaydı bu konuda hangi soru cevapsız kalırdı?",
+                    f"Bu kavramın dersteki diğer kavramlarla ilişkisini nasıl özetlersin?"
+                ]
+                suggested_replies = [
+                    "Temel mekanizmayı ve amacı anlamak için zorunludur",
+                    "Günlük hayattan bir örnek verir misin?",
+                    "Videoda bu kavram nerede anlatılıyor?"
+                ]
+        else:
+            reply_text = (
+                f"**{term_name}** is one of the pivotal building blocks in this lecture.\n\n"
+                + (f"Lecture context: *{term_expl}*\n\n" if term_expl else "")
+                + f"Rather than rote memorization, let's explore why this concept is indispensable here."
+            )
+            guiding_questions = [
+                f"What problem would remain unsolved without {term_name}?",
+                f"How does {term_name} connect to other ideas in this lecture?"
+            ]
+            suggested_replies = [
+                "It provides the necessary foundation",
+                "Could you share a real-world analogy?",
+                "Jump to where this is discussed in the video"
+            ]
         pedagogical_phase = "open_socratic"
 
     # Contextual Video Timestamp connection

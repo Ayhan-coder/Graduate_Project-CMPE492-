@@ -21,6 +21,19 @@ EXPERIMENTS_DIR = Path(__file__).resolve().parent
 if str(EXPERIMENTS_DIR) not in sys.path:
     sys.path.insert(0, str(EXPERIMENTS_DIR))
 
+# The local project key is the one the user edits for this app. Windows may also
+# provide a stale EVREN_API_KEY inherited by the launcher, which otherwise silently
+# takes precedence over experiments/.env in evren_llm.py.
+project_env = EXPERIMENTS_DIR / ".env"
+if project_env.exists():
+    for env_line in project_env.read_text(encoding="utf-8").splitlines():
+        env_line = env_line.strip()
+        if env_line.startswith("EVREN_API_KEY="):
+            project_key = env_line.split("=", 1)[1].strip().strip('"').strip("'")
+            if project_key:
+                os.environ["EVREN_API_KEY"] = project_key
+            break
+
 # Suppress unauthenticated HF Hub warning and noisy framework deprecations
 os.environ.setdefault("HF_HUB_DISABLE_IMPLICIT_TOKEN", "1")
 os.environ.setdefault("HF_HUB_DISABLE_SYMLINKS_WARNING", "1")
