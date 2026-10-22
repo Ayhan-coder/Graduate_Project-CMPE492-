@@ -315,6 +315,109 @@ class ModularSceneBuilderTests(unittest.TestCase):
         compiled = compile(code, "<modular_test>", "exec")
         self.assertIsNotNone(compiled)
 
+    def test_detect_scene_type_no_kural_false_positive(self):
+        from gui.manim_scene_builders import detect_scene_type
+        # "kural" should not trigger equation_step
+        self.assertEqual(detect_scene_type({"title": "Sınav Altın Kuralı"}), "concept_card")
+        self.assertEqual(detect_scene_type({"title": "Önemli Kurallar"}), "concept_card")
+        # Explicit equation keyword triggers equation_step
+        self.assertEqual(detect_scene_type({"title": "Maliyet Sapması Formülü"}), "equation_step")
+
+    def test_latex_to_unicode_math_formatting(self):
+        from gui.manim_scene_builders import latex_to_unicode_math
+        raw_eq = r"w_{t+1} = w_t - \eta \cdot \nabla L"
+        converted = latex_to_unicode_math(raw_eq)
+        self.assertIn("·", converted)
+        self.assertIn("∇", converted)
+        self.assertIn("η", converted)
+        self.assertNotIn(r"\cdot", converted)
+        self.assertNotIn(r"\nabla", converted)
+
+    def test_equation_step_without_formula_falls_back_to_concept_card(self):
+        from gui.manim_scene_builders import generate_modular_manim_code
+        spec = {
+            "title": "Genel Kural",
+            "scenes": [
+                {"id": 1, "scene_type": "equation_step", "title": "Kural Sahnesi", "duration_s": 8.0}
+            ],
+        }
+        code = generate_modular_manim_code(spec)
+        # Should NOT contain dummy E = mc^2 formula
+        self.assertNotIn("E = mc^2", code)
+        self.assertNotIn("MathTex", code)
+        # Should gracefully fall back to concept card
+        self.assertIn("Kavram Kartı", code)
+
+    def test_dynamic_payload_content_in_generated_code(self):
+        from gui.manim_scene_builders import generate_modular_manim_code
+        spec = {
+            "title": "Veri Bilimi",
+            "scenes": [
+                {
+                    "id": 1,
+                    "scene_type": "process_flow",
+                    "title": "Boru Hattı",
+                    "steps": [
+                        {"title": "1. Veri Toplama", "desc": "Sensörlerden okuma"},
+                        {"title": "2. Temizleme", "desc": "Eksik değer giderme"},
+                    ],
+                    "duration_s": 10.0,
+                },
+                {
+                    "id": 2,
+                    "scene_type": "comparison_table",
+                    "title": "Yöntem Kıyası",
+                    "left_title": "Model X",
+                    "right_title": "Model Y",
+                    "left_points": ["Hızlı eğitim", "Düşük bellek"],
+                    "right_points": ["Yüksek doğruluk", "Yüksek bellek"],
+                    "duration_s": 12.0,
+                },
+            ],
+        }
+        code = generate_modular_manim_code(spec)
+        self.assertIn("Sensörlerden okuma", code)
+        self.assertIn("Model X", code)
+        self.assertIn("Model Y", code)
+        self.assertIn("Hızlı eğitim", code)
+        # No dummy placeholder strings
+        self.assertNotIn("Statik veya kural tabanlı", code)
+        self.assertNotIn("Çözümleme ve hesap", code)
+
+    def test_scene_durations_audio_first_pacing(self):
+        from gui.manim_scene_builders import generate_modular_manim_code
+        spec = {
+            "title": "Test Konusu",
+            "scenes": [
+                {"id": 1, "scene_type": "concept_card", "title": "Sahne 1", "duration_s": 20.0},
+                {"id": 2, "scene_type": "concept_card", "title": "Sahne 2", "duration_s": 20.0},
+            ],
+        }
+        # Audio durations measured as 6.0s and 10.0s
+        code = generate_modular_manim_code(spec, scene_durations=[6.0, 10.0])
+        # Pacing calculations: hold_s is max(0.5, dur - 4.8)
+        # For 6.0s: hold_s = 1.2s -> 60% = 0.72s
+        # For 10.0s: hold_s = 5.2s -> 60% = 3.12s
+        self.assertIn("self.wait(0.72)", code)
+        self.assertIn("self.wait(3.12)", code)
+
+    def test_evm_fallback_spec_correctness(self):
+        from gui.manimator import generate_fallback_explainer_spec
+        spec = generate_fallback_explainer_spec("Kazanılmış Değer Analizi (EVM)")
+        scenes = spec.get("scenes", [])
+        self.assertEqual(len(scenes), 3)
+        # Scene 1: concept_card
+        self.assertEqual(scenes[0]["scene_type"], "concept_card")
+        # Scene 2: equation_step with real CV = EV - AC formula
+        self.assertEqual(scenes[1]["scene_type"], "equation_step")
+        self.assertEqual(scenes[1]["formula"], "CV = EV - AC")
+        # Scene 3: comparison_table
+        self.assertEqual(scenes[2]["scene_type"], "comparison_table")
+        # Takeaway should be a real takeaway, not a hook
+        self.assertNotIn("Duvar ustası", scenes[0]["takeaway"])
+        self.assertIn("EVM, sadece harcanan parayı değil", scenes[0]["takeaway"])
+
 
 if __name__ == "__main__":
     unittest.main()
+

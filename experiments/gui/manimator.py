@@ -128,21 +128,32 @@ Lütfen aşağıdaki JSON şemasına birebir uyarak yanıt ver:
       "scene_type": "concept_card",
       "title": "Giriş ve Problem",
       "narration": "Bu sahnenin anlatımı...",
-      "duration_s": 12.0
+      "duration_s": 12.0,
+      "takeaway": "Ders bağlamına dayalı altın çıkarım ve kilit kural"
     }},
     {{
       "id": 2,
       "scene_type": "process_flow",
-      "title": "Kavram ve İşleyiş",
+      "title": "İşleyiş Aşamaları",
+      "steps": [
+        {{"title": "1. Girdi", "desc": "Aşama açıklaması"}},
+        {{"title": "2. İşlem", "desc": "Aşama açıklaması"}},
+        {{"title": "3. Çıktı", "desc": "Aşama açıklaması"}}
+      ],
       "narration": "Adımların anlatımı...",
       "duration_s": 18.0
     }},
     {{
       "id": 3,
-      "scene_type": "concept_card",
-      "title": "Kural ve Özet",
-      "narration": "Sınav kuralı ve altın ipucu...",
-      "duration_s": 15.0
+      "scene_type": "comparison_table",
+      "title": "Karşılaştırma ve Özet",
+      "left_title": "Yaklaşım A",
+      "right_title": "Yaklaşım B",
+      "left_points": ["Özellik 1", "Özellik 2"],
+      "right_points": ["Özellik 1", "Özellik 2"],
+      "narration": "Karşılaştırmalı özet ve altın kural...",
+      "duration_s": 15.0,
+      "takeaway": "Sınav ve uygulama altın ipucu"
     }}
   ],
   "manim_code": ""
@@ -191,12 +202,12 @@ Kurallar:
 2. Yalnizca verilen ders baglamiyla desteklenen bilgileri soyle. Alakasiz genel tavsiye, baska konuya ait kavram, uydurma ornek veya baglamda olmayan bilgi ekleme.
 3. Baglam yetersizse bunu acikca soyle; kesin olmayan tanim uydurma. Teknik terimi bu kesitteki anlami ile acikla.
 4. Benzetme kullanacaksan teknik fikri dogru korusun ve baglamla uyussun; aksi halde bos birak.
-5. Her sahne icin konuya en uygun gorsel sahne tipini ("scene_type") sec:
-   - "dag_concept": Kavramlar arasi onkosul ve baglanti semasi
-   - "process_flow": Adim adim sirali isleyis ve surec akisi
-   - "comparison_table": Iki yontem veya durumun karsilastirilmasi
-   - "equation_step": Matematiksel formuller ve parametreler
-   - "concept_card": Somut pedagojik kavram ve altin cikarim karti
+5. Her sahne icin konuya en uygun gorsel sahne tipini ("scene_type") sec ve o sahneye ozel gorsel veri alanlarini (payload) ders iceriginden doldur:
+   - "concept_card": "takeaway" alani: Ders baglamina dayali altin cikarim veya kilit kural.
+   - "process_flow": "steps" alani: [{"title": "1. Baslik", "desc": "Kisa aciklama"}] (2 veya 3 adim).
+   - "comparison_table": "left_title", "right_title", "left_points": ["Madde 1", "Madde 2"], "right_points": ["Karsit 1", "Karsit 2"].
+   - "equation_step": Yalnizca gercek bir matematiksel denklem/formul varsa sec. "formula": "LaTeX formulu", "variables": [{"symbol": "EV", "meaning": "Kazanilmis Deger"}]. Formul yoksa ASLA equation_step secme!
+   - "dag_concept": "nodes": [{"name": "Onkosul", "desc": "Tanimi"}, {"name": "Hedef", "desc": "Tanimi"}] (2-3 dugum).
 6. narration_script, sahnelerdeki anlatimlarin sirayla birlestirilmis hali olsun.
 7. Yanit SADECE gecerli bir JSON nesnesi olsun. manim_code alanini bos birak; gorsel sahne olusturucu bu semaya gore animasyonu olusturur.
 """
@@ -216,13 +227,43 @@ Asagidaki JSON semasina birebir uyarak yanit ver:
   ],
   "narration_script": "Videonun bastan sona eksiksiz seslendirme metni",
   "scenes": [
-    {{"id": 1, "scene_type": "concept_card", "title": "Giris ve Problem", "narration": "Bu sahnenin anlatimi", "duration_s": 12.0}},
-    {{"id": 2, "scene_type": "process_flow", "title": "Kavram ve Isleyis", "narration": "Adimlarin anlatimi", "duration_s": 18.0}},
-    {{"id": 3, "scene_type": "concept_card", "title": "Kural ve Ozet", "narration": "Altin ipucu", "duration_s": 15.0}}
+    {{
+      "id": 1,
+      "scene_type": "concept_card",
+      "title": "Giris ve Problem",
+      "narration": "Bu sahnenin anlatimi",
+      "duration_s": 12.0,
+      "takeaway": "Kilit cikarim ve kural"
+    }},
+    {{
+      "id": 2,
+      "scene_type": "process_flow",
+      "title": "Isleyis Semasi",
+      "steps": [
+        {{"title": "1. Girdi", "desc": "Ilk adim tanimi"}},
+        {{"title": "2. Islem", "desc": "Mekanizma tanimi"}},
+        {{"title": "3. Cikti", "desc": "Nihai sonuc"}}
+      ],
+      "narration": "Adimlarin anlatimi",
+      "duration_s": 18.0
+    }},
+    {{
+      "id": 3,
+      "scene_type": "comparison_table",
+      "title": "Karsilastirma ve Ozet",
+      "left_title": "Yaklasim A",
+      "right_title": "Yaklasim B",
+      "left_points": ["Madde 1", "Madde 2"],
+      "right_points": ["Madde 1", "Madde 2"],
+      "narration": "Karsilastirma anlatimi ve altin cikarim",
+      "duration_s": 15.0,
+      "takeaway": "Sinav ve uygulama altin ipucu"
+    }}
   ],
   "manim_code": ""
 }}
 """
+
 
 
 def _complete_spec(parsed: dict, topic_clean: str, lang: str, target_duration_s: float = 0.0) -> dict:
@@ -378,15 +419,43 @@ def generate_fallback_explainer_spec(
         script = (
             "Merhaba! Bu konuda kafanızın karışması çok normal. "
             "Kazanılmış Değer Analizi, projenizin bütçesinde ve takviminde nerede olduğunuzu gösteren bir pusuladır. "
-            "Gelin duvar ustası örneğine bakalım: Planlanan Değer, yani PV, başlangıçta hedeflediğiniz tuğla bütçesidir. "
-            "Kazanılmış Değer, yani EV ise ustanın gerçekten ördüğü tuğlanın değeridir. "
-            "Eğer harcadığınız para yani AC, örülen tuğladan fazlaysa Maliyet Sapması negatif çıkar. "
-            "Sınav altın kuralı: CV eşittir EV eksi AC. Negatif sonuç, bütçeyi aştığınızı gösterir!"
+            "Maliyet Sapması CV eşittir EV eksi AC'dir. EV gerçekleşen işi, AC harcanan parayı temsil eder. "
+            "CV pozitifse proje tasarrufta, negatifse bütçe aşımında demektir. "
+            "Unutmayın: EV daima ilk terimdir ve pozitif sonuç her zaman başarıyı gösterir."
         )
         scenes = [
-            {"id": 1, "title": "Problem & Pusula", "narration": "Projenizin bütçesinde ve takviminde nerede olduğunuzu nasıl anlarsınız?", "duration_s": 10.0},
-            {"id": 2, "title": "Duvar Ustası Benzetmesi", "narration": "PV planlanan iş, EV tamamlanan iş, AC ise harcanan paradır.", "duration_s": 22.0},
-            {"id": 3, "title": "Sınav Altın Kuralı", "narration": "CV = EV - AC formülü negatifse bütçe aşılmıştır!", "duration_s": 13.0},
+            {
+                "id": 1,
+                "scene_type": "concept_card",
+                "title": "Problem & Pusula",
+                "narration": "Projenizin bütçesinde ve takviminde nerede olduğunuzu nasıl anlarsınız?",
+                "duration_s": 10.0,
+                "takeaway": "EVM, sadece harcanan parayı değil; paranın karşılığı üretilen gerçek değeri ölçer.",
+            },
+            {
+                "id": 2,
+                "scene_type": "equation_step",
+                "title": "Maliyet Sapması Formülü",
+                "formula": "CV = EV - AC",
+                "variables": [
+                    {"symbol": "EV", "meaning": "Kazanılmış Değer (Hak edilen bütçe)"},
+                    {"symbol": "AC", "meaning": "Gerçekleşen Maliyet (Harcanan fiili nakit)"},
+                ],
+                "narration": "Maliyet Sapması CV eşittir EV eksi AC'dir. EV gerçekleşen işi, AC harcanan parayı temsil eder.",
+                "duration_s": 18.0,
+            },
+            {
+                "id": 3,
+                "scene_type": "comparison_table",
+                "title": "Sapma Analizi Karşılaştırması",
+                "left_title": "CV > 0 (Bütçe Altı)",
+                "right_title": "CV < 0 (Bütçe Aşımı)",
+                "left_points": ["Tasarruf sağlanmış", "Maliyet kontrol altında", "Müdahale gerekmez"],
+                "right_points": ["Bütçe aşımı / zarar", "Maliyet sapması negatif", "Düzeltici önlem şart"],
+                "narration": "CV pozitifse proje tasarrufta, negatifse bütçe aşımında demektir. Düzeltici önlem alınmalıdır.",
+                "duration_s": 14.0,
+                "takeaway": "Altın Kural: EV daima formülün ilk terimidir. Pozitif değer tasarruf, negatif değer zarardır.",
+            },
         ]
     elif "turizm" in norm_topic or "uktkg" in norm_topic:
         title = "Turizm Bileşenleri ve UKTKG Modeli"
@@ -399,14 +468,43 @@ def generate_fallback_explainer_spec(
         ]
         script = (
             "Turizm dersinde takıldığınız UKTKG kavramını hemen basitleştirelim. "
-            "Turizm, tek bir parça değil, birbirine kenetli bir zincirdir. "
-            "U harfi Ulaşımı, K Konaklamayı, T Tanıtımı, ikinci K Kamu Hizmetlerini, G ise Güvenliği temsil eder. "
-            "Biri bile aksarsa turist memnuniyeti çöker. Unutmayın: Turizm ürünleri stoklanamaz!"
+            "Turizm tek bir işletmeden ibaret değil, birbirine kenetli bir hizmet zinciridir. "
+            "Ulaşım, Konaklama, Tanıtım, Kamu Hizmetleri ve Güvenlik birbirini tamamlar. "
+            "Turizm ürünleri depolanamaz veya ertesi güne stoklanamaz; üretim ve tüketim eşzamanlıdır."
         )
         scenes = [
-            {"id": 1, "title": "Turizm Zinciri", "narration": "Turizm neden tek bir işletmeden ibaret değildir?", "duration_s": 10.0},
-            {"id": 2, "title": "UKTKG Çerçevesi", "narration": "Ulaşım, Konaklama, Tanıtım, Kamu ve Güvenlik birbirine bağlıdır.", "duration_s": 20.0},
-            {"id": 3, "title": "Sınav Kuralı", "narration": "Boş bir otel odası ertesi güne stoklanamaz!", "duration_s": 12.0},
+            {
+                "id": 1,
+                "scene_type": "concept_card",
+                "title": "Turizm Zinciri",
+                "narration": "Turizm neden tek bir işletmeden ibaret değildir?",
+                "duration_s": 10.0,
+                "takeaway": "Turizm birleşik bir hizmettir; tek bir halkanın kopması tüm deneyimi bozar.",
+            },
+            {
+                "id": 2,
+                "scene_type": "process_flow",
+                "title": "UKTKG Hizmet Zinciri",
+                "steps": [
+                    {"title": "1. Ulaşım & Erişim", "desc": "Hedefe hızlı ve güvenli varış"},
+                    {"title": "2. Konaklama & Ağırlama", "desc": "Nitelikli otel ve dinlenme altyapısı"},
+                    {"title": "3. Tanıtım & Güvenlik", "desc": "Kamu desteği, güvenlik ve memnuniyet"},
+                ],
+                "narration": "Ulaşım, Konaklama, Tanıtım, Kamu ve Güvenlik birbirine kenetlidir.",
+                "duration_s": 18.0,
+            },
+            {
+                "id": 3,
+                "scene_type": "comparison_table",
+                "title": "Turizm Hizmeti vs Fiziki Mal",
+                "left_title": "Fiziki Ürünler",
+                "right_title": "Turizm Hizmetleri",
+                "left_points": ["Depolanabilir ve stoklanır", "Kullanım zamanı ertelenebilir"],
+                "right_points": ["Stoklanamaz ve anlıktır", "Üretim ve tüketim eşzamanlıdır"],
+                "narration": "Turizm ürünleri depolanamaz veya ertesi güne stoklanamaz; üretim ve tüketim eşzamanlıdır.",
+                "duration_s": 14.0,
+                "takeaway": "Altın Kural: Boş kalan otel odası veya uçak koltuğu ertesi güne devredilemez.",
+            },
         ]
     elif "veri" in norm_topic or "python" in norm_topic or "model" in norm_topic:
         title = "Veri Ön İşleme (Data Preprocessing)"
@@ -422,9 +520,38 @@ def generate_fallback_explainer_spec(
             "Çöp giren sisteme çöp çıkar prensibini aklınızdan çıkarmayın!"
         )
         scenes = [
-            {"id": 1, "title": "Ham Veri Sorunu", "narration": "Ham veri neden doğrudan modele verilemez?", "duration_s": 10.0},
-            {"id": 2, "title": "Rafineri Adımları", "narration": "Temizleme, ölçekleme ve dönüştürme adımları uygulanır.", "duration_s": 20.0},
-            {"id": 3, "title": "Model Çıktısı", "narration": "Temiz veri, yüksek doğruluklu tahminler üretir.", "duration_s": 12.0},
+            {
+                "id": 1,
+                "scene_type": "concept_card",
+                "title": "Ham Veri Sorunu",
+                "narration": "Ham veri neden doğrudan modele verilemez?",
+                "duration_s": 10.0,
+                "takeaway": "Çöp giren sisteme çöp çıkar; model başarısının temeli temiz veridir.",
+            },
+            {
+                "id": 2,
+                "scene_type": "process_flow",
+                "title": "Veri Hazırlık Adımları",
+                "steps": [
+                    {"title": "1. Eksik Veri Tespiti", "desc": "Boş hücrelerin temizlenmesi"},
+                    {"title": "2. Özellik Ölçekleme", "desc": "Sayıları ortak teraziye getirme"},
+                    {"title": "3. X ve y Ayrımı", "desc": "Girdi ve hedef matrislerinin oluşumu"},
+                ],
+                "narration": "Temizleme, ölçekleme ve dönüştürme adımları sırayla uygulanır.",
+                "duration_s": 18.0,
+            },
+            {
+                "id": 3,
+                "scene_type": "comparison_table",
+                "title": "Ham Veri vs Temizlenmiş Veri",
+                "left_title": "Ham Veri",
+                "right_title": "İşlenmiş Veri",
+                "left_points": ["Uç değerler ve gürültü", "Modelde yüksek yanılgı"],
+                "right_points": ["Dengeli ve standart ölçek", "Yüksek tahmin doğruluğu"],
+                "narration": "Temiz veri, yüksek doğruluklu tahminler ve genellenebilir modeller üretir.",
+                "duration_s": 14.0,
+                "takeaway": "Altın Kural: Model algoritmasından önce veri kalitesini optimize edin.",
+            },
         ]
     elif "proje" in norm_topic or "yönetici" in norm_topic or "alternatif" in norm_topic or "problem" in norm_topic:
         title = "Proje Yönetimi ve Karar Verme"
@@ -437,14 +564,43 @@ def generate_fallback_explainer_spec(
         ]
         script = (
             "Dersin bu anında tam olarak takıldığınız noktayı aydınlatalım. "
-            "Proje yöneticisi, ortaya çıkan problemlerin çözümü için önerilen alternatiflerden hangisinin proje amaçlarına daha uygun olduğuna karar vermek durumundadır. "
+            "Proje yöneticisi, ortaya çıkan problemlerin çözümü için önerilen alternatiflerden hangisinin proje amaçlarına daha uygun olduğuna karar verir. "
             "Öte yandan faaliyetler devam ederken maliyetler izlenmeli ve gerektiğinde düzeltici önlemler çok geç olmadan alınmalıdır. "
-            "Unutmayın: Başarılı proje yönetimi, problemleri erkenden teşhis edip doğru alternatifi uygulamaktır!"
+            "İzleme nerede olduğumuzu gösterir, kontrol ise rotaya geri döndürür."
         )
         scenes = [
-            {"id": 1, "title": "Karar Verme Sorumluluğu", "narration": "Proje yöneticisi alternatifler arasından en uygun seçeneği belirler.", "duration_s": 12.0},
-            {"id": 2, "title": "İzleme ve Maliyet Takibi", "narration": "Faaliyetler sürerken maliyetler ve ilerleme düzenli izlenir.", "duration_s": 20.0},
-            {"id": 3, "title": "Düzeltici Önlemler", "narration": "Sapmalar büyümeden çok geç olmadan önlem alınmalıdır.", "duration_s": 14.0},
+            {
+                "id": 1,
+                "scene_type": "concept_card",
+                "title": "Karar Verme Sorumluluğu",
+                "narration": "Proje yöneticisi alternatifler arasından en uygun seçeneği belirler.",
+                "duration_s": 12.0,
+                "takeaway": "Yönetici sadece kriz çözmez; alternatifleri proje amaçlarına göre rasyonel seçer.",
+            },
+            {
+                "id": 2,
+                "scene_type": "process_flow",
+                "title": "Karar ve Müdahale Akışı",
+                "steps": [
+                    {"title": "1. Problem Tespiti", "desc": "Sapmanın erkenden belirlenmesi"},
+                    {"title": "2. Alternatif Analizi", "desc": "Zaman ve maliyet etki analizi"},
+                    {"title": "3. Düzeltici Aksiyon", "desc": "Hedefe dönüş müdahalesi"},
+                ],
+                "narration": "Faaliyetler sürerken maliyetler ve ilerleme düzenli izlenir.",
+                "duration_s": 18.0,
+            },
+            {
+                "id": 3,
+                "scene_type": "comparison_table",
+                "title": "İzleme vs Kontrol Ayrımı",
+                "left_title": "İzleme (Monitoring)",
+                "right_title": "Kontrol (Controlling)",
+                "left_points": ["Veri toplama ve kaydetme", "Performans raporlama", "Mevcut durumu görme"],
+                "right_points": ["Sapmayı giderme", "Düzeltici önlem alma", "Planlanan hedefe geri döndürme"],
+                "narration": "Sapmalar büyümeden çok geç olmadan önlem alınmalıdır.",
+                "duration_s": 14.0,
+                "takeaway": "İzleme hız göstergesine bakmaktır; kontrol ise hız aşılınca frene basmaktır.",
+            },
         ]
     elif "izleme" in norm_topic or "kontrol" in norm_topic:
         title = "Proje İzleme ve Kontrol Süreci"
@@ -462,9 +618,38 @@ def generate_fallback_explainer_spec(
             "Zaman, maliyet ve performans kısıtları kontrolün temel direkleridir!"
         )
         scenes = [
-            {"id": 1, "title": "İzleme Nedir?", "narration": "Performans verilerinin toplanıp raporlanması sürecidir.", "duration_s": 12.0},
-            {"id": 2, "title": "Kontrol ve Sapma Tespiti", "narration": "Planlanan ile fiili durum arasındaki fark incelenir.", "duration_s": 18.0},
-            {"id": 3, "title": "Düzeltici Önlemler", "narration": "Gecikme ve maliyet aşımına karşı çok geç olmadan önlem alınır.", "duration_s": 14.0},
+            {
+                "id": 1,
+                "scene_type": "concept_card",
+                "title": "İzleme Nedir?",
+                "narration": "Performans verilerinin toplanıp raporlanması sürecidir.",
+                "duration_s": 12.0,
+                "takeaway": "İzleme olmadan sapmalar görülemez; düzenli veri toplama şarttır.",
+            },
+            {
+                "id": 2,
+                "scene_type": "process_flow",
+                "title": "Kontrol Döngüsü",
+                "steps": [
+                    {"title": "1. Veri Toplama", "desc": "Fiili ilerleme tespiti"},
+                    {"title": "2. Sapma Analizi", "desc": "Planlanan ile fiili farkı"},
+                    {"title": "3. Düzeltici Eylem", "desc": "Plana dönüş müdahalesi"},
+                ],
+                "narration": "Planlanan ile fiili durum arasındaki fark incelenir.",
+                "duration_s": 18.0,
+            },
+            {
+                "id": 3,
+                "scene_type": "comparison_table",
+                "title": "İzleme vs Kontrol",
+                "left_title": "İzleme (Monitoring)",
+                "right_title": "Kontrol (Controlling)",
+                "left_points": ["Pasif gözlem ve kayıt", "Raporlama odaklı"],
+                "right_points": ["Aktif müdahale", "Sapmayı düzeltme odaklı"],
+                "narration": "Gecikme ve maliyet aşımına karşı çok geç olmadan önlem alınır.",
+                "duration_s": 14.0,
+                "takeaway": "İzleme rotayı gösterir, kontrol direksiyonu kırar.",
+            },
         ]
     elif context and len(context.strip()) > 20:
         clean_ctx = context.strip()
@@ -475,6 +660,7 @@ def generate_fallback_explainer_spec(
         hook = f"Ders kesitindeki ifade: {first_sent}"
         terms = [
             {"term": topic_clean, "explanation": f"Bu kesitteki anlamı: {first_sent}"},
+            {"term": "Temel Kural", "explanation": "Ders bağlamında terimin üstlendiği pedagojik görev."},
         ]
         script = (
             f"Bu ders kesitinde odak kavram {topic_clean}. "
@@ -483,9 +669,34 @@ def generate_fallback_explainer_spec(
             "Terimin cümledeki görevine ve önceki-sonraki ifadelerle ilişkisine dikkat edin."
         )
         scenes = [
-            {"id": 1, "title": f"Odak: {topic_clean}", "narration": f"Bu kesitte odak kavram {topic_clean}.", "duration_s": 12.0},
-            {"id": 2, "title": "Ders Kesiti", "narration": first_sent, "duration_s": 20.0},
-            {"id": 3, "title": "Bağlamı İzle", "narration": "Terimin cümledeki görevine ve çevresindeki ifadelere dikkat edin.", "duration_s": 14.0},
+            {
+                "id": 1,
+                "scene_type": "concept_card",
+                "title": f"Odak: {topic_clean}",
+                "narration": f"Bu kesitte odak kavram {topic_clean}.",
+                "duration_s": 12.0,
+                "takeaway": f"{topic_clean} kavramını ders bağlamındaki anlamıyla değerlendirin.",
+            },
+            {
+                "id": 2,
+                "scene_type": "dag_concept",
+                "title": "Kavram Bağıntısı",
+                "nodes": [
+                    {"name": "Ders Bağlamı", "desc": "Öncül anlatım"},
+                    {"name": topic_clean, "desc": "Kilit terim"},
+                    {"name": "Sonuç Çıkarımı", "desc": "Uygulama"},
+                ],
+                "narration": first_sent,
+                "duration_s": 18.0,
+            },
+            {
+                "id": 3,
+                "scene_type": "concept_card",
+                "title": "Bağlamı İzle",
+                "narration": "Terimin cümledeki görevine ve çevresindeki ifadelere dikkat edin.",
+                "duration_s": 14.0,
+                "takeaway": "Altın Kural: Ezberden kaçının; terimi cümledeki rolüyle öğrenin.",
+            },
         ]
     else:
         title = topic_clean
@@ -502,9 +713,38 @@ def generate_fallback_explainer_spec(
             "Böylece sınavda karşınıza çıktığında neden ve sonuç ilişkisini hemen kurabilirsiniz."
         )
         scenes = [
-            {"id": 1, "title": "Giriş", "narration": f"{topic_clean} kavramının temel sorusu.", "duration_s": 10.0},
-            {"id": 2, "title": "Çekirdek Mantık", "narration": "Adım adım işleyen neden-sonuç mekanizması.", "duration_s": 18.0},
-            {"id": 3, "title": "Özet ve İpucu", "narration": "Akılda tutulması gereken temel nokta.", "duration_s": 12.0},
+            {
+                "id": 1,
+                "scene_type": "concept_card",
+                "title": "Giriş ve Problem",
+                "narration": f"{topic_clean} kavramının temel sorusu.",
+                "duration_s": 10.0,
+                "takeaway": f"{topic_clean} konusunun temel mantığını adım adım kavrayın.",
+            },
+            {
+                "id": 2,
+                "scene_type": "process_flow",
+                "title": "Çekirdek Mantık Akışı",
+                "steps": [
+                    {"title": f"1. {safe_text(topic_clean, 14)}", "desc": "Temel tanım"},
+                    {"title": "2. İşleyiş", "desc": "Neden-sonuç mekanizması"},
+                    {"title": "3. Çözüm", "desc": "Pratik uygulama"},
+                ],
+                "narration": "Adım adım işleyen neden-sonuç mekanizması incelenir.",
+                "duration_s": 18.0,
+            },
+            {
+                "id": 3,
+                "scene_type": "dag_concept",
+                "title": "Özet ve İpucu",
+                "nodes": [
+                    {"name": "Zemin", "desc": "Önkoşul"},
+                    {"name": topic_clean, "desc": "Kavram"},
+                    {"name": "Sonuç", "desc": "Sınav ipucu"},
+                ],
+                "narration": "Akılda tutulması gereken temel nokta ve çıkarım.",
+                "duration_s": 12.0,
+            },
         ]
 
     spec_res = {
@@ -862,6 +1102,101 @@ def get_media_duration_seconds(file_path: Path) -> float:
         return max(1.0, float(res.stdout.strip()))
     except Exception:
         return 15.0
+
+
+def synthesize_scenes_narration_audio(
+    scenes: List[Dict[str, Any]],
+    lang: str = "tr",
+    voice: Optional[str] = None,
+    master_output_filename: Optional[str] = None,
+    fallback_script: str = "",
+) -> Tuple[Path, List[float], Dict[str, str]]:
+    """Synthesize each scene's narration to measure exact scene-by-scene audio durations.
+
+    Returns:
+        (master_audio_path, scene_durations, narration_info)
+    """
+    valid_scenes = [s for s in scenes if s.get("narration") and str(s.get("narration")).strip()]
+    master_name = master_output_filename or f"tts_master_{uuid.uuid4().hex[:8]}.mp3"
+    master_path = TEMP_DIR / master_name
+
+    # If there are multiple scenes with narration, attempt per-scene audio synthesis
+    if len(valid_scenes) >= 2:
+        scene_files: List[Path] = []
+        scene_durations: List[float] = []
+        master_info: Dict[str, str] = {}
+        all_succeeded = True
+
+        for idx, sc in enumerate(valid_scenes):
+            sc_text = str(sc.get("narration")).strip()
+            sc_out_name = f"sc_{uuid.uuid4().hex[:6]}_{idx}.mp3"
+            sc_path, sc_info = synthesize_narration_audio(
+                script_text=sc_text,
+                lang=lang,
+                voice=voice,
+                output_filename=sc_out_name,
+            )
+            if not master_info and sc_info.get("narration_engine") != "silent":
+                master_info = sc_info
+
+            dur = get_media_duration_seconds(sc_path)
+            if not sc_path.exists() or dur <= 0.5:
+                all_succeeded = False
+                break
+            scene_files.append(sc_path)
+            scene_durations.append(dur)
+
+        if all_succeeded and len(scene_files) == len(valid_scenes):
+            concat_list = TEMP_DIR / f"concat_{uuid.uuid4().hex[:6]}.txt"
+            try:
+                concat_list.write_text(
+                    "\n".join(f"file '{p.resolve().as_posix()}'" for p in scene_files),
+                    encoding="utf-8",
+                )
+                cmd = [
+                    "ffmpeg", "-y", "-f", "concat", "-safe", "0",
+                    "-i", str(concat_list),
+                    "-c:a", "libmp3lame", "-b:a", "192k",
+                    str(master_path),
+                ]
+                subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+                if master_path.exists() and master_path.stat().st_size > 1000:
+                    for p in scene_files:
+                        p.unlink(missing_ok=True)
+                    return master_path, scene_durations, master_info or {"narration_engine": "edge-tts", "narration_voice": ""}
+            except Exception as exc:
+                logger.warning("Scene audio concatenation failed: %s; falling back to monolithic synthesis", exc)
+            finally:
+                concat_list.unlink(missing_ok=True)
+                for p in scene_files:
+                    p.unlink(missing_ok=True)
+
+    # Monolithic fallback: synthesize full text and allocate durations proportionally
+    full_script = " ".join(str(s.get("narration", "")).strip() for s in scenes if s.get("narration"))
+    if not full_script.strip():
+        full_script = fallback_script.strip() or "Ders anlatımı tamamlandı."
+
+
+    master_path, master_info = synthesize_narration_audio(
+        script_text=full_script,
+        lang=lang,
+        voice=voice,
+        output_filename=master_name,
+    )
+    total_audio_s = get_media_duration_seconds(master_path)
+
+    # Proportionally allocate total measured audio duration among scenes
+    sum_declared = sum(float(s.get("duration_s") or 10.0) for s in scenes) or 1.0
+    scene_durations = [
+        max(2.0, total_audio_s * (float(s.get("duration_s") or 10.0) / sum_declared))
+        for s in scenes
+    ]
+    if scene_durations:
+        # Guarantee exact sum match down to milliseconds
+        diff = total_audio_s - sum(scene_durations)
+        scene_durations[-1] = max(1.0, scene_durations[-1] + diff)
+
+    return master_path, scene_durations, master_info
 
 
 # ---------------------------------------------------------------------------
@@ -1224,27 +1559,28 @@ def produce_student_explainer_video(
         )
         used_model = evren_model if spec.get("script_backend") == "evren" else local_model_id
 
-        # Step 2: TTS Synthesis
+        # Step 2: TTS Synthesis (Scene-aware audio-first pacing)
         narration = spec.get("narration_script", "")
-        audio_file, narration_info = synthesize_narration_audio(
-            script_text=narration,
+        audio_file, scene_durations, narration_info = synthesize_scenes_narration_audio(
+            scenes=spec.get("scenes", []),
             lang=lang,
             voice=voice,
-            output_filename=f"{video_id}.mp3",
+            master_output_filename=f"{video_id}.mp3",
+            fallback_script=narration,
         )
         audio_duration = get_media_duration_seconds(audio_file)
 
-        # The template scene has no model-authored timing, so pace it against the
-        # measured narration instead of the requested length. Model-authored code is
-        # left exactly as the LLM wrote it.
-        # Pace the modular scene against the measured narration so the visual flow
-        # perfectly matches the spoken audio without freezing or stalling.
+
+        # Pace the modular scene against the measured narration durations per scene
+        # so visual flow and animations perfectly match the spoken audio without freezing or stalling.
         if spec.get("manim_code_source") == "template" and audio_duration > 0:
             spec["manim_code"] = generate_modular_manim_code(
                 spec=spec,
                 lang=lang,
-                target_duration_s=audio_duration + 0.5,
+                target_duration_s=audio_duration,
+                scene_durations=scene_durations,
             )
+
 
         final_mp4_path = VIDEOS_DIR / f"{video_id}.mp4"
 
