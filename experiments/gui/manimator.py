@@ -43,6 +43,8 @@ import uuid
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+from gui.manim_scene_builders import generate_modular_manim_code
+
 logger = logging.getLogger("eduterm.manimator")
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -77,7 +79,7 @@ DEFAULT_EVREN_MODEL = "qwen3.8-flash-next"
 # narration is muxed back onto the animation.
 VIDEO_QUALITY_TIERS: Dict[str, Dict[str, Any]] = {
     "draft":    {"resolution": (854, 480),   "fps": 15.0, "crf": 23, "preset": "veryfast"},
-    "standard": {"resolution": (1280, 720),  "fps": 30.0, "crf": 20, "preset": "veryfast"},
+    "standard": {"resolution": (1920, 1080), "fps": 30.0, "crf": 20, "preset": "fast"},
     "high":     {"resolution": (1920, 1080), "fps": 30.0, "crf": 18, "preset": "medium"},
     "ultra":    {"resolution": (1920, 1080), "fps": 60.0, "crf": 17, "preset": "medium"},
 }
@@ -97,7 +99,13 @@ Kurallar:
 1. Terimler ve anlatım kesinlikle CEFR B1 düzeyinde, anlaşılır, somut ve sade olmalıdır.
 2. Yalnizca verilen ders baglamiyla desteklenen bilgileri soyle. Baska konuya ait kavram veya genel tavsiye ekleme.
 3. Baglam yetersizse bunu acikca soyle; kesin olmayan tanim uydurma. Baglamla uyusan bir benzetme yoksa bos birak.
-5. Çıktıyı SADECE geçerli bir JSON objesi olarak ver. Markdown kod bloğu içine alma.
+4. Her sahne için konuya en uygun görsel sahne tipini seç:
+   - "dag_concept": Kavramlar arası önkoşul veya hiyerarşi ilişkisi (nodes)
+   - "process_flow": Adım adım sıralı süreç, algoritma veya boru hattı (steps)
+   - "comparison_table": İki yaklaşımın veya durumun karşılaştırılması (left_title, right_title, left_points, right_points)
+   - "equation_step": Matematiksel formül, kural veya fonksiyon analizi (formula, variables)
+   - "concept_card": Somut benzetme, tanım ve pedagojik altın çıkarım kartı (takeaway)
+5. Çıktıyı SADECE geçerli bir JSON objesi olarak ver. manim_code alanını boş bırak.
 <|im_end|>
 <|im_start|>user
 Öğrencinin Takıldığı Konu / Terim: {TOPIC}
@@ -117,18 +125,21 @@ Lütfen aşağıdaki JSON şemasına birebir uyarak yanıt ver:
   "scenes": [
     {{
       "id": 1,
+      "scene_type": "concept_card",
       "title": "Giriş ve Problem",
       "narration": "Bu sahnenin anlatımı...",
       "duration_s": 12.0
     }},
     {{
       "id": 2,
-      "title": "Kavram ve Benzetme",
-      "narration": "Benzetmenin anlatımı...",
+      "scene_type": "process_flow",
+      "title": "Kavram ve İşleyiş",
+      "narration": "Adımların anlatımı...",
       "duration_s": 18.0
     }},
     {{
       "id": 3,
+      "scene_type": "concept_card",
       "title": "Kural ve Özet",
       "narration": "Sınav kuralı ve altın ipucu...",
       "duration_s": 15.0
@@ -180,8 +191,14 @@ Kurallar:
 2. Yalnizca verilen ders baglamiyla desteklenen bilgileri soyle. Alakasiz genel tavsiye, baska konuya ait kavram, uydurma ornek veya baglamda olmayan bilgi ekleme.
 3. Baglam yetersizse bunu acikca soyle; kesin olmayan tanim uydurma. Teknik terimi bu kesitteki anlami ile acikla.
 4. Benzetme kullanacaksan teknik fikri dogru korusun ve baglamla uyussun; aksi halde bos birak.
-5. narration_script, sahnelerdeki anlatimlarin sirayla birlestirilmis hali olsun.
-6. Yanit SADECE gecerli bir JSON nesnesi olsun. manim_code alanini bos birak; animasyon sablonu uygulama tarafinda olusturulur.
+5. Her sahne icin konuya en uygun gorsel sahne tipini ("scene_type") sec:
+   - "dag_concept": Kavramlar arasi onkosul ve baglanti semasi
+   - "process_flow": Adim adim sirali isleyis ve surec akisi
+   - "comparison_table": Iki yontem veya durumun karsilastirilmasi
+   - "equation_step": Matematiksel formuller ve parametreler
+   - "concept_card": Somut pedagojik kavram ve altin cikarim karti
+6. narration_script, sahnelerdeki anlatimlarin sirayla birlestirilmis hali olsun.
+7. Yanit SADECE gecerli bir JSON nesnesi olsun. manim_code alanini bos birak; gorsel sahne olusturucu bu semaya gore animasyonu olusturur.
 """
 
 EVREN_MANIM_USER_TEMPLATE = """Ogrencinin Takildigi Konu / Terim: {TOPIC}
@@ -199,9 +216,9 @@ Asagidaki JSON semasina birebir uyarak yanit ver:
   ],
   "narration_script": "Videonun bastan sona eksiksiz seslendirme metni",
   "scenes": [
-    {{"id": 1, "title": "Giris ve Problem", "narration": "Bu sahnenin anlatimi", "duration_s": 12.0}},
-    {{"id": 2, "title": "Kavram ve Benzetme", "narration": "Benzetmenin anlatimi", "duration_s": 18.0}},
-    {{"id": 3, "title": "Kural ve Ozet", "narration": "Altin ipucu", "duration_s": 15.0}}
+    {{"id": 1, "scene_type": "concept_card", "title": "Giris ve Problem", "narration": "Bu sahnenin anlatimi", "duration_s": 12.0}},
+    {{"id": 2, "scene_type": "process_flow", "title": "Kavram ve Isleyis", "narration": "Adimlarin anlatimi", "duration_s": 18.0}},
+    {{"id": 3, "scene_type": "concept_card", "title": "Kural ve Ozet", "narration": "Altin ipucu", "duration_s": 15.0}}
   ],
   "manim_code": ""
 }}
@@ -223,12 +240,9 @@ def _complete_spec(parsed: dict, topic_clean: str, lang: str, target_duration_s:
         )
     if not spec["terms"] and spec["scenes"]:
         spec["terms"] = [{"term": topic_clean, "explanation": str(spec["scenes"][0].get("narration", ""))[:160]}]
-    # Keep animation deterministic and inexpensive. The model supplies the teaching
-    # content; the renderer owns a compact, safe visual template and readable layout.
-    spec["manim_code"] = generate_default_manim_code(
-        topic=spec.get("title", topic_clean),
-        analogy=spec.get("pedagogical_hook", ""),
-        terms=spec.get("terms", []),
+    # Generate modular parametric Manim code using the scene-type builders
+    spec["manim_code"] = generate_modular_manim_code(
+        spec=spec,
         lang=lang,
         target_duration_s=target_duration_s,
     )
@@ -493,18 +507,17 @@ def generate_fallback_explainer_spec(
             {"id": 3, "title": "Özet ve İpucu", "narration": "Akılda tutulması gereken temel nokta.", "duration_s": 12.0},
         ]
 
-    manim_code = generate_default_manim_code(title, hook, terms, lang=lang, target_duration_s=duration_s)
-
-    return {
+    spec_res = {
         "title": title,
         "target_concept": topic_clean,
         "pedagogical_hook": hook,
         "terms": terms,
         "narration_script": script,
         "scenes": scenes,
-        "manim_code": manim_code,
-        "manim_code_source": "template",
     }
+    spec_res["manim_code"] = generate_modular_manim_code(spec_res, lang=lang, target_duration_s=duration_s)
+    spec_res["manim_code_source"] = "template"
+    return spec_res
 
 
 import textwrap
@@ -649,9 +662,15 @@ class ExplainerScene(Scene):
             run_time={beat(1.0)}
         )
         
-        final_msg = Text("Tebrikler! Konuyu Başarıyla Kavradınız.", font_size=26, color="#10B981")
-        final_msg.move_to(DOWN * 0.8)
-        self.play(Write(final_msg), run_time={beat(1.2)})
+        final_box = RoundedRectangle(corner_radius=0.18, height=1.6, width=10.0, color="#10B981")
+        final_box.set_fill("#064E3B", opacity=0.9)
+        final_box.move_to(DOWN * 0.6)
+        final_title = Text("💡 Altın Çıkarım", font_size=22, weight=BOLD, color="#6EE7B7")
+        final_title.next_to(final_box.get_top(), DOWN, buff=0.2)
+        final_desc = Text("Temel mantığı kavra, adımları ve kuralları bağlamında uygula.", font_size=16, color="#FFFFFF")
+        final_desc.next_to(final_title, DOWN, buff=0.15)
+        final_grp = VGroup(final_box, final_title, final_desc)
+        self.play(GrowFromCenter(final_grp), run_time={beat(1.0)})
         self.wait({beat(1.5, True)})
 '''
     return code
@@ -1218,11 +1237,11 @@ def produce_student_explainer_video(
         # The template scene has no model-authored timing, so pace it against the
         # measured narration instead of the requested length. Model-authored code is
         # left exactly as the LLM wrote it.
+        # Pace the modular scene against the measured narration so the visual flow
+        # perfectly matches the spoken audio without freezing or stalling.
         if spec.get("manim_code_source") == "template" and audio_duration > 0:
-            spec["manim_code"] = generate_default_manim_code(
-                topic=spec.get("title", topic),
-                analogy=spec.get("pedagogical_hook", ""),
-                terms=spec.get("terms", []),
+            spec["manim_code"] = generate_modular_manim_code(
+                spec=spec,
                 lang=lang,
                 target_duration_s=audio_duration + 0.5,
             )

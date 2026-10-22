@@ -277,5 +277,44 @@ class NarrationEngineTests(unittest.TestCase):
         self.assertEqual(info["narration_voice"], "")
 
 
+class ModularSceneBuilderTests(unittest.TestCase):
+    def test_standard_quality_tier_is_1080p(self):
+        from gui.manimator import VIDEO_QUALITY_TIERS
+        self.assertEqual(VIDEO_QUALITY_TIERS["standard"]["resolution"], (1920, 1080))
+        self.assertEqual(VIDEO_QUALITY_TIERS["standard"]["fps"], 30.0)
+
+    def test_detect_scene_type_heuristics(self):
+        from gui.manim_scene_builders import detect_scene_type
+        self.assertEqual(detect_scene_type({"title": "Kayıp Fonksiyonu ve Formül"}), "equation_step")
+        self.assertEqual(detect_scene_type({"title": "A vs B Karşılaştırması"}), "comparison_table")
+        self.assertEqual(detect_scene_type({"title": "Adım Adım Pipeline Akışı"}), "process_flow")
+        self.assertEqual(detect_scene_type({"title": "Önkoşul Kavram Grafiği"}), "dag_concept")
+        self.assertEqual(detect_scene_type({"title": "Genel Tanıtım"}), "concept_card")
+
+    def test_modular_manim_code_all_scenes_compilation(self):
+        from gui.manim_scene_builders import generate_modular_manim_code
+        spec = {
+            "title": "Büyük Dil Modelleri",
+            "pedagogical_hook": "Kütüphanecinin tüm kitapları hızlıca taraması",
+            "terms": [
+                {"term": "Dikkat Mekanizması", "explanation": "İlgili kelimelere odaklanma"},
+                {"term": "Gömme (Embedding)", "explanation": "Kelimeleri vektörlere dönüştürme"},
+            ],
+            "scenes": [
+                {"id": 1, "scene_type": "dag_concept", "title": "Önkoşul Haritası", "duration_s": 10.0},
+                {"id": 2, "scene_type": "process_flow", "title": "Token İşleme Süreci", "duration_s": 12.0},
+                {"id": 3, "scene_type": "equation_step", "title": "Self-Attention", "formula": "Softmax(QK^T / sqrt(d)) V", "duration_s": 14.0},
+                {"id": 4, "scene_type": "comparison_table", "title": "RNN vs Transformer", "duration_s": 12.0},
+                {"id": 5, "scene_type": "concept_card", "title": "Özet ve Çıkarım", "duration_s": 10.0},
+            ],
+        }
+        code = generate_modular_manim_code(spec, target_duration_s=58.0)
+        self.assertIn("class ExplainerScene(Scene):", code)
+        self.assertIn("self.camera.background_color = \"#0B0F19\"", code)
+        # Verify valid Python syntax
+        compiled = compile(code, "<modular_test>", "exec")
+        self.assertIsNotNone(compiled)
+
+
 if __name__ == "__main__":
     unittest.main()
