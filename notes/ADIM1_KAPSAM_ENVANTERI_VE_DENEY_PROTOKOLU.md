@@ -21,11 +21,11 @@ Bu kapsamda:
 
 ---
 
-## 2. 32 Kayıtlık Birleşik Veri Envanteri (Data Inventory) *(GÜNCELLEME: 40 Videoya Genişletilerek Güncellenmiştir)*
+## 2. 40 Kayıtlık Birleşik Veri Envanteri (Data Inventory)
 
-> **[GÜNCELLEME VE ÜSTÜNE YAZILMA NOTU - 22 Ekim 2026]:** Bu belgedeki ilk 32 kayıtlık envanter tasarımı, kurumsal zorunlu eğitimlerin (KVKK: TR-17..18, EN-17..18; İSG: TR-19..20, EN-19..20) eklenmesiyle **40 videoluk envantere (20 TR + 20 EN, 13,6 saat)** genişletilmiştir. Disk üzerinde 34 yerel WAV mevcuttur (6 pending); 15 transkript kalite eşiğini geçmiştir (7 gold + 8 tam Whisper Turbo kurumsal transkripti). Güncel tek doğruluk kaynağı `experiments/data/data_inventory.json` ve `data_inventory.csv` dosyalarıdır.
+> **[GÜNCELLEME VE ÜSTÜNE YAZILMA NOTU - 22 Ekim 2026]:** Bu belgedeki ilk 32 kayıtlık envanter tasarımı, kurumsal zorunlu eğitimlerin (KVKK: TR-17..18, EN-17..18; İSG: TR-19..20, EN-19..20) eklenmesiyle **40 videoluk envantere (20 TR + 20 EN, kaynak üstverisinde 10,1 saat; diskte süre doğrulaması yapılmış 16/40 videoda 4,6 saat)** genişletilmiştir. Disk üzerinde **16 doğrulanmış yerel WAV** (7 gold + 8 kurumsal + EN-11) + **18 süre uyumsuz ham kayıt** (pending slice trim) + **6 henüz indirilmemiş kayıt** (downloadable pending fetch) yer almaktadır; 15 transkript kalite eşiğini geçmiştir (7 gold + 8 tam Whisper Turbo kurumsal transkripti). Güncel tek doğruluk kaynağı `experiments/data/data_inventory.json` ve `data_inventory.csv` dosyalarıdır.
 
-Envanter, 12 farklı STEM ve sosyal bilimler disiplininden seçilmiş 16 Türkçe (`TR-01` .. `TR-16`) ve 16 İngilizce (`EN-01` .. `EN-16`) olmak üzere toplam **32 video kaydını** içermektedir (genişletilmiş son sürümde TR-20 ve EN-20'ye kadar 40 videodur).
+Envanter, 14 farklı disiplin ve kurumsal alandan seçilmiş 20 Türkçe (`TR-01` .. `TR-20`) ve 20 İngilizce (`EN-01` .. `EN-20`) olmak üzere toplam **40 video kaydını** içermektedir.
 
 ### 2.1 Dört Bağımsız Durum Boyutu
 
@@ -48,7 +48,7 @@ Her veri öğesi için aşağıdaki 4 durum ekseni ayrı ayrı izlenir:
 
 ### 2.2 Veri Envanteri Özet Tablosu *(Tarihsel 32 Kayıtlık Çekirdek Tasarım)*
 
-> **[TARİHSEL TABLO NOTU]:** Aşağıdaki tablo, projenin ilk aşamasındaki 32 videoluk çekirdek tasarım durumunu yansıtmaktadır. Genişletilmiş güncel envanterde 40 kayıt (20 TR + 20 EN, 13,6 saat; 7 altın + 8 kurumsal QA onaylı transkript) yer almakta olup, tek doğruluk kaynağı `experiments/data/data_inventory.json` ve `data_inventory.csv` dosyalarıdır.
+> **[TARİHSEL TABLO NOTU]:** Aşağıdaki tablo, projenin ilk aşamasındaki 32 videoluk çekirdek tasarım durumunu yansıtmaktadır. Genişletilmiş güncel envanterde 40 kayıt (20 TR + 20 EN, kaynak üstverisinde 10,1 saat; diskte süre doğrulanmış 16/40 klipte 4,6 saat; 7 altın + 8 kurumsal QA onaylı transkript) yer almakta olup, tek doğruluk kaynağı `experiments/data/data_inventory.json` ve `data_inventory.csv` dosyalarıdır.
 
 | Metrik / Durum | Türkçe (TR) | İngilizce (EN) | Başlangıç (32 Kayıt) | Güncel Genişletme (40 Kayıt) | Açıklama |
 |---|:---:|:---:|:---:|:---:|---|
@@ -65,42 +65,52 @@ Her veri öğesi için aşağıdaki 4 durum ekseni ayrı ayrı izlenir:
 
 ---
 
-### 2.3 32 Kaydın Detaylı Matrisi
+### 2.3 40 Kaydın Detaylı Matrisi (Güncel Disk ve Transkript Durumu)
+
+> **[GÜNCEL MATRİS NOTU]:** Aşağıdaki matris, 40 kaydın disk üzerindeki gerçek durumunu (16 doğrulanmış yerel WAV, 18 süre uyumsuz ham kayıt, 6 fetch bekleyen) ve transkript durumunu yansıtmaktadır. Tek doğruluk kaynağı experiments/data/data_inventory.json ve data_inventory.csv dosyalarıdır.
 
 | ID | Eski ID | Dil | Alan (Domain) | Süre | Ses Durumu | Transkript Durumu | Anotasyon Durumu | Kaynak Kanalı |
 |---|---|:---:|---|:---:|:---:|:---:|:---:|---|
-| **TR-01** | TR-1 | TR | Project Management | 12:01 | LOCAL WAV (23.0 MB) | HUMAN GOLD (1.528 kelime) | CLOSED GOLD (32 terim) + IAA | Açıköğretim Fakültesi - Anadolu Üniv. |
-| **TR-02** | TR-2 | TR | Tourism & Hospitality | 11:17 | LOCAL WAV (21.7 MB) | HUMAN GOLD (1.493 kelime) | DUAL ANNOTATED (IAA) | Forteliber |
-| **TR-03** | TR-3 | TR | Data Science (Python) | 14:15 | LOCAL WAV (27.3 MB) | HUMAN GOLD (1.583 kelime) | DUAL ANNOTATED (IAA) | Tirendaz AI / Tirendaz Academy |
-| **TR-04** | - | TR | Natural Language Processing | 13:40 | DOWNLOADABLE PENDING | CURATED DRAFT (72 kelime) | TEMPLATE ONLY (4 aday terim) | Bilgisayar Kavramları |
-| **TR-05** | - | TR | Operating Systems | 15:10 | DOWNLOADABLE PENDING | CURATED DRAFT (63 kelime) | TEMPLATE ONLY (4 aday terim) | İTÜ Açık Ders |
-| **TR-06** | - | TR | Data Structures & Algorithms | 16:25 | DOWNLOADABLE PENDING | CURATED DRAFT (69 kelime) | TEMPLATE ONLY (4 aday terim) | ODTÜ Bilgisayar Mühendisliği |
-| **TR-07** | - | TR | Machine Learning | 14:50 | DOWNLOADABLE PENDING | CURATED DRAFT (60 kelime) | TEMPLATE ONLY (4 aday terim) | Bilgisayar Kavramları |
-| **TR-08** | - | TR | Thermodynamics | 12:30 | DOWNLOADABLE PENDING | CURATED DRAFT (49 kelime) | TEMPLATE ONLY (4 aday terim) | İTÜ Makina Fakültesi |
-| **TR-09** | - | TR | Circuit Theory & Kirchhoff | 11:45 | DOWNLOADABLE PENDING | CURATED DRAFT (54 kelime) | TEMPLATE ONLY (4 aday terim) | Yıldız Teknik Üniversitesi |
-| **TR-10** | - | TR | Linear Algebra | 13:15 | DOWNLOADABLE PENDING | CURATED DRAFT (53 kelime) | TEMPLATE ONLY (4 aday terim) | Boğaziçi Üniversitesi Açık Ders |
-| **TR-11** | - | TR | Classical Mechanics | 10:55 | DOWNLOADABLE PENDING | CURATED DRAFT (52 kelime) | TEMPLATE ONLY (4 aday terim) | Fizik Rehberi |
-| **TR-12** | - | TR | Microeconomics | 12:40 | DOWNLOADABLE PENDING | CURATED DRAFT (52 kelime) | TEMPLATE ONLY (4 aday terim) | Anadolu Üniversitesi AÖF |
-| **TR-13** | - | TR | Cognitive Psychology | 14:05 | DOWNLOADABLE PENDING | CURATED DRAFT (55 kelime) | TEMPLATE ONLY (4 aday terim) | Açık Beyin Akademi |
-| **TR-14** | - | TR | Economic History | 11:20 | DOWNLOADABLE PENDING | CURATED DRAFT (52 kelime) | TEMPLATE ONLY (4 aday terim) | Tarih TV |
-| **TR-15** | - | TR | Philosophy & Epistemology | 15:35 | DOWNLOADABLE PENDING | CURATED DRAFT (52 kelime) | TEMPLATE ONLY (4 aday terim) | Felsefe Akademisi |
-| **TR-16** | - | TR | Molecular Biology & Genetics | 13:50 | DOWNLOADABLE PENDING | CURATED DRAFT (54 kelime) | TEMPLATE ONLY (4 aday terim) | Bilim ve Gelecek |
-| **EN-01** | EN-1 | EN | Agile Methodologies | 13:17 | LOCAL WAV (25.5 MB) | HUMAN GOLD (1.921 kelime) | CLOSED GOLD (32 terim) + IAA | Grow with Google (Coursera) |
-| **EN-02** | EN-2 | EN | Sustainable Tourism | 09:16 | LOCAL WAV (17.8 MB) | HUMAN GOLD (1.139 kelime) | DUAL ANNOTATED (IAA) | Dr Hayley Stainton / Tourism Teacher |
-| **EN-03** | EN-3 | EN | Generative AI in a Nutshell | 17:57 | LOCAL WAV (34.5 MB) | HUMAN GOLD (2.812 kelime) | DUAL ANNOTATED (IAA) | Henrik Kniberg |
-| **EN-04** | EN-4 | EN | Thermal Radiation & Heat | 17:33 | LOCAL WAV (33.7 MB) | HUMAN GOLD (2.991 kelime) | DUAL ANNOTATED (IAA) | The Efficient Engineer |
-| **EN-05** | - | EN | Deep Learning Fundamentals | 16:10 | DOWNLOADABLE PENDING | CURATED DRAFT (61 kelime) | TEMPLATE ONLY (4 aday terim) | 3Blue1Brown |
-| **EN-06** | - | EN | Database Normalization | 12:45 | DOWNLOADABLE PENDING | CURATED DRAFT (64 kelime) | TEMPLATE ONLY (4 aday terim) | MIT OpenCourseWare |
-| **EN-07** | - | EN | Graph Search Algorithms | 14:20 | DOWNLOADABLE PENDING | CURATED DRAFT (60 kelime) | TEMPLATE ONLY (4 aday terim) | Stanford Online |
-| **EN-08** | - | EN | Fundamental Theorem of Calculus | 11:50 | DOWNLOADABLE PENDING | CURATED DRAFT (57 kelime) | TEMPLATE ONLY (4 aday terim) | Khan Academy |
-| **EN-09** | - | EN | Maxwell's Equations | 15:30 | DOWNLOADABLE PENDING | CURATED DRAFT (54 kelime) | TEMPLATE ONLY (4 aday terim) | YaleCourses |
-| **EN-10** | - | EN | Concurrent Programming | 13:40 | DOWNLOADABLE PENDING | CURATED DRAFT (53 kelime) | TEMPLATE ONLY (4 aday terim) | Harvard CS50 |
-| **EN-11** | - | EN | Market Failure & Public Goods | 10:50 | DOWNLOADABLE PENDING | CURATED DRAFT (52 kelime) | TEMPLATE ONLY (4 aday terim) | CrashCourse Economics |
-| **EN-12** | - | EN | Neuroplasticity & Memory | 12:15 | DOWNLOADABLE PENDING | CURATED DRAFT (53 kelime) | TEMPLATE ONLY (4 aday terim) | Huberman Lab Clips |
-| **EN-13** | - | EN | Structural Engineering (SFD/BMD) | 14:00 | DOWNLOADABLE PENDING | CURATED DRAFT (54 kelime) | TEMPLATE ONLY (4 aday terim) | Structurefree |
-| **EN-14** | - | EN | CRISPR-Cas9 Gene Editing | 16:45 | DOWNLOADABLE PENDING | CURATED DRAFT (53 kelime) | TEMPLATE ONLY (4 aday terim) | Bozeman Science |
-| **EN-15** | - | EN | Philosophy of Mind & Qualia | 13:25 | DOWNLOADABLE PENDING | CURATED DRAFT (55 kelime) | TEMPLATE ONLY (4 aday terim) | Closer To Truth |
-| **EN-16** | - | EN | Fast Fourier Transform (FFT) | 15:10 | DOWNLOADABLE PENDING | CURATED DRAFT (56 kelime) | TEMPLATE ONLY (4 aday terim) | Reducible |
+| **TR-01** | TR-1 | TR | Software Engineering & Project Management | 12:01 | LOCAL WAV (22.0 MB, Doğrulanmış) | HUMAN GOLD (1.256 kelime) | CLOSED GOLD (32 terim) + IAA | Açıköğretim Fakültesi - Anadolu Üniversitesi |
+| **TR-02** | TR-2 | TR | Tourism & Sustainable Hospitality | 11:17 | LOCAL WAV (20.7 MB, Doğrulanmış) | HUMAN GOLD (1.464 kelime) | DUAL ANNOTATED (IAA) | Forteliber |
+| **TR-03** | TR-3 | TR | Computer Science & Data Science | 14:15 | LOCAL WAV (26.1 MB, Doğrulanmış) | HUMAN GOLD (1.583 kelime) | DUAL ANNOTATED (IAA) | Tirendaz AI / Tirendaz Academy |
+| **TR-04** | TR-4 | TR | Artificial Intelligence & Machine Learning | 13:40 | HAM SES (5153.2 sn, Dilimleme Bekliyor) | CURATED DRAFT (66 kelime) | TEMPLATE ONLY (4 aday terim) | Bilişim Vadisi Akademi |
+| **TR-05** | TR-5 | TR | Computer Science & Data Science | 15:20 | DOWNLOADABLE PENDING | CURATED DRAFT (66 kelime) | TEMPLATE ONLY (4 aday terim) | ODTÜ Bilgisayar Mühendisliği Açık Ders |
+| **TR-06** | TR-6 | TR | Computer Science & Data Science | 12:50 | DOWNLOADABLE PENDING | CURATED DRAFT (70 kelime) | TEMPLATE ONLY (4 aday terim) | Boğaziçi Mezunlar Akademisi |
+| **TR-07** | TR-7 | TR | Artificial Intelligence & Machine Learning | 14:05 | DOWNLOADABLE PENDING | CURATED DRAFT (63 kelime) | TEMPLATE ONLY (4 aday terim) | Yapay Zeka Araştırmacıları Derneği |
+| **TR-08** | TR-8 | TR | Mechanical & Thermal Engineering | 16:10 | HAM SES (2974.5 sn, Dilimleme Bekliyor) | ASR REJECTED (36 kelime) | TEMPLATE ONLY (4 aday terim) | İTÜ Açık Ders Malzemeleri |
+| **TR-09** | TR-9 | TR | Electrical Engineering & Circuit Theory | 11:45 | HAM SES (764.5 sn, Dilimleme Bekliyor) | ASR REJECTED (3 kelime) | TEMPLATE ONLY (4 aday terim) | Mühendislik Dersleri |
+| **TR-10** | TR-10 | TR | Mathematics (Linear Algebra, Calculus) | 13:30 | HAM SES (1754.8 sn, Dilimleme Bekliyor) | ASR REJECTED (2 kelime) | TEMPLATE ONLY (4 aday terim) | Matematik Köyü Seminerleri |
+| **TR-11** | TR-11 | TR | Physics (Mechanics, Electromagnetism) | 15:00 | HAM SES (963.5 sn, Dilimleme Bekliyor) | ASR REJECTED (40 kelime) | TEMPLATE ONLY (4 aday terim) | TÜBİTAK Temel Bilimler |
+| **TR-12** | TR-12 | TR | Economics & Finance | 10:55 | HAM SES (782.2 sn, Dilimleme Bekliyor) | ASR REJECTED (56 kelime) | TEMPLATE ONLY (4 aday terim) | Açıköğretim Fakültesi - Anadolu Üniversitesi |
+| **TR-13** | TR-13 | TR | Cognitive Psychology & Neuroscience | 12:15 | HAM SES (607.5 sn, Dilimleme Bekliyor) | ASR REJECTED (45 kelime) | TEMPLATE ONLY (4 aday terim) | Psikoloji Platformu TR |
+| **TR-14** | TR-14 | TR | History & Cultural Heritage | 13:50 | DOWNLOADABLE PENDING | CURATED DRAFT (41 kelime) | TEMPLATE ONLY (4 aday terim) | Tarih Vakfı Konferansları |
+| **TR-15** | TR-15 | TR | History & Cultural Heritage | 11:30 | DOWNLOADABLE PENDING | CURATED DRAFT (44 kelime) | TEMPLATE ONLY (4 aday terim) | Felsefe Açık Ders |
+| **TR-16** | TR-16 | TR | Biology & Genetics | 14:40 | HAM SES (1400.0 sn, Dilimleme Bekliyor) | ASR REJECTED (60 kelime) | TEMPLATE ONLY (4 aday terim) | Biyoloji Günlüğü |
+| **TR-17** | TR-17 | TR | Corporate Compliance & Personal Data Protection (KVKK/GDPR) | 21:13 | LOCAL WAV (38.8 MB, Doğrulanmış) | ASR QA PASSED (2.375 kelime) | TEMPLATE ONLY (4 aday terim) | Arda Çetin |
+| **TR-18** | TR-18 | TR | Corporate Compliance & Personal Data Protection (KVKK/GDPR) | 10:17 | LOCAL WAV (18.8 MB, Doğrulanmış) | ASR QA PASSED (812 kelime) | TEMPLATE ONLY (4 aday terim) | İK Kütüphanem Filiz Erboğa |
+| **TR-19** | TR-19 | TR | Occupational Health and Safety (İSG / OHS) | 62:10 | LOCAL WAV (113.8 MB, Doğrulanmış) | ASR QA PASSED (6.572 kelime) | TEMPLATE ONLY (4 aday terim) | İzka Osgb TV |
+| **TR-20** | TR-20 | TR | Occupational Health and Safety (İSG / OHS) | 45:50 | LOCAL WAV (83.9 MB, Doğrulanmış) | ASR QA PASSED (5.508 kelime) | TEMPLATE ONLY (4 aday terim) | Fatma AYAZ DEĞERLİ |
+| **EN-01** | EN-1 | EN | Software Engineering & Project Management | 13:17 | LOCAL WAV (24.3 MB, Doğrulanmış) | HUMAN GOLD (2.168 kelime) | CLOSED GOLD (32 terim) + IAA | Grow with Google |
+| **EN-02** | EN-2 | EN | Tourism & Sustainable Hospitality | 09:16 | LOCAL WAV (17.0 MB, Doğrulanmış) | HUMAN GOLD (1.267 kelime) | DUAL ANNOTATED (IAA) | Dr Hayley Stainton | Tourism Teacher |
+| **EN-03** | EN-3 | EN | Artificial Intelligence & Machine Learning | 17:57 | LOCAL WAV (32.9 MB, Doğrulanmış) | HUMAN GOLD (3.459 kelime) | DUAL ANNOTATED (IAA) | Henrik Kniberg |
+| **EN-04** | EN-4 | EN | Mechanical & Thermal Engineering | 17:33 | LOCAL WAV (32.1 MB, Doğrulanmış) | HUMAN GOLD (2.270 kelime) | DUAL ANNOTATED (IAA) | The Efficient Engineer |
+| **EN-05** | EN-5 | EN | Artificial Intelligence & Machine Learning | 14:20 | HAM SES (766.7 sn, Dilimleme Bekliyor) | ASR REJECTED (93 kelime) | TEMPLATE ONLY (4 aday terim) | 3Blue1Brown |
+| **EN-06** | EN-6 | EN | Computer Science & Data Science | 12:40 | HAM SES (21283.4 sn, Dilimleme Bekliyor) | ASR REJECTED (66 kelime) | TEMPLATE ONLY (4 aday terim) | freeCodeCamp |
+| **EN-07** | EN-7 | EN | Computer Science & Data Science | 13:05 | HAM SES (3030.1 sn, Dilimleme Bekliyor) | ASR REJECTED (61 kelime) | TEMPLATE ONLY (4 aday terim) | MIT OpenCourseWare (6.006) |
+| **EN-08** | EN-8 | EN | Mathematics (Linear Algebra, Calculus) | 15:10 | HAM SES (482.5 sn, Dilimleme Bekliyor) | ASR REJECTED (84 kelime) | TEMPLATE ONLY (4 aday terim) | Khan Academy |
+| **EN-09** | EN-9 | EN | Physics (Mechanics, Electromagnetism) | 16:45 | HAM SES (258.8 sn, Dilimleme Bekliyor) | ASR REJECTED (44 kelime) | TEMPLATE ONLY (4 aday terim) | Veritasium |
+| **EN-10** | EN-10 | EN | Computer Science & Data Science | 14:15 | DOWNLOADABLE PENDING | CURATED DRAFT (52 kelime) | TEMPLATE ONLY (4 aday terim) | Stanford Online (CS110) |
+| **EN-11** | EN-11 | EN | Economics & Finance | 11:50 | LOCAL WAV (22.3 MB, Doğrulanmış) | ASR REJECTED (73 kelime) | TEMPLATE ONLY (4 aday terim) | CrashCourse Economics |
+| **EN-12** | EN-12 | EN | Cognitive Psychology & Neuroscience | 12:35 | HAM SES (117.0 sn, Dilimleme Bekliyor) | ASR REJECTED (57 kelime) | TEMPLATE ONLY (4 aday terim) | Harvard University Center for Brain Science |
+| **EN-13** | EN-13 | EN | Mechanical & Thermal Engineering | 13:20 | HAM SES (982.9 sn, Dilimleme Bekliyor) | ASR REJECTED (81 kelime) | TEMPLATE ONLY (4 aday terim) | StructureFree |
+| **EN-14** | EN-14 | EN | Biology & Genetics | 13:55 | HAM SES (271.6 sn, Dilimleme Bekliyor) | ASR REJECTED (43 kelime) | TEMPLATE ONLY (4 aday terim) | Nature Video |
+| **EN-15** | EN-15 | EN | History & Cultural Heritage | 12:05 | HAM SES (343.5 sn, Dilimleme Bekliyor) | ASR REJECTED (50 kelime) | TEMPLATE ONLY (4 aday terim) | Wireless Philosophy |
+| **EN-16** | EN-16 | EN | Electrical Engineering & Circuit Theory | 15:30 | HAM SES (1702.5 sn, Dilimleme Bekliyor) | ASR REJECTED (96 kelime) | TEMPLATE ONLY (4 aday terim) | Reducible |
+| **EN-17** | EN-17 | EN | Corporate Compliance & Personal Data Protection (KVKK/GDPR) | 08:00 | LOCAL WAV (14.6 MB, Doğrulanmış) | ASR QA PASSED (1.500 kelime) | TEMPLATE ONLY (4 aday terim) | Data Protection World Forum |
+| **EN-18** | EN-18 | EN | Corporate Compliance & Personal Data Protection (KVKK/GDPR) | 01:33 | LOCAL WAV (2.8 MB, Doğrulanmış) | ASR QA PASSED (201 kelime) | TEMPLATE ONLY (4 aday terim) | IT Governance Ltd |
+| **EN-19** | EN-19 | EN | Occupational Health and Safety (İSG / OHS) | 05:22 | LOCAL WAV (9.8 MB, Doğrulanmış) | ASR QA PASSED (645 kelime) | TEMPLATE ONLY (4 aday terim) | Health and Safety Executive (HSE UK) |
+| **EN-20** | EN-20 | EN | Occupational Health and Safety (İSG / OHS) | 16:22 | LOCAL WAV (30.0 MB, Doğrulanmış) | ASR QA PASSED (1.843 kelime) | TEMPLATE ONLY (4 aday terim) | Safety Training Videos |
 
 ---
 

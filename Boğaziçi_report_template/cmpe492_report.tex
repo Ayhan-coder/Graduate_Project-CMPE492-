@@ -105,7 +105,7 @@ The system addresses three critical operational layers:
 \subsection{Project Time and Resource Estimation}
 The project was executed across two academic terms, structured into five major development phases:
 \begin{enumerate}
-    \item \textbf{Phase 1: Corpus Curation and Gold Reference Construction (Weeks 1--4):} Selection of 40 diverse lecture clips (13.6 hours total; 20 Turkish, 20 English) across computer science, engineering, economics, and corporate compliance; creation of human-verified gold transcripts and closed 32-term reference lists.
+    \item \textbf{Phase 1: Corpus Curation and Gold Reference Construction (Weeks 1--4):} Selection of 40 diverse lecture clips (10.1 hours source metadata, of which 4.6 hours across 16 local WAVs is duration-verified on disk; 20 Turkish, 20 English) across 14 academic and corporate domains; creation of human-verified gold transcripts and closed 32-term reference lists on the 7-lecture evaluation set (TR-1..3, EN-1..4).
     \item \textbf{Phase 2: Acoustic Layer Benchmarking and Optimization (Weeks 5--8):} Comprehensive GPU evaluation of Whisper (Medium, Large-v3, Turbo), Qwen3-ASR (0.6B, 1.7B), and NVIDIA Nemotron 3.5; empirical assessment of Voice Activity Detection (VAD) chunking.
     \item \textbf{Phase 3: Semantic Layer and LLM Benchmarking (Weeks 9--12):} Zero-shot, few-shot, and Chain-of-Thought (CoT) prompting across GPT-4.1, GPT-4o-mini, and Qwen3.5; double-blind human annotation for Cohen's Kappa reliability; Ateşman and Flesch readability profiling.
     \item \textbf{Phase 4: Generative Video Pipeline and UI Development (Weeks 13--16):} Integration of Manimator, Edge-TTS, and FFmpeg; construction of the FastAPI interactive local studio.
@@ -708,24 +708,24 @@ Requirements:
 \chapter{BENCHMARK DATASET INVENTORY}
 \label{app:dataset}
 
-Table \ref{table:dataset_summary} summarizes the 40-lecture evaluation corpus spanning academic lectures and corporate compliance modules.
+Table \ref{table:dataset_summary} summarizes the 40-lecture dataset inventory documented in \texttt{experiments/data/data\_inventory.json} and \texttt{.csv}. Across all 40 records, source video metadata sums to 10.12 hours, with 16 recordings (4.64 hours) duration-verified on disk (7 gold lectures, 8 corporate modules, and EN-11), 18 unverified raw captures pending slice trimming, and 6 pending download. Terminology candidates comprise 160 starter template terms (4 per lecture) supplemented by 32 closed gold terms on TR-1 and EN-1.
 
 \begin{table}[h!]
 \centering
-\caption{Multilingual 40-Lecture Corpus Distribution Across Domains}
+\caption{Multilingual 40-Lecture Inventory Derived From \texttt{data\_inventory.json}}
 \label{table:dataset_summary}
 \vskip 0.5\baselineskip
-\small
-\begin{tabular}{|l|c|c|c|c|}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{|p{7.2cm}|c|c|c|c|}
 \hline
-\textbf{Domain} & \textbf{Language} & \textbf{Lectures} & \textbf{Total Duration} & \textbf{Target Terms} \\ \hline
-Computer Science \& Algorithms & TR / EN & 10 & 3.4 hours & 84 \\ \hline
-Statistics \& Data Science & TR / EN & 8 & 2.8 hours & 62 \\ \hline
-Economics \& Business & TR / EN & 6 & 2.1 hours & 48 \\ \hline
-Physics \& Engineering & TR / EN & 6 & 2.1 hours & 52 \\ \hline
-Corporate Compliance (KVKK / GDPR) & TR & 5 & 1.6 hours & 38 \\ \hline
-Occupational Health \& Safety (OHS) & TR & 5 & 1.6 hours & 42 \\ \hline
-\textbf{Total} & \textbf{Bilingual} & \textbf{40} & \textbf{13.6 hours} & \textbf{326} \\ \hline
+\textbf{Discipline / Domain Group} & \textbf{Language} & \textbf{Clips} & \textbf{Meta Dur.} & \textbf{Terms} \\ \hline
+Computer Science \& Software Engineering & TR / EN & 12 & 2.79 hours & 48 \\ \hline
+Engineering, Circuits \& Mathematics & TR / EN & 9 & 2.24 hours & 36 \\ \hline
+Social Sciences, Humanities \& Life Sciences & TR / EN & 11 & 2.24 hours & 44 \\ \hline
+Corporate Compliance (KVKK / GDPR) & TR / EN & 4 & 0.68 hours & 16 \\ \hline
+Occupational Health \& Safety (İSG / OHS) & TR / EN & 4 & 2.16 hours & 16 \\ \hline
+\textbf{Total Inventory} & \textbf{Bilingual} & \textbf{40} & \textbf{10.12 hours} & \textbf{160} \\ \hline
 \end{tabular}
 \end{table}
 

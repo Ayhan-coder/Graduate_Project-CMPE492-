@@ -101,10 +101,9 @@ Gold files live at `experiments/data/gold/{ID}.txt`. `manifest.jsonl` sets `refe
 ## Distribution
 
 - Wavs stay local (`experiments/data/TR-1.wav` … `EN-4.wav`) and are listed in `manifest.jsonl`.
-- Gold transcripts are local files under `experiments/data/gold/`. They are evaluation references, not a release.
 ## 32-Video Extended Benchmark Corpus (`manifest_30plus.jsonl`)
 
-To transform the initial 7-video pilot into a rigorous, journal-grade benchmark, the dataset is extended to **32 educational video lectures** (16 Turkish, 16 English) totaling **~395 minutes (~6.6 hours)** of instructional speech (`sources_30plus.json`, `manifest_30plus.jsonl`).
+To transform the initial 7-video pilot into a rigorous, journal-grade benchmark, the dataset is extended to **32 educational video lectures** (16 Turkish, 16 English) totaling **~437 minutes (~7.28 hours)** of instructional speech metadata (`sources_30plus.json`, `manifest_30plus.jsonl`). Note that this manifest overlaps the 7 gold clips (TR-01..03, EN-01..04); among candidate audio files, EN-11 matches duration while 18 files remain unverified raw captures pending slice trimming, and no new extension clips were benchmarked.
 
 ### Domain and Topic Diversity
 

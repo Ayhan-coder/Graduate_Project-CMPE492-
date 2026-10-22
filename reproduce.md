@@ -24,7 +24,7 @@ pip install -r experiments/requirements.txt
 
 ## 2. Dataset & Inventory Verification
 
-The project manages an inventory of 40 educational and compliance videos (13.6 hours total, 20 TR + 20 EN across 12 disciplines). The measured ASR ground-truth benchmark is conducted on the 7-lecture human-verified gold test set (~95 minutes).
+The project manages an inventory of 40 educational and compliance videos (10.1 hours source metadata, of which 4.6 hours across 16/40 clips is duration-verified on disk; 20 TR + 20 EN across 14 domains). The measured ASR ground-truth benchmark is conducted on the 7-lecture human-verified gold test set (~95 minutes).
 
 ### Run Inventory Audit
 

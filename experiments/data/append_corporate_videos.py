@@ -576,7 +576,7 @@ def update_inventory():
     fieldnames = [
         "id", "alt_id", "lang", "domain", "title", "duration", "channel",
         "source_status", "source_url",
-        "audio_status", "audio_path", "audio_size_bytes",
+        "audio_status", "audio_path", "audio_size_bytes", "disk_duration_s", "audio_verification",
         "transcript_status", "transcript_file", "word_count",
         "annotation_status", "closed_gold_terms", "iaa_annotated_pairs", "template_terms"
     ]
@@ -596,6 +596,8 @@ def update_inventory():
             "audio_status": r["audio"]["status"],
             "audio_path": r["audio"]["local_path"] or "",
             "audio_size_bytes": r["audio"]["size_bytes"],
+            "disk_duration_s": r["audio"].get("disk_duration_s") or "",
+            "audio_verification": r["audio"].get("verification", ""),
             "transcript_status": r["transcript"]["status"],
             "transcript_file": r["transcript"]["file_path"] or "",
             "word_count": r["transcript"]["word_count"],

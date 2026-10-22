@@ -10,7 +10,7 @@ plt.rcParams['font.sans-serif'] = 'Arial'
 plt.rcParams['font.family'] = 'sans-serif'
 
 def generate_donut_chart_a():
-    # 5 Discipline clusters in the 40-video inventory (20 TR, 20 EN, 13.6 hours)
+    # 5 Discipline clusters in the 40-video inventory (20 TR, 20 EN, 10.1 hours metadata; 4.6 hours verified on disk)
     labels = ['Bilgisayar & YZ', 'Mühendislik & Devre', 'Fizik & Matematik', 'Sosyal & Turizm', 'Kurumsal Uyum (KVKK/İSG)']
     sizes = [10, 8, 8, 6, 8]
     colors = ['#E65100', '#F57C00', '#FF9800', '#FFB74D', '#FFE082']
