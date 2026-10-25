@@ -5,7 +5,7 @@ Follows the datasheets-for-datasets fields that this benchmark actually uses.
 ## Motivation
 
 - **Why:** Gold audio + transcripts for a three-layer evaluation (layer 1 ASR, layer 2 LLM terminology extraction, both measured here; layer 3 generative animation, feasibility only) on beginner-oriented educational speech.
-- **Funders / creators:** Cakil Yilmaz (Koç University) with Berat Enes Dadak, Efe Batur Giritli, Yekta Said Can (Tatilsepeti R&D).
+- **Funders / creators:** Ali Ayhan Günder (Boğaziçi University) with Berat Enes Dadak, Efe Batur Giritli, Yekta Said Can (Tatilsepeti R&D).
 - **Not for:** Training new ASR or LLM weights. Evaluation only.
 
 ## Composition

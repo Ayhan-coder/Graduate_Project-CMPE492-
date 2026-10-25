@@ -49,14 +49,14 @@
 
 \footercontent{
   \begin{columns}[c]
-    \begin{column}{0.58\linewidth}
+    \begin{column}{0.56\linewidth}
       \textbf{İLETİŞİM:} Ali Ayhan Günder \samelineand \textbf{Kurum:} Boğaziçi Üniversitesi Bilgisayar Mühendisliği Bölümü \\
-      \textbf{E-posta:} gunderaliayhan@gmail.com \samelineand \textbf{Proje Web:} EduTerm AI Studio (Whisper + Qwen 2.5 + LoRA + RAG)
+      \textbf{E-posta:} gunderaliayhan@gmail.com \samelineand \textbf{Proje Web:} EduTerm AI Studio (Whisper + Qwen 2.5 7B LoRA + DAG + RAG)
     \end{column}
-    \begin{column}{0.40\linewidth}
+    \begin{column}{0.42\linewidth}
       \raggedleft
       \textbf{Boğaziçi Üniversitesi Bilgisayar Mühendisliği Bölümü} \\
-      CMPE 492 Lisans Bitirme Projesi 2026 $\cdot$ Millî EVREN YZ Platformu (H200) $\cdot$ A0 Yatay Şablon
+      CMPE 492 Lisans Bitirme Projesi 2026 $\cdot$ Boğaziçi HPC (A40 48GB) $\cdot$ Millî EVREN (H200) $\cdot$ A0 Şablon
     \end{column}
   \end{columns}
 }
@@ -135,7 +135,7 @@
   \end{block}
 
   \vskip-0.3ex
-  \begin{block}{TABLO 1: MİLLÎ EVREN (H200) VS. YEREL DONANIM}
+  \begin{block}{TABLO 1: MİLLÎ EVREN (H200), BOĞAZİÇİ HPC (A40) VE YEREL GPU}
     \small
     \begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}X c c c}
       \toprule
@@ -143,6 +143,7 @@
       \textcolor{white}{\textbf{Model / Altyapı}} & \textcolor{white}{\textbf{TR Süre}} & \textcolor{white}{\textbf{EN Süre}} & \textcolor{white}{\textbf{Ortam}} \\
       \midrule
       \textbf{EVREN Qwen 3.8F} & \textbf{6.11 s} & \textbf{4.23 s} & Millî Bulut (H200) \\
+      \textbf{Boğaziçi HPC (A40)} & \textbf{15.28 s} & \textbf{12.45 s} & 7B LoRA (48GB A40) \\
       \textbf{EVREN DeepSeek} & 27.68 s & 24.12 s & Yüksek Hacim \\
       \textbf{Qwen 3.5-4B (Local)} & 39.80 s & 34.20 s & RTX 5060 (4-bit) \\
       \textbf{Qwen 3.5-9B (Local)} & 513.19 s & 322.29 s & CPU Offload \\
@@ -159,21 +160,17 @@
 
 \begin{column}{\colwidth}
 
-  \begin{block}{DİKEY ALAN QLORA TASARIM PROJEKSİYONU}
+  \begin{block}{HPC MODEL ÖLÇEKLEME (SCALING LAW) VE EDUTERM-7B-TR SFT}
     \begin{itemize}
-      \item \textbf{5 Dikey Sektör Tasarımı:} Turizm (Tatilsepeti Ar-Ge), İSG, KVKK, Finans ve Siber Güvenlik. Yerel prototipte (RTX 5060, Qwen2.5-0.5B) dry-run simülasyonu yapılmış; A100 kümesi eğitimi hedef projeksiyonu ($r=16, \alpha=32$).
+      \item \textbf{Ampirik Scaling Law (0.5B $\to$ 1.5B $\to$ 7B $\to$ 14B):} A40 üzerinde 5 model ölçeği 8 dikey alanda kıyaslanmıştır (İş ID \texttt{33611}): 0.5B \%41.7 recall (0.95GB), 1.5B \%68.8 recall (2.90GB, uç cihaz dengesi), 14B \%85.4 recall (27.74GB, 7.11s).
+      \item \textbf{Dikey SFT Üstünlüğü (EduTerm-7B-TR):} 2.296 dikey örnekle eğitilen modelimiz 14B'den daha yüksek doğruluğa (\textbf{\%95.7 Recall, \%95.8 Precision}) yarı VRAM'de (14.39 GB) ve \textbf{4.2 kat daha hızlı (1.68 sn)} ulaşmıştır.
+      \item \textbf{Pedagojik B1 Uyumu:} 14B fazla karmaşıklaşırken (38.7 Ateşman), EduTerm-7B-TR hedef \textbf{CEFR B1 (66.4 Ateşman)} bandına tam oturmuştur.
     \end{itemize}
 
     \vskip0.2ex
     \centering
-    \includegraphics[width=\linewidth,height=6.6cm,keepaspectratio]{img/finetune_gain_chart.png}
-    \captionof{figure}{Şekil 5: Qwen 2.5 Ders Notu LoRA İnce Ayar Hedef Tasarım Projeksiyonu.}
-
-    \begin{itemize}
-      \item \textbf{Hedeflenen Recall Artışı:} Terim yakalama \%53.3'ten \textbf{\%93.3'e} (tasarım projeksiyonu).
-      \item \textbf{Hedeflenen F1 Skoru:} 0.571 $\to$ \textbf{0.949} (hedeflenen kazanım projeksiyonu).
-      \item \textbf{Hedeflenen Bloom Doğruluğu:} \%40.0 $\to$ \textbf{\%90.0'a} yükselme hedefi.
-    \end{itemize}
+    \includegraphics[width=\linewidth,height=6.2cm,keepaspectratio]{img/scaling_law_curve.png}
+    \captionof{figure}{Şekil 5: Model Boyutu Ölçekleme Eğrisi (Parametre vs. Recall, VRAM, Ateşman).}
   \end{block}
 
   \vskip-0.3ex
@@ -190,14 +187,15 @@
   \end{block}
 
   \vskip-0.3ex
-  \begin{block}{ÇAPRAZ KATMAN HATA YAYILIMI}
+  \begin{block}{ÇAPRAZ KATMAN HATA YAYILIMI (ASR WER $\to$ LLM F1)}
     \centering
     \includegraphics[width=\linewidth,height=5.8cm,keepaspectratio]{img/cross_layer_curve.png}
-    \captionof{figure}{Şekil 7: Hata Yayılımı (Sentetik Gürültü vs. Gerçek ASR).}
+    \captionof{figure}{Şekil 7: Ampirik Hata Yayılım Eğrileri (A40, İş ID \texttt{33660}).}
 
     \begin{itemize}
-      \item Gerçek ASR çıktılarında $F_1$ 0.238--0.439 bandındadır.
-      \item Dil modelinin terim yakalama açığı (\emph{under-recall}) akustik bozulmayı domine etmektedir.
+      \item \textbf{7 ASR Basamağı (WER \%0 $\to$ \%89.7):} Gold referanstan Tiny/Small'a kadar aynı sesler taranmış ve 7B LLM ile kapalı 32 altın terimde test edilmiştir.
+      \item \textbf{Duyarlılık Eğrileri:} $\Delta \text{WER} = +5\% \implies \Delta F_1 = -0.11\% \text{ (TR)} \text{ / } -1.23\% \text{ (EN)}$.
+      \item \textbf{Tolerans Eşiği ($\text{WER} \le 15\%$):} Turbo ASR ile terim F1 korunurken, WER > \%40 seviyesinde halüsinasyon \%91.7'ye tırmanmaktadır.
     \end{itemize}
   \end{block}
 
@@ -210,15 +208,17 @@
 
 \begin{column}{\colwidth}
 
-  \begin{block}{PEDAGOJİK ÖNKOŞUL GRAFİĞİ (DAG)}
-    \centering
-    \includegraphics[width=0.94\linewidth,height=6.5cm,keepaspectratio]{img/concept_dag_graph.png}
-    \captionof{figure}{Şekil 8: Pedagojik Kavram Önkoşul Grafiği ve Bloom Hiyerarşisi.}
-
+  \begin{block}{TAM KORPUS (33 DERS) BİLGİ ÇİZGESİ (DAG) VE ÖNCÜL BOŞLUK ANALİZİ}
     \begin{itemize}
-      \item \textbf{NetworkX DAG Motoru:} Çıkarılan terimler arasında yönlü döngüsüz çizge kurulup \texttt{is\_acyclic} doğrulanır.
-      \item \textbf{Öğrenme Açığı Tespiti:} Derste temeli verilmeden ileri bir kavram anlatıldığında sistem otomatik pedagojik eksik uyarısı verir.
+      \item \textbf{12 Disiplinde 33 Derslik Tam Hat:} Boğaziçi HPC A40 üzerinde tüm korpus 504.47 sn'de (~8.4 dk) işlenmiş; \textbf{118 teknik terim} ve 33 topolojik öğrenme rotası (DAG) çıkarılmıştır (İş ID \texttt{33600}).
+      \item \textbf{19 Pedagojik Öncül Açığı Tespiti:} Temeli verilmeden ileri kavramlara geçilen noktalar DAG analiziyle bayraklanmıştır: KVKK'da (\texttt{TR-17}) \textbf{7 eksik öncül}, İSG'de (\texttt{TR-19/20}) \textbf{5'er eksik öncül} saptanmıştır.
+      \item \textbf{CEFR B1 Uyumu:} Çıkarılan tanımların \textbf{\%57.6'sı} doğrudan B1 seviyesindedir.
     \end{itemize}
+
+    \vskip0.2ex
+    \centering
+    \includegraphics[width=0.94\linewidth,height=6.0cm,keepaspectratio]{img/concept_dag_graph.png}
+    \captionof{figure}{Şekil 8: Pedagojik Kavram Önkoşul Grafiği ve Bloom Hiyerarşisi.}
   \end{block}
 
   \vskip-0.3ex
@@ -255,7 +255,7 @@
       \item J. Cohen, ``A coefficient of agreement for nominal scales,'' \emph{Educ. Psych. Meas.}, 1960.
     \end{enumerate}
     \vskip0.3ex
-    \textbf{Teşekkür:} Boğaziçi Üniversitesi Lisans Bitirme Projesi (CMPE 492) kapsamında yürütülmüş; hesaplama desteği SSB / TÜBİTAK BİLGEM Millî EVREN YZ Platformu (H200) ve Tatilsepeti Ar-Ge Merkezi tarafından sağlanmıştır.
+    \textbf{Teşekkür:} Boğaziçi Üniversitesi Lisans Bitirme Projesi (CMPE 492) kapsamında yürütülmüş; hesaplama desteği Boğaziçi Üniversitesi Bilgisayar Mühendisliği HPC Kümesi (NVIDIA A40 48GB), SSB / TÜBİTAK BİLGEM Millî EVREN YZ Platformu (H200) ve Tatilsepeti Ar-Ge Merkezi tarafından sağlanmıştır.
   \end{block}
 
 \end{column}

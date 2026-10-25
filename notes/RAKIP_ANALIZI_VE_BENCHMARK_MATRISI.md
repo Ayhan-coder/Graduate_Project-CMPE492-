@@ -24,11 +24,11 @@ Piyasadaki mevcut çözümler ya **yalnızca akustik transkripsiyona** (Otter.ai
 | **Kavram Önkoşul Grafiği (DAG)** | ❌ Yok | ❌ Yok | ❌ Yok | ❌ Yok | ❌ Yok | ❌ Yok | **✅ Var (Bloom Taksonomisi)** |
 | **Dikey Alan Desteği (Turizm, İSG)** | ❌ Yok (Genel) | ❌ Yok (İş/Ofis) | ❌ Yok (K12) | ❌ Yok | ❌ Yok | Kısmi (Prompt) | **✅ Var (LoRA + RAG)** |
 | **Halüsinasyon Önleme (RAG)** | Kısmi | ❌ Yok | Kısmi | ❌ Yok | ❌ Yok | Vektör RAG | **Ontoloji RAG (%0 hedef)** |
-| **Uç Cihaz / Yerel Çalışma (Offline)**| ❌ Kapalı Bulut | ❌ SaaS Bulut | ❌ Kapalı Bulut | ❌ Bulut | ✅ Yerel CLI | ❌ Google Bulut | **✅ Var (RTX 5060 / CPU)** |
+| **Uç Cihaz / Yerel Çalışma (Offline)**| ❌ Kapalı Bulut | ❌ SaaS Bulut | ❌ Kapalı Bulut | ❌ Bulut | ✅ Yerel CLI | ❌ Google Bulut | **✅ Var (RTX 5060 / HPC A40)** |
 | **Egemen Bulut Entegrasyonu** | ❌ (ABD) | ❌ (ABD) | ❌ (ABD) | ❌ (ABD) | ❌ Yok | ❌ (ABD) | **✅ Var (Millî EVREN H200)** |
 | **Veri Gizliliği & KVKK Uyumu** | Düşük (3. parti) | Düşük | Düşük | Düşük | Yüksek (Yerel) | Orta | **Tam Uyumlu (On-Premise)** |
 | **Açık Kaynak Kod & Veri** | ❌ Kapalı | ❌ Ticari | ❌ Kapalı | ❌ Kapalı | ✅ Açık Kaynak | ❌ Kapalı | **✅ Tam Açık Kaynak** |
-| **Uç Çıkarım Gecikmesi** | Bulut (2-5s) | Bulut (3-10s) | Bulut (4-8s) | Asenkron | GPU (1-3s) | Bulut (15-30s) | **6.11s (EVREN) / 3.9s (SLM)** |
+| **Uç Çıkarım Gecikmesi** | Bulut (2-5s) | Bulut (3-10s) | Bulut (4-8s) | Asenkron | GPU (1-3s) | Bulut (15-30s) | **6.11s (EVREN) / 12.78s (HPC A40 7B)** |
 
 ---
 
@@ -60,9 +60,9 @@ quadrantChart
 
 ### 3.2. Zayıf Yönlerimiz ve İyileştirme Planı (Weaknesses & Mitigation)
 1. **Kullanıcı Sayısı ve Veri Hacmi:** Coursera ve YouTube milyonlarca saatlik veriye sahipken, projemiz 32 video ve 7 altın klip ile başlamıştır.  
-   *Aksiyon:* 32 videonun tamamı indirilip otomatik etiketleme hattına bağlanmıştır.
-2. **Model Parametre Boyutu (Yerelde):** 9B modeller yerel 8GB GPU'da bellek darboğazı yaşamaktadır.  
-   *Aksiyon:* Toplantı kararı doğrultusunda Qwen 2.5 (0.5B-1.5B) ve Llama 3.2-1B gibi Small Language Model (SLM) LoRA hattı devreye alınmıştır.
+   *Aksiyon:* 40 videoluk genişletilmiş veri envanteri tamamlanmıştır.
+2. **Model Parametre Boyutu (Yerelde):** 7B ve 9B modeller yerel 8GB GPU'da bellek aşımı (OOM) yaşamaktadır (7B model tepe bellek: 27.84 GB VRAM).  
+   *Aksiyon:* Hibrit hesaplama stratejisi uygulanmıştır: Uç cihaz için Qwen 2.5 (0.5B-1.5B) ve Llama 3.2-1B gibi SLM hattı profillenmiş; büyük 7B model için Boğaziçi HPC NVIDIA A40 (48GB VRAM) kümesinde LoRA fine-tuning ve benchmark hattı başarıyla devreye alınmıştır.
 3. **Mobil ve Canlı Arayüz:** Otter.ai mobil uygulamaya sahiptir.  
    *Aksiyon:* Proje web tabanlı responsive FastAPI ve erişilebilir GitHub Pages arayüzüne kavuşturulmaktadır.
 

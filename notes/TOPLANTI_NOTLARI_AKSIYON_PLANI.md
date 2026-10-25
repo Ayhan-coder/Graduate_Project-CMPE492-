@@ -65,8 +65,9 @@ flowchart TD
   1. `experiments/data/data_inventory.json` ve `data_inventory.csv` güncellendi (40 kayıt, 20 TR / 20 EN).
   2. `download_and_transcribe_corpus.py` betiği 40 videoluk hat için optimize edildi.
   3. `experiments/rag/domain_rag_extractor.py` bilgi tabanına KVKK ve İSG kavramları eklendi.
+  4. **[TAMAMLANDI - HPC NVIDIA A40]**: Boğaziçi Üniversitesi HPC kümesi (`ultramarine`, Job ID `33600`) üzerinde Qwen 2.5-7B + LoRA ile 33 doğrulanmış dersin tamamında toplu terim, Bloom seviyesi ve DAG çıkarımı 504,47 saniyede tamamlandı (118 terim, 19 eksik öncül tespit edildi).
 - **Sorumlu:** Ali Ayhan Günder, Berat Enes Dadak
-- **Çıktı:** 40 videoluk güncel veri envanteri, indirme/transkripsiyon hattı ve zenginleştirilmiş RAG ontolojisi.
+- **Çıktı:** 40 videoluk güncel veri envanteri, `experiments/outputs/full_corpus_40_report.json` ve `experiments/outputs/full_corpus_analyses/` altında 33 dersin tam DAG ve pedagojik analiz artefaktları.
 
 ---
 
@@ -125,11 +126,21 @@ flowchart TD
 ---
 
 ### AKSİYON 5: Okul Sunucusu (Boğaziçi GPU / SLURM) ve Kaynak Planı
-- **Hedef:** Fine-tuning işleri için okulun yüksek kapasiteli GPU sunucularından (A100/H100) kota ve SLURM kuyruk erişimi talep etmek.
-- **Planlama:**
-  - Tek GPU (A100 40/80GB) için 4-bit QLoRA scripti optimize edilerek eğitim süresi <2 saate düşürülür.
-  - Diğer öğrencilerin kota kullanımını aksatmayacak şekilde gece saatleri (low-priority / preemptible partition) hedeflenir.
-- **Çıktı:** `experiments/finetune/slurm_job_finetune.sh` SLURM betiği ve sunucu başvuru talep şablonu.
+- **Hedef:** Fine-tuning işleri için okulun yüksek kapasiteli GPU sunucularından (A40/A100) kota ve SLURM kuyruk erişimiyle 7B modellerin eğitimi ve testi.
+- **Gerçekleştirilen Çalışma:**
+  - SSH anahtar doğrulaması ile Boğaziçi HPC sunucusuna (`ultramarine` - `79.123.177.160`) erişildi.
+  - Pyxis/Enroot üzerinden resmi NVIDIA NGC PyTorch konteyneri (`nvcr.io#nvidia/pytorch:23.10-py3`) ile Slurm iş kuyruğu yapılandırıldı.
+  - `Qwen/Qwen2.5-7B-Instruct` (14.2 GB) modeli `/users/ali.gunder/models/Qwen2.5-7B-Instruct` dizinine kalıcı olarak indirildi.
+  - Slurm Job `33580` ile 1x NVIDIA A40 (48GB VRAM) üzerinde LoRA fine-tuning ($r=16, \alpha=32$, 40.3M parametre) **13.67 saniyede** tamamlandı.
+  - **Ampirik Bellek İspatı:** Temel model 14.23 GB VRAM, eğitim tepe bellek **27.84 GB VRAM** olarak ölçülerek yerel RTX 5060 8GB GPU'da 7B modellerin neden OOM verdiği kesinleştirildi.
+  - Görülmemiş disiplinlerde (`BENCH-EE`, `BENCH-BIO`, `BENCH-CS`, `BENCH-TOUR`) LoRA adaptasyonu ile dikey terim yakalama (%0 $\to$ %33.3) ve B1 pedagojik okunabilirlik iyileşmesi sağlandı.
+- **Çıktılar:**
+  - Slurm koşturma betiği: `/users/ali.gunder/eduterm-finetune/submit_qwen7b.sbatch`
+  - Eğitim & test motoru: `/users/ali.gunder/eduterm-finetune/run_hpc_7b_experiment.py`
+  - Deney sonuç raporu: `experiments/outputs/qwen7b_hpc_experiment_report.json`
+  - Ayrıntılı analiz dokümanı: `notes/HPC_A40_QWEN7B_DENEY_RAPORU.md`
+- **Durum:** ✅ Tamamlandı (HPC A40 48GB üzerinde Qwen 2.5-7B LoRA eğitimi ve benchmarkı başarıyla koşturuldu ve arşivlendi).
+
 
 ---
 

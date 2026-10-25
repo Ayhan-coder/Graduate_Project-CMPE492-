@@ -3,26 +3,57 @@
 experiments/.env
 *.env
 
-# Local data and model weights
+# Local data and model weights (exclude all large model weight files)
 models/
+**/models/
+hf_cache/
+**/hf_cache/
+experiments/hf_cache/
 experiments/finetune/checkpoints/*
 !experiments/finetune/checkpoints/**/
 !experiments/finetune/checkpoints/**/*.json
 !experiments/finetune/checkpoints/**/*.md
-experiments/finetune/checkpoints/**/*.safetensors
-experiments/finetune/checkpoints/**/*.bin
-experiments/data/audio/
-experiments/finetune/data/external/asr_audio/
+
+# Global model binary weights
+*.pt
+*.pth
+*.bin
+*.safetensors
+*.onnx
+*.gguf
+*.tflite
+*.ckpt
+*.h5
+*.model
+*.weights
+
+# Global audio & video binaries
 *.wav
 *.mp3
 *.mp4
+*.webm
+*.flac
+*.m4a
+*.ogg
+
+# Global large archives
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+*.7z
+
+experiments/data/audio/
+experiments/data/*.wav
+experiments/data/*.webm
+experiments/finetune/data/external/asr_audio/
 experiments/data/raw/
 experiments/data/smoke/
 experiments/data/_work/
 experiments/gui/temp/
 experiments/gui/data/
 experiments/gui/static/generated_videos/
-experiments/hf_cache/
 
 # Reference archives
 speech2text-main.zip
