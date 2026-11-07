@@ -1,0 +1,885 @@
+{
+ "labels": {
+  "TR-01-machine-001": {
+   "R": 1,
+   "D": 0,
+   "comment": ""
+  },
+  "TR-01-machine-002": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-01-machine-003": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-01-machine-004": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-02-machine-001": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-02-machine-002": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-02-machine-003": {
+   "R": 1,
+   "D": 0,
+   "comment": ""
+  },
+  "TR-02-machine-004": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-02-machine-005": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-03-machine-001": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-03-machine-002": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-03-machine-003": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-03-machine-004": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-03-machine-005": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-03-machine-006": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-04-machine-001": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-04-machine-002": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-04-machine-003": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-04-machine-004": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-04-machine-005": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-04-machine-006": {
+   "R": 0,
+   "D": 1,
+   "comment": "blok ders yani iki dersin birleştirilmesi kastediliyor"
+  },
+  "TR-04-machine-007": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-04-machine-008": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-04-machine-009": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-04-machine-010": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-04-machine-011": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-04-machine-012": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-04-machine-013": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-04-machine-014": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-04-machine-015": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-04-machine-016": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-04-machine-017": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-04-machine-018": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-04-machine-019": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-04-machine-020": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-04-machine-021": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-04-machine-022": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-04-machine-023": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-04-machine-024": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-08-machine-001": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-08-machine-002": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-08-machine-003": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-08-machine-004": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-08-machine-005": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-08-machine-006": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-08-machine-007": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-08-machine-008": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-08-machine-009": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-08-machine-010": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-08-machine-011": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-08-machine-012": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-08-machine-013": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-08-machine-014": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-09-machine-001": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-09-machine-002": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-09-machine-003": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-09-machine-004": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-10-machine-001": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-10-machine-002": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-10-machine-003": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-10-machine-004": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-10-machine-005": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-10-machine-006": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-11-machine-001": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-11-machine-002": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-11-machine-003": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-11-machine-004": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-11-machine-005": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-11-machine-006": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-11-machine-007": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-12-machine-001": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-12-machine-002": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-12-machine-003": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-12-machine-004": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-12-machine-005": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-12-machine-006": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-13-machine-001": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-13-machine-002": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-13-machine-003": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-13-machine-004": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-16-machine-001": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-16-machine-002": {
+   "R": 0,
+   "D": 0,
+   "comment": "böyle bir terim yok yanlış yazılmış"
+  },
+  "TR-16-machine-003": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-16-machine-004": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-16-machine-005": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-16-machine-006": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-16-machine-007": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-16-machine-008": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-16-machine-009": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-16-machine-010": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "TR-16-machine-011": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-01-machine-001": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-01-machine-002": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-01-machine-003": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-01-machine-004": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-01-machine-005": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-01-machine-006": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-01-machine-007": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-01-machine-008": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-02-machine-001": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-02-machine-002": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-02-machine-003": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-02-machine-004": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-03-machine-001": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-03-machine-002": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-03-machine-003": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-03-machine-004": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-03-machine-005": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-03-machine-006": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-03-machine-007": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-03-machine-008": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-03-machine-009": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-03-machine-010": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-03-machine-011": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-03-machine-012": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-03-machine-013": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-04-machine-001": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-04-machine-002": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-04-machine-003": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-04-machine-004": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-04-machine-005": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-04-machine-006": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-04-machine-007": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-04-machine-008": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-05-machine-001": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-05-machine-002": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-05-machine-003": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-05-machine-004": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-05-machine-005": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-05-machine-006": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-05-machine-007": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-05-machine-008": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-06-machine-001": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-06-machine-002": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-06-machine-003": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-06-machine-004": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-06-machine-005": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-06-machine-006": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-06-machine-007": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-06-machine-008": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-06-machine-009": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-06-machine-010": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-06-machine-011": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-06-machine-012": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-06-machine-013": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-06-machine-014": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-06-machine-015": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-06-machine-016": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-06-machine-017": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-06-machine-018": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-06-machine-019": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-06-machine-020": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-06-machine-021": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-06-machine-022": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-06-machine-023": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-06-machine-024": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-07-machine-001": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-07-machine-002": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-07-machine-003": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-07-machine-004": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-07-machine-005": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-07-machine-006": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-07-machine-007": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-07-machine-008": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-07-machine-009": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-07-machine-010": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-07-machine-011": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-07-machine-012": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-07-machine-013": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-07-machine-014": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-07-machine-015": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-07-machine-016": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-07-machine-017": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-07-machine-018": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-07-machine-019": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  },
+  "EN-07-machine-020": {
+   "R": 1,
+   "D": 1,
+   "comment": ""
+  }
+ },
+ "index": 176
+}

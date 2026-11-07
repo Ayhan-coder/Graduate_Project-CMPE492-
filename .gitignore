@@ -35,6 +35,7 @@ experiments/finetune/checkpoints/*
 *.flac
 *.m4a
 *.ogg
+*.opus
 
 # Global large archives
 *.zip
@@ -43,6 +44,10 @@ experiments/finetune/checkpoints/*
 *.tgz
 *.rar
 *.7z
+*.whl
+tmp_wheels/
+tmp_wheels_py310/
+tmp_wheels_restore/
 
 experiments/data/audio/
 experiments/data/*.wav
@@ -90,3 +95,4 @@ scratch/
 *.fdb_latexmk
 *.synctex.gz
 *.backup*.pdf
+*.bak

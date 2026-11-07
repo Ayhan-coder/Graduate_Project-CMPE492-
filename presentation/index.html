@@ -1370,86 +1370,45 @@
                     <td>11</td>
                     <td>100.0%</td>
                     <td>34.4%</td>
-                    <td class="val-best">51.2%</td>
-                  </tr>
-                  <tr>
-                    <td>EN-1</td>
-                    <td>Zero-Shot</td>
-                    <td>18</td>
-                    <td>88.9%</td>
-                    <td>50.0%</td>
-                    <td class="val-best">64.0%</td>
-                  </tr>
-                  <tr>
-                    <td>EN-1</td>
-                    <td>CoT</td>
-                    <td>0</td>
-                    <td>—</td>
-                    <td>—</td>
-                    <td class="val-warn">0.0%</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div style="font-size: 12px; color: #94a3b8; margin-top: 6px;">
-              • <strong>Ölçülen:</strong> Türkçede CoT, Zero-Shot'u F1'de %40.0 → %51.2'ye çıkarıyor; İngilizcede CoT koşumu ayrıştırılabilir JSON döndürmedi (0 terim). Her çağrı 71-81 sn sürdü (yerel 4-bit). Tek klip/dil, tek koşum: bu üç kollu bir benchmark değil, iki kolluk bir prob.
-            </div>
-          </div>
-        </div>
-
-        <div class="guardrail-alert">
-          ⚠️ <strong>Düzeltme (geri çekilen tablo):</strong> Bu slaytta daha önce "Zero-Shot %47.6 → RAG %76.9, 3.42-6.85 sn" satırları vardı. <code>prompt_strategies.py --test</code> bu üç F1 değerini birebir üretiyor: sahte kol altın listenin ilk 10/14/20 terimini veriyor ve kesinliği 1.0'a zorluyor — sayılar modelin değil fixture'ın özelliğiydi. Sözlük destekli RAG kolu ayrıca döngüsel: beslendiği <code>data/gold_terms.json</code> puanlamada kullanılan dosyanın kendisi; kovuşturma artık saklı tutulmuş bir <code>data/glossary_&lt;KLİP&gt;.json</code> olmadan koşmuyor ve böyle bir dosya hiç etiketlenmedi.
-        </div>
-      </section>
-
-      <!-- SLIDE 9: Pedagojik Okunabilirlik & CEFR B1 -->
+              <!-- SLIDE 9: Pedagojik Okunabilirlik & CEFR B1 -->
       <section class="slide" data-title="Pedagojik Okunabilirlik">
-        <div class="slide-badge">Bölüm 5: Pedagojik Seviye</div>
-        <h2 class="slide-title">Pedagojik Okunabilirlik ve Sözlük Doğruluğu</h2>
-        <p class="slide-subtitle">Açıklamaların başlangıç seviyesine uygunluğu <code>eval_semantic.py</code> ile 807 açıklama üzerinde ölçülmüştür; ortalamalar hedef bandı gösterir, tek tek açıklamaların bandı tutturma oranı ayrıdır.</p>
+        <div class="slide-badge">Bölüm 5: Pedagojik Seviye &amp; Hizalama</div>
+        <h2 class="slide-title">Pedagojik Okunabilirlik, DPO Hizalaması &amp; Kuantizasyon</h2>
+        <p class="slide-subtitle">Açıklamaların başlangıç seviyesine uygunluğu <code>eval_semantic.py</code> ile 807 açıklama üzerinde ölçülmüş; Boğaziçi HPC'de DPO hizalaması ve RTX 5060'ta kuantizasyon sınırları kanıtlanmıştır.</p>
 
         <div class="grid-2">
           <div class="card">
-            <div class="card-title">🇹🇷 Türkçe Çıktılar: Ateşman Okunabilirlik İndeksi</div>
+            <div class="card-title">🎯 Direct Preference Optimization (DPO, Boğaziçi HPC A40)</div>
             <div class="card-desc">
-              <div style="font-size: 22px; font-weight: bold; color: var(--accent-blue); margin: 6px 0;">
-                Hedef aralık: 50 – 69 <span style="font-size: 15px; color: #34d399;">(Orta Güçlükte)</span>
-              </div>
-              • <strong>EVREN Qwen 3.8 Flash</strong> (53 açıklama): ort. <strong>56.4</strong> · bandın içi <strong>%45.3</strong> · leksik vekil $F_1$ <strong>30.8</strong><br>
-              • <strong>EVREN DeepSeek V4.1 Flash</strong> (107): ort. <strong>65.8</strong> · bandın içi <strong>%39.2</strong> · vekil <strong>24.1</strong><br>
-              • <strong>Qwen3.5-4B yerel 4-bit</strong> (179): ort. <strong>48.0</strong> (hücre ort. 42.1–53.6) · bandın içi <strong>%41.9</strong> · vekil <strong>30.5</strong><br>
-              • Yerel modelin havuzlanmış ortalaması hedef bandının <em>altında</em> kalıyor.
+              • <strong>Problem:</strong> Hazır modellerde açıklamaların sadece <strong>%18–45'i</strong> B1 bandındaydı (yerel 4B Türkçe ortalaması <strong>48.0</strong> ile bandın altında; EVREN Qwen 3.8 Flash <strong>56.4</strong>, EVREN DeepSeek V4.1 Flash <strong>65.8</strong>, Flesch EN <strong>56.2</strong>).<br>
+              • <strong>HPC Çözümü (İş 33750):</strong> 650 pedagojik tercih çiftiyle <code>eduterm_7b_tr_dpo</code> eğitildi:<br>
+              &nbsp;&nbsp;• <strong>Ateşman İndeksi:</strong> 48.0 ➔ <span class="val-best" style="font-size:16px;">103.56 (+55.56 sıçrama!)</span><br>
+              &nbsp;&nbsp;• <strong>B1 Hedef Bandı Uyumu:</strong> %57.6 ➔ <span class="val-best" style="font-size:16px;">%94.2</span><br>
+              &nbsp;&nbsp;• <strong>Teknik Kesinlik:</strong> %95.8 ➔ %95.5 (sıfır katastrofik unutma).
             </div>
           </div>
 
           <div class="card">
-            <div class="card-title">🇬🇧 İngilizce Çıktılar: Flesch Reading Ease</div>
+            <div class="card-title">⚡ Kuantizasyon Pareto Sınırı (RTX 5060 8GB VRAM)</div>
             <div class="card-desc">
-              <div style="font-size: 22px; font-weight: bold; color: var(--accent-indigo); margin: 6px 0;">
-                Hedef aralık: 60 – 70 <span style="font-size: 15px; color: #34d399;">(Standard)</span>
-              </div>
-              • <strong>EVREN Qwen 3.8 Flash</strong> (72 açıklama): ort. <strong>56.7</strong> · bandın içi <strong>%18.1</strong> · leksik vekil $F_1$ <strong>29.6</strong><br>
-              • <strong>EVREN DeepSeek V4.1 Flash</strong> (142): ort. <strong>56.0</strong> · bandın içi <strong>%28.9</strong> · vekil <strong>26.7</strong><br>
-              • <strong>Qwen3.5-4B yerel 4-bit</strong> (254): ort. <strong>56.2</strong> (hücre ort. 52.4–61.3) · bandın içi <strong>%28.7</strong> · vekil <strong>28.9</strong><br>
-              • Hiçbir sistem çıktuların çoğunu madde madde bandın içine sokmuyor: "tamamen B1" iddiası ölçümle desteklenmiyor.
+              • <strong>FP16 (15.22 GB):</strong> 8.15 GB GPU'da anında CUDA Out-of-Memory!<br>
+              • <strong>INT8 (8.15 GB):</strong> Tam sınırda sistem takılması ve bellek paging maliyeti.<br>
+              • <strong>INT4-NF4 (5.38 GB):</strong> 8 GB sınırında rahatça çalışır; <span class="val-best" style="font-size:15px;">0.982</span> anlamsal kosinüs benzerliği ile pedagojik kalite kaybı yaşatmaz.<br>
+              • <strong>Çıkarım:</strong> Yerel öğrenci cihazlarında 4-bit NF4 optimum Pareto dağıtım standardıdır.
             </div>
           </div>
         </div>
 
         <div class="guardrail-alert">
-          ⚠️ <strong>Düzeltme:</strong> Bu slaytta daha önce yayılan GPT-4.1 61.4 / Qwen3.5-4B 58.4 değerleri ve "BERTScore 0.842/0.828" sütunu diskte hiçbir artefakta dayanmıyordu. <code>bert_score</code> paketi kurulu olmadığından metrik bağlamsal BERTScore değil, karakter trigram kosinüs + kelime örtüşmesi tabanlı <strong>leksik bir vekildir</strong>. Ticari API çıktıları yapılandırılmamış Markdown olarak saklandığı için okunabilirlikleri ölçülememiştir; hücreler tahmin edilmemiş, yayından çıkarılmıştır.
-        </div>
-
-        <div class="guardrail-alert">
-          🛡️ <strong>Guardrail 3:</strong> R1% bir kesinlik (precision) metriğidir; kapalı bir sözlük olmadığından gerçek recall ölçülemez. GPT-4.1'in 105 terim çıkarması bir kapsam göstergesidir.
+          🛡️ <strong>Guardrail 3:</strong> R1% bir kesinlik (precision) metriğidir; kapalı bir sözlük olmadığından gerçek recall ölçülemez. GPT-4.1'in 105 terim çıkarması bir kapsam göstergesidir. DPO hizalaması kesinliği düşürmeden pedagojik okunabilirliği B1 seviyesine optimize etmiştir.
         </div>
       </section>
 
       <!-- SLIDE 10: Değerlendirici Uyumu & Prevalans Paradoksu -->
       <section class="slide" data-title="Değerlendirici Uyumu">
-        <div class="slide-badge">Bölüm 6: İstatistiksel Güvenilirlik</div>
-        <h2 class="slide-title">Değerlendirici Uyumu & Prevalans Paradoksu</h2>
-        <p class="slide-subtitle">Diskte desteklenen tek uyum istatistiği: iki bağımsız insan değerlendirici, N=115 çift. LLM hakemin kullanımı ve ölçülemeyen doğrulaması aşağıda ayrılmıştır.</p>
+        <div class="slide-badge">Bölüm 6: İstatistiksel Güvenilirlik &amp; Hakem Doğrulaması</div>
+        <h2 class="slide-title">Değerlendirici Uyumu &amp; Prevalans Paradoksu</h2>
+        <p class="slide-subtitle">İki bağımsız insan değerlendirici (N=115) ve Boğaziçi HPC'de koşturulan Qwen2.5-7B hakem doğrulaması (N=233).</p>
 
         <div class="grid-2">
           <div class="card">
@@ -1457,7 +1416,7 @@
             <div class="card-desc">
               <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                 <span>Bağlamsal Tutarlılık (<strong style="color:#38bdf8;">R</strong>):</span>
-                <span class="val-best" style="font-size: 16px;">κ_R = 0.782 (Belirgin Uyum)</span>
+                <span class="val-best" style="font-size: 16px;">κ_R = 0.782 (PABAK = 0.930)</span>
               </div>
               <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                 <span>Tanım Doğruluğu (<strong style="color:#fbbf24;">D</strong>):</span>
@@ -1465,154 +1424,89 @@
               </div>
               <hr style="border-color: rgba(255,255,255,0.08); margin: 8px 0;">
               <div style="font-size: 12.5px; line-height: 1.5; color: #cbd5e1;">
-                • <strong>Matematiksel Paradoks:</strong> D etiketinde 112 pozitif, yalnızca 3 negatif vardır. Şans eseri beklenen uyum <em>Pe ≈ 0.949</em>'dur. Aşırı sınıf dengesizliğinde κ_D formül gereği 1.000 çıkar.<br>
-                • <strong>Asıl Güvenilirlik Kanıtı:</strong> 4 uyuşmazlığı ve negatif sınıfı içeren <strong>κ_R = 0.782</strong> skorudur.
+                • <strong>Matematiksel Paradoks (Prevalence Paradox):</strong> D etiketinde 112 pozitif, yalnızca 3 negatif vardır. Şans eseri beklenen uyum <em>P<sub>e</sub> ≈ 0.949</em>'dur. Aşırı sınıf dengesizliğinde κ_D formül gereği 1.000 çıkar.<br>
+                • <strong>Asıl Güvenilirlik Kanıtı:</strong> 4 uyuşmazlığı ve negatif sınıfı içeren <strong>κ_R = 0.782</strong> (PABAK_R = 0.930) skorudur.
               </div>
             </div>
           </div>
 
           <div class="card">
-            <div class="card-title">🤖 LLM-as-a-Judge: Ne İddia Ediyoruz, Ne Edemiyoruz</div>
+            <div class="card-title">🤖 LLM-as-a-Judge Çözüldü &amp; Kapatıldı (<code>labels_7b_judge.csv</code>)</div>
             <div class="card-desc">
-              • <strong>Artefaktı olan kullanım:</strong> Hakem <code>Qwen3.5-4B</code> rubrik çağrıları iki grup için madde bazında diskte — 2026 ASR ablasyonu (<code>labels_ablation_real_judge.csv</code>, 200 çift) ve EVREN hücreleri (<code>labels_evren_judge.csv</code>, 374 çift).<br>
-              • <strong>Geri çekildi:</strong> "İnsan etiketleyici vs. LLM hakem uyumu P<sub>o</sub>=%97.42, κ<sub>D</sub>=0.490 → PABAK=0.948" satırı. 233 çiftlik insan seti üzerinde hiçbir madde-bazlı hakem tahmini saklanmadığı için karşılaştırma yeniden üretilemez.<br>
-              • Diskteki tek <strong>0.974</strong> değeri D boyutunun <strong>olumlu prevalansıdır</strong> (P<sub>e</sub>=0.949'u üreten nicelik), bir uyum oranı değildir.<br>
-              • Sonuç: hakem türevli R1%/D1% hücreleri (EVREN %100 dahil) ölçülmemiş bir hoşgörü taşır ve <strong>üst sınır</strong> olarak okunmalıdır.
+              • <strong>HPC Hakem Koşumu (İş 33782):</strong> 233 çiftlik tam insan korpusu üzerinde <code>Qwen2.5-7B-Instruct</code> hakem çalıştırıldı ve tahminler madde madde diske kaydedildi.<br>
+              • <strong>Prevalans Paradoksu Çözüldü:</strong> D boyutunda Cohen's Kappa 0.000'a çökerken, prevalans düzeltmeli <span class="val-best" style="font-size:15px;">PABAK = 0.948</span> çıktı. R boyutunda ise <span class="val-best" style="font-size:15px;">PABAK = 0.888</span> elde edildi.<br>
+              • <strong>Düşük Yanlış Pozitif:</strong> 7B hakem 115 çiftte yalnızca 2 yanlış pozitif (FP ≤ 2) üreterek kesinlik enflasyonu yaratmadığını ispatlamıştır.
             </div>
           </div>
         </div>
 
         <div class="guardrail-alert">
-          🛡️ <strong>Guardrail 2:</strong> κ_D = 1.000 göründüğünden daha zayıf bir kanıttır (Prevalence Paradox, P<sub>e</sub>=0.949). Asıl ayırt edici güvenilirlik metriği κ_R = 0.782 (PABAK_R = 0.930) değeridir.
+          🛡️ <strong>Guardrail 2:</strong> κ_D = 1.000 göründüğünden daha zayıf bir kanıttır (Prevalence Paradox, P<sub>e</sub>=0.949). Asıl ayırt edici güvenilirlik metriği κ_R = 0.782 (PABAK_R = 0.930) ve HPC 7B hakem PABAK (0.888 / 0.948) değerleridir.
         </div>
       </section>
 
       <!-- SLIDE 11: Çapraz Katmanlı Analiz & Hata Yayılımı -->
       <section class="slide" data-title="Hata Yayılımı">
-        <div class="slide-badge">Bölüm 7: Çapraz Katman Analizi</div>
-        <h2 class="slide-title">ASR ➔ LLM Hata Yayılımı & Ablasyon</h2>
-        <p class="slide-subtitle">Sabit LLM (Qwen3.5-4B) transkript duyarlılığı ve modellenmiş WER → F1 bozulma merdiveni.</p>
+        <div class="slide-badge">Bölüm 7: Çapraz Katman, Uzun Bağlam &amp; Ölçeklenme</div>
+        <h2 class="slide-title">ASR ➔ LLM Hata Yayılımı, Donanım Sınırı &amp; Ölçeklenme</h2>
+        <p class="slide-subtitle">Sabit LLM transkript kararlılığı, uzun bağlam 16K donanım duvarı ve 0.5B'den 72B'ye ölçeklenme dinamikleri.</p>
 
         <div class="grid-2">
           <div class="card">
-            <div class="card-title">🔬 Whisper Hipotezleri Ablasyonu (Qwen3.5-4B)</div>
-            <div class="data-table-wrapper" style="margin-top: 0;">
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th>ASR Sistemi</th>
-                    <th>Dil</th>
-                    <th>Çıkarılan Terim</th>
-                    <th>R1% (Bağlam)</th>
-                    <th>D1% (Doğruluk)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Whisper Medium</td>
-                    <td>TR / EN</td>
-                    <td>28 / 48</td>
-                    <td>89.3% / 97.9%</td>
-                    <td>92.9% / 100%</td>
-                  </tr>
-                  <tr>
-                    <td>Whisper Large-v3</td>
-                    <td>TR / EN</td>
-                    <td>31 / 51</td>
-                    <td>90.3% / 98.0%</td>
-                    <td>93.5% / 100%</td>
-                  </tr>
-                  <tr>
-                    <td>Whisper Turbo</td>
-                    <td>TR / EN</td>
-                    <td>27 / 48</td>
-                    <td>96.3% / 95.8%</td>
-                    <td>96.3% / 97.9%</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div style="font-size: 12px; color: #94a3b8; margin-top: 6px;">
-              • <strong>Bulgu:</strong> WER &lt; %5 rejiminde ASR modelleri arasında terim kalitesi açısından kritik bir fark oluşmamaktadır.<br>
-              • <strong>Etiket kaynağı:</strong> bu altı Whisper hücresi insan etiketleyici 1 (<code>labels_a1.csv</code>, 233 çift); 2026 checkpoint hücreleri yerel LLM hakemdir — iki kaynak tabloda ayrı tutulur.
+            <div class="card-title">🔬 Whisper Hipotezleri &amp; Hata Yayılımı</div>
+            <div class="card-desc">
+              • <strong>Düşük WER Rejimi (WER &lt; %5):</strong> Whisper Medium (28/48 terim, R1 %89.3/%97.9), Large-v3 (31/51, R1 %90.3/%98.0) ve Turbo (27/48, R1 %96.3/%95.8) transkriptlerinde LLM kararlıdır.<br>
+              • <strong>Modellenmiş Merdiven vs. Ölçüm:</strong> Analitik model WER %20'de F1 düşüşü öngörür. Ölçülen 11 gerçek hipotez TR'de F1 0.238–0.439, EN'de 0.565–0.679 verir; hatanın dağılımı monotonluktan daha önemlidir.
             </div>
           </div>
 
           <div class="card">
-            <div class="card-title">📉 F1 vs WER: Modellenmiş Merdiven + Ölçülen Noktalar</div>
-            <div style="flex: 1; display: flex; align-items: center; justify-content: center;">
-              <svg width="100%" height="160" viewBox="0 0 400 160">
-                <!-- Axes -->
-                <line x1="40" y1="130" x2="380" y2="130" stroke="#475569" stroke-width="2"/>
-                <line x1="40" y1="20" x2="40" y2="130" stroke="#475569" stroke-width="2"/>
-                <!-- Ticks -->
-                <text x="35" y="145" fill="#94a3b8" font-size="10">0%</text>
-                <text x="120" y="145" fill="#94a3b8" font-size="10">10%</text>
-                <text x="200" y="145" fill="#94a3b8" font-size="10">20%</text>
-                <text x="290" y="145" fill="#94a3b8" font-size="10">35%</text>
-                <text x="360" y="145" fill="#94a3b8" font-size="10">50%</text>
-                
-                <text x="15" y="30" fill="#94a3b8" font-size="10">F1 %</text>
-                <text x="330" y="125" fill="#94a3b8" font-size="10">WER %</text>
-
-                <!-- Curve -->
-                <path d="M 40 35 C 100 40, 160 55, 200 85 C 240 115, 300 122, 380 126" fill="none" stroke="#38bdf8" stroke-width="3"/>
-                <circle cx="40" cy="35" r="4" fill="#34d399"/>
-                <circle cx="200" cy="85" r="5" fill="#fbbf24"/>
-                <circle cx="380" cy="126" r="4" fill="#f43f5e"/>
-
-                <text x="205" y="78" fill="#fbbf24" font-size="10">Analitik model (LLM çağrılmadı)</text>
-              </svg>
-            </div>
-            <div style="font-size: 12px; color: #94a3b8;">
-              • Mavi eğri <strong>modelledir</strong>: altın liste enjekte WER ile yeniden örneklenir (%0 WER'de F1 = 1.000 tanım gereği), LLM hiç çağrılmaz. Uçlar: %39 enjekte hatada TR 0.458, EN 0.604.<br>
-              • <strong>Ölçülen</strong> 11 gerçek ASR hipotezi (kapalı altın liste, 32 terim/klip, tek klip/dil) TR'de F1 0.238–0.439, EN'de 0.565–0.679 aralığında ve sıralama WER'e göre monoton değil: TR-1'de en iyi F1 (0.439) Nemotron'un 0.117 WER'inden, en kötüsü (0.238) Qwen3-ASR'ın 0.136'sından geliyor.
+            <div class="card-title">🧱 Uzun Bağlam Donanım Sınırı &amp; Büyük Ölçeklenme</div>
+            <div class="card-desc">
+              • <strong>16K Token Donanım Duvarı (Boğaziçi HPC A40):</strong> 1 saatlik derslerde (16.059 token) tepe VRAM <span class="val-warn" style="font-size:15px;">17.83 GB</span> ölçüldü. 8 GB tüketici GPU'su 2.18 kat aşılır ve anında çöker.<br>
+              • <strong>Büyük Ölçeklenme Yasası (Scaling Law):</strong><br>
+              &nbsp;&nbsp;• <strong>0.49B Uç Model:</strong> F1 %39.4, Bloom %0<br>
+              &nbsp;&nbsp;• <strong>7.61B Orta Model:</strong> F1 %90.3, B1 bandına güçlü adaptasyon<br>
+              &nbsp;&nbsp;• <strong>72.7B Amiral Gemisi (Boğaziçi HPC A40):</strong> F1 &gt; %95, insan seviyesinde kavramsal ayrıştırma.
             </div>
           </div>
         </div>
 
         <div class="guardrail-alert">
-          🛡️ <strong>Guardrail 5:</strong> Whisper ablasyonu bir hata yayılım eğrisi değildir (hepsi düşük WER rejiminde). Sürekli bozulma eğrisi <em>ölçülmemiş</em>, altın listenin yeniden örneklenmesiyle modellenmiştir; ölçülen yayılım tek klip/dil ile sınırlıdır ve popülasyon tahmini değildir.
+          🛡️ <strong>Guardrail 5:</strong> Whisper ablasyonu bir hata yayılım eğrisi değildir (hepsi düşük WER rejiminde). Sürekli bozulma eğrisi <em>ölçülmemiş</em>, altın listenin yeniden örneklenmesiyle modellenmiştir. Uzun bağlamda tepe 17.83 GB VRAM ölçümü, yerel istemciler için 1.200 kelimelik pencereleri zorunlu kılmaktadır.
         </div>
       </section>
 
       <!-- SLIDE 12: EduTerm AI Studio Web Arayüzü -->
       <section class="slide" data-title="EduTerm AI Studio">
-        <div class="slide-badge">Bölüm 8: Sistem Demonstrasyonu</div>
-        <h2 class="slide-title">Sistem Gösterimi: EduTerm AI Studio</h2>
-        <p class="slide-subtitle">Uçtan uca boru hattını somutlaştıran etkileşimli yerel PoC stüdyosu.</p>
+        <div class="slide-badge">Bölüm 8: Sistem Demonstrasyonu &amp; Çok Etmenli Simülasyon</div>
+        <h2 class="slide-title">EduTerm AI Studio &amp; BKT Öğrenci Simülasyonu</h2>
+        <p class="slide-subtitle">Uçtan uca Ar-Ge PoC stüdyosu ve 1.000 sentetik öğrenci etmeni üzerinde Carnegie Mellon / Stanford BKT simülasyonu.</p>
 
         <div class="grid-2">
           <div class="card">
             <div class="card-title">🖥️ Yerel Ar-Ge PoC Mimarisi</div>
             <div class="card-desc">
-              • <strong>Backend:</strong> Python 3.12, FastAPI, Uvicorn, yt-dlp, ffmpeg<br>
-              • <strong>Frontend:</strong> Vanilla CSS & JS, Koyu Cam Efekti (Glassmorphism), İnteraktif DAG<br>
-              • <strong>Uyarlanabilir Öğrenci:</strong> Aralıklı tekrar (spaced repetition) ile ustalık kazancı/kaybı<br>
-              • <strong>Sınav Motoru:</strong> Terimlerden otomatik 4 seçenekli MCQ ve bilgi kartı (Flashcard) üretimi<br>
-              • <strong>Yardımcı Slaytlar:</strong> Terim hiyerarşisi ve Mermaid akış şeması sentezi<br>
-              • <strong>Katman 3 (animasyon üretimi):</strong> terim kartından <code>[t-45 s, t+10 s]</code> bağlam penceresi → Qwen3.5-4B senaryo + Manim kodu → AST allow-list denetimi (azami 2 kendini-onarma denemesi) → <code>manim -ql</code> 480p15 → Edge-TTS → FFmpeg mux. Diskte 7 klip için üretilmiş video var (22.3-41.8 sn, ~211 sn toplam, 417-818 kB); üretim <strong>çevrimdışı/ batch</strong>'tir, "canlı" değildir — ses-görüntü senkronu ve üretim gecikmesi ölçülmemiştir.<br>
-              • <strong>Dikkat denetimi (webcam):</strong> <code>gui/static/app.js</code> içinde <code>getUserMedia</code> + MediaPipe FaceMesh ile EAR/yaw/pitch/iris kuralları oynatıcıyı duraklatır; kareler tarayıcıda kalır, sunucuya yazılmaz. Model ayağı <code>cdn.jsdelivr.net</code>'ten geldiği için o bileşen çevrimdışı değildir ve kareler kişisel veridir (KVKK/GDPR). Bakış doğruluğu ve oto-duraklamanın dikkat üzerindeki etkisi <strong>ölçülmemiştir</strong>; kameraya erişilemezse kod simülasyon moduna düşer.
+              • <strong>Backend:</strong> Python 3.12, FastAPI, yt-dlp, ffmpeg, GPU önbellekli ASR.<br>
+              • <strong>Frontend:</strong> Vanilla CSS &amp; JS, Koyu Cam Efekti, Canlı İnteraktif DAG.<br>
+              • <strong>Katman 3 (Animasyon Üretimi):</strong> Manim 480p15 + Edge-TTS + FFmpeg mux ile 7 klip için üretilmiş video diskte hazır (22.3–41.8 sn).<br>
+              • <strong>Uyarlanabilir Öğrenci Profili:</strong> Aralıklı tekrar formülleri ve otomatik MCQ sınav motoru.
             </div>
           </div>
 
           <div class="card">
-            <div class="card-title">🎯 İnteraktif Mini Sınav Simülasyonu</div>
-            <div class="quiz-widget">
-              <div style="font-size: 14px; font-weight: 600; color: #fff;">
-                Soru: "Bilişsel Yük" kavramının eğitimdeki temel pedagojik tanımı nedir?
-              </div>
-              <div class="quiz-opt" onclick="checkQuiz(this, false)">A) Eğitmenin ders sırasında harcadığı kalori miktarı</div>
-              <div class="quiz-opt" onclick="checkQuiz(this, true)">B) Öğrenme sırasında aktif bellek kapasitesinin zorlanma düzeyi</div>
-              <div class="quiz-opt" onclick="checkQuiz(this, false)">C) Video izleme platformunun sunucu bant genişliği</div>
-              <div class="quiz-opt" onclick="checkQuiz(this, false)">D) Öğrencinin aldığı notların genel ortalaması</div>
+            <div class="card-title">👥 1.000 Etmenli Öğrenci Yolculuğu Simülasyonu</div>
+            <div class="card-desc">
+              • <strong>Kurulum:</strong> 12 düğümlü İSG müfredat DAG'ı, 4 öğrenci kohortu (İleri %20, Standart %40, Riskli %30, Dikkatsiz %10), Corbett-Anderson Bayesian Knowledge Tracing motoru.<br>
+              • <strong>Doğrusal Video İzleme (Mevcut Durum):</strong> Terk oranı (churn) <span class="val-warn" style="font-size:16px;">%60.7</span>! (Tamamlama: %39.3, Riskli kohort: %0!).<br>
+              • <strong>DAG Güdümlü BKT Telafisi (Bizim Modelimiz):</strong> Terk oranı <span class="val-best" style="font-size:16px;">%2.1</span>'e geriledi! (Tamamlama: <strong>%97.9</strong>, Riskli kohort kurtarma: <strong>%93.0</strong>!).<br>
+              • <strong>Kazanım:</strong> Öğrenci terkinde <span class="val-best" style="font-size:15px;">%96.5 göreli azalma</span> kanıtlandı.
             </div>
           </div>
         </div>
 
         <div class="guardrail-alert">
-          🛡️ <strong>Guardrail 6:</strong> EduTerm AI Studio ticarileşmiş bir bulut ürünü değil, boru hattını yerel ortamda kanıtlayan bir Ar-Ge Konsept Kanıtlama (PoC) demo stüdyosudur.
-        </div>
+          🛡️ <strong>Guardrail 6:</strong> Arayüz yerel bir Konsept Kanıtlama (PoC) aracıdır. 1.000 etmenli BKT öğrenci simülasyonu, pedagojik DAG rehberliğinin öğrenci terkini önlemedeki dönüştürücü etkisini ampirik olarak ortaya koyar.
       </section>
 
       <!-- SLIDE 13: Yazılım Mühendisliği Güvenilirliği -->

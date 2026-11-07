@@ -1,10 +1,10 @@
 {
   "status": "DRY_RUN_PASSED",
   "model_id": "Qwen/Qwen2.5-0.5B-Instruct",
-  "train_samples": 8,
-  "val_samples": 2,
+  "train_samples": 3,
+  "val_samples": 1,
   "train_source_mix": {
-    "local": 8
+    "local": 3
   },
   "epochs": 3,
   "batch_size": 2,

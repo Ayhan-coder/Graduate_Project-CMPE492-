@@ -196,7 +196,7 @@ def get_or_load_llm(model_id: str = "Qwen/Qwen3.5-4B") -> tuple[object, object]:
         return packed
 
 
-def generate_hf(model_id: str, prompt: str, max_new_tokens: int = 1024) -> str:
+def generate_hf(model_id: str, prompt: str, max_new_tokens: int = 1024, prefill: str | None = None) -> str:
     from evren_llm import is_evren_model, generate_evren
 
     if is_evren_model(model_id):
@@ -211,6 +211,11 @@ def generate_hf(model_id: str, prompt: str, max_new_tokens: int = 1024) -> str:
         "add_generation_prompt": True,
         "enable_thinking": False,
     }
+    if prefill:
+        # Small judges echo long rubric prompts back; seeding the assistant turn with
+        # the answer prefix forces them to continue instead of repeating the question.
+        messages.append({"role": "assistant", "content": prefill})
+        tmpl_kwargs["add_generation_prompt"] = False
     try:
         inputs = tok.apply_chat_template(messages, **tmpl_kwargs)
     except TypeError:

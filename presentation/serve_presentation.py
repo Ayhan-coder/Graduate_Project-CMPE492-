@@ -34,6 +34,11 @@ def find_free_port(start_port: int = 8080, max_attempts: int = 50) -> int:
 
 
 def main():
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    if hasattr(sys.stderr, "reconfigure"):
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
     port = find_free_port(8080)
     handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=str(PRESENTATION_DIR))
 

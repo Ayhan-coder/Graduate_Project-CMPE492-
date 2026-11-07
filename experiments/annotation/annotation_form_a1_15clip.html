@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EduTerm etiketleme — a1</title>
+<style>
+  :root {
+    --bg: #f4f6f9; --card: #ffffff; --ink: #0f172a; --muted: #64748b;
+    --line: #d8dee9; --accent: #0e7490; --ok: #15803d; --no: #b91c1c;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 16px/1.55 "Segoe UI", system-ui, sans-serif; }
+  header { position: sticky; top: 0; z-index: 5; background: #0f172a; color: #e2e8f0;
+           padding: 10px 20px; display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+  header b { color: #67e8f9; font-weight: 600; }
+  .bar { flex: 1 1 240px; height: 8px; background: #1e293b; border-radius: 99px; overflow: hidden; min-width: 160px; }
+  .bar > i { display: block; height: 100%; width: 0; background: #22d3ee; transition: width .15s; }
+  main { max-width: 980px; margin: 26px auto 120px; padding: 0 20px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 26px 28px; }
+  .meta { color: var(--muted); font-size: 14px; letter-spacing: .02em; }
+  .term { font-size: 32px; font-weight: 650; margin: 10px 0 18px; line-height: 1.2; }
+  .label { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 4px; }
+  .expl { font-size: 19px; margin-bottom: 20px; }
+  .ctx { border-left: 0 solid; background: #f1f5f9; border-radius: 8px; padding: 14px 16px; font-size: 15px; color: #334155; }
+  .ctx mark { background: #fef3c7; padding: 0 2px; }
+  .mode { margin-top: 26px; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+  .pill { padding: 6px 14px; border-radius: 999px; font-weight: 600; font-size: 14px; }
+  .pill.r { background: #e0f2fe; color: #075985; }
+  .pill.d { background: #ede9fe; color: #5b21b6; }
+  .pill.idle { background: #e2e8f0; color: #475569; }
+  .keys { color: var(--muted); font-size: 14px; }
+  kbd { background: #0f172a; color: #e2e8f0; border-radius: 5px; padding: 2px 7px; font: 600 13px/1.4 ui-monospace, monospace; }
+  .options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+  button.opt { border: 1px solid var(--line); background: #fff; border-radius: 10px; padding: 14px;
+               font-size: 15px; cursor: pointer; text-align: left; color: var(--ink); }
+  button.opt:hover { border-color: var(--accent); }
+  button.opt b { display: block; font-size: 17px; margin-bottom: 2px; }
+  button.opt.yes b { color: var(--ok); }
+  button.opt.no b { color: var(--no); }
+  textarea { width: 100%; margin-top: 14px; border: 1px solid var(--line); border-radius: 8px;
+             padding: 10px; font: 15px/1.5 "Segoe UI", sans-serif; resize: vertical; min-height: 54px; }
+  .row { display: flex; justify-content: space-between; gap: 16px; margin-top: 18px; flex-wrap: wrap; }
+  .row button { border: 1px solid var(--line); background: #fff; border-radius: 8px; padding: 9px 16px;
+                font-size: 14px; cursor: pointer; }
+  .row button.primary { background: #0f172a; color: #fff; border-color: #0f172a; }
+  .legend { color: var(--muted); font-size: 13px; margin-top: 20px; line-height: 1.7; }
+  .done { text-align: center; padding: 40px 0; }
+  .done h2 { margin: 0 0 8px; }
+  .toast { position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%);
+           background: #0f172a; color: #e2e8f0; padding: 10px 18px; border-radius: 10px;
+           font-size: 14px; opacity: 0; transition: opacity .2s; pointer-events: none; }
+  .toast.on { opacity: 1; }
+</style>
+</head>
+<body>
+<header>
+  <span><b>EduTerm</b> · etiketleyici: a1</span>
+  <div class="bar"><i id="fill"></i></div>
+  <span id="count" class="keys">0/0</span>
+  <button class="rowbtn" id="export" style="border:0;background:#22d3ee;color:#083344;border-radius:8px;padding:7px 14px;font-weight:600;cursor:pointer">CSV indir</button>
+</header>
+<main>
+  <div class="card" id="card"></div>
+  <div class="legend">
+    <b>R1</b> terim transkript bağlamıyla tutarlı &nbsp;·&nbsp; <b>R0</b> değil (yanlış dil, derste yok, alan terimi değil)<br>
+    <b>D1</b> açıklama TDK/OED tanımına göre doğru &nbsp;·&nbsp; <b>D0</b> değil (hatalı, döngüsel, jargon)<br>
+    Emin değilsen 0 işaretle ve not bırak. <kbd>1</kbd>/<kbd>0</kbd> seç, <kbd>Backspace</kbd> geri, <kbd>s</kbd> atla, <kbd>n</kbd> not.
+  </div>
+</main>
+<div class="toast" id="toast"></div>
+<script>
+const ITEMS = [{"item_id": "TR-17-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-001", "video_id": "TR-17", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "KVKK", "explanation": "Kişisel verilerin korunması kanunu, bireylerin verileri nasıl işlenebileceğini belirleyen yasal çerçevedir.", "context": "Bu eğitimde KVKK ile 6698 sayılı kanunu kastediyoruz."}, {"item_id": "TR-17-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-002", "video_id": "TR-17", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "Kişisel veri", "explanation": "Bireylerle doğrudan veya dolaylı ilişki kurabilecek her türlü bilgiyi kapsayan geniş kavramdır.", "context": "Kişisel verilerin korunması, bireylerin temel haklarının korunmasıyla doğrudan bağlantılıdır."}, {"item_id": "TR-17-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-003", "video_id": "TR-17", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "özel nitelikli veri", "explanation": "Sağlık, biyometrik veya inanç gibi hassas kişisel bilgileri ifade eder.", "context": "Bu nedenle sıradan bir iletişim listesinde uygulanan süreçler özel nitelikli veriler için yeterli olmayabilir."}, {"item_id": "TR-17-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-004", "video_id": "TR-17", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "biyometrik veri", "explanation": "Kimliği belirlemek için kullanılan fiziksel veya fizyolojik özelliklerdir.", "context": "Fotoğraf veya ses kaydının biyometrik veri sayılması da teknik işleme ve kimlik belirleme amacıyla ilişkilidir."}, {"item_id": "TR-17-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-005", "video_id": "TR-17", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "veri işleme", "explanation": "Veriyi toplamak, saklamak, aktarmak veya başka bir sisteme taşımaktır.", "context": "Veri işleme, yalnızca yeni bilgi toplamak anlamına gelmez."}, {"item_id": "TR-17-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-006", "video_id": "TR-17", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "veri sorumlusu", "explanation": "Kurumsal süreçlerde veri işleme kararını veren ve sorumlu olan kişidir.", "context": "Üniversitenin kendi kurumsal süreçlerinde veri sorumlusu genellikle üniversite tüzel kişiliğidir."}, {"item_id": "TR-17-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-007", "video_id": "TR-17", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "Veri Minimizasyonu", "explanation": "İşlemler için sadece gerekli olan verileri toplamak ve gereksiz veri toplamaktan kaçınmak.", "context": "Veri Minimizasyonu, işi yürütmek için gereken bilgileri toplamak demektir."}, {"item_id": "TR-17-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-008", "video_id": "TR-17", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "Açık rıza", "explanation": "Kişinin işlemin yapılmasına kendiliğinden ve bilerek onay vermesi.", "context": "Açık rıza bu şartlardan biridir. Fakat tek seçenek değildir."}, {"item_id": "TR-17-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-009", "video_id": "TR-17", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "Kişisel veri işlemede", "explanation": "Kişisel verilerin toplanması, kullanılması ve saklanması sürecini ifade eder.", "context": "Kişisel veri işlemede beş genel ilke bütün sürecin temelini oluşturur."}, {"item_id": "TR-18-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-001", "video_id": "TR-18", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "KVKK", "explanation": "Kişisel Verilerin Korunması Kanonu ile kişisel verilerin güvenliğini sağlamak için yasal çerçeve.", "context": "Merhaba değerli katılımcılar. KVKK Personel Farkındalık Eğitimine hoş geldiniz."}, {"item_id": "TR-18-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-002", "video_id": "TR-18", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "özel nitelikli kişisel veri", "explanation": "Sağlık, biyometrik veya dini inanç gibi hassas veriler; özel koruma gerektirir.", "context": "Sağlık raporları, biyometrik kayıtlar, sendika üyeliği, ceza bilgisi, dini inanç ve benzeri bilgiler özel nitelikli kişisel veridir."}, {"item_id": "TR-18-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-003", "video_id": "TR-18", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "rıza", "explanation": "Kişinin verilerin kullanılmasına verdiği onay veya izindir.", "context": "Açık rıza önemli bir kavramdır. Fakat her işlem için sınırsız izin anlamına gelmez."}, {"item_id": "TR-18-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-004", "video_id": "TR-18", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "veri ihlali", "explanation": "Kişisel verilerin yetkisiz kişiler tarafından görülmesi, çalınması veya yanlış kişiye gitmesi durumudur.", "context": "Yanlış kişiye gönderilen bir liste, fotoğraf, rapor veya belge veri ihlali oluşturabilir."}, {"item_id": "TR-19-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-001", "video_id": "TR-19", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "güvenlik bilinci", "explanation": "İnsanların riskleri fark edip güvenli davranışları benimsemesiyle oluşan içsel motivasyon ve farkındalık durumudur.", "context": "Burada önemli konu güvenlik bilinci, güvenlik kültürü."}, {"item_id": "TR-19-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-002", "video_id": "TR-19", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "tehlikeli durum", "explanation": "İşyerinde kazaya yol açabilecek dış koşullar veya ortamlar, örneğin trafik gibi hareketli alanlardır.", "context": "Örneğin trafik çoğumuz kullanıyoruz. Bu da bir tehlikeli durumdur aslına bakarsanız trafik durumunda."}, {"item_id": "TR-19-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-003", "video_id": "TR-19", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "güvenlik tertibatı", "explanation": "İşyerinde çalışanların güvenliğini sağlamak amacıyla uygulanan resmi veya yasal düzenlemeler ve kurallar bütünüdür.", "context": "Bir güvenlik tertibatı."}, {"item_id": "TR-19-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-004", "video_id": "TR-19", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "madencilik", "explanation": "Madencilik; yer altı veya yer üstü kayaçlardan maden madenlerini çıkarıp işleme hazırlama faaliyetleri.", "context": "madencilik sektörü birinci sırada, 2018 yılı verileri inşaat sektörü ikinci sırada"}, {"item_id": "TR-19-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-005", "video_id": "TR-19", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "inşaat", "explanation": "İnşaat; binalar, köprüler, otoparklar gibi yapıların planlama, inşaat ve bakım onarım işlemleridir.", "context": "2018 yılı verileri inşaat sektörü ikinci sırada, ondan sonra ulaştırma, tarım, gıda"}, {"item_id": "TR-19-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-006", "video_id": "TR-19", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "ulaştırma", "explanation": "Ulaştırma; yol, demiryolu, havayolu ve su yolu gibi araçlarla yük ve yolcu taşıma işlemleridir.", "context": "inşaat sektörü ikinci sırada, ondan sonra ulaştırma, tarım, gıda yani elektrik"}, {"item_id": "TR-19-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-007", "video_id": "TR-19", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "ölümlü iş kazası", "explanation": "İşyerinde çalışanların ölümüne neden olan kazalar.", "context": "2013 ve 2018 yılları arasında 5 yıllık planda baktığımızda ölümlü iş kazası oranımız %21.2 düşmüş."}, {"item_id": "TR-19-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-008", "video_id": "TR-19", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "İş kazası", "explanation": "İstenmeyen, planlanmamış yaralanmalar, ölümler veya maddi hasarlar yaratan olaylardır.", "context": "İş kazasının tanımı önceden planlanmamış yaralanmaları, ölümlere ya da maddi hasara sebebiyet veren istenmeyen olaylara iş kazası denir."}, {"item_id": "TR-19-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-009", "video_id": "TR-19", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "dikkat", "explanation": "İnsanların çevresini algılayıp tehlikeleri fark etme yeteneği.", "context": "İlk bir saat ve son bir saat özellikle dikkatimizi toplayamadığımız ve dağıldığı dönemlerde kazaya maruz kalmışız."}, {"item_id": "TR-19-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-010", "video_id": "TR-19", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "dikkatsizlik", "explanation": "Dikkatin eksikliği veya dağılmışlığı sonucu oluşan tehlikeli davranış.", "context": "Burada tehlikeli hareketlerle de gördüğümüzde dikkatsizlik olarak karşımıza çıkacak iş kazalarının sebepleri."}, {"item_id": "TR-19-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-011", "video_id": "TR-19", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "İş Kazaları", "explanation": "İşyerinde çalışanların hayatını, sağlığını veya mal varlığını tehdit eden ani ve beklenmedik olaylardır.", "context": "Ama iş kazalarının da tabii ki %98'lik kısmı da önlenebiliyor."}, {"item_id": "TR-19-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-012", "video_id": "TR-19", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "kişisel koruyucu", "explanation": "İşyerinde çalışanların yaralanmasını önlemek için giyilen veya kullanılan koruyucu ekipman.", "context": "Ve tabii ki kişisel koruyucu hasarlı ekipman."}, {"item_id": "TR-19-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-013", "video_id": "TR-19", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "periyodik kontroller", "explanation": "Belirli aralıklarla yapılan, ekipmanların veya sistemlerin düzenli olarak kontrol edilip güncellenmesini sağlayan prosedürlerdir.", "context": "Bu biraz daha sistemli bir çalışma gereken basınçlı gaz tutularının yıllık periyodik kontrollerinin yapılması gerekiyor."}, {"item_id": "TR-19-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-014", "video_id": "TR-19", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "yüksekte çalışmalarda", "explanation": "İnsanların yüksek yerlerde (merdiven, platform vb.) çalıştıkları ve özel güvenlik önlemlerinin alınması gereken durumları ifade eder.", "context": "Yüksekte çalışmalarda merdivenli çalışmalarda yüksekte çalışma içerisinde geliyor."}, {"item_id": "TR-19-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-015", "video_id": "TR-19", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "merdivenli çalışmalarda", "explanation": "Merdiven üzerinde veya merdiven kullanılarak yapılan yükseklikli işlemlerdir; bu tür çalışmalarda en az iki kişinin bulunması zorunludur.", "context": "Yüksekte çalışmalarda merdivenli çalışmalarda yüksekte çalışma içerisinde geliyor."}, {"item_id": "TR-19-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-016", "video_id": "TR-19", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "denge basamağı", "explanation": "Merdivenin en son basamağı olarak kabul edilen, merdivenin en üstünde durulması gereken güvenli konumdur.", "context": "Genel kabul gören kural olarak bizim merdivenlerin son uç basamağı denge basamağıdır."}, {"item_id": "TR-19-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-017", "video_id": "TR-19", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "porozyon", "explanation": "Malzelerin zamanla eriyip küçülmesi veya parçalanmasıdır.", "context": "Örneğin rafların kesinlikle periyodik kontrolünün yapılarak muhtemelen burada porozyon, erozyon yani bir tahribat meydana gelmiş ve bu çarptığından dolayı bu birazdan raf kişinin üzerine düşecek."}, {"item_id": "TR-19-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-018", "video_id": "TR-19", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "erozyon", "explanation": "Malzelerin zamanla aşınması veya parçalanmasıdır.", "context": "Örneğin rafların kesinlikle periyodik kontrolünün yapılarak muhtemelen burada porozyon, erozyon yani bir tahribat meydana gelmiş ve bu çarptığından dolayı bu birazdan raf kişinin üzerine düşecek."}, {"item_id": "TR-19-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-019", "video_id": "TR-19", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "darbe koruyucusu", "explanation": "Mekanik çarpışmalardan kaynaklanan darbeleri engellemek için kullanılan güvenlik cihazıdır.", "context": "İkincisi bu raf sisteminin darbe koruyucusunun forklift çarpmalarına karşı darbe koruyucusu sistemin olması lazım."}, {"item_id": "TR-19-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-020", "video_id": "TR-19", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "kasa sistemi", "explanation": "Ürünleri güvenli bir şekilde saklamak ve taşımak için kullanılan sabit veya hareketli depolama ünitesidir.", "context": "Ve o rafların oraya kasa sisteminin gerektiğisi sabitlenilmesi, vurma durumunda dahi bu şekilde dağılmaması gerekiyor."}, {"item_id": "TR-19-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-021", "video_id": "TR-19", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "ihmal zinciri", "explanation": "Güvenlik kurallarının ihmal edilmesi sonucu oluşan, bir hata diğer hatalara yol açan zincirsel olaylar.", "context": "Baktığımız zaman bunlar ihmal zincirinden ve sonucu ağır oluyor tabii ki."}, {"item_id": "TR-19-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-022", "video_id": "TR-19", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "iş sağlığı güvenliği", "explanation": "İş yerlerinde çalışanların sağlığını ve güvenliğini koruma altına alan profesyonel faaliyetler.", "context": "Buraya iş sağlığı güvenliği profesyonellerini de bir taraf olarak yani iş güvenliği uzmanları, iş yeri, hekimleri, diğer sağlık personeli dediğimiz hepçilerimizi ekleyebiliriz."}, {"item_id": "TR-19-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-023", "video_id": "TR-19", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "kıdem tazminatı", "explanation": "Çalışanın işten ayrılma bedeli olarak ödenen, işyeri güvenliği ihlali nedeniyle mahrum edilebilecek bir tazminat türüdür.", "context": "Yani kıdem tazminatından, ihbar tazminatından mahrum bir şekilde kişi işten çıkarılabilir."}, {"item_id": "TR-19-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-024", "video_id": "TR-19", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "ihbar tazminatı", "explanation": "İşçinin işten ayrılma bedeli olarak ödenen, işyeri güvenliği ihlali nedeniyle mahrum edilebilecek bir tazminat türüdür.", "context": "Yani kıdem tazminatından, ihbar tazminatından mahrum bir şekilde kişi işten çıkarılabilir."}, {"item_id": "TR-20-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-001", "video_id": "TR-20", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "meslek hastalıkları", "explanation": "Uzun süreli tehlikeli ortamda çalışarak gelişen, işe özgü sağlık bozukluklarıdır.", "context": "meslek hastalıkları ve ilk yardım konusunda bilinçlenmek"}, {"item_id": "TR-20-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-002", "video_id": "TR-20", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "İş güvenliği", "explanation": "İş yerinde çalışanların sağlığını ve güvenliğini korumak için yapılan sistemli bilimsel çalışmalardır.", "context": "İş güvenliği kavramında beş temel kavram vardır."}, {"item_id": "TR-20-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-003", "video_id": "TR-20", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "İş sağlığı ve güvenliği", "explanation": "Çalışanların sağlığı ve güvenliği ile ilgili yasal düzenlemeler ve kurumsal yapıdır.", "context": "İş sağlığı ve güvenliği alanında görev yapmak üzere bakanlıkça yetkilendirilmiş"}, {"item_id": "TR-20-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-004", "video_id": "TR-20", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "İş güvenliği uzmanı", "explanation": "İş sağlığı ve güvenliği alanında görev yapan, yetkilendirilmiş mühendisler veya teknik elemanlardır.", "context": "İş güvenliği uzmanı kavramına gelirsek, iş sağlığı ve güvenliği alanında görev yapmak üzere"}, {"item_id": "TR-20-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-005", "video_id": "TR-20", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "İş kanunu", "explanation": "Çalışan hakları ve iş ilişkilerini düzenleyen temel yasal metindir.", "context": "Bu birlikte çalıştığı yasalar ise anayasa, iş kanunu, iş sağlığı ve güvenliği kanunu"}, {"item_id": "TR-20-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-006", "video_id": "TR-20", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "Risk değerlendirmesi", "explanation": "Tehlikelerin büyüklüğünü ve olasılığını ölçerek öncelikli önlemleri belirleme sürecidir.", "context": "Risk değerlendirmesi yapar ya da yaptırır."}, {"item_id": "TR-20-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-007", "video_id": "TR-20", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "iş kazası", "explanation": "İş yerinde veya iş yaparken meydana gelen, yaralanma, ölüm veya üretim durmasına neden olan beklenmedik olaydır.", "context": "Peki iş kazası nedir?"}, {"item_id": "TR-20-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-008", "video_id": "TR-20", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "Meslek hastalığı", "explanation": "İşin niteliği veya şartları nedeniyle tekrarlayan maruz kalma sonucu oluşan sağlık bozukluklarıdır.", "context": "Meslek hastalığı ise sigortalının çalıştığı veya yaptığı işin niteliğinden dolayı tekrarlanan bir sebeple veya işin yürütüm şartları yüzünden uğradığı geçici veya sürekli hastalık, bedensel veya ruhsal özürlülük halleridir."}, {"item_id": "TR-20-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-009", "video_id": "TR-20", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "Sıfır kaza", "explanation": "İş kazalarının hiçbiri gerçekleşmemesi ve tüm önlemlerin alınması hedefidir.", "context": "Sıfır kaza nedir? İnsanların kazaya uğramadan işe bitirmesi veya genellikle tüm önlemlerin alınarak iş kazalarının hiçbirisinin olmaması anlamına gelir."}, {"item_id": "TR-20-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-010", "video_id": "TR-20", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "Ucuz atlatmalar", "explanation": "Yaralanmaya veya hasara yol açmayan ancak gelecekte sorun yaratabilecek olaylardır.", "context": "Ucuz atlatmalar yani ramak kalı olaylar ise yaralanmaya, hastalanmaya veya hasara yol açmayan ama yol açabilecek olaylardır."}, {"item_id": "TR-20-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-011", "video_id": "TR-20", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "kaza zinciri", "explanation": "Kazaların nedenlerini domino taşları gibi birbirini etkileyen faktörler dizisi olarak gösteren güvenlik modelidir.", "context": "Bu modele göre kaza zinciri faktörleri şu şekilde sıralanabilir."}, {"item_id": "TR-20-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-012", "video_id": "TR-20", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "tehlikeli durum", "explanation": "İş ortamında bulunan fiziksel koşullar veya ortamdaki riskli faktörlerdir.", "context": "İş ortamından kaynaklanan biz tehlikeli şart ya da tehlikeli durum diyoruz."}, {"item_id": "TR-20-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-013", "video_id": "TR-20", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "tehlikeli davranış", "explanation": "Çalışanın iş yerinde gösterdiği riskli eylemler veya hatalı iş yöntemleridir.", "context": "Çalışandan kaynaklanan ise tehlikeli davranış diyoruz."}, {"item_id": "TR-20-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-014", "video_id": "TR-20", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "decibel", "explanation": "Ses şiddetini ölçen birimdir; gürültü seviyesini belirler.", "context": "Bir çalışanın 8 saatte maruz kalabileceği maksimum gürültü değeri 85 decibeli geçmemelidir."}, {"item_id": "TR-20-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-015", "video_id": "TR-20", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "ergonomik", "explanation": "İnsan anatomisi ve fizyolojisiyle uyumlu çalışma koşullarını sağlayan.", "context": "Bunlar fiziksel risk etmenleri, kimyasal risk etmenleri, biyolojik risk etmenleri, psikososyal risk etmenleri, ergonomik risk etmenleri olarak beşe ayrılır."}, {"item_id": "TR-20-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-016", "video_id": "TR-20", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "Termal konfor", "explanation": "Çalışma ortamındaki ısı, nem ve hava akımı koşullarında vücut ve zihin rahatlığı.", "context": "Termal konfor, çalışma ortamında çalışanların ısı, nem, hava akımı açısından bedensel ve zihinsel rahatlık içinde olmasıdır."}, {"item_id": "TR-20-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-017", "video_id": "TR-20", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "Titreşim", "explanation": "Belirli aralıklarla tekrarlayan mekanik enerji; el ve omuzda rahatsızlığa yol açabilir.", "context": "Titreşim ise belirli aralıklarla tekrarlayan mekanik bir enerjidir."}, {"item_id": "TR-20-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-018", "video_id": "TR-20", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "Ergonomi", "explanation": "Yükleri doğru şekilde taşıma ve bel bükülmemesi için çalışma posturuna dikkat etme bilimi.", "context": "Ergonomiye bakacak olursak, kaldırılan yükü yakın durulmalı ve bel bükülmemelidir."}, {"item_id": "TR-20-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-019", "video_id": "TR-20", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "Kimyasal risk etmenleri", "explanation": "Doğal veya üretilen kimyasal maddelerden kaynaklanan sağlık tehlikeleri.", "context": "Kimyasal risk etmenlerine bakacak olursak, kimyasal madde doğal halde bulunan ya da üretilen veya herhangi bir işlem sırasında ortaya çıkan element leşik ya da karışım olarak tanımlanır."}, {"item_id": "TR-20-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-020", "video_id": "TR-20", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "genel aspirasyon", "explanation": "İş yerindeki genel havayı filtreleyerek toz ve dumanı emen merkezi bir havalandırma sistemidir.", "context": "Ortamda alınacak önlemler ise iş yeri tertip düzeni ve genel aspirasyondur."}, {"item_id": "TR-20-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-021", "video_id": "TR-20", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "tr", "term": "kişisel koruyucu donanım", "explanation": "İş güvenliği risklerine karşı çalışanların üzerine giyilen veya kullanılabilecek fiziksel koruma ekipmanlarıdır.", "context": "Kişiye yönelik önlemlerde tabii ki eğitim ve kişisel koruyucu donanım gelir."}, {"item_id": "EN-17-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-001", "video_id": "EN-17", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "GDPR", "explanation": "A regulation setting rules for how personal data must be handled and processed.", "context": "So what are GDPR's seven principles and how do they drive your compliance?"}, {"item_id": "EN-17-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-002", "video_id": "EN-17", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "global turnover", "explanation": "The total amount of money a company makes from selling its products or services worldwide.", "context": "4% of your global turnover or 20 million euros or 17.5 million pounds, depending on your GDPR, whichever is higher."}, {"item_id": "EN-17-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-003", "video_id": "EN-17", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "privacy framework", "explanation": "A system or plan designed to help an organization manage and protect personal data.", "context": "So stick with us and also for the bonus tip on creating your privacy framework."}, {"item_id": "EN-17-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-004", "video_id": "EN-17", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "article 5", "explanation": "A specific section within the GDPR law that lists the seven principles for data processing.", "context": "If you're new new here please do click subscribe and notify to hear about all of our fantastic new videos as always links are in the notes below and we'll just use gdpr for both eu and uk gdprs because they're identical on this point at least for the moment that's for another video right grab a cup of coffee and let's crack on okay so here are gpr's seven principles they're set out in article 5 of GDPR."}, {"item_id": "EN-17-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-005", "video_id": "EN-17", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "lawfulness", "explanation": "The requirement to have a valid legal basis before processing personal data.", "context": "Now, unsurprisingly, this is the lawfulness, fairness fairness and transparency principle but the focus has mostly been on lawful and transparent"}, {"item_id": "EN-18-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-001", "video_id": "EN-18", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "GDPR", "explanation": "General Data Protection Regulation, a European privacy law requiring organizations to protect and process data securely.", "context": "GDPR Awareness Education Are you aware of GDPR? It's a new type of legislation due to come into effect from May 2018 and will place a greater onus on your organisation to protect and process data in a more secure way."}, {"item_id": "EN-18-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-002", "video_id": "EN-18", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "data protection", "explanation": "The practice of safeguarding personal information and ensuring it is handled securely according to legal standards.", "context": "It is essentially data protection after all. So that's why we've built engaging and interactive e-learning training to deliver the key messages about GDPR straight to your employees in a way that they'll find not only relevant to their roles but also memorable and entertaining."}, {"item_id": "EN-18-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-003", "video_id": "EN-18", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "e-learning", "explanation": "Digital learning delivered through electronic means, such as online courses or interactive software.", "context": "So that's why we've built engaging and interactive e-learning training to deliver the key messages about GDPR straight to your employees in a way that they'll find not only relevant to their roles but also memorable and entertaining."}, {"item_id": "EN-19-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-001", "video_id": "EN-19", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "principal contractor", "explanation": "The main person or company responsible for managing the construction project and ensuring safety.", "context": "As the principal contractor or employer, it's your responsibility to ensure the prevention of work accidents and occupational diseases on the job site."}, {"item_id": "EN-19-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-002", "video_id": "EN-19", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "occupational diseases", "explanation": "Illnesses that workers get because of the conditions or tasks in their job.", "context": "As the principal contractor or employer, it's your responsibility to ensure the prevention of work accidents and occupational diseases on the job site."}, {"item_id": "EN-19-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-003", "video_id": "EN-19", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "prevention program", "explanation": "A plan designed to stop accidents and health issues from happening in the workplace.", "context": "Managing occupational health and safety means implementing a prevention program, an action plan adapted to your reality."}, {"item_id": "EN-19-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-004", "video_id": "EN-19", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "continuous improvement", "explanation": "The ongoing effort to make things better by constantly finding and fixing problems.", "context": "A prevention program is a great starting point, but managing occupational health and safety is a never-ending process of continuous improvement."}, {"item_id": "EN-20-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-001", "video_id": "EN-20", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "Personal protective equipment", "explanation": "Protective gear worn by workers to shield them from specific hazards or injuries.", "context": "The content of this training program are safety attitudes, slips, trips and falls, musculoskeletal disorders, back safety and safe lifting techniques, fire safety, electrical safety, hazardous chemicals, Personal protective equipment, also referred to as PPE."}, {"item_id": "EN-20-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-002", "video_id": "EN-20", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "PPE", "explanation": "An acronym for Personal Protective Equipment, representing gear used to prevent workplace injuries.", "context": "The content of this training program are safety attitudes, slips, trips and falls, musculoskeletal disorders, back safety and safe lifting techniques, fire safety, electrical safety, hazardous chemicals, Personal protective equipment, also referred to as PPE."}, {"item_id": "EN-20-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-003", "video_id": "EN-20", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "Bloodborne pathogens", "explanation": "Disease-causing microorganisms found in human blood that can be transmitted through contact.", "context": "Bloodborne pathogens."}, {"item_id": "EN-20-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-004", "video_id": "EN-20", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "Needle sticks", "explanation": "Accidental punctures caused by sharp medical needles, posing a risk of infection.", "context": "Needle sticks."}, {"item_id": "EN-20-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-005", "video_id": "EN-20", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "musculoskeletal injuries", "explanation": "Injuries to muscles, bones, or joints caused by physical strain or overexertion.", "context": "Rates of musculoskeletal injuries from overexertion in health care occupations are among the highest of all U.S. industries."}, {"item_id": "EN-20-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-006", "video_id": "EN-20", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "manual lifting", "explanation": "The physical act of moving a person or object by hand without mechanical assistance.", "context": "The single greatest risk factor for overexertion injuries in healthcare workers is the manual lifting, moving, and repositioning of patients."}, {"item_id": "EN-20-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-007", "video_id": "EN-20", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "slide boards", "explanation": "Flat devices used to help move patients smoothly across a surface.", "context": "When lifting or moving a patient, utilize devices such as slide boards, slip sheets, slings, rollers, belts, and mechanical or electric hoist whenever possible."}];
+const ANN = "a1";
+const KEY = "eduterm-anno-" + ANN;
+const state = JSON.parse(localStorage.getItem(KEY) || '{"labels":{},"index":0}');
+const labels = state.labels || {};
+let index = Math.min(state.index || 0, ITEMS.length);
+
+const card = document.getElementById('card');
+const fill = document.getElementById('fill');
+const countEl = document.getElementById('count');
+const toastEl = document.getElementById('toast');
+
+let mode = 'R';
+let draft = null;
+
+function save() { localStorage.setItem(KEY, JSON.stringify({labels, index})); }
+
+function toast(msg) {
+  toastEl.textContent = msg; toastEl.classList.add('on');
+  clearTimeout(toast.t); toast.t = setTimeout(() => toastEl.classList.remove('on'), 1200);
+}
+
+function esc(s) { return String(s || '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+function markTerm(ctx, term) {
+  const safe = esc(ctx);
+  if (!term) return safe;
+  const t = esc(term).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return safe.replace(new RegExp('(' + t + ')', 'ig'), '<mark>$1</mark>');
+}
+
+function labeledCount() { return ITEMS.filter(it => labels[it.item_id] && labels[it.item_id].R !== undefined && labels[it.item_id].D !== undefined).length; }
+
+function render() {
+  const done = labeledCount();
+  fill.style.width = (ITEMS.length ? (100 * done / ITEMS.length) : 0) + '%';
+  countEl.textContent = done + '/' + ITEMS.length;
+
+  if (index >= ITEMS.length) {
+    card.innerHTML = '<div class="done"><h2>Bitti.</h2><p class="meta">' + done + ' madde etiketlendi. Sağ üstteki <b>CSV indir</b> ile dosyayı dışa aktar.</p></div>';
+    return;
+  }
+  const it = ITEMS[index];
+  const cur = labels[it.item_id];
+  if (!cur || (cur.R === undefined) || (cur.D === undefined)) {
+    mode = (!cur || cur.R === undefined) ? 'R' : 'D';
+  } else {
+    mode = 'R';
+  }
+  const shown = cur ? Object.assign({}, cur) : {};
+  if (draft && draft.item_id === it.item_id) { shown.R = draft.R; shown.D = draft.D; shown.comment = draft.comment; }
+
+  const modeHtml = mode === 'R'
+    ? '<span class="pill r">şimdi: R — bağlam uyumu</span><span class="keys"><kbd>1</kbd> tutarlı · <kbd>0</kbd> değil</span>'
+    : '<span class="pill d">şimdi: D — tanım doğruluğu</span><span class="keys"><kbd>1</kbd> doğru · <kbd>0</kbd> değil</span>';
+
+  card.innerHTML =
+    '<div class="meta">' + esc(it.video_id) + ' · ' + esc(it.lang) + ' · ' + (index + 1) + '. madde' +
+      (cur && cur.R !== undefined ? ' · R=' + cur.R : '') +
+      (cur && cur.D !== undefined ? ' · D=' + cur.D : '') + '</div>' +
+    '<div class="term">' + esc(it.term) + '</div>' +
+    '<div class="label">Açıklama</div>' +
+    '<div class="expl">' + esc(it.explanation) + '</div>' +
+    (it.context ? '<div class="label">Transkript bağlamı</div><div class="ctx">' + markTerm(it.context, it.term) + '</div>' : '') +
+    '<div class="mode">' + modeHtml + '</div>' +
+    '<div class="options">' +
+      '<button class="opt yes" data-v="1"><b>1 — evet</b>' + (mode === 'R' ? 'Terim bağlama uygun' : 'Tanım doğru') + '</button>' +
+      '<button class="opt no" data-v="0"><b>0 — hayır</b>' + (mode === 'R' ? 'Bağlama uygun değil' : 'Tanım hatalı') + '</button>' +
+    '</div>' +
+    '<textarea id="comment" placeholder="Not (isteğe bağlı, n ile odaklan)">' + esc(shown.comment || '') + '</textarea>' +
+    '<div class="row">' +
+      '<button id="prev">← önceki (Backspace)</button>' +
+      '<button id="skip">atla (s) →</button>' +
+      '<button id="exp2">CSV indir</button>' +
+    '</div>';
+
+  card.querySelectorAll('button.opt').forEach(b => b.addEventListener('click', () => choose(b.dataset.v, b)));
+  document.getElementById('prev').addEventListener('click', prev);
+  document.getElementById('skip').addEventListener('click', skip);
+  document.getElementById('exp2').addEventListener('click', exportCsv);
+}
+
+function choose(v, btn) {
+  if (index >= ITEMS.length) return;
+  const it = ITEMS[index];
+  const cur = labels[it.item_id] || {};
+  const val = Number(v);
+  const comment = (document.getElementById('comment') || {}).value || cur.comment || '';
+  if (mode === 'R') {
+    labels[it.item_id] = {R: val, D: cur.D, comment};
+    draft = {item_id: it.item_id, R: val, D: cur.D, comment};
+    mode = 'D';
+    save();
+    render();
+    toast('R=' + val + ' · şimdi D');
+  } else {
+    labels[it.item_id] = {R: cur.R, D: val, comment};
+    draft = null;
+    index += 1;
+    save();
+    render();
+    toast('kaydedildi');
+  }
+}
+
+function prev() {
+  if (index > 0) { index -= 1; draft = null; save(); render(); }
+}
+
+function skip() { if (index < ITEMS.length) { index += 1; draft = null; save(); render(); } }
+
+function exportCsv() {
+  const head = ['item_id','video_id','model','lang','term','explanation','R','D','comment'];
+  const rows = [head.join(',')];
+  for (const it of ITEMS) {
+    const l = labels[it.item_id];
+    if (!l || l.R === undefined || l.D === undefined) continue;
+    const cell = x => '"' + String(x === undefined || x === null ? '' : x).replace(/"/g, '""') + '"';
+    rows.push([it.item_id, it.video_id, it.model, it.lang, it.term, it.explanation, l.R, l.D, l.comment || ''].map(cell).join(','));
+  }
+  const blob = new Blob(['\ufeff' + rows.join('\r\n')], {type: 'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'labels_' + ANN + '_new.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+  toast(rows.length - 1 + ' satır indirildi');
+}
+
+document.getElementById('export').addEventListener('click', exportCsv);
+
+document.addEventListener('keydown', e => {
+  const tag = (e.target.tagName || '').toLowerCase();
+  if (tag === 'textarea') {
+    if (e.key === 'Escape') { e.target.blur(); }
+    return;
+  }
+  if (e.key === '1' || e.key === '0') { e.preventDefault(); choose(e.key, null); }
+  else if (e.key === 'Backspace') { e.preventDefault(); prev(); }
+  else if (e.key === 's' || e.key === 'S') { e.preventDefault(); skip(); }
+  else if (e.key === 'n' || e.key === 'N') { const t = document.getElementById('comment'); if (t) { e.preventDefault(); t.focus(); } }
+});
+
+render();
+</script>
+</body>
+</html>

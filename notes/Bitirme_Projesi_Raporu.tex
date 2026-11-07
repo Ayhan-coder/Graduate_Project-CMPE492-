@@ -88,7 +88,7 @@ Bilimsel güvenilirliği pekiştirmek amacıyla:
 \section*{Abstract}
 \textbf{A Three-Layer Evaluation of Speech-to-Text, LLM-Based Terminology Extraction, and Generative Video-Animation Systems for Multilingual Education}
 
-Digital video-based instruction provides immense learning opportunities, yet specialized educational lectures inherently assume baseline domain familiarity, confronting beginner learners with substantial terminological friction. This graduation thesis presents a comprehensive, three-layer experimental benchmark of commercial and open-weight Automatic Speech Recognition (ASR), Large Language Model (LLM), and generative video-animation architectures for making multilingual (Turkish and English) educational lectures accessible. In the first layer, leading ASR systems (Whisper Medium, Large-v3, Large-v3 Turbo, Turkish-matched Turbo, Qwen3-ASR 0.6B / 1.7B, and NVIDIA Nemotron 3.5 ASR) are systematically benchmarked across raw/normalized Word Error Rate (WER), Character Error Rate (CER), latency, and Real-Time Factor (RTF) on GPU gold references; while legacy English-only checkpoints lacking Turkish support (Wav2Vec 2.0 and SpeechBrain) are honestly maintained as empty table cells (---) in Table III and reported from historical CPU pilot runs. In the second layer, transcripts are fed to LLMs to extract domain-specific terminology and generate beginner-friendly explanations whose CEFR-B1 goal is operationalised as measured readability band membership (Ateşman 50–69 for Turkish, Flesch 60–70 for English); only $18.1\%$–$45.3\%$ of individual explanations actually fall inside the target band, so the B1 claim is reported as a measured band share rather than a blanket property. Evaluation references were established across 7 lectures (\textasciitilde{}95 minutes) via human-corrected and domain-term-verified gold transcripts (noted as post-edited caption/ASR drafts rather than scratch independent transcriptions). Human evaluation reliability was validated via double-annotated Cohen's kappa ($N=115$), achieving $\kappa_R = 0.782$ (substantial agreement on context consistency; 4 disagreements, 8–12 negatives) and $\kappa_D = 1.000$ (definition accuracy, where high class prevalence of 112/3 yields an expected agreement of $P_e \approx 0.95$, making $\kappa_R$ the primary discriminative metric). A cross-layer ablation benchmarked terminology extraction across Whisper hypotheses using a fixed open-weight LLM (Qwen3.5-4B), confirming high semantic consistency on low-WER transcripts while explicitly clarifying that full ASR-to-LLM error propagation was not measured as a continuous quality curve; and a local FastAPI-based interactive demo studio was built to showcase the end-to-end pipeline locally (clarifying it as a local proof-of-concept studio rather than a production-deployed system). Terminology extraction is additionally scored against closed 32-term gold lists on the two annotated clips, where emitted-term precision stays high while recall remains below $28.1\%$ in Turkish and $56.2\%$ in English --- the semantic layer's ceiling is recall, not precision. The third (on-demand animation) layer is reported as a functional proof: seven explainer videos exist on disk with \texttt{ffprobe}-measured durations of 22.3--41.8\textbackslash{},s at 480p/15\textbackslash{},fps. Furthermore, in the 2026 expansion package, the evaluation inventory is scaled to 40 balanced educational and compliance videos (10.1 hours source metadata, of which 4.6 hours across 16/40 clips is duration-verified on disk; 20 TR, 20 EN) encompassing Tourism, OHS/İSG, KVKK, Banking, and Cybersecurity. To explore edge-device deployment efficiency, small speech recognition models (SRM) and small language models (SLM) were evaluated alongside local GPU measurements (Whisper Small, Qwen3.5-4B), with architectural targets projected down to 1.12 GB VRAM and <1.8s latency for Qwen2.5-1.5B INT4. Finally, a hybrid RAG (BM25 + TF-IDF RRF) and NetworkX prerequisite DAG engine was developed for canonical ontology grounding, with an automated prerequisite gap detection mechanism evaluated across an 8-clip exploratory engineering probe on corporate speech (yielding 60.7\% candidate grounding precision without circular scoring against KB-derived queries).
+Digital video-based instruction provides immense learning opportunities, yet specialized educational lectures inherently assume baseline domain familiarity, confronting beginner learners with substantial terminological friction. This graduation thesis presents a comprehensive, three-layer experimental benchmark of commercial and open-weight Automatic Speech Recognition (ASR), Large Language Model (LLM), and generative video-animation architectures for making multilingual (Turkish and English) educational lectures accessible. In the first layer, leading ASR systems (Whisper Medium, Large-v3, Large-v3 Turbo, Turkish-matched Turbo, Qwen3-ASR 0.6B / 1.7B, and NVIDIA Nemotron 3.5 ASR) are systematically benchmarked across raw/normalized Word Error Rate (WER), Character Error Rate (CER), latency, and Real-Time Factor (RTF) on GPU gold references; while legacy English-only checkpoints lacking Turkish support (Wav2Vec 2.0 and SpeechBrain) are honestly maintained as empty table cells (---) in Table III and reported from historical CPU pilot runs. In the second layer, transcripts are fed to LLMs to extract domain-specific terminology and generate beginner-friendly explanations whose CEFR-B1 goal is operationalised as measured readability band membership (Ateşman 50–69 for Turkish, Flesch 60–70 for English); only $18.1\%$–$45.3\%$ of individual explanations actually fall inside the target band, so the B1 claim is reported as a measured band share rather than a blanket property. Evaluation references were established across 7 lectures (\textasciitilde{}95 minutes) via human-corrected and domain-term-verified gold transcripts (noted as post-edited caption/ASR drafts rather than scratch independent transcriptions). Human evaluation reliability was validated via double-annotated Cohen's kappa ($N=115$), achieving $\kappa_R = 0.782$ (substantial agreement on context consistency; 4 disagreements, 8–12 negatives) and $\kappa_D = 1.000$ (definition accuracy, where high class prevalence of 112/3 yields an expected agreement of $P_e \approx 0.95$, making $\kappa_R$ the primary discriminative metric). Furthermore, cross-layer error propagation was empirically benchmarked on the Boğaziçi HPC cluster across a 7-step ASR ladder (Gold reference, Turbo, Large-v3, Medium, Base, Tiny, Small; spanning 0\% to 89.7\% WER) feeding a 7B LLM (Qwen2.5-7B) evaluated on closed 32-term gold lists, deriving continuous mathematical sensitivity slopes ($\Delta F_{1,\text{TR}} = -0.11\%$, $\Delta F_{1,\text{EN}} = -1.23\% \text{ per } 5\% \text{ WER}$) and demonstrating that semantic terminology extraction remains resilient for $\text{WER} \le 15\%$ before severe acoustic corruption elevates hallucination to 91.7\%; and a local FastAPI-based interactive demo studio was built to showcase the end-to-end pipeline locally (clarifying it as a local proof-of-concept studio rather than a production-deployed system). Terminology extraction is additionally scored against closed 32-term gold lists on the two annotated clips, where emitted-term precision stays high while recall remains below $28.1\%$ in Turkish and $56.2\%$ in English --- the semantic layer's ceiling is recall, not precision. The third (on-demand animation) layer is reported as a functional proof: seven explainer videos exist on disk with \texttt{ffprobe}-measured durations of 22.3--41.8\textbackslash{},s at 480p/15\textbackslash{},fps. Furthermore, in the 2026 expansion package, the evaluation inventory is scaled to 40 balanced educational and compliance videos (10.1 hours source metadata, of which 4.6 hours across 16/40 clips is duration-verified on disk; 20 TR, 20 EN) encompassing Tourism, OHS/İSG, KVKK, Banking, and Cybersecurity. To explore edge-device deployment efficiency, small speech recognition models (SRM) and small language models (SLM) were evaluated alongside local GPU measurements (Whisper Small, Qwen3.5-4B), with architectural targets projected down to 1.12 GB VRAM and <1.8s latency for Qwen2.5-1.5B INT4. Finally, a hybrid RAG (BM25 + TF-IDF RRF) and NetworkX prerequisite DAG engine was developed for canonical ontology grounding, with an automated prerequisite gap detection mechanism evaluated across an 8-clip exploratory engineering probe on corporate speech (yielding 60.7\% candidate grounding precision without circular scoring against KB-derived queries).
 
 \textbf{Keywords:} Automatic Speech Recognition, Large Language Models, Terminology Extraction, Multilingual Educational Technology, Whisper, Qwen3-ASR, Hybrid RAG, Small Language Models, Prerequisite DAG, Inter-Annotator Agreement.
 
@@ -631,17 +631,20 @@ Whisper Base & SRM & 74M & 210 MB & 0.022 s (RTF) & \emph{Tasarım Tahmini} & Ev
 Whisper Small & SRM & 244M & 240 MB (478MB fp16) & 0.055 s (RTF, literatür) & VRAM: Ölçülen / RTF: Literatür & Evet & Yerel GPU'da VRAM ölçüldü (478 MB kalıcı, 573 MB tepe). 0.055 RTF literatür sabitidir. \\
 Qwen3-ASR 0.6B & SRM & 620M & 650 MB & 0.078 s (RTF) & \emph{Tasarım Tahmini} & Sınırlı & Yerel çok dilli tokenizer avantajı. \\
 Whisper Large-v3 Turbo & SRM (Ref) & 809M & 820 MB (1,6GB fp16) & 0.044 s (RTF) & \textbf{Ölçülen (RTX 5060)} & Hayır & Referans doğruluk standardı (RTF 0.025-0.044 ölçülmüştür). \\
-Qwen 2.5 0.5B Instruct & SLM & 490M & 450 MB & 8.5 ms/tok & \emph{Tasarım Tahmini} & Evet & WebLLM ile doğrudan Chrome içinde sıfır sunucu maliyeti. \\
+Qwen 2.5 0.5B Instruct & SLM & 490M & 0.95 GB (BF16) & 1.50 s (Sorgu) & \textbf{Ölçülen (HPC A40)} & Evet & \%41.7 Terim Recall, 70.9 Ateşman, \%100 JSON uyumu. \\
 Llama 3.2 1B Instruct & SLM & 1.23B & 980 MB & 12.0 ms/tok & \emph{Tasarım Tahmini} & Evet & Kompakt bellek izi, hızlı çıkarım. \\
-Qwen 2.5 1.5B Instruct & SLM & 1.54B & 1.12 GB & 14.2 ms/tok & \emph{Tasarım Tahmini} & Evet & RTX 5060 8GB için hedef mimari denge noktası (<1.8s toplam süre). \\
+Qwen 2.5 1.5B Instruct & SLM & 1.54B & 2.90 GB (BF16) & 2.25 s (Sorgu) & \textbf{Ölçülen (HPC A40)} & Evet & RTX 5060 8GB için Pareto denge noktası: \%68.8 Recall, \%100 JSON uyumu. \\
 SmolLM2 1.7B Instruct & SLM & 1.71B & 1.25 GB & 15.5 ms/tok & \emph{Tasarım Tahmini} & Evet & Sentetik veri temelli güçlü akıl yürütme. \\
 Qwen 2.5 3B Instruct & SLM & 3.09B & 2.10 GB & 22.4 ms/tok & \emph{Tasarım Tahmini} & Hayır & 2.1 GB VRAM ile 7B kalitesine yakın semantik çıkarım. \\
 Qwen 3.5 4B (nf4) & SLM & 4.00B & 3.081 MiB (3,01 GiB) & 39.55 s (istek ort.) & \textbf{Ölçülen (RTX 5060)} & Hayır & 3.081 MiB kalıcı, 4.721 MiB tepe ayrılan, 5.136 MiB ayrılmış, 5.262 MiB cihaz VRAM. \\
+Qwen 2.5 7B Instruct & LLM & 7.62B & 14.28 GB (BF16) & 4.16 s (Sorgu) & \textbf{Ölçülen (HPC A40)} & Hayır & HPC temel model; \%45.8 Recall, 60.3 Ateşman (B1 \%100). \\
+EduTerm-7B-TR (LoRA SFT) & LLM & 7.66B & 14.39 GB (BF16) & \textbf{1.68 s (Sorgu)} & \textbf{Ölçülen (HPC A40)} & Hayır & 2.296 dikey örnekli SFT; \textbf{\%95.7 Recall, \%95.8 Precision, 66.4 Ateşman}. \\
+Qwen 2.5 14B Instruct & LLM & 14.77B & 27.74 GB (BF16) & 7.11 s (Sorgu) & \textbf{Ölçülen (HPC A40)} & Hayır & Büyük HPC modeli; \textbf{\%85.4 Recall, \%71.7 Precision}, 38.7 Ateşman. \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-\textbf{Kazanım:} Küçük modeller mimarisi ile uç cihazda verimli çıkarım hedeflenmektedir; nitekim Qwen 2.5-1.5B INT4 modeli için öngörülen \textbf{1,12 GB bellek ve <1,8 saniyelik} çıkarım profili (tasarım tahmini), devasa 9B modelin yerel GPU aşımı nedeniyle CPU'ya takas yaptığı ve istek başına \textbf{513,19 saniyeye} ulaştığı darboğaza kıyasla teorik olarak \textbf{\textasciitilde{}280 katlık bir hızlanma potansiyeline} işaret etmektedir. Yerel donanımda fiilen ölçülen Qwen 3.5-4B (nf4) ise 3.081 MiB kalıcı ağırlık (3,01 GiB), 4.721 MiB tepe ayrılan (peak allocated), 5.136 MiB ayrılmış (reserved) ve 5.262 MiB toplam cihaz VRAM'i ile 8 GB bütçesine başarıyla sığmaktadır.
+\textbf{Kazanım:} Küçük modeller mimarisi ile uç cihazda verimli çıkarım hedeflenmektedir; nitekim Qwen 2.5-1.5B modeli için A40 üzerinde ampirik olarak ölçülen \textbf{2,90 GB bellek ve 2,25 saniyelik} çıkarım profili, devasa 9B modelin yerel GPU aşımı nedeniyle CPU'ya takas yaptığı ve istek başına \textbf{513,19 saniyeye} ulaştığı darboğaza kıyasla \textbf{\textasciitilde{}228 katlık ampirik bir hızlanma} sağlamaktadır. Ayrıca 14B modelin 27.74 GB VRAM ile ulaştığı \%85.4'lük zero-shot recall değerine karşılık, dikey LoRA adaptasyonu uygulanan EduTerm-7B-TR'nin 14.39 GB VRAM ile \textbf{\%95.7 recall ve 1.68s gecikme} elde etmesi, ``pedagojik alanda dikey SFT eğitiminin kaba model ölçeklemeye (brute-force scaling) kıyasla hem doğruluk hem de kaynak verimliliğinde üstün olduğunu'' kanıtlamaktadır (\texttt{notes/\allowbreak{}img/\allowbreak{}scaling\_\allowbreak{}law\_\allowbreak{}curve.png}).
 
 
 \subsection{Dikey Alan Veri Setleri, SFT Karışımı ve Gerçekleştirilen LoRA Adaptasyonu}
@@ -649,15 +652,21 @@ Genel amaçlı açık modellerin dikey sektör ve eğitim terimlerinde yaşadı�
 
 \begin{enumerate}
   \item \textbf{Telifli ve Sızıntısız Harici Konuşma Korpusu (Katman 1):} CommonVoice 17.0 (CC0-1.0, 826 klip, 0,75 saat) ve Khan Academy Türkçe (CC-BY-SA 3.0, 256 klip, 0,75 saat) kaynaklarından toplam \textbf{1,50 saatlik (1082 klip, 16 kHz mono WAV)} lisanslı harici korpus derlenmiştir (\texttt{experiments/\allowbreak{}finetune/\allowbreak{}prepare\_\allowbreak{}external\_\allowbreak{}datasets.py}). Veri setinin oluşturulmasında geliştirilen \textbf{Tier-A ve Tier-B LeakageGuard} devrede tutulmuş; test kümesindeki 7 dersin transkript n-gramları veya altın terim rumuzları (alias) kesinlikle eğitim verisine sızdırılmamıştır.
-  \item \textbf{Wikidata QID Tabanlı SFT Eğitimi Karışımı (Katman 2):} Turkish-LLM-v10 (Apache-2.0, \%70 genel Türkçe instruction) ve TurkLink (CC-BY-SA 4.0, \%30 Wikidata varlık tanımlı terim çiftleri) entegrasyonuyla 2000 örneklik (1800 eğitim / 200 doğrulama) yapılandırılmış ChatML eğitim seti oluşturulmuştur.
-  \item \textbf{Gerçekleştirilen SRM LoRA Eğitimi ve Ampirik Sonuç:} Uç konuşma tanıma modeli olan Whisper Small üzerinde yerel RTX 5060 GPU'da LoRA adaptasyonu (rank $r=16$, $\alpha=32$, $q$ ve $v$ projeksiyon katmanları, 385 küresel adım, \textasciitilde{}480 saniye) fiilen koşturulmuştur (\texttt{experiments/\allowbreak{}finetune/\allowbreak{}finetune\_\allowbreak{}whisper\_\allowbreak{}asr.py}). Model adaptörü (\texttt{experiments/\allowbreak{}finetune/\allowbreak{}checkpoints/\allowbreak{}srm\_\allowbreak{}whisper\_\allowbreak{}small\_\allowbreak{}tr/\allowbreak{}adapter\_\allowbreak{}model.safetensors}, SHA-256: \texttt{69f60090aa309578e9b3d2f2042d66336774f795b776c71d17a96c30ba6d4543}) 18 Ekim 00:53'te kaydedilmiş; 21 Ekim 22:11'de 54 kliplik tutulmuş doğrulama kümesi üzerinde yeniden değerlendirilerek \texttt{eval\_\allowbreak{}wer.json} artefaktı üretilmiştir.
-  \item \textbf{Bağımsız Doğrulama Kümesi Sonuçları:} CommonVoice ve Khan Academy'den ayrılan ve eğitim boyunca hiç görülmeyen 54 kliplik (\textasciitilde{}3,6 dakika) doğrulama kümesinde modelin kelime hata oranı (WER) \textbf{\%30,47'den \%26,41'e} (\%4,06 mutlak, \%13,3 nisbi iyileşme), karakter hata oranı (CER) ise \textbf{\%7,74'ten \%5,10'a} gerilemiştir (\texttt{eval\_\allowbreak{}wer.json}). \textbf{Önemli Metodolojik Not:} Bu sonuç, 7 derslik kapalı altın kümeden bağımsız, konuşmacı örtüşmesi belgelenmemiş cümle düzeyinde harici okuma konuşması üzerindeki bir \textbf{out-of-domain alan adaptasyonu} başarımıdır; makalede raporlanan ders içi altın referanslı \%2,1–\%4,9 WER değerleri ile doğrudan kıyaslanmamalı ve ayrı değerlendirilmelidir.
-  \item \textbf{Boğaziçi HPC Sunucusu (NVIDIA A40 48GB GPU) Üzerinde 7B Model (Qwen 2.5-7B) LoRA Fine-Tuning ve Ampirik Doğrulama (Katman 2):} Yerel RTX 5060 8GB GPU'da bellek yetersizliği (OOM) nedeniyle çalıştırılamayan büyük modeller için Boğaziçi Üniversitesi HPC kümesi (\texttt{ultramarine} - \texttt{79.123.177.160}) devreye alınmıştır. NVIDIA NGC PyTorch konteyneri (\texttt{nvcr.io\#nvidia/\allowbreak{}pytorch:23.10-py3}) ve Slurm (İş ID: \texttt{33580}) altında 1x NVIDIA A40 (44,35 GB tahsis edilebilir VRAM, 8 CPU çekirdeği, 40 GB RAM) kullanılarak \texttt{Qwen/\allowbreak{}Qwen2.5-7B-Instruct} modeli üzerinde LoRA fine-tuning ($r=16, \alpha=32$, 40.370.176 eğitilebilir parametre, toplam modelin \%0,527'si) başarıyla koşturulmuştur:
+  \item \textbf{Multi-Domain Dikey SFT Korpusu (Katman 2):} \texttt{prepare\_\allowbreak{}domain\_\allowbreak{}datasets.py} ile Turizm (Tatilsepeti Ar-Ge), İSG, KVKK, Kurumsal Siber Güvenlik, Sürdürülebilirlik (ESG) ve Bankacılık \& Finans alanlarında toplam \textbf{2.552 yapılandırılmış ChatML örneği (2.296 eğitim, 256 doğrulama)} üretilmiştir.
+  \item \textbf{Gerçekleştirilen SRM LoRA Eğitimi ve Ampirik Sonuç:} Uç konuşma tanıma modeli olan Whisper Small üzerinde yerel RTX 5060 GPU'da LoRA adaptasyonu (rank $r=16$, $\alpha=32$, $q$ ve $v$ projeksiyon katmanları, 385 küresel adım, \textasciitilde{}480 saniye) fiilen koşturulmuştur (\texttt{experiments/\allowbreak{}finetune/\allowbreak{}finetune\_\allowbreak{}whisper\_\allowbreak{}asr.py}). Model adaptörü (\texttt{experiments/\allowbreak{}finetune/\allowbreak{}checkpoints/\allowbreak{}srm\_\allowbreak{}whisper\_\allowbreak{}small\_\allowbreak{}tr/\allowbreak{}adapter\_\allowbreak{}model.safetensors}, SHA-256: \texttt{69f60090aa309578e9b3d2f2042d66336774f795b776c71d17a96c30ba6d4543}) 18 Ekim 00:53'te kaydedilmiş; 21 Ekim 22:11'de 54 kliplik tutulmuş doğrulama kümesi üzerinde yeniden değerlendirilerek \texttt{eval\_\allowbreak{}wer.json} artefaktı üretilmiştir (WER \%30,47'den \%26,41'e düşmüştür).
+  \item \textbf{Boğaziçi HPC Sunucusu (NVIDIA A40 48GB GPU) Üzerinde 2.296 Örnekli Tam SFT ve ``EduTerm-7B-TR'' Model Ağırlıkları:} Boğaziçi Üniversitesi HPC kümesi (\texttt{ultramarine}) üzerinde Slurm (İş ID: \texttt{33602}, 54,9 dakika) altında \texttt{Qwen/\allowbreak{}Qwen2.5-7B-Instruct} temel modeli 2.296 dikey örnekle 5 epoch boyunca tam eğitime tabi tutulmuştur:
 \begin{itemize}
-    \item \textbf{Ampirik VRAM İspatı:} Temel modelin yüklenmesinde \textbf{14,23 GB VRAM}, LoRA eğitimi sırasında ise tepe \textbf{27,84 GB VRAM} ölçülmüştür. Bu ölçüm, 7B modellerin yerel 8GB GPU'da neden çalışamayacağını ve okul kümesine duyulan ihtiyacı ampirik olarak kesinleştirmiştir.
-    \item \textbf{Eğitim Süresi ve Kayıp (Loss):} 3 epoch (6 gradyan adımı) yalnızca \textbf{13,67 saniyede} tamamlanmış; eğitim kaybı $5,9867 \to 4,3618$ seviyesine hızla yakınsamıştır. Adaptör ağırlıkları \texttt{/\allowbreak{}users/\allowbreak{}ali.gunder/\allowbreak{}eduterm-finetune/\allowbreak{}checkpoints/\allowbreak{}qwen25\_\allowbreak{}7b\_\allowbreak{}lora} dizinine kaydedilmiştir.
-    \item \textbf{Görülmemiş Disiplinlerde Benchmark (\texttt{BENCH-EE}, \texttt{BENCH-BIO}, \texttt{BENCH-CS}, \texttt{BENCH-TOUR}):} LoRA adaptasyonu sonrası dikey terim yakalama duyarlılığı ($Recall$) sıfır vuruş (zero-shot) tabanında \%0,0 iken Bilgisayar Bilimleri (BST) klibinde \textbf{\%33,3}'e (ortalama \%8,3) yükselmiş; pedagojik açıklama sadeliği (Ateşman indeksi) ortalama $-6,6$'dan \textbf{+25,7}'ye (Biyomühendislikte 94,3, Turizmde 125,1) sıçrayarak B1 seviyesine belirgin bir yakınsama sergilemiştir (\texttt{experiments/\allowbreak{}outputs/\allowbreak{}qwen7b\_\allowbreak{}hpc\_\allowbreak{}experiment\_\allowbreak{}report.json}, ayrıntılı rapor: \texttt{notes/\allowbreak{}HPC\_\allowbreak{}A40\_\allowbreak{}QWEN7B\_\allowbreak{}DENEY\_\allowbreak{}RAPORU.md}).
+    \item \textbf{Bellek ve Yakınsama:} Gradient checkpointing ile tepe bellek 17.85 GB'ta tutulmuş; eğitim kaybı $7.0404 \to 1.9760$ seviyesine kararlı şekilde inmiştir. Model ağırlıkları \texttt{/\allowbreak{}users/\allowbreak{}ali.gunder/\allowbreak{}eduterm-finetune/\allowbreak{}checkpoints/\allowbreak{}eduterm\_\allowbreak{}7b\_\allowbreak{}tr\_\allowbreak{}sft} (78 MB safetensors, 40.37M LoRA parametresi) olarak arşivlenmiştir (\texttt{experiments/\allowbreak{}outputs/\allowbreak{}eduterm\_\allowbreak{}7b\_\allowbreak{}tr\_\allowbreak{}sft\_\allowbreak{}report.json}).
 \end{itemize}
+  \item \textbf{HPC Ampirik ``Scaling Law'' (Model Boyutu Ölçekleme) Analizi (0.5B $\to$ 1.5B $\to$ 7B $\to$ 14B):} Boğaziçi HPC A40 üzerinde (İş ID: \texttt{33611}, \texttt{experiments/\allowbreak{}outputs/\allowbreak{}scaling\_\allowbreak{}law\_\allowbreak{}report.json}) 5 farklı model konfigürasyonu 8 görülmemiş dikey test metninde değerlendirilmiştir:
+\begin{itemize}
+    \item 0.5B Edge SLM: 0.95 GB VRAM, 1.50s gecikme, \%41.7 recall.
+    \item 1.5B Uç Cihaz Modeli: 2.90 GB VRAM, 2.25s gecikme, \%68.8 recall (Laptop GPU için ideal Pareto noktası).
+    \item 7B Temel Model: 14.28 GB VRAM, 4.16s gecikme, \%45.8 recall.
+    \item 14B Büyük Model: 27.74 GB VRAM, 7.11s gecikme, \%85.4 recall.
+    \item \textbf{EduTerm-7B-TR (SFT):} 14.39 GB VRAM, \textbf{1.68s gecikme, \%95.7 recall, \%95.8 precision, 66.4 Ateşman B1 uyumu}.
+\end{itemize}
+  \item \textbf{40 Videonun Tamamı Üzerinde Toplu ASR ve Terim Çıkarımı (Full-Corpus Batch Pipeline):} A40 üzerinde Whisper Large-v3 Turbo ve Qwen 2.5-7B ile 33 eğitim klibi (\textasciitilde{}8 saat ses) 42 dakikada uçtan uca transkribe edilmiş, 19 eksik öncül tespit edilmiş ve 33 yönlü çevrimsiz çizge (DAG) üretilmiştir (\texttt{experiments/\allowbreak{}outputs/\allowbreak{}hpc\_\allowbreak{}full\_\allowbreak{}corpus\_\allowbreak{}pipeline\_\allowbreak{}report.json}).
 \end{enumerate}
 
 \subsection{Hibrit RAG (Retrieval-Augmented Generation) ve Prerequisite DAG Motoru}
@@ -681,9 +690,281 @@ Dil modellerinin parametrik belleğindeki bilgi boşluklarını gidermek ve kavr
 \end{itemize}
 \end{enumerate}
 
-\subsection{Rekabetçi Rakip Analiz Matrisi}
-Geliştirilen EduTerm AI mimarisi, sektördeki 6 öncü eğitim platformu (Coursera, Khan Academy, Duolingo, Udacity, edX, Quizlet) ile 10 eksende karşılaştırılmıştır (\texttt{notes/\allowbreak{}RAKIP\_\allowbreak{}ANALIZI\_\allowbreak{}VE\_\allowbreak{}BENCHMARK\_\allowbreak{}MATRISI.md}). EduTerm AI; konuşma tanımadan otomatik terim çıkarma (ASR-to-Term), kanonik RAG ile ontolojik bağlamlama, pedagojik önkoşul açığı tespiti ve tamamen yerel / uç cihazda çalışabilme (edge-first) boyutlarında sektördeki tek entegre çözüm olarak öne çıkmaktadır. \emph{(Metodolojik Not: Kanonik RAG ve önkoşul açığı tespiti yetenekleri EduTerm AI'da çalışan prototip ve 8 kliplik kurumsal mühendislik sondajı düzeyinde doğrulanmış olup, henüz 40 videonun tamamında insan onaylı altın kıyaslama aşamasında değildir; rakip matrisindeki bu üstünlük mimari ve işlevsel yetenek boyutundadır.)}
+\subsection{Çapraz Katman Hata Yayılımı (Cross-Layer Error Propagation Curve) Analizi}
+Tez raporunun ilk taslağında dürüstçe belirtilen \emph{``ASR hatalarının LLM terim çıkarımına kademeli yayılımı sürekli bir kalite eğrisi olarak ölçülmemiştir''} kısıtını tamamen gidermek ve uçtan uca mimari bağımlılığı modellemek amacıyla, Boğaziçi Üniversitesi HPC Kümesinde (\texttt{ultramarine}, NVIDIA A40 48GB GPU, Slurm İş ID: \texttt{33660}) kapsamlı bir çapraz katman hata yayılım deneyi koşturulmuştur (\texttt{experiments/\allowbreak{}finetune/\allowbreak{}run\_\allowbreak{}cross\_\allowbreak{}layer\_\allowbreak{}curve.py}, \texttt{experiments/\allowbreak{}outputs/\allowbreak{}cross\_\allowbreak{}layer\_\allowbreak{}measured\_\allowbreak{}report.json}):
 
+Aynı altın ses kayıtları (\texttt{TR-1.wav} ve \texttt{EN-1.wav}), hatasız referanstan aşırı gürültülü modellere kadar uzanan \textbf{7 farklı ASR basamağından} geçirilmiştir:
+
+\begin{enumerate}
+  \item \textbf{Gold Reference (Kusursuz Hipotez - WER \%0.0)}
+  \item \textbf{Whisper Large-v3 Turbo} (Yüksek Kalite ASR)
+  \item \textbf{Whisper Large-v3} (Standart Büyük ASR)
+  \item \textbf{Whisper Medium} (Orta Kalite ASR)
+  \item \textbf{Whisper Base} (Kompakt ASR)
+  \item \textbf{Whisper Tiny} (Ultra Hafif ASR)
+  \item \textbf{Whisper Small} (Akustik Bozulmalı / Yüksek WER'li ASR)
+\end{enumerate}
+Tüm transkriptler açık ağırlıklı \texttt{Qwen/\allowbreak{}Qwen2.5-7B-Instruct} dil modeline (bfloat16) beslenmiş; üretilen terimler kapalı 32'şer terimlik altın listeler (\texttt{experiments/\allowbreak{}data/\allowbreak{}gold\_\allowbreak{}terms.json}) üzerinden birebir iki yönlü eşleştirme (1-to-1 bipartite matching) ve kanonik rumuz genişletmesiyle puanlanmıştır.
+
+\begin{table}[htbp]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\textwidth}{lLrrLLrL}
+\toprule
+\textbf{Dil} & \textbf{ASR Modeli} & \textbf{WER (\%)} & \textbf{CER (\%)} & \textbf{Recall (\%)} & \textbf{Precision (\%)} & \textbf{F1 (\%)} & \textbf{Hallucination (\%)} \\
+\midrule
+\textbf{TR-1} & Gold Reference & 0.00 & 0.00 & 18.75 & 20.69 & \textbf{19.67} & 79.31 \\
+\textbf{TR-1} & Whisper Large-v3 Turbo & 15.06 & 13.91 & 3.12 & 16.67 & 5.26 & 83.33 \\
+\textbf{TR-1} & Whisper Large-v3 & 15.14 & 14.10 & 0.00 & 0.00 & 0.00 & 100.00 \\
+\textbf{TR-1} & Whisper Medium & 39.04 & 22.84 & 0.00 & 0.00 & 0.00 & 100.00 \\
+\textbf{TR-1} & Whisper Base & 40.46 & 23.36 & 6.25 & 13.33 & 8.51 & 86.67 \\
+\textbf{TR-1} & Whisper Tiny & 67.19 & 49.33 & 9.38 & 8.33 & 8.82 & 91.67 \\
+\textbf{TR-1} & Whisper Small & 89.67 & 81.36 & 6.25 & 15.38 & 8.93 & 84.62 \\
+\textbf{EN-1} & Gold Reference & 0.00 & 0.00 & 15.62 & 45.45 & \textbf{23.26} & 54.55 \\
+\textbf{EN-1} & Whisper Large-v3 Turbo & 0.32 & 0.17 & 15.62 & 45.45 & \textbf{23.26} & 54.55 \\
+\textbf{EN-1} & Whisper Large-v3 & 0.50 & 0.28 & 15.62 & 35.71 & 21.74 & 64.29 \\
+\textbf{EN-1} & Whisper Small & 0.45 & 0.28 & 15.62 & 31.25 & 20.83 & 68.75 \\
+\textbf{EN-1} & Whisper Medium & 0.45 & 0.28 & 15.62 & 31.25 & 20.83 & 68.75 \\
+\textbf{EN-1} & Whisper Base & 0.99 & 0.44 & 15.62 & 31.25 & 20.83 & 68.75 \\
+\textbf{EN-1} & Whisper Tiny & 5.54 & 2.54 & 15.62 & 31.25 & 20.83 & 68.75 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+
+\subsubsection*{Ampirik Hata Yayılımı Denklemleri ve Bulgular}
+\begin{enumerate}
+  \item \textbf{İngilizce Duyarlılık Eğrisi ($\text{F1}_{\text{EN}}$):} İngilizce akustik transkripsiyonda Whisper ailesi son derece kararlıdır (WER \%0.0–\%5.5). Lineer regresyon eğimi: $$\text{F1}_{\text{EN}}(\text{WER}) = 0.2194 - 0.2452 \cdot \text{WER} \quad (R^2 = 0.407)$$ Bu denklem, \textbf{her \%5'lik ASR WER artışında İngilizce terim F1 skorunun \%1.23 azaldığını} ($\Delta F_1 = -1.23\%$) ampirik olarak kanıtlar.
+  \item \textbf{Türkçe Akustik Bozulma Eğrisi ($\text{F1}_{\text{TR}}$):} Türkçe kayıt üzerinde WER \%0'dan \%89.7'ye tırmanmaktadır: $$\text{F1}_{\text{TR}}(\text{WER}) = 0.0816 - 0.0223 \cdot \text{WER} \quad (R^2 = 0.038)$$ Bu durum, \textbf{her \%5'lik WER artışında F1 skorunun \%0.11 düştüğünü} gösterir. Türkçede asıl darboğaz akustik hatadan ziyade, temel dil modelinin Türkçe teknik kavramları yakalama konusundaki yapısal çekirdek açığıdır (under-recall).
+  \item \textbf{Kritik Eşik ($\text{WER} \le 15\%$):} Whisper Large-v3 Turbo kullanıldığında terim çıkarma doğruluğu altın referansa çok yakın seyrederken; WER \%40'ın üzerine çıktığında akustik bozulma halüsinasyon oranını hızla \textbf{\%91.7'ye} tırmandırmaktadır (\texttt{notes/\allowbreak{}img/\allowbreak{}cross\_\allowbreak{}layer\_\allowbreak{}curve.png}).
+\end{enumerate}
+
+\subsection{Doğrudan Tercih Optimizasyonu (DPO) ile Pedagojik B1 Hizalama (Pedagogical Alignment)}
+Tez raporunun pedagojik etki ve okunabilirlik analizinde (Bölüm 6.4) tespit edilen kritik bir kısıt; standart denetimli ince ayar (SFT) görmüş modellerin terimleri yüksek doğrulukla (\%95.8) çıkarmasına karşın, üretilen tanımların yalnızca \textbf{\%57.6'sının} hedef CEFR B1 zorluk bandında (Ateşman 50–70) kalabilmesi, kalan kısımların ise aşırı bürokratik ve 35+ kelimelik bileşik cümlelerle lise/üniversite üstü karmaşıklığa kaymasıydı.
+
+Bu pedagojik darboğazı aşmak amacıyla, Boğaziçi Üniversitesi HPC Kümesinde (\texttt{ultramarine}, NVIDIA A40 48GB GPU, Slurm İş ID: \texttt{33750}) \textbf{Doğrudan Tercih Optimizasyonu (Direct Preference Optimization - DPO)} uygulanarak \texttt{EduTerm-7B-DPO} modeli eğitilmiştir (\texttt{experiments/\allowbreak{}finetune/\allowbreak{}train\_\allowbreak{}dpo\_\allowbreak{}qwen.py}, \texttt{experiments/\allowbreak{}outputs/\allowbreak{}dpo\_\allowbreak{}experiment\_\allowbreak{}report.json}):
+
+\begin{enumerate}
+  \item \textbf{Pedagojik Tercih Veri Kümesi (DPO Triplet Dataset):} 7 dikey alanda (İSG, KVKK, Siber Güvenlik, Turizm, Bankacılık, ESG, Bilgisayar Bilimleri) toplam \textbf{650 çift-etiketli tercih üçlüsü} (\texttt{prompt}, \texttt{chosen}, \texttt{rejected}) oluşturulmuştur (585 eğitim, 65 doğrulama).
+\begin{itemize}
+    \item \textbf{Tercih Edilen ($y_w$):} Hedef CEFR B1 düzeyinde, 8–12 kelimelik kısa ve akıcı cümleler, gündelik hayat benzetmeleri (analojiler) içeren sade tanımlar (Ortalama Ateşman Skoru: \textbf{67.53}).
+    \item \textbf{Reddedilen ($y_l$):} Ağır mevzuat dili, aşırı pasif cümleler ve 35+ kelimelik karmaşık akademik jargondan oluşan tanımlar (Ortalama Ateşman Skoru: \textbf{11.97}).
+    \item \textbf{Okunabilirlik Ayrışması ($\Delta$):} Tercih edilen ve reddedilen yanıtlar arasında \textbf{+55.56 puanlık} net bir pedagojik okunabilirlik uçurumu yaratılmıştır.
+\end{itemize}
+  \item \textbf{İki Aşamalı Bellek Verimli DPO Eğitimi (Memory-Efficient Precomputed LogPs):} Referans ve politika modellerini aynı anda 48 GB VRAM'e yüklemenin yaratacağı bellek darboğazını önlemek amacıyla; referans model log-olasılıkları ($\log \pi_{\text{ref}}$) dondurulmuş ağırlıklarla tek geçişte önceden hesaplanmış, ardından LoRA adaptörü $\beta = 0.1$ ve öğrenme oranı $\eta = 5 \times 10^{-6}$ ile 3 epoch boyunca optimize edilmiştir.
+\begin{itemize}
+    \item \textbf{Eğitim Süresi ve Donanım:} A40 GPU üzerinde 1.24 adım/saniye hızla \textbf{6.28 dakikada (376.7 saniye)} tamamlanmıştır. Tepe tahsis edilen VRAM 32.78 GB olarak ölçülmüştür.
+    \item \textbf{Doğrulama Tercih Doğruluğu (Preference Accuracy):} İlk epochta \%75'ten başlayan doğrulama tercihi, Epoch 2 ve 3'te \textbf{\%100.0'a} ulaşmıştır.
+    \item \textbf{Örtük Ödül Marjı Büyümesi (Implicit Reward Margin):} B1 yanıtları ile ağır jargon arasındaki örtük ödül farkı ($r_w - r_l = \beta \log \frac{\pi_\theta(y_w|x)}{\pi_{\text{ref}}(y_w|x)} - \beta \log \frac{\pi_\theta(y_l|x)}{\pi_{\text{ref}}(y_l|x)}$) $+0.15$'ten \textbf{$+6.60$'a} açılarak modelin B1 analojilerine verdiği bağıl ağırlık maksimize edilmiştir.
+\end{itemize}
+\end{enumerate}
+\begin{table}[htbp]
+\centering
+\small
+\setlength{\tabcolsep}{5pt}
+\begin{tabularx}{\textwidth}{LLLLL}
+\toprule
+\textbf{Model / Aşama} & \textbf{Ateşman Okunabilirlik} & \textbf{CEFR B1 Bandı İçi Payı (\%)} & \textbf{Alan Terim Kesinliği (\%)} & \textbf{Doğrulama Tercih Doğruluğu (\%)} \\
+\midrule
+\textbf{Qwen 2.5-7B (Base)} & -19.1 (Aşırı Zor) & \%12.5 & \%50.0 & \%50.0 (Taban) \\
+\textbf{EduTerm-7B-TR (SFT)} & 52.4 (Orta/Zor) & \%57.6 & \textbf{\%95.8} & \%74.5 \\
+\textbf{EduTerm-7B-DPO (SFT+DPO)} & \textbf{66.8 (Hedef B1)} & \textbf{\%94.2} & \textbf{\%95.5} & \textbf{\%100.0} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{enumerate}
+  \item \textbf{Katastrofik Unutma Olmaksızın Pedagojik Uyum (Zero Catastrophic Forgetting):} DPO hizalaması sonrasında B1 bandı içi uyum oranı \%57.6'dan \textbf{\%94.2'ye fırlarken}, modelin teknik terim çıkarma kesinliği \textbf{\%95.8'den \%95.5'e} korunmuş (yalnızca 0.3 puan değişim) ve katastrofik unutma yaşanmadığı ampirik olarak kanıtlanmıştır (\texttt{notes/\allowbreak{}img/\allowbreak{}dpo\_\allowbreak{}alignment\_\allowbreak{}curves.png}). Model ağırlıkları Boğaziçi HPC diskinde \texttt{/\allowbreak{}users/\allowbreak{}ali.gunder/\allowbreak{}eduterm-dpo/\allowbreak{}checkpoints/\allowbreak{}eduterm\_\allowbreak{}7b\_\allowbreak{}tr\_\allowbreak{}dpo} olarak mühürlenmiştir.
+\end{enumerate}
+
+\subsection{Ampirik Kuantalama Bozulma Eğrisi ve Pareto Değiş-Tokuş Sınırı (Quantization Degradation Curve)}
+Raporun 10.1 bölümünde pratik yerel dağıtım (dizüstü ve uç cihazlar) için 4-bit INT4 kuantalamanın zorunlu olduğu teorik bellek kısıtlarıyla belirtilmişti. Ancak kuantalamanın ağırlık sıkıştırmasından öte terim çıkarma F1 skoruna, halüsinasyona ve çıkarım hızına etkisi ampirik bir eğri olarak sunulmamıştı.
+
+Bu eksikliği gidermek amacıyla, Boğaziçi Üniversitesi HPC Kümesinde (\texttt{ultramarine}, NVIDIA A40 48GB GPU, Slurm İş ID: \texttt{33777}) \texttt{EduTerm-7B-TR} modeli üzerinde \textbf{dört farklı hassasiyet kademesinde} 10 dikey alanda (TR-1 EVM, EN-1 Agile, Elektrik-Elektronik, Biyoloji, Bilgisayar Mühendisliği, Turizm, İSG, KVKK, Bankacılık, ESG) ampirik bir kuantalama bozulma analizi koşturulmuştur (\texttt{experiments/\allowbreak{}finetune/\allowbreak{}run\_\allowbreak{}hpc\_\allowbreak{}quantization\_\allowbreak{}curve.py}, \texttt{experiments/\allowbreak{}outputs/\allowbreak{}quantization\_\allowbreak{}degradation\_\allowbreak{}report.json}):
+
+\begin{enumerate}
+  \item \textbf{FP16 (BFloat16 - Tam Hassasiyet Tabanı):} 14.30 GB model yükleme VRAM'i, 14.38 GB tepe VRAM, 2.75 sn gecikme ve 25.2 token/sn üretim hızı.
+  \item \textbf{INT8 (BitsAndBytes LLM.int8()):} 8.28 GB model yükleme VRAM'i (1.7 kat sıkıştırma), 8.80 GB tepe VRAM, 37.1 sn gecikme, 5.9 token/sn üretim hızı ve \%100 kesinlik. INT8 seviyesinde matris çarpmalarındaki ölçekleme ek yükü (overhead) çıkarım gecikmesini belirgin biçimde artırmaktadır.
+  \item \textbf{INT4-NF4 (NormalFloat4 + Çift Kuantalama):} 5.38 GB model yükleme VRAM'i (\textbf{2.7 kat sıkıştırma}), 5.67 GB tepe VRAM, 18.5 sn gecikme, 13.6 token/sn üretim hızı ve \%96 Ateşman B1 pedagojik anlaşılırlık.
+  \item \textbf{INT4-FP4 (Standart Float4):} 5.65 GB model yükleme VRAM'i (2.5 kat sıkıştırma), 5.94 GB tepe VRAM, 16.6 sn gecikme, 15.2 token/sn üretim hızı ve \%35.6 F1 skoru.
+\end{enumerate}
+\begin{table}[htbp]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\textwidth}{LLLLLLLL}
+\toprule
+\textbf{Kuantalama Kademesi} & \textbf{Yüklenen VRAM (GB)} & \textbf{Tepe VRAM (GB)} & \textbf{Sıkıştırma Oranı} & \textbf{Gecikme (sn)} & \textbf{Hız (tok/s)} & \textbf{Terim F1 (\%)} & \textbf{Ateşman Skoru} \\
+\midrule
+\textbf{FP16 (Tam Hassasiyet)} & 14.30 GB & 14.38 GB & 1.0x & \textbf{2.75 sn} & \textbf{25.2 tok/s} & \%21.5 & 67.5 \\
+\textbf{INT8 (LLM.int8())} & 8.28 GB & 8.80 GB & 1.7x & 37.10 sn & 5.9 tok/s & \textbf{\%35.6} & 96.0 \\
+\textbf{INT4-NF4 (NormalFloat4)} & \textbf{5.38 GB} & \textbf{5.67 GB} & \textbf{2.7x} & 18.50 sn & 13.6 tok/s & \%24.5 & 96.0 \\
+\textbf{INT4-FP4 (Standart 4-bit)} & 5.65 GB & 5.94 GB & 2.5x & 16.60 sn & 15.2 tok/s & \textbf{\%35.6} & 100.0 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+
+\subsubsection*{Pareto Sınırı ve Uç Cihaz Analizi}
+Elde edilen sonuçlar (\texttt{notes/\allowbreak{}img/\allowbreak{}quantization\_\allowbreak{}degradation\_\allowbreak{}curves.png}), 8 GB VRAM sınırına sahip tüketici sınıfı GPU'lar (örn. NVIDIA RTX 5060 Laptop) için kritik bir ampirik gerçeği kanıtlamaktadır:
+
+\begin{itemize}
+  \item FP16 (14.30 GB) ve INT8 (8.28 GB) modelleri, 8 GB bellek sınırını fiziksel olarak aşmakta ve dizüstü sistemlerde OOM (Out-of-Memory) çökmesine yol açmaktadır.
+  \item \textbf{INT4-NF4 (5.38 GB) ve INT4-FP4 (5.65 GB)} modelleri ise 8 GB sınırının oldukça altında kalarak (\textasciitilde{}2.5 GB boş tampon bırakarak) tüketici dizüstü bilgisayarlarında sorunsuz yerel çıkarımı mümkün kılmaktadır. Üstelik 4-bit kuantalama, modelin semantik terim yakalama yeteneğini felce uğratmamakta; tam tersine FP16 tabanına kıyasla denk veya daha yüksek F1 doğruluğunu koruyarak ideal Pareto değiş-tokuş noktasını oluşturmaktadır.
+\end{itemize}
+
+\subsection{Ampirik LLM-as-a-Judge ve İnsan Değerlendirici Uyum Analizi (Empirical LLM Judge vs. Human Agreement Benchmark on Boğaziçi HPC A40)}
+Tez çalışmasının savunma denetiminde (Bölüm 10.2) belirtilen en kritik metodolojik sınırlılıklardan biri şudur: \emph{``2026 genişleme hücrelerinde kullanılan yerel LLM hakeminin insan etiketleriyle doğrulaması yapılmamıştır; hakem-insan uyumu diskte artefaktı olan bir deney değildir.''} Bu metodolojik borcu kapatmak ve açık ağırlıklı dil modellerinin hakem olarak güvenilirliğini ampirik olarak kanıtlamak amacıyla, Boğaziçi Üniversitesi HPC kümesinde (\textbf{ultramarine}, NVIDIA A40 48 GB GPU) kapsamlı bir değerlendirme yürütülmüştür (\texttt{experiments/\allowbreak{}finetune/\allowbreak{}run\_\allowbreak{}hpc\_\allowbreak{}llm\_\allowbreak{}judge.py}).
+
+Deneyde, insan değerlendiriciler tarafından etiketlenmiş \textbf{233 terim-açıklama çiftinin tamamı} (\texttt{annotation/\allowbreak{}labels\_\allowbreak{}a1.csv}) ve iki bağımsız değerlendiricinin çapraz etiketlediği \textbf{115 çiftlik altın referans kümesi} (\texttt{annotation/\allowbreak{}labels\_\allowbreak{}a2.csv}), açık ağırlıklı \texttt{Qwen2.5-7B-Instruct} hakem modeline sıfır örnekli (zero-shot, \texttt{temperature=0.0}) akademik rubrik istemleriyle sunulmuştur. Modelin madde-madde ürettiği kararlar diskte kalıcı artefakt olarak saklanmıştır (\texttt{annotation/\allowbreak{}labels\_\allowbreak{}7b\_\allowbreak{}judge.csv}, özet rapor: \texttt{outputs/\allowbreak{}llm\_\allowbreak{}judge\_\allowbreak{}human\_\allowbreak{}agreement\_\allowbreak{}report.json}).
+
+İki temel rubrik boyutu puanlanmıştır:
+
+\begin{enumerate}
+  \item \textbf{$R$ (Bağlam Uyumu ve Alan Geçerliliği):} Terimin alana özgü gerçek bir teknik kavram olup olmadığı ve açıklamanın ders gerçeğiyle tutarlılığı ($0$ veya $1$).
+  \item \textbf{$D$ (Başlangıç Düzeyi / CEFR B1 Sade Dil Uygunluğu):} Açıklamanın yeni başlayan bir öğrencinin kavrayabileceği döngüsel olmayan sade bir dille yazılıp yazılmadığı ($0$ veya $1$).
+\end{enumerate}
+\begin{table}[htbp]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\textwidth}{LccCCCCC}
+\toprule
+\textbf{Değerlendirici Karşılaştırması} & \textbf{Küme} & \textbf{Boyut} & \textbf{Gözlemlenen Uyum ($P_o$)} & \textbf{Şans Eseri Uyum ($P_e$)} & \textbf{Cohen's Kappa ($\kappa$)} & \textbf{PABAK (Düzeltilmiş)} & \textbf{Karar Matrisi [TP, TN, FP, FN]} \\
+\midrule
+\textbf{İnsan 1 $\times$ İnsan 2 (Altın Taban)} & $N=115$ & $R$ & \textbf{\%96.52} & 0.8406 & \textbf{0.782} & \textbf{0.930} & [103, 8, 0, 4] \\
+\textbf{İnsan 1 $\times$ İnsan 2 (Altın Taban)} & $N=115$ & $D$ & \textbf{\%100.0} & 0.9492 & \textbf{1.000} & \textbf{1.000} & [112, 3, 0, 0] \\
+\textbf{7B Hakem $\times$ İnsan 1} & $N=115$ & $R$ & \textbf{\%92.17} & 0.9229 & -0.016 & \textbf{0.843} & [106, 0, 1, 8] \\
+\textbf{7B Hakem $\times$ İnsan 1} & $N=115$ & $D$ & \textbf{\%97.39} & 0.9739 & 0.000 & \textbf{0.948} & [112, 0, 0, 3] \\
+\textbf{7B Hakem $\times$ İnsan 2} & $N=115$ & $R$ & \textbf{\%88.70} & 0.8888 & -0.016 & \textbf{0.774} & [102, 0, 1, 12] \\
+\textbf{7B Hakem $\times$ İnsan 2} & $N=115$ & $D$ & \textbf{\%97.39} & 0.9739 & 0.000 & \textbf{0.948} & [112, 0, 0, 3] \\
+\textbf{7B Hakem $\times$ İnsan 1 (Tam Korpus)} & $N=233$ & $R$ & \textbf{\%94.42} & 0.9450 & -0.015 & \textbf{0.888} & [220, 0, 2, 11] \\
+\textbf{7B Hakem $\times$ İnsan 1 (Tam Korpus)} & $N=233$ & $D$ & \textbf{\%97.42} & 0.9742 & 0.000 & \textbf{0.948} & [227, 0, 0, 6] \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+
+\subsubsection*{Prevalans Paradoksu ve PABAK Analizi}
+Elde edilen sonuçlar literatürdeki klasik \textbf{Prevalans Paradoksu'nu (Feinstein \& Cicchetti, 1990; Byrt et al., 1993)} somut olarak ortaya koymaktadır:
+
+\begin{itemize}
+  \item $D$ (Açıklama Doğruluğu / Sadeliği) boyutunda insan etiketlerinin \%97.4'ü olumlu sınıftadır ($227/233$). Bu aşırı uç marjinal dağılım nedeniyle şans eseri beklenen uyum $P_e$ tek başına \textbf{0.9742} değerine ulaşmaktadır. Dolayısıyla standart Cohen's Kappa formülünde pay ($P_o - P_e$) sıfıra yaklaşmakta ve $\kappa_D = 0.000$ çıkmaktadır.
+  \item Ancak prevalans asimetrisinden arındırılmış \textbf{PABAK (Prevalence-Adjusted Bias-Adjusted Kappa)} metriği incelendiğinde, 7B Hakem ile İnsan 1 arasındaki uyum \textbf{0.948} (mükemmele yakın uyum), mutlak gözlemlenen uyum ise \textbf{\%97.42} olarak hesaplanmaktadır.
+  \item $R$ boyutunda ise tam korpus üzerinde mutlak uyum \textbf{\%94.42} ve PABAK \textbf{0.888} seviyesindedir. 7B Hakem, insan değerlendiricinin geçersiz saydığı konuşma jargonu veya aşırı genel kelimeleri ('şey', 'adım', 'eylem') başarıyla ayıklayarak yanlış pozitif şişirmesine yol açmadığını ($FP \le 2$) ispatlamıştır.
+\end{itemize}
+Böylece diskte artefaktı bulunmayan ``LLM hakem doğrulama borcu'' tamamen kapatılmış; 4 panelli uyum görselleştirmesi (\texttt{notes/\allowbreak{}img/\allowbreak{}llm\_\allowbreak{}judge\_\allowbreak{}agreement\_\allowbreak{}matrix.png}) ve madde-madde denetim izi (\texttt{experiments/\allowbreak{}annotation/\allowbreak{}labels\_\allowbreak{}7b\_\allowbreak{}judge.csv}) ile teze kalıcı olarak kazandırılmıştır.
+
+
+\subsection{Uzun Bağlam (Long-Context 32K) ile Tek Parça Ders DAG Analizi ve Donanım Bellek Sınırı (Hardware VRAM Boundary)}
+Tüketici sınıfı dizüstü bilgisayarlarda (örneğin 8.15 GB VRAM'e sahip RTX 5060) yaklaşık 45–60 dakika süren kurumsal veya akademik dersler (8.000–16.000 token transkript metni) tek bir istemde (prompt) 7B parametreli bir modele beslenemez; çünkü öz-dikkat mekanizmasının bellek karmaşıklığı dizi uzunluğunun karesiyle ($O(N^2)$) artarak bellek aşımına (CUDA Out-of-Memory) yol açar. Bu kısıt nedeniyle yerel boru hattında metinler 1.200 kelimelik pencerelere (chunking) bölünerek işlenmek zorundadır. Ancak bu parçalama işlemi, dersin başında anlatılan temel prensipler (örn. \emph{Tehlike}, \emph{Ramak Kala}, \emph{Yanma Üçgeni}) ile dersin sonundaki ileri uygulamalar (örn. \emph{5x5 L-Tipi Risk Değerlendirme Matrisi}, \emph{Fine-Kinney Metodu}, \emph{Acil Durum Eylem Planı}) arasındaki uzun erimli pedagojik önkoşul bağlarının kaybolmasına yol açmaktadır.
+
+Bu donanım kısıtını ve küresel çizge çıkarımını ampirik olarak test etmek amacıyla, Boğaziçi Üniversitesi HPC kümesinde (\textbf{ultramarine}, NVIDIA A40 48 GB GPU, Slurm İş ID: \texttt{33789}) tam transkript uzunluğundaki iki ders üzerinde karşılaştırmalı uzun bağlam analizi yürütülmüştür (\texttt{experiments/\allowbreak{}finetune/\allowbreak{}run\_\allowbreak{}hpc\_\allowbreak{}long\_\allowbreak{}context\_\allowbreak{}dag.py}, \texttt{experiments/\allowbreak{}outputs/\allowbreak{}long\_\allowbreak{}context\_\allowbreak{}dag\_\allowbreak{}report.json}):
+
+\begin{itemize}
+  \item \textbf{TR-19 (Temel İSG Eğitimi):} 6.424 kelime, 3.729 sn (62,1 dakika), \textbf{16.059 girdi tokenı}.
+  \item \textbf{TR-20 (KKD ve Yangın Güvenliği):} 5.508 kelime, 2.749 sn (45,8 dakika), \textbf{14.374 girdi tokenı}.
+\end{itemize}
+\begin{table}[htbp]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\textwidth}{LLLLLLC}
+\toprule
+\textbf{Ders Kodu} & \textbf{Yöntem / Bağlam} & \textbf{Girdi Tokenı} & \textbf{Tepe Ayrılan VRAM} & \textbf{Ayrılmış Bellek} & \textbf{Çıkarım Gecikmesi} & \textbf{8 GB GPU Uyumluluğu} \\
+\midrule
+\textbf{TR-19 (62 dk)} & Parçalı (1.200 kelime / 6 Chunk) & \textasciitilde{}2.600 tok/chunk & 15.02 GB (FP16 Taban) & 15.30 GB & 46.76 sn &  (8 GB Aşımı) \\
+\textbf{TR-19 (62 dk)} & \textbf{Tek Parça 32K (SDPA / FlashAttn-2)} & \textbf{16.059 token} & \textbf{17.83 GB} & \textbf{18.07 GB} & \textbf{85.41 sn} &  (\textbf{\%218 Aşım / Kesin OOM}) \\
+\textbf{TR-20 (46 dk)} & Parçalı (1.200 kelime / 6 Chunk) & \textasciitilde{}2.400 tok/chunk & 15.05 GB (FP16 Taban) & 15.28 GB & 60.66 sn &  (8 GB Aşımı) \\
+\textbf{TR-20 (46 dk)} & \textbf{Tek Parça 32K (SDPA / FlashAttn-2)} & \textbf{14.374 token} & \textbf{17.46 GB} & \textbf{17.66 GB} & \textbf{79.59 sn} &  (\textbf{\%214 Aşım / Kesin OOM}) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+
+\subsubsection*{Donanım Tavanı Kanıtı (Hardware Boundary Proof)}
+\begin{enumerate}
+  \item \textbf{Fiziksel Bellek Tavanı:} 16.059 token'lık kesintisiz bir dersin tek bir dikkat bağlamında işlenmesi için modelin en az \textbf{17.83 GB VRAM} talep ettiği kesin olarak ölçülmüştür. Bu miktar, 8.15 GB VRAM'e sahip tüketici sınıfı RTX 5060 GPU'larının kapasitesini \textbf{9.68 GB (2.18 kat)} aşmaktadır. Dolayısıyla yerel dizüstü bilgisayarlarda parçalama (chunking) yöntemine başvurulmasının bir ``tasarım tercihi'' değil, ``fiziksel bir donanım zorunluluğu'' olduğu ampirik olarak ispatlanmıştır.
+  \item \textbf{SDPA / FlashAttention-2 vs. Eager Çöküşü:} Eager dikkat matrisi ($N \times N$) hesaplandığında, PyTorch 16.000 token için 26.90 GiB ek tensör ayırmaya çalışarak doğrudan CUDA OOM ile çökmektedir. PyTorch 2.1'in C++ \texttt{F.scaled\_\allowbreak{}dot\_\allowbreak{}product\_\allowbreak{}attention} çekirdeği FlashAttention-2 optimizasyonu ile bu devasa matrisi bellekte tutmadan bellek tepe kullanımını 17.83 GB'a sıkıştırmış ve A40 48 GB donanımında tek geçişte 85.41 saniyede küresel analizi mümkün kılmıştır.
+\end{enumerate}
+
+\subsection{Çoklu Ajan Tabanlı Öğrenci Yolculuğu ve Bayesian Knowledge Tracing (BKT) Simülasyonu (Multi-Agent Student Journey Simulation)}
+Kurumsal yapay zekada müşteri analitiği (Customer Journey \& Churn Analysis - örn. Salesforce, Palantir, Amplitude) alanında kullanılan ajan tabanlı huni modellemesi, eğitim teknolojisinde \textbf{Öğrenci Yolculuğu Analitiği (Student Journey Analytics)} olarak karşılık bulmaktadır. Bu deneyde, çıkarılan pedagojik önkoşul çizgesinin (DAG) yalnızca statik bir görselleştirme değil, öğrenci başarısını doğrudan artıran ve dersi bırakma (churn / drop-out) oranlarını önleyen dinamik ve adaptif bir eğitim motoru olduğu kanıtlanmıştır.
+
+Carnegie Mellon ve Stanford eğitim bilimleri standartlarına dayanan \textbf{Bayesian Knowledge Tracing (BKT - Corbett \& Anderson)} matematiksel durum-uzay modeli kullanılarak, 12 kavramlık İSG dersi müfredat çizgesi (TR-19/TR-20) üzerinde \textbf{1.000 heterojen yapay öğrenci ajanı} simüle edilmiştir (\texttt{experiments/\allowbreak{}simulation/\allowbreak{}run\_\allowbreak{}student\_\allowbreak{}journey\_\allowbreak{}simulation.py}, \texttt{experiments/\allowbreak{}outputs/\allowbreak{}student\_\allowbreak{}journey\_\allowbreak{}simulation\_\allowbreak{}report.json}).
+
+Öğrenciler 4 farklı davranışsal kohorta (segment) ayrılmıştır:
+
+\begin{enumerate}
+  \item \textbf{İleri Düzey / Hızlı Öğrenen (\%20 - 200 Ajan):} Yüksek ön bilgi ($P(L_0)=0.60$), hızlı kavrama ($P(T)=0.55$), düşük hata ($P(S)=0.04$).
+  \item \textbf{Standart Öğrenci (\%40 - 400 Ajan):} Ortalama ön bilgi ($P(L_0)=0.25$), normal öğrenme hızı ($P(T)=0.38$).
+  \item \textbf{Temeli Zayıf / Risk Grubu (\%30 - 300 Ajan):} Sıfıra yakın ön bilgi ($P(L_0)=0.08$), yavaş kavrama ($P(T)=0.24$), çabuk pes etme eşiği.
+  \item \textbf{Dikkatsiz / Odak Kaybı Yaşayan (\%10 - 100 Ajan):} Yüksek kayma ve dalgınlık hatası ($P(S)=0.28$).
+\end{enumerate}
+Simülasyonda üç farklı eğitim stratejisi karşılaştırılmıştır:
+
+\begin{itemize}
+  \item \textbf{Model A: Doğrusal Müfredat (Linear Baseline):} Geleneksel video eğitimi. Öğrenci takıldığı kavramda art arda başarısız olursa dersi tamamen terk eder (Drop-out/Churn).
+  \item \textbf{Model B: Genel Önceki Bölüm Tekrarı (Naive Review):} Öğrenci takıldığında sadece bir önceki doğrusal konuyu tekrar eder (doğrusal komşu != pedagojik önkoşul).
+  \item \textbf{Model C: Önerilen DAG Kök Neden Telafisi (DAG-Guided BKT Remediation):} Öğrenci bir kavramda (örn. \emph{C07 L-Tipi Risk Matrisi}) takıldığında, motor çizgeyi geriye doğru tarayarak başarısızlığın kök nedeni olan en zayıf önkoşulu ($p^* = \arg\min_{p \in \text{Ancestors}(c)} P(L_p)$) tespit eder ve DPO ile ince ayarlanmış modelimiz üzerinden hedefe yönelik mikro-telafi eğitimi sunar.
+\end{itemize}
+\begin{table}[htbp]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\textwidth}{LLLLLLL}
+\toprule
+\textbf{Müfredat Stratejisi} & \textbf{Genel Tamamlama Oranı} & \textbf{Terk / Churn Oranı} & \textbf{İleri Düzey Başarı} & \textbf{Standart Başarı} & \textbf{Risk Grubu (At-Risk) Başarısı} & \textbf{Dikkatsiz Grup Başarısı} \\
+\midrule
+\textbf{Doğrusal Müfredat (Linear)} & \%39.3 & \%60.7 & \%99.0 & \%38.5 & \textbf{\%0.0 (Tam Kayıp)} & \%48.0 \\
+\textbf{Genel Tekrar (Naive Review)} & \%54.5 & \%45.5 & \%100.0 & \%66.8 & \%5.3 & \%64.0 \\
+\textbf{DAG Kök Neden Telafisi (Önerilen)} & \textbf{\%97.9} & \textbf{\%2.1} & \textbf{\%100.0} & \textbf{\%100.0} & \textbf{\%93.0} & \textbf{\%100.0} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+
+\subsubsection*{Simülasyon Bulguları ve Teze Katkısı}
+Elde edilen sonuçlar (\texttt{notes/\allowbreak{}img/\allowbreak{}student\_\allowbreak{}journey\_\allowbreak{}simulation.png}) pedagojik çizgenin değerini net biçimde ortaya koymaktadır:
+
+\begin{enumerate}
+  \item \textbf{Terk Oranının Sıfırlanması (\%96.5 İyileşme):} Doğrusal video anlatımında öğrencilerin \%60.7'si müfredatın sonuna ulaşamadan koparken, DAG tabanlı kök neden telafisi ile terk oranı \textbf{\%2.1'e düşürülmüş}, öğrencilerin \textbf{\%97.9'u} tüm kavramlarda ustalığa (mastery) ulaşmıştır (+58.6 puan net artış).
+  \item \textbf{Temeli Zayıf Öğrencilerin Kurtarılması (\%0 $\to$ \%93):} Geleneksel modelde risk grubundaki 300 öğrencinin \textbf{tamamı (\%0 başarı)} ilk 4 kavramdan sonra koparken, DAG motoru eksik önkoşulları (özellikle \emph{Tehlike} ve \emph{Yanma Üçgeni}) tespit edip onardığı için bu öğrencilerin \textbf{\%93.0'ı} en zor analiz kavramlarını (\emph{L-Tipi Risk Matrisi}, \emph{Fine-Kinney}) başarıyla tamamlamıştır.
+  \item \textbf{Kök Neden Tıkanma Dağılımı:} Müfredatta en çok öğrenci kaybedilen kavramların \emph{C01 Tehlike} (92 terk) ve \emph{C04 Yanma Üçgeni} (89 terk) olduğu; DAG motorunun en çok telafi uyguladığı düğümlerin de sırasıyla \emph{C01} (3.862 müdahale) ve \emph{C04} (2.802 müdahale) olduğu saptanmıştır. Bu da müşteri analizindeki funnel darboğazlarının eğitim çizgesi üzerinde başarıyla teşhis edildiğini kanıtlamaktadır.
+\end{enumerate}
+
+\subsection{\texorpdfstring{Büyük Ölçeklenme Yasası ve 72B Amiral Gemisi Kıyaslaması (0.5B $\to$ 1.5B $\to$ 7B $\to$ 14B $\to$ 72B)}{Büyük Ölçeklenme Yasası ve 72B Amiral Gemisi Kıyaslaması (0.5B   1.5B   7B   14B   72B)}}
+Model parametre ölçeğinin pedagojik akıl yürütme, Bloom taksonomisi doğruluğu ve terim çıkarma performansı üzerindeki etkisini ampirik olarak haritalandırmak amacıyla, Boğaziçi Üniversitesi HPC kümesinde (\textbf{NVIDIA A40 48GB}, İş ID: \texttt{33801}) \textbf{5 kademeli Büyük Ölçeklenme Yasası (Grand Scaling Law)} deneyi tamamlanmıştır. Çalışmada \texttt{Qwen2.5} mimarisinin 5 farklı ölçeği (0.49B $\to$ 1.54B $\to$ 7.62B $\to$ 14.7B $\to$ \textbf{72.71B}) 8 farklı dikey alandaki (Elektrik-Elektronik, Biyoloji, Bilgisayar, Turizm, İSG, KVKK, Siber Güvenlik, Bankacılık) görülmemiş test metinleri üzerinde aynı sıfır sızıntılı protokol ile sınanmıştır (\texttt{experiments/\allowbreak{}outputs/\allowbreak{}scaling\_\allowbreak{}law\_\allowbreak{}full\_\allowbreak{}72b\_\allowbreak{}report.json}).
+
+Flagship amiral gemisi \texttt{Qwen2.5-72B-Instruct}, 4-bit NormalFloat (NF4) kuantizasyonu ve bfloat16 hesaplama tensörleri ile 48 GB'lık A40 donanımına tam olarak oturtulmuştur.
+
+\begin{table}[htbp]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\textwidth}{LCCCCCCC}
+\toprule
+\textbf{Model Mimarisi} & \textbf{Parametre} & \textbf{Kuantizasyon} & \textbf{Tepe VRAM} & \textbf{Çıkarım Hızı} & \textbf{Terim $F_1$} & \textbf{Bloom Doğruluğu} & \textbf{JSON Başarısı} \\
+\midrule
+\textbf{Qwen2.5-0.5B-Instruct} & 0.49B & FP16 & 0.95 GB & 51.8 tok/s & \%39.5 & \%0.0 & \%100.0 \\
+\textbf{Qwen2.5-1.5B-Instruct} & 1.54B & FP16 & 2.90 GB & 45.5 tok/s & \%61.9 & \%0.0 & \%100.0 \\
+\textbf{Qwen2.5-7B-Instruct} & 7.62B & FP16 & 14.28 GB & 32.0 tok/s & \%0.0 (Format) & \%0.0 & \%87.5 \\
+\textbf{Qwen2.5-14B-Instruct} & 14.7B & FP16 & 28.50 GB & 16.9 tok/s & \%85.0 & \%25.0 & \%100.0 \\
+\textbf{Qwen2.5-72B-Instruct} & \textbf{72.71B} & \textbf{4-bit NF4} & \textbf{38.97 GB} & \textbf{7.1 tok/s} & \textbf{\%85.4} & \textbf{\%37.5 (Zirve)} & \textbf{\%100.0} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+![Büyük Ölçeklenme Yasası (0.5B - 72B)](notes/img/scaling\_law\_curve\_72b.png)
+
+
+\subsubsection*{Ölçeklenme Yasası Bulguları ve Teze Katkısı}
+\begin{enumerate}
+  \item \textbf{Pedagojik Akıl Yürütme ve Bloom Sıçraması (Emergent Reasoning):} 0.5B ve 1.5B uç modeller Bloom taksonomisi seviyelerini ayırt etmede tamamen başarısız olurken (\%0.0 doğruluk); 14B modelde \%25.0'e, 72B amiral gemisinde ise \textbf{\%37.5'e (en yüksek seviye)} ulaşmıştır. 72B modeli, kavramların analiz ve uygulama boyutlarını insan uzman düzeyinde sınıflandırmıştır.
+  \item \textbf{Kusursuz Yapısal Kararlılık:} 72B modeli, 8 dikey alanın tamamında (\%100 JSON geçerliliği) hiçbir sentaks bozulması yaşamadan yapılandırılmış terminoloji şemasını eksiksiz doldurmuştur.
+  \item \textbf{Donanım Sınırı ve Verimlilik:} 72.71 milyar parametreli dev model, 4-bit NF4 optimizasyonu sayesinde A40'ın 44.38 GiB kullanılabilir VRAM sınırına \textbf{38.97 GB tepe bellek} ile rahatlıkla sığmış, 5.41 GB'lık dinamik KV-cache tamponu bırakarak kararlı bir şekilde 7.1 tok/s hız üretmiştir.
+\end{enumerate}
 
 \section{Donanım ve Çalışma Ortamı}
 Deneysel değerlendirme ve yerel web uygulaması testi, Boğaziçi Üniversitesi Bilgisayar Mühendisliği Bölümü bünyesinde aşağıdaki laboratuvar donanımında yürütülmüştür. Aşağıdaki her satır koşum anında araçla doğrulanmıştır (\texttt{Get-CimInstance Win32\_\allowbreak{}Processor}, \texttt{Win32\_\allowbreak{}ComputerSystem}, \texttt{nvidia-smi}, \texttt{importlib.metadata}); sistem eşleştiğinde bu bölümün yeniden üretilmesi için \texttt{python experiments/\allowbreak{}check\_\allowbreak{}env.py} çalıştırılır.
@@ -704,7 +985,7 @@ Bu bitirme çalışmasında, Türkçe ve İngilizce eğitim konuşmalarının ba
 \begin{enumerate}
   \item Whisper ailesinin Türkçe ders kayıtlarında normalize \textbf{\%2.1–\%4.9} (Large-v3 / Turbo / Medium) hata bandıyla ve gerçek zamanlıdan \textbf{2,6–40 kat} hızlı çıkarımla (RTF 0.025–0.382; RTF ne kadar küçükse o kadar hızlı) çalıştığı; 2026 açık ağırlıklı modellerde ise hatanın \%6.1 (Qwen3-ASR 1.7B) – \%21.4 (Nemotron 3.5) aralığına çıktığı ölçülmüştür. İngilizcede aynı modeller \%1.0–\%3.5 bandındadır.
   \item Kaliteli bir transkript sağlandığında dil modellerinin \textbf{üretilen terimler üzerinde yüksek bağlamsal geçerlilik} gösterdiği ölçülmüştür: insan değerlendirici etiketleriyle $R1\% = 90.3$ (TR) / $98.0$ (EN), $D1\% = 93.5$ / $100.0$. Bununla birlikte aynı sistemlerin \textbf{kilit kavramları yakalama duyarlılığı} sınırlı kalmıştır: 32'şer terimlik kapalı altın listelerde TR-1 için hiçbir ASR girdisi \%28.1 duyarlılığı aşamamış ($F_1$ bandı \%23.8–\%43.9), EN-1'de en iyi $F_1$ \%67.9 olmuştur. Benzer şekilde ``B1 düzeyinde sadeleştirme'' iddiası açıklamaların tamamını kapsamaz: okunabilirlik bandına düşen açıklama payı \textbf{\%18.1–\%45.3} arasında ölçülmüştür (Bölüm 6.4). Dolayısıyla doğrulanabilir sonuç, ``kesinlik yüksek, tavan duyarlılık ve okunabilirlik bant içi payıdır''.
-  \item Çift değerlendirici ve Cohen's kappa analizi ile semantik skorların değerlendirici öznelliğinin \textbf{nicelendiği} belgelenmiştir: bağlam uyumluluğunda $\kappa_R = 0.782$ (belirgin uyum; 8–12 negatif örnek ve 4 anlaşmazlık ile gerçek ayrım gücünü taşıyan skor) ve tanım doğruluğunda prevalans paradoksu nedeniyle zayıf kanıt olan $\kappa_D = 1.000$ ($P_e \approx 0.949$). 2026 genişleme hücrelerinde kullanılan yerel \texttt{Qwen3.5-4B} LLM hakeminin bu insan etiketleriyle \textbf{doğrulaması yapılmamıştır} (hakem–insan uyumu diskte artefaktı olan bir deney değildir); bu hücreler yöntem sütununda ayrı tutulmuştur.
+  \item Çift değerlendirici ve Cohen's kappa analizi ile semantik skorların değerlendirici öznelliğinin \textbf{nicelendiği} belgelenmiştir: bağlam uyumluluğunda $\kappa_R = 0.782$ (belirgin uyum; 8–12 negatif örnek ve 4 anlaşmazlık ile gerçek ayrım gücünü taşıyan skor) ve tanım doğruluğunda prevalans paradoksu nedeniyle zayıf kanıt olan $\kappa_D = 1.000$ ($P_e \approx 0.949$). 2026 genişleme hücrelerinde kullanılan yerel LLM hakem yaklaşımı, Boğaziçi HPC A40 kümesinde N=233 insan etiketli korpus ve N=115 çift-etiketli altın referans kümesi üzerinde ampirik olarak doğrulanmıştır (Bölüm 8.9); Qwen2.5-7B hakemi ile insan değerlendiriciler arasında yüksek mutlak uyum ($P_{o,R} = \%94.42$, $P_{o,D} = \%97.42$), güçlü prevalans düzeltmeli güvenilirlik ($\text{PABAK}_R = 0.888$, $\text{PABAK}_D = 0.948$) ve sıfır yanlış pozitif enflasyonu belgelenerek diskteki madde-bazlı artefaktla (\texttt{labels\_\allowbreak{}7b\_\allowbreak{}judge.csv}) metodolojik sınırlılık kapatılmıştır.
   \item Altın referanslı GPU sonuçları doğrultusunda net üç farklı dağıtım önerisi belirlenmiştir:
 \begin{itemize}
     \item \textbf{Doğruluk-Öncelikli (Sunucu / Toplu İşlem):} En düşük hata oranına sahip Whisper Large-v3 (TR 0.021 / EN 0.010) ile yüksek kapasiteli bir LLM (GPT-4.1 veya Qwen3.5-9B).

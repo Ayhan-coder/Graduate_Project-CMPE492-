@@ -1,0 +1,1680 @@
+{
+ "note": "Metadata-only candidate pool for the 100-clip expansion; measured duration bounds 300-2700 s, video ids deduplicated against data_inventory.json. No audio downloaded, no gold claim: anything accepted later stays gold_how=machine_only.",
+ "tool": "yt-dlp 2026.08.19",
+ "bounds_s": [
+  300,
+  2700
+ ],
+ "total_candidates": 163,
+ "by_lang": {
+  "tr": 74,
+  "en": 83
+ },
+ "per_cell_stats": {
+  "Artificial Intelligence & Machine Learning|en": {
+   "seen": 15,
+   "kept": 6,
+   "rejected_short": 3,
+   "rejected_long": 4,
+   "duplicate": 0
+  },
+  "Artificial Intelligence & Machine Learning|tr": {
+   "seen": 15,
+   "kept": 6,
+   "rejected_short": 1,
+   "rejected_long": 1,
+   "duplicate": 0
+  },
+  "Biology & Genetics|en": {
+   "seen": 15,
+   "kept": 6,
+   "rejected_short": 4,
+   "rejected_long": 4,
+   "duplicate": 0
+  },
+  "Biology & Genetics|tr": {
+   "seen": 15,
+   "kept": 6,
+   "rejected_short": 1,
+   "rejected_long": 5,
+   "duplicate": 0
+  },
+  "Cognitive Psychology & Neuroscience|en": {
+   "seen": 15,
+   "kept": 6,
+   "rejected_short": 1,
+   "rejected_long": 2,
+   "duplicate": 0
+  },
+  "Cognitive Psychology & Neuroscience|tr": {
+   "seen": 15,
+   "kept": 6,
+   "rejected_short": 0,
+   "rejected_long": 3,
+   "duplicate": 0
+  },
+  "Computer Science & Data Science|en": {
+   "seen": 15,
+   "kept": 6,
+   "rejected_short": 2,
+   "rejected_long": 2,
+   "duplicate": 0
+  },
+  "Computer Science & Data Science|tr": {
+   "seen": 0,
+   "kept": 0,
+   "rejected_short": 0,
+   "rejected_long": 0,
+   "duplicate": 0
+  },
+  "Corporate Compliance & Personal Data Protection (KVKK/GDPR)|en": {
+   "seen": 15,
+   "kept": 6,
+   "rejected_short": 4,
+   "rejected_long": 3,
+   "duplicate": 1
+  },
+  "Corporate Compliance & Personal Data Protection (KVKK/GDPR)|tr": {
+   "seen": 15,
+   "kept": 2,
+   "rejected_short": 9,
+   "rejected_long": 4,
+   "duplicate": 0
+  },
+  "Economics & Finance|en": {
+   "seen": 15,
+   "kept": 6,
+   "rejected_short": 0,
+   "rejected_long": 2,
+   "duplicate": 0
+  },
+  "Economics & Finance|tr": {
+   "seen": 15,
+   "kept": 6,
+   "rejected_short": 1,
+   "rejected_long": 1,
+   "duplicate": 0
+  },
+  "Electrical Engineering & Circuit Theory|en": {
+   "seen": 15,
+   "kept": 6,
+   "rejected_short": 1,
+   "rejected_long": 0,
+   "duplicate": 0
+  },
+  "Electrical Engineering & Circuit Theory|tr": {
+   "seen": 15,
+   "kept": 6,
+   "rejected_short": 0,
+   "rejected_long": 1,
+   "duplicate": 0
+  },
+  "History & Cultural Heritage|en": {
+   "seen": 15,
+   "kept": 6,
+   "rejected_short": 0,
+   "rejected_long": 7,
+   "duplicate": 0
+  },
+  "History & Cultural Heritage|tr": {
+   "seen": 15,
+   "kept": 6,
+   "rejected_short": 2,
+   "rejected_long": 2,
+   "duplicate": 0
+  },
+  "Mathematics (Linear Algebra, Calculus)|en": {
+   "seen": 15,
+   "kept": 6,
+   "rejected_short": 1,
+   "rejected_long": 2,
+   "duplicate": 0
+  },
+  "Mathematics (Linear Algebra, Calculus)|tr": {
+   "seen": 15,
+   "kept": 6,
+   "rejected_short": 0,
+   "rejected_long": 2,
+   "duplicate": 0
+  },
+  "Mechanical & Thermal Engineering|en": {
+   "seen": 15,
+   "kept": 6,
+   "rejected_short": 1,
+   "rejected_long": 6,
+   "duplicate": 0
+  },
+  "Mechanical & Thermal Engineering|tr": {
+   "seen": 15,
+   "kept": 6,
+   "rejected_short": 0,
+   "rejected_long": 0,
+   "duplicate": 0
+  },
+  "Occupational Health and Safety (ISG / OHS)|en": {
+   "seen": 15,
+   "kept": 6,
+   "rejected_short": 7,
+   "rejected_long": 1,
+   "duplicate": 1
+  },
+  "Occupational Health and Safety (ISG / OHS)|tr": {
+   "seen": 15,
+   "kept": 6,
+   "rejected_short": 5,
+   "rejected_long": 1,
+   "duplicate": 0
+  },
+  "Physics (Mechanics, Electromagnetism)|en": {
+   "seen": 15,
+   "kept": 6,
+   "rejected_short": 4,
+   "rejected_long": 5,
+   "duplicate": 0
+  },
+  "Physics (Mechanics, Electromagnetism)|tr": {
+   "seen": 15,
+   "kept": 6,
+   "rejected_short": 1,
+   "rejected_long": 5,
+   "duplicate": 0
+  },
+  "Software Engineering & Project Management|en": {
+   "seen": 15,
+   "kept": 6,
+   "rejected_short": 0,
+   "rejected_long": 2,
+   "duplicate": 0
+  },
+  "Software Engineering & Project Management|tr": {
+   "seen": 15,
+   "kept": 6,
+   "rejected_short": 1,
+   "rejected_long": 6,
+   "duplicate": 1
+  },
+  "Tourism & Sustainable Hospitality|en": {
+   "seen": 15,
+   "kept": 5,
+   "rejected_short": 7,
+   "rejected_long": 2,
+   "duplicate": 1
+  },
+  "Tourism & Sustainable Hospitality|tr": {
+   "seen": 15,
+   "kept": 6,
+   "rejected_short": 2,
+   "rejected_long": 0,
+   "duplicate": 0
+  }
+ },
+ "candidates": [
+  {
+   "youtube_id": "CldVDuUisYE",
+   "lang": "tr",
+   "domain": "Software Engineering & Project Management",
+   "title": "Proje Yönetimi Kazanılmış Değer Analizi - Earned Value Analysis",
+   "duration_s": 941.0,
+   "channel": "faruk çubukçu",
+   "url": "https://www.youtube.com/watch?v=CldVDuUisYE"
+  },
+  {
+   "youtube_id": "d1m59vuAdmA",
+   "lang": "tr",
+   "domain": "Software Engineering & Project Management",
+   "title": "Microsoft Project - Yürütme",
+   "duration_s": 802.0,
+   "channel": "faruk çubukçu",
+   "url": "https://www.youtube.com/watch?v=d1m59vuAdmA"
+  },
+  {
+   "youtube_id": "HDC3dcSeCoE",
+   "lang": "tr",
+   "domain": "Software Engineering & Project Management",
+   "title": "Learn to Ignore Everything: Psychologist's Cool Posture Formula",
+   "duration_s": 644.0,
+   "channel": "Psikolog Tuba Dadaşoğlu",
+   "url": "https://www.youtube.com/watch?v=HDC3dcSeCoE"
+  },
+  {
+   "youtube_id": "FXN4jIj0bb0",
+   "lang": "tr",
+   "domain": "Software Engineering & Project Management",
+   "title": "Bilinçaltını Etkileyen İkna Tekniği  I Sinan Ergin",
+   "duration_s": 742.0,
+   "channel": "Sinan Ergin - livealive",
+   "url": "https://www.youtube.com/watch?v=FXN4jIj0bb0"
+  },
+  {
+   "youtube_id": "QEOlVZPDhKg",
+   "lang": "tr",
+   "domain": "Software Engineering & Project Management",
+   "title": "SATIŞ ve PAZARLAMADA HİÇ SÖYLENMEMİŞ SIRLAR",
+   "duration_s": 735.0,
+   "channel": "Sinan Ergin - livealive",
+   "url": "https://www.youtube.com/watch?v=QEOlVZPDhKg"
+  },
+  {
+   "youtube_id": "DbMJeplrutA",
+   "lang": "tr",
+   "domain": "Software Engineering & Project Management",
+   "title": "Seni Ezmeye ve Aşağılamaya Çalışan İnsanlara Karşı Yapman Gerekenler",
+   "duration_s": 717.0,
+   "channel": "Psikolog Tuba Dadaşoğlu",
+   "url": "https://www.youtube.com/watch?v=DbMJeplrutA"
+  },
+  {
+   "youtube_id": "z7b3SYQuqJM",
+   "lang": "en",
+   "domain": "Software Engineering & Project Management",
+   "title": "Earned value analysis worked example",
+   "duration_s": 632.0,
+   "channel": "Engineer4Free",
+   "url": "https://www.youtube.com/watch?v=z7b3SYQuqJM"
+  },
+  {
+   "youtube_id": "9g55AwVQS64",
+   "lang": "en",
+   "domain": "Software Engineering & Project Management",
+   "title": "What is Earned Value Management? Example Formulas | EV, PV, SV, CV, AC",
+   "duration_s": 367.0,
+   "channel": "Project Management Academy",
+   "url": "https://www.youtube.com/watch?v=9g55AwVQS64"
+  },
+  {
+   "youtube_id": "ZErXJiC9TEU",
+   "lang": "en",
+   "domain": "Software Engineering & Project Management",
+   "title": "Software Project Management: Monitor and Control",
+   "duration_s": 1869.0,
+   "channel": "Ayman Bahaa-Eldin",
+   "url": "https://www.youtube.com/watch?v=ZErXJiC9TEU"
+  },
+  {
+   "youtube_id": "o_BG-wxLGzg",
+   "lang": "en",
+   "domain": "Software Engineering & Project Management",
+   "title": "Earned Value Analysis: Worked Example",
+   "duration_s": 705.0,
+   "channel": "Tactical Project Manager",
+   "url": "https://www.youtube.com/watch?v=o_BG-wxLGzg"
+  },
+  {
+   "youtube_id": "7qGUyTfjWCw",
+   "lang": "en",
+   "domain": "Software Engineering & Project Management",
+   "title": "What is Earned Value Management? | EVM | CV, SV, CPI, SPI, EAC, ETC, TCPI, VAC | PMP Exam",
+   "duration_s": 1873.0,
+   "channel": "Sunny Sensei",
+   "url": "https://www.youtube.com/watch?v=7qGUyTfjWCw"
+  },
+  {
+   "youtube_id": "vyT2YrgHHJo",
+   "lang": "en",
+   "domain": "Software Engineering & Project Management",
+   "title": "Earned Value Management Made Easy: Learn EVM in 11 Minutes with a Road Trip",
+   "duration_s": 661.0,
+   "channel": "PM Aspirant",
+   "url": "https://www.youtube.com/watch?v=vyT2YrgHHJo"
+  },
+  {
+   "youtube_id": "xvvkx49HuuU",
+   "lang": "en",
+   "domain": "Computer Science & Data Science",
+   "title": "Text as Data [part 3]: Feature extraction",
+   "duration_s": 778.0,
+   "channel": "Terne Thorn Jakobsen",
+   "url": "https://www.youtube.com/watch?v=xvvkx49HuuU"
+  },
+  {
+   "youtube_id": "_lxhnV8Ucy8",
+   "lang": "en",
+   "domain": "Computer Science & Data Science",
+   "title": "W3_L2: Demonstration of data extraction, imputation, scaling, visualizing feature distribution",
+   "duration_s": 1784.0,
+   "channel": "IIT Madras - B.S. Degree Programme",
+   "url": "https://www.youtube.com/watch?v=_lxhnV8Ucy8"
+  },
+  {
+   "youtube_id": "8x4bfmkx6kM",
+   "lang": "en",
+   "domain": "Computer Science & Data Science",
+   "title": "Feature Extraction in Computer Vision | Traditional vs Deep Learning Explained",
+   "duration_s": 1515.0,
+   "channel": "Debstuti Das",
+   "url": "https://www.youtube.com/watch?v=8x4bfmkx6kM"
+  },
+  {
+   "youtube_id": "BEmBkEs4qEA",
+   "lang": "en",
+   "domain": "Computer Science & Data Science",
+   "title": "Feature Engineering",
+   "duration_s": 593.0,
+   "channel": "MachineLearnAthon",
+   "url": "https://www.youtube.com/watch?v=BEmBkEs4qEA"
+  },
+  {
+   "youtube_id": "gvnjf6Rn2t0",
+   "lang": "en",
+   "domain": "Computer Science & Data Science",
+   "title": "#PY05 L1 L2 Data Normalizer 4 Preparation Preprocessing|ITFO",
+   "duration_s": 695.0,
+   "channel": "ITFO",
+   "url": "https://www.youtube.com/watch?v=gvnjf6Rn2t0"
+  },
+  {
+   "youtube_id": "LDvmYUlpwwA",
+   "lang": "en",
+   "domain": "Computer Science & Data Science",
+   "title": "Normalization | Feature Scaling | Machine Learning",
+   "duration_s": 1285.0,
+   "channel": "NEXT iN",
+   "url": "https://www.youtube.com/watch?v=LDvmYUlpwwA"
+  },
+  {
+   "youtube_id": "SsnQl8m6rqQ",
+   "lang": "tr",
+   "domain": "Artificial Intelligence & Machine Learning",
+   "title": "Gradient Descent Algoritması Türkçe",
+   "duration_s": 397.0,
+   "channel": "Oğuzhan Kahraman",
+   "url": "https://www.youtube.com/watch?v=SsnQl8m6rqQ"
+  },
+  {
+   "youtube_id": "ei06icYphnw",
+   "lang": "tr",
+   "domain": "Artificial Intelligence & Machine Learning",
+   "title": "ÇOKLU GRADİENT DESCENT - MAKİNE ÖĞRENMESİNE GİRİŞ - 19",
+   "duration_s": 442.0,
+   "channel": "Özkan Yılmaz",
+   "url": "https://www.youtube.com/watch?v=ei06icYphnw"
+  },
+  {
+   "youtube_id": "okL2q2eN9V4",
+   "lang": "tr",
+   "domain": "Artificial Intelligence & Machine Learning",
+   "title": "REGULARIZATION - MAKİNE ÖĞRENMESİNE GİRİŞ - 42",
+   "duration_s": 858.0,
+   "channel": "Özkan Yılmaz",
+   "url": "https://www.youtube.com/watch?v=okL2q2eN9V4"
+  },
+  {
+   "youtube_id": "kv78q-g1pJ4",
+   "lang": "tr",
+   "domain": "Artificial Intelligence & Machine Learning",
+   "title": "Makine Öğrenmesi -3- Lineer Regresyon'un Arkasındaki Matematik (Yapay Zeka)",
+   "duration_s": 1645.0,
+   "channel": "Makine Öğrenmesi",
+   "url": "https://www.youtube.com/watch?v=kv78q-g1pJ4"
+  },
+  {
+   "youtube_id": "Rnb_iUQ3PJQ",
+   "lang": "tr",
+   "domain": "Artificial Intelligence & Machine Learning",
+   "title": "REGULARIZED LOJISTIC REGRESSION - MAKİNE ÖĞRENMESİNE GİRİŞ - 44",
+   "duration_s": 557.0,
+   "channel": "Özkan Yılmaz",
+   "url": "https://www.youtube.com/watch?v=Rnb_iUQ3PJQ"
+  },
+  {
+   "youtube_id": "q3WzsNzxZQY",
+   "lang": "tr",
+   "domain": "Artificial Intelligence & Machine Learning",
+   "title": "Gradient descent derinlemesine | Yapay Zekâ için Calculus #11",
+   "duration_s": 410.0,
+   "channel": "Emre Baran ARCA",
+   "url": "https://www.youtube.com/watch?v=q3WzsNzxZQY"
+  },
+  {
+   "youtube_id": "i62czvwDlsw",
+   "lang": "en",
+   "domain": "Artificial Intelligence & Machine Learning",
+   "title": "Gradient Descent Explained",
+   "duration_s": 425.0,
+   "channel": "IBM Technology",
+   "url": "https://www.youtube.com/watch?v=i62czvwDlsw"
+  },
+  {
+   "youtube_id": "EehRcPo1M-Q",
+   "lang": "en",
+   "domain": "Artificial Intelligence & Machine Learning",
+   "title": "Regularization in a Neural Network | Dealing with overfitting",
+   "duration_s": 700.0,
+   "channel": "AssemblyAI",
+   "url": "https://www.youtube.com/watch?v=EehRcPo1M-Q"
+  },
+  {
+   "youtube_id": "Q81RR3yKn30",
+   "lang": "en",
+   "domain": "Artificial Intelligence & Machine Learning",
+   "title": "Regularization Part 1: Ridge (L2) Regression",
+   "duration_s": 1227.0,
+   "channel": "StatQuest with Josh Starmer",
+   "url": "https://www.youtube.com/watch?v=Q81RR3yKn30"
+  },
+  {
+   "youtube_id": "ib5cMb1p02w",
+   "lang": "en",
+   "domain": "Artificial Intelligence & Machine Learning",
+   "title": "Lecture 7.3 - Training Neural Networks [Gradient Descent in Neural Networks]",
+   "duration_s": 560.0,
+   "channel": "UCF CRCV",
+   "url": "https://www.youtube.com/watch?v=ib5cMb1p02w"
+  },
+  {
+   "youtube_id": "NhZXRzH2y-E",
+   "lang": "en",
+   "domain": "Artificial Intelligence & Machine Learning",
+   "title": "#41 Machine Learning Specialization [Course 1, Week 3, Lesson 4]",
+   "duration_s": 333.0,
+   "channel": "DeepLearningAI",
+   "url": "https://www.youtube.com/watch?v=NhZXRzH2y-E"
+  },
+  {
+   "youtube_id": "VqKq78PVO9g",
+   "lang": "en",
+   "domain": "Artificial Intelligence & Machine Learning",
+   "title": "Machine Learning Tutorial Python - 17: L1 and L2 Regularization | Lasso, Ridge Regression",
+   "duration_s": 1161.0,
+   "channel": "codebasics",
+   "url": "https://www.youtube.com/watch?v=VqKq78PVO9g"
+  },
+  {
+   "youtube_id": "rNzsVW8pzdg",
+   "lang": "tr",
+   "domain": "Mechanical & Thermal Engineering",
+   "title": "Termodinamik, 7. Entropi",
+   "duration_s": 1262.0,
+   "channel": "Termodinamikakademi",
+   "url": "https://www.youtube.com/watch?v=rNzsVW8pzdg"
+  },
+  {
+   "youtube_id": "Tx70P5ZTBcA",
+   "lang": "tr",
+   "domain": "Mechanical & Thermal Engineering",
+   "title": "Termodinamik Ders 8 | Entropi, mcΔT ve Isı Transferi Soru Çözümü",
+   "duration_s": 605.0,
+   "channel": "Teksin Akademi",
+   "url": "https://www.youtube.com/watch?v=Tx70P5ZTBcA"
+  },
+  {
+   "youtube_id": "s8EukINHdbU",
+   "lang": "tr",
+   "domain": "Mechanical & Thermal Engineering",
+   "title": "Termodinamiğe Giriş (Ders:13) Isı Transferi",
+   "duration_s": 2135.0,
+   "channel": "Furkan Dolgun Akademi",
+   "url": "https://www.youtube.com/watch?v=s8EukINHdbU"
+  },
+  {
+   "youtube_id": "oTIdniLf2Vk",
+   "lang": "tr",
+   "domain": "Mechanical & Thermal Engineering",
+   "title": "Termodinamik, 7.Entropi, Saf Maddelerde Entropi Değişimi",
+   "duration_s": 1125.0,
+   "channel": "Termodinamikakademi",
+   "url": "https://www.youtube.com/watch?v=oTIdniLf2Vk"
+  },
+  {
+   "youtube_id": "cxGR4X-boTY",
+   "lang": "tr",
+   "domain": "Mechanical & Thermal Engineering",
+   "title": "Termodinamik, 7. Entropi, Entropi Dengesi",
+   "duration_s": 1466.0,
+   "channel": "Termodinamikakademi",
+   "url": "https://www.youtube.com/watch?v=cxGR4X-boTY"
+  },
+  {
+   "youtube_id": "wUeNiwkpzuI",
+   "lang": "tr",
+   "domain": "Mechanical & Thermal Engineering",
+   "title": "Termodinamik 2. Hafta, 3. Ders, Enerji, Enerji Geçişi ve Genel Enerji Analizi",
+   "duration_s": 1498.0,
+   "channel": "Termodinamikakademi",
+   "url": "https://www.youtube.com/watch?v=wUeNiwkpzuI"
+  },
+  {
+   "youtube_id": "bRZwzy0xvhM",
+   "lang": "en",
+   "domain": "Mechanical & Thermal Engineering",
+   "title": "Heat Transfer - Conduction, Convection, and Radiation",
+   "duration_s": 669.0,
+   "channel": "The Organic Chemistry Tutor",
+   "url": "https://www.youtube.com/watch?v=bRZwzy0xvhM"
+  },
+  {
+   "youtube_id": "LR5bYxC4syI",
+   "lang": "en",
+   "domain": "Mechanical & Thermal Engineering",
+   "title": "Thermal Conductivity, Stefan Boltzmann Law, Heat Transfer, Conduction, Convecton, Radiation, Physics",
+   "duration_s": 1763.0,
+   "channel": "The Organic Chemistry Tutor",
+   "url": "https://www.youtube.com/watch?v=LR5bYxC4syI"
+  },
+  {
+   "youtube_id": "2A3iASlMVEI",
+   "lang": "en",
+   "domain": "Mechanical & Thermal Engineering",
+   "title": "Thermodynamics lecture series - Entropy - Part 1",
+   "duration_s": 2376.0,
+   "channel": "Morteza Eslamian",
+   "url": "https://www.youtube.com/watch?v=2A3iASlMVEI"
+  },
+  {
+   "youtube_id": "49Nbpcv4sVg",
+   "lang": "en",
+   "domain": "Mechanical & Thermal Engineering",
+   "title": "Thermodynamics - ENTROPY as a Property in 12 Minutes!",
+   "duration_s": 719.0,
+   "channel": "Less Boring Lectures",
+   "url": "https://www.youtube.com/watch?v=49Nbpcv4sVg"
+  },
+  {
+   "youtube_id": "KWJ6r8h62JE",
+   "lang": "en",
+   "domain": "Mechanical & Thermal Engineering",
+   "title": "Heat Transfer Methods (Heat & Thermodynamics)",
+   "duration_s": 1191.0,
+   "channel": "Sara Rose Ph.D.",
+   "url": "https://www.youtube.com/watch?v=KWJ6r8h62JE"
+  },
+  {
+   "youtube_id": "ETeYsZ-4cgs",
+   "lang": "en",
+   "domain": "Mechanical & Thermal Engineering",
+   "title": "Heat Transfer in Thermodynamics",
+   "duration_s": 1922.0,
+   "channel": "ECCSEL",
+   "url": "https://www.youtube.com/watch?v=ETeYsZ-4cgs"
+  },
+  {
+   "youtube_id": "_36V4-HphpQ",
+   "lang": "tr",
+   "domain": "Electrical Engineering & Circuit Theory",
+   "title": "Lecture on Thevenin and Norton equivalent circuits 1",
+   "duration_s": 1415.0,
+   "channel": "Devre Analizi",
+   "url": "https://www.youtube.com/watch?v=_36V4-HphpQ"
+  },
+  {
+   "youtube_id": "0ypwVXiSpGw",
+   "lang": "tr",
+   "domain": "Electrical Engineering & Circuit Theory",
+   "title": "Thevenin ve Norton Eşdeğer devresi Örnek 1",
+   "duration_s": 414.0,
+   "channel": "Semi Akademi",
+   "url": "https://www.youtube.com/watch?v=0ypwVXiSpGw"
+  },
+  {
+   "youtube_id": "87St2R43kNU",
+   "lang": "tr",
+   "domain": "Electrical Engineering & Circuit Theory",
+   "title": "THEVENİN TEOREMİ || ELEKTRİK ELEKTRONİK MÜH. GİRİŞ || DERS 15",
+   "duration_s": 840.0,
+   "channel": "Ahmet Hilmi Tuna Öztürk",
+   "url": "https://www.youtube.com/watch?v=87St2R43kNU"
+  },
+  {
+   "youtube_id": "EfL8AvLidHw",
+   "lang": "tr",
+   "domain": "Electrical Engineering & Circuit Theory",
+   "title": "Thevenin Teoremi  ( Thevenin Theorem, Thevenin Teoremi Soru Çözümü )",
+   "duration_s": 737.0,
+   "channel": "OHM Akademi",
+   "url": "https://www.youtube.com/watch?v=EfL8AvLidHw"
+  },
+  {
+   "youtube_id": "0Cs8cprznsw",
+   "lang": "tr",
+   "domain": "Electrical Engineering & Circuit Theory",
+   "title": "Thevenin Teoremi (DEVRE TEOREMLERİ)(Thevenin Theorem)/ İhsan Hoca ile Kısaca Elektrik",
+   "duration_s": 852.0,
+   "channel": "İhsan GÜLLER",
+   "url": "https://www.youtube.com/watch?v=0Cs8cprznsw"
+  },
+  {
+   "youtube_id": "vV1D5HHsYk4",
+   "lang": "tr",
+   "domain": "Electrical Engineering & Circuit Theory",
+   "title": "Thevenin ve Norton Teoremi",
+   "duration_s": 629.0,
+   "channel": "Semi Akademi",
+   "url": "https://www.youtube.com/watch?v=vV1D5HHsYk4"
+  },
+  {
+   "youtube_id": "-kkvqr1wSwA",
+   "lang": "en",
+   "domain": "Electrical Engineering & Circuit Theory",
+   "title": "Norton's Theorem and Thevenin's Theorem - Electrical Circuit Analysis",
+   "duration_s": 666.0,
+   "channel": "The Organic Chemistry Tutor",
+   "url": "https://www.youtube.com/watch?v=-kkvqr1wSwA"
+  },
+  {
+   "youtube_id": "zTDgziJC-q8",
+   "lang": "en",
+   "domain": "Electrical Engineering & Circuit Theory",
+   "title": "Thevenin's Theorem - Circuit Analysis",
+   "duration_s": 563.0,
+   "channel": "The Organic Chemistry Tutor",
+   "url": "https://www.youtube.com/watch?v=zTDgziJC-q8"
+  },
+  {
+   "youtube_id": "JquOjbUECnQ",
+   "lang": "en",
+   "domain": "Electrical Engineering & Circuit Theory",
+   "title": "Circuits 1 - Thevenin and Norton Equivalents",
+   "duration_s": 763.0,
+   "channel": "UConn HKN",
+   "url": "https://www.youtube.com/watch?v=JquOjbUECnQ"
+  },
+  {
+   "youtube_id": "-X7otqsma4Q",
+   "lang": "en",
+   "domain": "Electrical Engineering & Circuit Theory",
+   "title": "The Complete Guide to Thevenin's Theorem | Engineering Circuit Analysis | (Solved Examples)",
+   "duration_s": 1401.0,
+   "channel": "Question Solutions",
+   "url": "https://www.youtube.com/watch?v=-X7otqsma4Q"
+  },
+  {
+   "youtube_id": "h9rA42B1euw",
+   "lang": "en",
+   "domain": "Electrical Engineering & Circuit Theory",
+   "title": "Norton Equivalent vs Thevenin Equivalent",
+   "duration_s": 1315.0,
+   "channel": "Physics Ninja",
+   "url": "https://www.youtube.com/watch?v=h9rA42B1euw"
+  },
+  {
+   "youtube_id": "UXYU3OIAR3M",
+   "lang": "en",
+   "domain": "Electrical Engineering & Circuit Theory",
+   "title": "Circuits -- Thevenin and Norton",
+   "duration_s": 430.0,
+   "channel": "Physics Videos by Eugene Khutoryansky",
+   "url": "https://www.youtube.com/watch?v=UXYU3OIAR3M"
+  },
+  {
+   "youtube_id": "M7_Uj42CDq4",
+   "lang": "tr",
+   "domain": "Mathematics (Linear Algebra, Calculus)",
+   "title": "Lineer Cebir : Özdeğerler ve Özvektörler (eigen values-eigen vectors) (www.buders.com)",
+   "duration_s": 1533.0,
+   "channel": "BUders Boğaziçiliden Özel Ders",
+   "url": "https://www.youtube.com/watch?v=M7_Uj42CDq4"
+  },
+  {
+   "youtube_id": "0b8QoN_26jk",
+   "lang": "tr",
+   "domain": "Mathematics (Linear Algebra, Calculus)",
+   "title": "Lineer Cebir : 2x2 Matrislerde Özdeğer ve Özvektör Bulma (www.buders.com)",
+   "duration_s": 1198.0,
+   "channel": "BUders Boğaziçiliden Özel Ders",
+   "url": "https://www.youtube.com/watch?v=0b8QoN_26jk"
+  },
+  {
+   "youtube_id": "xan-5zHwgmA",
+   "lang": "tr",
+   "domain": "Mathematics (Linear Algebra, Calculus)",
+   "title": "Lineer Cebir ❖ Özdeğer ve Özvektör Bulma ❖ Finding Eigenvalues and Eigenvectors of Matrices",
+   "duration_s": 854.0,
+   "channel": "Gökhan Kelebek Matematik",
+   "url": "https://www.youtube.com/watch?v=xan-5zHwgmA"
+  },
+  {
+   "youtube_id": "L4i8_8AxwiQ",
+   "lang": "tr",
+   "domain": "Mathematics (Linear Algebra, Calculus)",
+   "title": "Özdeğer ve Özvektörler (Lineer Cebir)",
+   "duration_s": 335.0,
+   "channel": "KhanAcademyTurkce",
+   "url": "https://www.youtube.com/watch?v=L4i8_8AxwiQ"
+  },
+  {
+   "youtube_id": "5LoLt0rjjxo",
+   "lang": "tr",
+   "domain": "Mathematics (Linear Algebra, Calculus)",
+   "title": "46) Özdeğerler ve Özvektörler [Eigenvalues and Eigenvectors]",
+   "duration_s": 635.0,
+   "channel": "Sürekli Matematik",
+   "url": "https://www.youtube.com/watch?v=5LoLt0rjjxo"
+  },
+  {
+   "youtube_id": "2tJErRefeq4",
+   "lang": "tr",
+   "domain": "Mathematics (Linear Algebra, Calculus)",
+   "title": "Lineer Cebir ❖ Özdeğer ve Özvektör Nedir? ❖ What is an Eigenvalues, an Eigenvector?",
+   "duration_s": 916.0,
+   "channel": "Gökhan Kelebek Matematik",
+   "url": "https://www.youtube.com/watch?v=2tJErRefeq4"
+  },
+  {
+   "youtube_id": "PFDu9oVAE-g",
+   "lang": "en",
+   "domain": "Mathematics (Linear Algebra, Calculus)",
+   "title": "Eigenvectors and eigenvalues | Chapter 14, Essence of linear algebra",
+   "duration_s": 1036.0,
+   "channel": "3Blue1Brown",
+   "url": "https://www.youtube.com/watch?v=PFDu9oVAE-g"
+  },
+  {
+   "youtube_id": "TQvxWaQnrqI",
+   "lang": "en",
+   "domain": "Mathematics (Linear Algebra, Calculus)",
+   "title": "Finding Eigenvalues and Eigenvectors",
+   "duration_s": 1030.0,
+   "channel": "Professor Dave Explains",
+   "url": "https://www.youtube.com/watch?v=TQvxWaQnrqI"
+  },
+  {
+   "youtube_id": "PhfbEr2btGQ",
+   "lang": "en",
+   "domain": "Mathematics (Linear Algebra, Calculus)",
+   "title": "Introduction to eigenvalues and eigenvectors | Linear Algebra | Khan Academy",
+   "duration_s": 463.0,
+   "channel": "Khan Academy",
+   "url": "https://www.youtube.com/watch?v=PhfbEr2btGQ"
+  },
+  {
+   "youtube_id": "DzqE7tj7eIM",
+   "lang": "en",
+   "domain": "Mathematics (Linear Algebra, Calculus)",
+   "title": "Eigenvalues and Eigenvectors",
+   "duration_s": 1141.0,
+   "channel": "MIT OpenCourseWare",
+   "url": "https://www.youtube.com/watch?v=DzqE7tj7eIM"
+  },
+  {
+   "youtube_id": "FOoi8h47Tw4",
+   "lang": "en",
+   "domain": "Mathematics (Linear Algebra, Calculus)",
+   "title": "COMPLEX Eigenvalues, Eigenvectors & Diagonalization **full example**",
+   "duration_s": 850.0,
+   "channel": "Dr. Trefor Bazett",
+   "url": "https://www.youtube.com/watch?v=FOoi8h47Tw4"
+  },
+  {
+   "youtube_id": "yh5ABTeNUpE",
+   "lang": "en",
+   "domain": "Mathematics (Linear Algebra, Calculus)",
+   "title": "Eigenvectors and Eigenvalues (5.1.1)",
+   "duration_s": 1147.0,
+   "channel": "SawFin Mathematics",
+   "url": "https://www.youtube.com/watch?v=yh5ABTeNUpE"
+  },
+  {
+   "youtube_id": "vgWrxQR3Wnw",
+   "lang": "tr",
+   "domain": "Physics (Mechanics, Electromagnetism)",
+   "title": "What is an induction current? How does it occur?",
+   "duration_s": 523.0,
+   "channel": "Uygulamalı Fizik",
+   "url": "https://www.youtube.com/watch?v=vgWrxQR3Wnw"
+  },
+  {
+   "youtube_id": "CFwMHMYHqs4",
+   "lang": "tr",
+   "domain": "Physics (Mechanics, Electromagnetism)",
+   "title": "Hareket Eden Telde Oluşan İndüksiyon Elektromotor Kuvveti | 88 Günde AYT Fizik Kampı | 61. Gün",
+   "duration_s": 1810.0,
+   "channel": "Özcan Aykın FİZİK",
+   "url": "https://www.youtube.com/watch?v=CFwMHMYHqs4"
+  },
+  {
+   "youtube_id": "Pn3iNKXl9Zg",
+   "lang": "tr",
+   "domain": "Physics (Mechanics, Electromagnetism)",
+   "title": "67) Manyetizma | İndüksiyon Elektromotor Kuvveti. EMK Nedir? Nasıl Oluşur? ( 42. Gün )",
+   "duration_s": 2022.0,
+   "channel": "Altuğ Güneş FİZİK",
+   "url": "https://www.youtube.com/watch?v=Pn3iNKXl9Zg"
+  },
+  {
+   "youtube_id": "UsUgGhyuz0E",
+   "lang": "tr",
+   "domain": "Physics (Mechanics, Electromagnetism)",
+   "title": "ELEKTROMANYETİK İNDÜKSİYON  KONU ANLATIMI VE SORU ÇÖZÜMÜ |AYT FİZİK | 11.SINIF| FİZİK",
+   "duration_s": 1552.0,
+   "channel": "Fizikle Barış ",
+   "url": "https://www.youtube.com/watch?v=UsUgGhyuz0E"
+  },
+  {
+   "youtube_id": "2Fr__kh7BBI",
+   "lang": "tr",
+   "domain": "Physics (Mechanics, Electromagnetism)",
+   "title": "AYT FİZİK /İNDÜKSİYON EMK ÖZET/ SORU ÇÖZDÜREN PÜF NOKTALARI",
+   "duration_s": 943.0,
+   "channel": "FİZİK BULUT",
+   "url": "https://www.youtube.com/watch?v=2Fr__kh7BBI"
+  },
+  {
+   "youtube_id": "6epk4p_NjXY",
+   "lang": "tr",
+   "domain": "Physics (Mechanics, Electromagnetism)",
+   "title": "İndüksiyon Akımı Soru Çözümü | 88 Günde AYT Fizik Kampı | 64. Gün",
+   "duration_s": 2197.0,
+   "channel": "Özcan Aykın FİZİK",
+   "url": "https://www.youtube.com/watch?v=6epk4p_NjXY"
+  },
+  {
+   "youtube_id": "LDOa7UdfcMQ",
+   "lang": "en",
+   "domain": "Physics (Mechanics, Electromagnetism)",
+   "title": "Faraday's Law of Electromagnetic Induction, Magnetic Flux & Induced EMF - Physics & Electromagnetism",
+   "duration_s": 713.0,
+   "channel": "The Organic Chemistry Tutor",
+   "url": "https://www.youtube.com/watch?v=LDOa7UdfcMQ"
+  },
+  {
+   "youtube_id": "yU--8Zk57-Y",
+   "lang": "en",
+   "domain": "Physics (Mechanics, Electromagnetism)",
+   "title": "Electromagnetic Induction | Class 12 | Electromagnetic Induction | Physics | Khan Academy",
+   "duration_s": 612.0,
+   "channel": "Khan Academy India - English",
+   "url": "https://www.youtube.com/watch?v=yU--8Zk57-Y"
+  },
+  {
+   "youtube_id": "3HyORmBip-w",
+   "lang": "en",
+   "domain": "Physics (Mechanics, Electromagnetism)",
+   "title": "What is Electromagnetic Induction? | Faraday's Laws and Lenz Law | iKen | iKen Edu | iKen App",
+   "duration_s": 362.0,
+   "channel": "Iken Edu",
+   "url": "https://www.youtube.com/watch?v=3HyORmBip-w"
+  },
+  {
+   "youtube_id": "7KNvANjSb4I",
+   "lang": "en",
+   "domain": "Physics (Mechanics, Electromagnetism)",
+   "title": "Faraday's Law and Lenz's Law | 20.1 General Physics",
+   "duration_s": 2152.0,
+   "channel": "Chad's Prep",
+   "url": "https://www.youtube.com/watch?v=7KNvANjSb4I"
+  },
+  {
+   "youtube_id": "pQp6bmJPU_0",
+   "lang": "en",
+   "domain": "Physics (Mechanics, Electromagnetism)",
+   "title": "Induction - An Introduction: Crash Course Physics #34",
+   "duration_s": 589.0,
+   "channel": "CrashCourse",
+   "url": "https://www.youtube.com/watch?v=pQp6bmJPU_0"
+  },
+  {
+   "youtube_id": "4n-3GCsMGfk",
+   "lang": "en",
+   "domain": "Physics (Mechanics, Electromagnetism)",
+   "title": "Faraday's Law Explained: Basics and Applications | Magnetism | Electromagnetics Theory",
+   "duration_s": 481.0,
+   "channel": "Engineering Funda",
+   "url": "https://www.youtube.com/watch?v=4n-3GCsMGfk"
+  },
+  {
+   "youtube_id": "kzIROqIIk_4",
+   "lang": "tr",
+   "domain": "Economics & Finance",
+   "title": "AÖF İKTİSADA GİRİŞ 1 Arz ve Talep Esneklikleri",
+   "duration_s": 1516.0,
+   "channel": "Ahmet Kocaman",
+   "url": "https://www.youtube.com/watch?v=kzIROqIIk_4"
+  },
+  {
+   "youtube_id": "gyAWyPsr8Ps",
+   "lang": "tr",
+   "domain": "Economics & Finance",
+   "title": "Esneklikler   Bölüm 1 Talebin fiyat esnekliği",
+   "duration_s": 452.0,
+   "channel": "Dersimiz Ekonomi",
+   "url": "https://www.youtube.com/watch?v=gyAWyPsr8Ps"
+  },
+  {
+   "youtube_id": "DfNN0j1HIOE",
+   "lang": "tr",
+   "domain": "Economics & Finance",
+   "title": "7) Esneklik Kavramı ve Talebin Fiyat Esnekliği",
+   "duration_s": 2202.0,
+   "channel": "İktisat Medresesi",
+   "url": "https://www.youtube.com/watch?v=DfNN0j1HIOE"
+  },
+  {
+   "youtube_id": "PSUS9_qDFdk",
+   "lang": "tr",
+   "domain": "Economics & Finance",
+   "title": "AÖF İKTİSADA GİRİŞ 1 Arz - Talep - Piyasa Dengesi",
+   "duration_s": 1767.0,
+   "channel": "Ahmet Kocaman",
+   "url": "https://www.youtube.com/watch?v=PSUS9_qDFdk"
+  },
+  {
+   "youtube_id": "vyJPCbgeyzw",
+   "lang": "tr",
+   "domain": "Economics & Finance",
+   "title": "49)  Talebin Fiyat Esnekliği   9 | Talebin YAY Esnekliği | Konu Anlatımı",
+   "duration_s": 617.0,
+   "channel": "İsmet Hoca İle Kolay İktisat",
+   "url": "https://www.youtube.com/watch?v=vyJPCbgeyzw"
+  },
+  {
+   "youtube_id": "GPNI962De_A",
+   "lang": "tr",
+   "domain": "Economics & Finance",
+   "title": "Talebin Fiyat Esnekliğine Giriş (Mikroekonomi)",
+   "duration_s": 582.0,
+   "channel": "KhanAcademyTurkce",
+   "url": "https://www.youtube.com/watch?v=GPNI962De_A"
+  },
+  {
+   "youtube_id": "HHcblIxiAAk",
+   "lang": "en",
+   "domain": "Economics & Finance",
+   "title": "Elasticity of Demand- Micro Topic  2.3",
+   "duration_s": 373.0,
+   "channel": "Jacob Clifford",
+   "url": "https://www.youtube.com/watch?v=HHcblIxiAAk"
+  },
+  {
+   "youtube_id": "kIFBaaPJUO0",
+   "lang": "en",
+   "domain": "Economics & Finance",
+   "title": "Supply and Demand in 8 Minutes",
+   "duration_s": 471.0,
+   "channel": "Jacob Clifford",
+   "url": "https://www.youtube.com/watch?v=kIFBaaPJUO0"
+  },
+  {
+   "youtube_id": "1XXhpHJTglg",
+   "lang": "en",
+   "domain": "Economics & Finance",
+   "title": "How To Understand Elasticity (Economics)",
+   "duration_s": 344.0,
+   "channel": "Market Power",
+   "url": "https://www.youtube.com/watch?v=1XXhpHJTglg"
+  },
+  {
+   "youtube_id": "kGyoqHLZ41M",
+   "lang": "en",
+   "domain": "Economics & Finance",
+   "title": "What is Elasticity? | Principles of Economics | From A Business Professor",
+   "duration_s": 489.0,
+   "channel": "Business School 101",
+   "url": "https://www.youtube.com/watch?v=kGyoqHLZ41M"
+  },
+  {
+   "youtube_id": "FBWJYH8DZ1g",
+   "lang": "en",
+   "domain": "Economics & Finance",
+   "title": "Introduction to price elasticity of demand | APⓇ Microeconomics | Khan Academy",
+   "duration_s": 520.0,
+   "channel": "Khan Academy",
+   "url": "https://www.youtube.com/watch?v=FBWJYH8DZ1g"
+  },
+  {
+   "youtube_id": "_OkTw766oCs",
+   "lang": "en",
+   "domain": "Economics & Finance",
+   "title": "1. Introduction and Supply & Demand",
+   "duration_s": 2087.0,
+   "channel": "MIT OpenCourseWare",
+   "url": "https://www.youtube.com/watch?v=_OkTw766oCs"
+  },
+  {
+   "youtube_id": "Dy6KnN0v6jY",
+   "lang": "tr",
+   "domain": "Cognitive Psychology & Neuroscience",
+   "title": "Cognitive and Neuropsychological Foundations of Working Memory",
+   "duration_s": 405.0,
+   "channel": "CELLULAR INFRASTRUCTURE",
+   "url": "https://www.youtube.com/watch?v=Dy6KnN0v6jY"
+  },
+  {
+   "youtube_id": "vU-VjgTWAUE",
+   "lang": "tr",
+   "domain": "Cognitive Psychology & Neuroscience",
+   "title": "Bilgi İşlem Modeli: Duyusal, Çalışan ve Uzun Süreli Bellekler (Psikoloji / Çevreyi Algılama)",
+   "duration_s": 608.0,
+   "channel": "KhanAcademyTurkce",
+   "url": "https://www.youtube.com/watch?v=vU-VjgTWAUE"
+  },
+  {
+   "youtube_id": "AL_BIawhqpk",
+   "lang": "tr",
+   "domain": "Cognitive Psychology & Neuroscience",
+   "title": "bilişsel psikoloji, öğrenme teknikleri ve zaman yönetimi",
+   "duration_s": 352.0,
+   "channel": "CELLULAR INFRASTRUCTURE",
+   "url": "https://www.youtube.com/watch?v=AL_BIawhqpk"
+  },
+  {
+   "youtube_id": "G2RDGojM8uE",
+   "lang": "tr",
+   "domain": "Cognitive Psychology & Neuroscience",
+   "title": "Piaget’nin Bilişsel Gelişim Kuramı | 4 Gelişim Evresi (Psikoloji)",
+   "duration_s": 419.0,
+   "channel": "KhanAcademyTurkce",
+   "url": "https://www.youtube.com/watch?v=G2RDGojM8uE"
+  },
+  {
+   "youtube_id": "0iXV7t53Sfw",
+   "lang": "tr",
+   "domain": "Cognitive Psychology & Neuroscience",
+   "title": "İşlem Belleği (Working Memory) | Dikkat Eksikliği Hastalarında Bu Bellek Düzgün Çalışmaz",
+   "duration_s": 391.0,
+   "channel": "Dr. Ahmet Koyuncu ",
+   "url": "https://www.youtube.com/watch?v=0iXV7t53Sfw"
+  },
+  {
+   "youtube_id": "0x6sIdHJVyk",
+   "lang": "tr",
+   "domain": "Cognitive Psychology & Neuroscience",
+   "title": "Çalışma Belleği ve DEHB",
+   "duration_s": 309.0,
+   "channel": "Bengi Semerci Enstitüsü",
+   "url": "https://www.youtube.com/watch?v=0x6sIdHJVyk"
+  },
+  {
+   "youtube_id": "UhQB8yD5RjU",
+   "lang": "en",
+   "domain": "Cognitive Psychology & Neuroscience",
+   "title": "Introduction to Cognitive Neuroscience: Session 5.2 (Working memory)",
+   "duration_s": 1378.0,
+   "channel": "Feldmann-Wustefeld Lab",
+   "url": "https://www.youtube.com/watch?v=UhQB8yD5RjU"
+  },
+  {
+   "youtube_id": "KGyTBLKElc8",
+   "lang": "en",
+   "domain": "Cognitive Psychology & Neuroscience",
+   "title": "The Neurophysiology of Working Memory and Attention",
+   "duration_s": 550.0,
+   "channel": "The Klingberg Lab",
+   "url": "https://www.youtube.com/watch?v=KGyTBLKElc8"
+  },
+  {
+   "youtube_id": "f8nG74JxbTw",
+   "lang": "en",
+   "domain": "Cognitive Psychology & Neuroscience",
+   "title": "8.4. Attentional Systems, Fundamentals of Cognitive Neuroscience Course, Session 8, Part 4",
+   "duration_s": 1229.0,
+   "channel": "Hamed Ekhtiari",
+   "url": "https://www.youtube.com/watch?v=f8nG74JxbTw"
+  },
+  {
+   "youtube_id": "JWFcFjxcLu8",
+   "lang": "en",
+   "domain": "Cognitive Psychology & Neuroscience",
+   "title": "Steven Luck - Attention and Working Memory in Health and Disease",
+   "duration_s": 2146.0,
+   "channel": "UC Davis Center For Neuroscience",
+   "url": "https://www.youtube.com/watch?v=JWFcFjxcLu8"
+  },
+  {
+   "youtube_id": "tzIWH0E6Z9w",
+   "lang": "en",
+   "domain": "Cognitive Psychology & Neuroscience",
+   "title": "Chapter 18 Part C: Attention and Higher Cognition",
+   "duration_s": 1302.0,
+   "channel": "Michael Nadorff",
+   "url": "https://www.youtube.com/watch?v=tzIWH0E6Z9w"
+  },
+  {
+   "youtube_id": "2f-MzjrQ2UI",
+   "lang": "en",
+   "domain": "Cognitive Psychology & Neuroscience",
+   "title": "7.1. Basic Concepts of Memory, Fundamentals of Cognitive Neuroscience Course, Session 7, Part 1",
+   "duration_s": 1400.0,
+   "channel": "Hamed Ekhtiari",
+   "url": "https://www.youtube.com/watch?v=2f-MzjrQ2UI"
+  },
+  {
+   "youtube_id": "1IV4wCj97n4",
+   "lang": "tr",
+   "domain": "History & Cultural Heritage",
+   "title": "3 -Kültürel Miras Hikayesi: ARKEOLOJİYE GİRİŞ   Ünite",
+   "duration_s": 475.0,
+   "channel": "FenOmen Bilim",
+   "url": "https://www.youtube.com/watch?v=1IV4wCj97n4"
+  },
+  {
+   "youtube_id": "27E1jT06hnI",
+   "lang": "tr",
+   "domain": "History & Cultural Heritage",
+   "title": "1 -Arkeoloji Nedir?  -ARKEOLOJİYE GİRİŞ   Ünite   1",
+   "duration_s": 601.0,
+   "channel": "FenOmen Bilim",
+   "url": "https://www.youtube.com/watch?v=27E1jT06hnI"
+  },
+  {
+   "youtube_id": "5WvqjEz00SU",
+   "lang": "tr",
+   "domain": "History & Cultural Heritage",
+   "title": "Dünya Mirasında Türkiye: İlk Çağ Antik Kentleri ve Eserleri",
+   "duration_s": 397.0,
+   "channel": "Rehberlik Akademi",
+   "url": "https://www.youtube.com/watch?v=5WvqjEz00SU"
+  },
+  {
+   "youtube_id": "45QnG51FAMQ",
+   "lang": "tr",
+   "domain": "History & Cultural Heritage",
+   "title": "33. Müzelerin Gelişimi, İşlevi, Yararları, Sınırlılıkları vb.",
+   "duration_s": 1694.0,
+   "channel": "Emrah Hoca ile Tarih",
+   "url": "https://www.youtube.com/watch?v=45QnG51FAMQ"
+  },
+  {
+   "youtube_id": "jzaM2pG5pXE",
+   "lang": "tr",
+   "domain": "History & Cultural Heritage",
+   "title": "Bölüm 6 - Anadolu Arkeolojisi - Anadolu’da Klasik Çağ",
+   "duration_s": 451.0,
+   "channel": "Forteliber",
+   "url": "https://www.youtube.com/watch?v=jzaM2pG5pXE"
+  },
+  {
+   "youtube_id": "SR-0_k77wxE",
+   "lang": "tr",
+   "domain": "History & Cultural Heritage",
+   "title": "Türkiye’nin UNESCO Somut Olmayan Kültürel Mirasları | Geleneklerimiz",
+   "duration_s": 988.0,
+   "channel": "Tarih Notları",
+   "url": "https://www.youtube.com/watch?v=SR-0_k77wxE"
+  },
+  {
+   "youtube_id": "d9ZHj4ihTog",
+   "lang": "en",
+   "domain": "History & Cultural Heritage",
+   "title": "Intangible Heritage - Why should we care? | Prof. Máiréad Nic Craith | TEDxHeriotWattUniversity",
+   "duration_s": 814.0,
+   "channel": "TEDx Talks",
+   "url": "https://www.youtube.com/watch?v=d9ZHj4ihTog"
+  },
+  {
+   "youtube_id": "V4UQYem6Dvc",
+   "lang": "en",
+   "domain": "History & Cultural Heritage",
+   "title": "Cultural heritage: a basic human need - Sada Mire at TEDxEuston",
+   "duration_s": 1144.0,
+   "channel": "TEDx Talks",
+   "url": "https://www.youtube.com/watch?v=V4UQYem6Dvc"
+  },
+  {
+   "youtube_id": "WEv_iV-4GTU",
+   "lang": "en",
+   "domain": "History & Cultural Heritage",
+   "title": "NYU Florence - (Panel 1) Protecting Cultural Heritage in an Uncertain Time",
+   "duration_s": 2039.0,
+   "channel": "NYU Florence",
+   "url": "https://www.youtube.com/watch?v=WEv_iV-4GTU"
+  },
+  {
+   "youtube_id": "CbnXgvCOuIg",
+   "lang": "en",
+   "domain": "History & Cultural Heritage",
+   "title": "WHAT IS CULTURAL HERITAGE? And how can we preserve our world heritage through Science?",
+   "duration_s": 615.0,
+   "channel": "Maria Baias",
+   "url": "https://www.youtube.com/watch?v=CbnXgvCOuIg"
+  },
+  {
+   "youtube_id": "W_JhwPL6LDk",
+   "lang": "en",
+   "domain": "History & Cultural Heritage",
+   "title": "Lecture 14 : Evolution of Heritage Conservation",
+   "duration_s": 1821.0,
+   "channel": "Architectural Conservation & Historic Preservation",
+   "url": "https://www.youtube.com/watch?v=W_JhwPL6LDk"
+  },
+  {
+   "youtube_id": "LwwQohMNJeg",
+   "lang": "en",
+   "domain": "History & Cultural Heritage",
+   "title": "Lecture 16: World Heritage Sites Part 1",
+   "duration_s": 1840.0,
+   "channel": "Architectural Conservation & Historic Preservation",
+   "url": "https://www.youtube.com/watch?v=LwwQohMNJeg"
+  },
+  {
+   "youtube_id": "tSYRVXHb-c8",
+   "lang": "tr",
+   "domain": "Biology & Genetics",
+   "title": "Hücre Bölünmeleri - Mitoz | Dr. Biyoloji | Dönem 2026 - 2027",
+   "duration_s": 1358.0,
+   "channel": "Dr. Biyoloji",
+   "url": "https://www.youtube.com/watch?v=tSYRVXHb-c8"
+  },
+  {
+   "youtube_id": "aK6e0Od3ppc",
+   "lang": "tr",
+   "domain": "Biology & Genetics",
+   "title": "Kalıtıma Giriş | Dr. Biyoloji | Dönem 2026 - 2027",
+   "duration_s": 533.0,
+   "channel": "Dr. Biyoloji",
+   "url": "https://www.youtube.com/watch?v=aK6e0Od3ppc"
+  },
+  {
+   "youtube_id": "wS--DcRAxP4",
+   "lang": "tr",
+   "domain": "Biology & Genetics",
+   "title": "Mayoz Bölünme Nedir? Nasıl Gerçekleşir?",
+   "duration_s": 302.0,
+   "channel": "TÜBİTAK Bilim Genç",
+   "url": "https://www.youtube.com/watch?v=wS--DcRAxP4"
+  },
+  {
+   "youtube_id": "xPITxjWNL7Y",
+   "lang": "tr",
+   "domain": "Biology & Genetics",
+   "title": "22) TYT Biyoloji - Mitoz - Zeliha Yücel - 2026",
+   "duration_s": 2471.0,
+   "channel": "Benim Hocam",
+   "url": "https://www.youtube.com/watch?v=xPITxjWNL7Y"
+  },
+  {
+   "youtube_id": "PxL73jp6LBI",
+   "lang": "tr",
+   "domain": "Biology & Genetics",
+   "title": "Kalıtım Genel Tekrar  | 39 GÜNDE AYRINTILI TYT BİYOLOJİ KAMPI 2026-2027 | 39",
+   "duration_s": 1750.0,
+   "channel": "Biosem Biyoloji",
+   "url": "https://www.youtube.com/watch?v=PxL73jp6LBI"
+  },
+  {
+   "youtube_id": "daAQxQJy9Mk",
+   "lang": "tr",
+   "domain": "Biology & Genetics",
+   "title": "Bölünme İle İlgili Kavramlar Konu Anlatımı | 39 GÜNDE AYRINTILI TYT BİYOLOJİ KAMPI 2026-2027 | 29",
+   "duration_s": 2700.0,
+   "channel": "Biosem Biyoloji",
+   "url": "https://www.youtube.com/watch?v=daAQxQJy9Mk"
+  },
+  {
+   "youtube_id": "zrKdz93WlVk",
+   "lang": "en",
+   "domain": "Biology & Genetics",
+   "title": "Mitosis vs. Meiosis: Side by Side Comparison",
+   "duration_s": 382.0,
+   "channel": "Amoeba Sisters",
+   "url": "https://www.youtube.com/watch?v=zrKdz93WlVk"
+  },
+  {
+   "youtube_id": "kQu6Yfrr6j0",
+   "lang": "en",
+   "domain": "Biology & Genetics",
+   "title": "Meiosis",
+   "duration_s": 407.0,
+   "channel": "Nucleus Biology",
+   "url": "https://www.youtube.com/watch?v=kQu6Yfrr6j0"
+  },
+  {
+   "youtube_id": "k2DBsovDXxE",
+   "lang": "en",
+   "domain": "Biology & Genetics",
+   "title": "Meiosis, Gametes, and the Human Life Cycle",
+   "duration_s": 607.0,
+   "channel": "Professor Dave Explains",
+   "url": "https://www.youtube.com/watch?v=k2DBsovDXxE"
+  },
+  {
+   "youtube_id": "ShEzlXZPpPM",
+   "lang": "en",
+   "domain": "Biology & Genetics",
+   "title": "Mitosis (UPDATED 2026)",
+   "duration_s": 522.0,
+   "channel": "Amoeba Sisters",
+   "url": "https://www.youtube.com/watch?v=ShEzlXZPpPM"
+  },
+  {
+   "youtube_id": "IQJ4DBkCnco",
+   "lang": "en",
+   "domain": "Biology & Genetics",
+   "title": "Comparing mitosis and meiosis | Cells | MCAT | Khan Academy",
+   "duration_s": 350.0,
+   "channel": "Khan Academy",
+   "url": "https://www.youtube.com/watch?v=IQJ4DBkCnco"
+  },
+  {
+   "youtube_id": "f-ldPgEfAHI",
+   "lang": "en",
+   "domain": "Biology & Genetics",
+   "title": "Mitosis: The Amazing Cell Process that Uses Division to Multiply! (Older Video 2016 )",
+   "duration_s": 507.0,
+   "channel": "Amoeba Sisters",
+   "url": "https://www.youtube.com/watch?v=f-ldPgEfAHI"
+  },
+  {
+   "youtube_id": "CyUEgneTPFw",
+   "lang": "tr",
+   "domain": "Tourism & Sustainable Hospitality",
+   "title": "4- Sürdürülebilir Turizm - Araş. Gör. Dr. Nur Çelik İlal",
+   "duration_s": 1826.0,
+   "channel": "MSKU greencampus",
+   "url": "https://www.youtube.com/watch?v=CyUEgneTPFw"
+  },
+  {
+   "youtube_id": "q5eQtfJjtBE",
+   "lang": "tr",
+   "domain": "Tourism & Sustainable Hospitality",
+   "title": "SÜRDÜRÜLEBİLİR TURİZM - Ünite 1 Özet",
+   "duration_s": 891.0,
+   "channel": "Açıköğretim Fakültesi - Anadolu Üniversitesi",
+   "url": "https://www.youtube.com/watch?v=q5eQtfJjtBE"
+  },
+  {
+   "youtube_id": "Yq9X-9tJnAc",
+   "lang": "tr",
+   "domain": "Tourism & Sustainable Hospitality",
+   "title": "Sürdürülebilir Turizm: Planlama ve İklim Değişikliği Özeti",
+   "duration_s": 511.0,
+   "channel": "Rehberlik Akademi",
+   "url": "https://www.youtube.com/watch?v=Yq9X-9tJnAc"
+  },
+  {
+   "youtube_id": "q_6yh21BlLk",
+   "lang": "tr",
+   "domain": "Tourism & Sustainable Hospitality",
+   "title": "SÜRDÜRÜLEBİLİR TURİZM - Ünite 2 Özet",
+   "duration_s": 803.0,
+   "channel": "Açıköğretim Fakültesi - Anadolu Üniversitesi",
+   "url": "https://www.youtube.com/watch?v=q_6yh21BlLk"
+  },
+  {
+   "youtube_id": "nutJrfs_X0I",
+   "lang": "tr",
+   "domain": "Tourism & Sustainable Hospitality",
+   "title": "8  Turizmde Çevre ve Sürdürülebilirlik",
+   "duration_s": 504.0,
+   "channel": "FenOmen Bilim",
+   "url": "https://www.youtube.com/watch?v=nutJrfs_X0I"
+  },
+  {
+   "youtube_id": "xHv-9fkFOFE",
+   "lang": "tr",
+   "domain": "Tourism & Sustainable Hospitality",
+   "title": "TURİZM PLANLAMASI VE POLİTİKASI - Ünite 5 Özet",
+   "duration_s": 386.0,
+   "channel": "Açıköğretim Fakültesi - Anadolu Üniversitesi",
+   "url": "https://www.youtube.com/watch?v=xHv-9fkFOFE"
+  },
+  {
+   "youtube_id": "Imbj0F-gUSw",
+   "lang": "en",
+   "domain": "Tourism & Sustainable Hospitality",
+   "title": "How to save tourism from itself | Doug Lansky | TEDxStockholmSalon",
+   "duration_s": 1069.0,
+   "channel": "TEDx Talks",
+   "url": "https://www.youtube.com/watch?v=Imbj0F-gUSw"
+  },
+  {
+   "youtube_id": "gfcKTMN-5CI",
+   "lang": "en",
+   "domain": "Tourism & Sustainable Hospitality",
+   "title": "Overtourism: How to be a responsible tourist - The Global Story podcast, BBC World Service",
+   "duration_s": 1033.0,
+   "channel": "BBC World Service",
+   "url": "https://www.youtube.com/watch?v=gfcKTMN-5CI"
+  },
+  {
+   "youtube_id": "W-NfkUwUu9o",
+   "lang": "en",
+   "domain": "Tourism & Sustainable Hospitality",
+   "title": "Sustainable Tourism Practices in Tourism Part 1",
+   "duration_s": 1417.0,
+   "channel": "Your Tourism and Hospitality Channel",
+   "url": "https://www.youtube.com/watch?v=W-NfkUwUu9o"
+  },
+  {
+   "youtube_id": "x_4zi3oUuO4",
+   "lang": "en",
+   "domain": "Tourism & Sustainable Hospitality",
+   "title": "Practicing Sustainable Tourism Development | Part I",
+   "duration_s": 1798.0,
+   "channel": "Venise Ocampo",
+   "url": "https://www.youtube.com/watch?v=x_4zi3oUuO4"
+  },
+  {
+   "youtube_id": "Ea4F7MIfU8g",
+   "lang": "en",
+   "domain": "Tourism & Sustainable Hospitality",
+   "title": "#oett22 - Tourism and sustainable hospitality",
+   "duration_s": 2388.0,
+   "channel": "Österreich Werbung",
+   "url": "https://www.youtube.com/watch?v=Ea4F7MIfU8g"
+  },
+  {
+   "youtube_id": "OE-wWqu4jk4",
+   "lang": "tr",
+   "domain": "Occupational Health and Safety (ISG / OHS)",
+   "title": "51- Risk Assessment - 2026 OHS lecture notes",
+   "duration_s": 1065.0,
+   "channel": "isg_turkiye_sinav",
+   "url": "https://www.youtube.com/watch?v=OE-wWqu4jk4"
+  },
+  {
+   "youtube_id": "QGKqFvqL5qQ",
+   "lang": "tr",
+   "domain": "Occupational Health and Safety (ISG / OHS)",
+   "title": "3- İş Sağlığı ve Güvenliği Risk Değerlendirmesi Yönetmeliği, 45001, Risk Değerlendirmesi Metotları",
+   "duration_s": 2606.0,
+   "channel": "İSG GALERİSİ",
+   "url": "https://www.youtube.com/watch?v=QGKqFvqL5qQ"
+  },
+  {
+   "youtube_id": "kHWcyVnZ2sI",
+   "lang": "tr",
+   "domain": "Occupational Health and Safety (ISG / OHS)",
+   "title": "Risk değerlendirme fine kinney metodu anlatımı #rd #risk #riskdeğerlendirme #isg #hse",
+   "duration_s": 339.0,
+   "channel": "İSGCEO - İş Sağlığı ve Güvenliği Videoları ( İSG )",
+   "url": "https://www.youtube.com/watch?v=kHWcyVnZ2sI"
+  },
+  {
+   "youtube_id": "kYIGBq9bDVg",
+   "lang": "tr",
+   "domain": "Occupational Health and Safety (ISG / OHS)",
+   "title": "Risk Değerlendirme yapılan genel yanlışlar nelerdir?",
+   "duration_s": 899.0,
+   "channel": "İSGLOJİ -İGU Ömer Kocak",
+   "url": "https://www.youtube.com/watch?v=kYIGBq9bDVg"
+  },
+  {
+   "youtube_id": "PkQg2VJ4oMo",
+   "lang": "tr",
+   "domain": "Occupational Health and Safety (ISG / OHS)",
+   "title": "3) İŞ SAĞLIĞI VE GÜVENLİĞİ RİSK DEĞERLENDİRMESİ YÖNETMELİĞİ, BÜY END. KAZ. ÖN.VE ET. AZALT. HK. YÖN.",
+   "duration_s": 1178.0,
+   "channel": "İSG GALERİSİ",
+   "url": "https://www.youtube.com/watch?v=PkQg2VJ4oMo"
+  },
+  {
+   "youtube_id": "stvgL3Fu0gE",
+   "lang": "tr",
+   "domain": "Occupational Health and Safety (ISG / OHS)",
+   "title": "3- 2025 (İSG-1) İş Sağlığı ve Güvenliği Risk Değerlendirmesi Yönetmeliği",
+   "duration_s": 2554.0,
+   "channel": "İSG GALERİSİ",
+   "url": "https://www.youtube.com/watch?v=stvgL3Fu0gE"
+  },
+  {
+   "youtube_id": "uByyeaOj5Fg",
+   "lang": "en",
+   "domain": "Occupational Health and Safety (ISG / OHS)",
+   "title": "The Occupational Health and Safety Risk Assessment Methodology",
+   "duration_s": 1342.0,
+   "channel": "My Safety Hub",
+   "url": "https://www.youtube.com/watch?v=uByyeaOj5Fg"
+  },
+  {
+   "youtube_id": "ijXc7-XU4Eg",
+   "lang": "en",
+   "domain": "Occupational Health and Safety (ISG / OHS)",
+   "title": "HIERARCHY of CONTROL Health and Safety | 5 Steps EXPLAINED!",
+   "duration_s": 495.0,
+   "channel": "Safeti | Your Trusted Health and Safety Partner",
+   "url": "https://www.youtube.com/watch?v=ijXc7-XU4Eg"
+  },
+  {
+   "youtube_id": "dhLbKrYkuA8",
+   "lang": "en",
+   "domain": "Occupational Health and Safety (ISG / OHS)",
+   "title": "Occupational Health and Safety: Risk Assessment @NurseEdUg",
+   "duration_s": 531.0,
+   "channel": "Ellie",
+   "url": "https://www.youtube.com/watch?v=dhLbKrYkuA8"
+  },
+  {
+   "youtube_id": "LgW0l8vf6YA",
+   "lang": "en",
+   "domain": "Occupational Health and Safety (ISG / OHS)",
+   "title": "OCCUPATIONAL HEALTH AND SAFETY MANAGEMENT RISK ASSESSMENT PROCESS Lecture 3",
+   "duration_s": 769.0,
+   "channel": "Knowledge Web Center",
+   "url": "https://www.youtube.com/watch?v=LgW0l8vf6YA"
+  },
+  {
+   "youtube_id": "8nbOI-0U9Co",
+   "lang": "en",
+   "domain": "Occupational Health and Safety (ISG / OHS)",
+   "title": "OCCUPATIONAL HEALTH AND SAFETY MANAGEMENT- Basic Concepts Lecture 1",
+   "duration_s": 792.0,
+   "channel": "Knowledge Web Center",
+   "url": "https://www.youtube.com/watch?v=8nbOI-0U9Co"
+  },
+  {
+   "youtube_id": "O3YRdciKfTg",
+   "lang": "en",
+   "domain": "Occupational Health and Safety (ISG / OHS)",
+   "title": "What is ISO 45001? 👉 Guide to Occupational Health and Safety (OHS) Standards",
+   "duration_s": 742.0,
+   "channel": "ISO",
+   "url": "https://www.youtube.com/watch?v=O3YRdciKfTg"
+  },
+  {
+   "youtube_id": "8oBAtc1GRc4",
+   "lang": "tr",
+   "domain": "Corporate Compliance & Personal Data Protection (KVKK/GDPR)",
+   "title": "Zehra Baranlı'dan KVKK Eğitimi Nesil Teknoloji A.Ş.",
+   "duration_s": 493.0,
+   "channel": "Nesil Teknoloji Anonim Şirketi",
+   "url": "https://www.youtube.com/watch?v=8oBAtc1GRc4"
+  },
+  {
+   "youtube_id": "hYNdlyNZmDg",
+   "lang": "tr",
+   "domain": "Corporate Compliance & Personal Data Protection (KVKK/GDPR)",
+   "title": "KVKK & Yapay Zekada Veri Koruma (Türkiye) | AI Güvenliği 10.6",
+   "duration_s": 674.0,
+   "channel": "Keşif - Mustafa Yılmaz",
+   "url": "https://www.youtube.com/watch?v=hYNdlyNZmDg"
+  },
+  {
+   "youtube_id": "MzFoFLZbr_c",
+   "lang": "en",
+   "domain": "Corporate Compliance & Personal Data Protection (KVKK/GDPR)",
+   "title": "GDPR Awareness and Certification for Data Protection",
+   "duration_s": 2681.0,
+   "channel": "DASCIN | Data Science Institute",
+   "url": "https://www.youtube.com/watch?v=MzFoFLZbr_c"
+  },
+  {
+   "youtube_id": "gBJXfayW40M",
+   "lang": "en",
+   "domain": "Corporate Compliance & Personal Data Protection (KVKK/GDPR)",
+   "title": "The Data Protection Act and the General Data Protection Regulation (GDPR)",
+   "duration_s": 2081.0,
+   "channel": "Computer Science Lessons",
+   "url": "https://www.youtube.com/watch?v=gBJXfayW40M"
+  },
+  {
+   "youtube_id": "IDOCnqGw2f8",
+   "lang": "en",
+   "domain": "Corporate Compliance & Personal Data Protection (KVKK/GDPR)",
+   "title": "What is GDPR ? |Complete Beginner-to-Expert Guide|Complete Masterclass for Auditors & Compliance Pro",
+   "duration_s": 787.0,
+   "channel": "Audit Decoded by Mayuri",
+   "url": "https://www.youtube.com/watch?v=IDOCnqGw2f8"
+  },
+  {
+   "youtube_id": "zcCYuF9lQUM",
+   "lang": "en",
+   "domain": "Corporate Compliance & Personal Data Protection (KVKK/GDPR)",
+   "title": "GDPR: What it means and compliance",
+   "duration_s": 771.0,
+   "channel": "freeCodeCamp.org",
+   "url": "https://www.youtube.com/watch?v=zcCYuF9lQUM"
+  },
+  {
+   "youtube_id": "zrYPNUDNA2s",
+   "lang": "en",
+   "domain": "Corporate Compliance & Personal Data Protection (KVKK/GDPR)",
+   "title": "GDPR Training by Aim - Module 14: Data Protection Act 2018",
+   "duration_s": 891.0,
+   "channel": "Aim Ltd",
+   "url": "https://www.youtube.com/watch?v=zrYPNUDNA2s"
+  },
+  {
+   "youtube_id": "3pZ3M7YfCpE",
+   "lang": "en",
+   "domain": "Corporate Compliance & Personal Data Protection (KVKK/GDPR)",
+   "title": "GDPR Training Launch - Interactive Compliance Training",
+   "duration_s": 2024.0,
+   "channel": "Interactive Services E-learning",
+   "url": "https://www.youtube.com/watch?v=3pZ3M7YfCpE"
+  },
+  {
+   "youtube_id": "puzueA0nOpQ",
+   "lang": "tr",
+   "domain": "Computer Science & Data Science",
+   "title": "B Ağacı Nedir? Konu Anlatımı - Giriş Videosu",
+   "duration_s": 369.0,
+   "channel": "algoritmauzmani",
+   "url": "https://www.youtube.com/watch?v=puzueA0nOpQ"
+  },
+  {
+   "youtube_id": "mKPTA7hAewY",
+   "lang": "tr",
+   "domain": "Computer Science & Data Science",
+   "title": "Veri yapıları ve Algoritmalar - Data Structures and Algorithms",
+   "duration_s": 449.0,
+   "channel": "Baris Dere",
+   "url": "https://www.youtube.com/watch?v=mKPTA7hAewY"
+  },
+  {
+   "youtube_id": "lECKSUfTS58",
+   "lang": "tr",
+   "domain": "Computer Science & Data Science",
+   "title": "VERİ YAPILARI & ALGORİTMALAR #1 (BIG O NOTATION)",
+   "duration_s": 573.0,
+   "channel": "Kodlama LAB",
+   "url": "https://www.youtube.com/watch?v=lECKSUfTS58"
+  },
+  {
+   "youtube_id": "n9YIVlSCmiU",
+   "lang": "tr",
+   "domain": "Computer Science & Data Science",
+   "title": "Stack Veri Yapısı (Push Pop Peek İşlemleri Dizi ile)",
+   "duration_s": 875.0,
+   "channel": "algoritmauzmani",
+   "url": "https://www.youtube.com/watch?v=n9YIVlSCmiU"
+  },
+  {
+   "youtube_id": "0X6REHNFEXY",
+   "lang": "tr",
+   "domain": "Computer Science & Data Science",
+   "title": "GRAPH Veri Yapısı: Graf Türleri, Dijkstra Algoritması, Komşuluk Matrisleri ve Kodlama (Animasyonlu)",
+   "duration_s": 1426.0,
+   "channel": "Sezgin Seven",
+   "url": "https://www.youtube.com/watch?v=0X6REHNFEXY"
+  },
+  {
+   "youtube_id": "DtSRU-Qslfg",
+   "lang": "tr",
+   "domain": "Computer Science & Data Science",
+   "title": "Veri Yapıları ve Algoritmalar - Ders 1",
+   "duration_s": 661.0,
+   "channel": "İstanbul Gedik Üniversitesi ACM Topluluğu",
+   "url": "https://www.youtube.com/watch?v=DtSRU-Qslfg"
+  }
+ ]
+}

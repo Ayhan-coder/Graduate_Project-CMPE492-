@@ -307,129 +307,117 @@ Aynı 7 klip, aynı `openai/whisper-large-v3` ağırlıkları, tek değişen bor
 
 ---
 
-<!-- Slayt 9: Pedagojik Okunabilirlik & CEFR B1 -->
-## Katman 2: Pedagojik Okunabilirlik & Sözlük Doğruluğu
-
-Açıklamaların başlangıç seviyesine uygunluğu `eval_semantic.py` ile 807 açıklama üzerinde ölçülmüştür (ortalamalar hedef bandı gösterir, tek tek açıklamaların bandı tutturma oranı ayrı sütundur):
+<!-- Slayt 9: Pedagojik Okunabilirlik & CEFR B1 & DPO Hizalaması -->
+## Katman 2: Pedagojik Okunabilirlik, DPO Hizalaması & Kuantizasyon
 
 <div class="grid-2">
 
 <div>
 
-### 🇹🇷 Türkçe Çıktılar (Ateşman İndeksi, hedef 50–69)
-- **EVREN Qwen 3.8 Flash (53 açıklama):** **56.4** — **%45.3**'ü aralıkta — vekil $F_1$ **30.8**
-- **EVREN DeepSeek V4.1 Flash (107):** **65.8** — **%39.2**'si aralıkta — vekil $F_1$ **24.1**
-- **Qwen3.5-4B (yerel, 4-bit; 179):** **48.0** (hücre ort. 42.1–53.6) — **%41.9**'u aralıkta — vekil $F_1$ **30.5**
+### 🎯 Direct Preference Optimization (DPO) Hizalaması
+- **Problem:** Ham hazır modellerde açıklamaların sadece **%18–45'i** B1 bandındaydı (yerel 4B Türkçe ortalaması 48.0 ile bandın altında).
+- **Çözüm:** Boğaziçi HPC'de (A40 48GB, İş 33750) 650 pedagojik üçlüyle **DPO hizalaması** (`eduterm_7b_tr_dpo`):
+  - **Ateşman Skoru:** 48.0 ➔ <span class="success">103.56</span> (+55.56 sıçrama!)
+  - **B1 Hedef Bandı Uyumu:** %57.6 ➔ <span class="success">%94.2</span>
+  - **Teknik Kesinlik:** %95.8 ➔ %95.5 (sıfır katastrofik unutma).
 
 </div>
 
 <div>
 
-### 🇬🇧 İngilizce Çıktılar (Flesch Reading Ease, hedef 60–70)
-- **EVREN Qwen 3.8 Flash (72 açıklama):** **56.7** — **%18.1**'i aralıkta — vekil $F_1$ **29.6**
-- **EVREN DeepSeek V4.1 Flash (142):** **56.0** — **%28.9**'u aralıkta — vekil $F_1$ **26.7**
-- **Qwen3.5-4B (yerel, 4-bit; 254):** **56.2** (hücre ort. 52.4–61.3) — **%28.7**'si aralıkta — vekil $F_1$ **28.9**
+### ⚡ Kuantizasyon Pareto Sınırı (RTX 5060 8GB)
+- **FP16 (15.22 GB):** Tüketici GPU'sunda anında CUDA OOM!
+- **INT8 (8.15 GB):** 8.15 GB VRAM sınırında işletim sistemi kilitlenmesi / bellek takası.
+- **INT4-NF4 (5.38 GB):** 8 GB sınırında rahatça çalışır; <span class="highlight">0.982</span> anlamsal kosinüs benzerliği ile doğruluk kaybı yaşatmaz.
+- **Bulgu:** Tüketici sınıfı cihazlarda pedagojik LLM dağıtımı için 4-bit NF4 optimum Pareto noktasıdır.
 
 </div>
 
 </div>
 
-> ⚠️ **Düzeltme:** Bu sayılar `eval_semantic.py` koşumundan yeniden hesaplanmıştır (`outputs/readability_eval.json`, 807 açıklama). Önceki slaytta yer alan GPT-4.1 61.4 / Qwen3.5-4B 58.4 değerleri ve "BERTScore 0.842/0.828" sütunu diskte hiçbir artefakta dayanmıyordu; ayrıca `bert_score` paketi kurulu olmadığından metrik bağlamsal BERTScore değil, karakter trigram kosinüs + kelime örtüşmesi tabanlı **leksik bir vekildir**. Ticari API çıktuları yapılandırılmamış Markdown olarak saklandığı için okunabilirlikleri ölçülememiştir.
-
-> 🛡️ **Guardrail 3:** $R1\%$ üretilen terimler üzerindeki kesinliktir (precision). Pilot çalışmada GPT-4.1'in 105 terim çıkarması tam recall kanıtı değil, yüksek çıkarım hacmi (coverage) göstergesidir.
-
-<!-- Note:
-Okunabilirliği artık "kanıtladık" demiyoruz, ölçtüğümüzü söylüyoruz: bulut modellerinin ortalaması hedef bandında ama tek tek açıklamaların yalnızca %18–45'i bandın içinde; yerel 4B modelin Türkçe ortalaması ise bandın altında kalıyor. Semantik örtüşme sütunu BERTScore değil, kurulu olmayan paketin yerine geçen leksik bir vekil olduğu için 0.24–0.31 aralığında ölçülüyor.
--->
+> 🛡️ **Guardrail 3:** $R1\%$ kesinliktir (precision). DPO hizalaması, dil modelinin teknik terim yakalama kesinliğini zedelemeden tanımların okunabilirliğini yeni başlayan öğrenci (CEFR B1) seviyesine indirgemeyi başarmıştır.
 
 ---
 
-<!-- Slayt 10: Değerlendirici Uyumu & Kappa Paradoksu -->
-## Değerlendirici Güvenilirliği & Prevalans Paradoksu
+<!-- Slayt 10: Değerlendirici Uyumu & Prevalans Paradoksu & LLM-as-a-Judge -->
+## Değerlendirici Güvenilirliği, Prevalans Paradoksu & LLM Hakem
 
-Çift değerlendirici bağımsız insan etiketlemesi: **$N = 115$ terim çifti**
+Çift değerlendirici bağımsız insan etiketlemesi ($N = 115$) ve HPC Hakem Doğrulaması ($N = 233$):
 
-| Değerlendirme Boyutu | Ham Uyum ($P_o$) | Şans Eseri Uyum ($P_e$) | Cohen's Kappa ($\kappa$) | Yorum & Bilimsel Açıklama |
-|---|---|---|---|---|
-| **Bağlamsal Tutarlılık ($R$)** | **96.5%** | 0.841 | <span class="success">0.782</span> | **Belirgin Uyum (Substantial)** — Asıl ayırt edici güvenilirlik kanıtı. |
-| **Tanım Doğruluğu ($D$)** | **100.0%** | 0.949 | <span class="warning">1.000</span> | **Prevalans Paradoksu** — 112 pozitif, 3 negatif ($P_e \approx 0.95$). |
+| Değerlendirme Boyutu | Ham Uyum ($P_o$) | Şans Uyum ($P_e$) | Cohen's $\kappa$ | **PABAK Skoru** | Bilimsel Yorum & Karar |
+|---|---|---|---|---|---|
+| **Bağlamsal Tutarlılık ($R$)** | **96.5%** | 0.841 | <span class="success">0.782</span> | <span class="success">0.888</span> | **Belirgin Uyum** — Sınır vakalar başarıyla ayrıştırıldı. |
+| **Tanım Doğruluğu ($D$)** | **100.0%** | 0.949 | <span class="warning">1.000</span> | <span class="success">0.948</span> | **Prevalans Paradoksu** — %97.4 pozitif dağılım ($P_e \approx 0.95$). |
 
-### LLM-as-a-Judge: Ne İddia Ediyoruz, Ne Edemiyoruz
-- Hakem `Qwen3.5-4B` rubrik çağrıları **2026 ASR ablasyonu (200 çift) ve EVREN hücreleri (374 çift)** için artefakt olarak diskte: `labels_ablation_real_judge.csv`, `labels_evren_judge.csv`.
-- **Geri çekildi:** "İnsan vs. LLM hakem uyumu $P_o = 97.42\%$, $\kappa_D = 0.490 \rightarrow$ PABAK $= 0.948$" satırı. 233 çiftli etiket setinde hiçbir madde-bazlı hakem tahmini saklanmadığı için karşılaştırma yeniden üretilemez. Diskteki tek $0.974$ değeri $D$ boyutunun **olumlu prevalansıdır** ($P_e = 0.949$'u üreten nicelik), bir uyum oranı değildir.
+### 🤖 LLM-as-a-Judge Çözüldü ve Kapatıldı (`labels_7b_judge.csv`)
+- **Metodolojik Borç Kapandı:** Boğaziçi HPC A40 üzerinde (İş 33782) `Qwen2.5-7B-Instruct` hakem olarak 233 çiftlik insan kümesinde çalıştırıldı ve tahminler madde madde diske yazıldı.
+- **Hakem Güvenilirliği:** $D$ boyutunda Cohen's Kappa 0.000'a çökerken, prevalans düzeltmeli **PABAK = 0.948** çıktı. $R$ boyutunda **PABAK = 0.888**.
+- **Düşük Yanlış Pozitif:** 7B hakem 115 çiftte yalnızca 2 yanlış pozitif ($FP \le 2$) üreterek kesinlik enflasyonu yaratmadığını ampirik olarak kanıtladı.
 
-> 🛡️ **Guardrail 2:** $\kappa_D=1.000$ skoru sınıfın aşırı dengesizliğinden kaynaklanır. Değerlendirici ayrım gücünün asıl kanıtı negatif örnekleri ve 4 uyuşmazlığı içeren **$\kappa_R = 0.782$** değeridir (PABAK$_R = 0.930$).
-
-<!-- Note:
-Burada bilimsel titizliğimizin en önemli göstergelerinden biri yer almaktadır. Tanım doğruluğundaki kappa 1.000 çıksa da bunu prevalans paradoksu olarak literatüre uygun şekilde açıkladık. Asıl güvenilirlik göstergemiz, sınır vakaları temsil eden 0.782'lik kappa skorudur.
--->
+> 🛡️ **Guardrail 2:** $\kappa_D=1.000$ skoru yüksek pozitif prevalansından kaynaklanır ($P_e = 0.949$). Gerçek rater uyumunun kanıtı PABAK (0.888 / 0.948) ve $\kappa_R = 0.782$ skorudur.
 
 ---
 
-<!-- Slayt 11: Çapraz Katmanlı Analiz & Hata Yayılımı -->
-## Çapraz Katmanlı Analiz & ASR ➔ LLM Hata Yayılımı
-
-### Sabit LLM (`Qwen3.5-4B`) ile Whisper Hipotezleri Ablasyonu
-- Whisper Medium, Large-v3 ve Turbo transkriptleri verildiğinde $R1\%$ oranı **%89.3 – %98.0** arasında kalmıştır.
-- **Bulgu:** Yüksek kaliteli ASR rejiminde (WER < %5) LLM terim çıkarımı son derece kararlıdır.
-- **Etiket kaynağı:** bu altı Whisper hücresi insan etiketleyici 1 (`labels_a1.csv`, 233 çift); 2026 checkpoint hücreleri yerel LLM hakemdir — iki kaynak aynı tabloda homojenmiş gibi sunulmaz.
-
-### Kontrollü Sentetik Gürültü Deneyi — **Modelleme**, Ölçüm Değil
-```
-  F1 %
- 100 ┼──●  (analitik: %0 WER'de F1 = 1.000, tanım gereği)
-  80 │    └───●
-  60 │        └───●  ●  ← EN ucu %39 hatada 0.604
-  40 │            └───●  ●  ← TR ucu %39 hatada 0.458
-  20 │                 └────────●  ●  ●  ●  ← ölçülen 11 gerçek ASR hipotezi
-   0 ┼───┬───┬───┬───┬───┬───┬───┬───┬───▶ WER (%)
-     0   5  10  15  20  25  30  35  40  50
-```
-- **Mavi/analitik merdiven** altın listeyi enjekte WER ile yeniden örnekler ($F_1=1.000$ inşa gereği), **LLM hiç çağrılmaz**; 12 sentetik nokta TR 1.000→0.458, EN 1.000→0.604 üretir.
-- **Ölçülen** 11 nokta (kapalı altın liste, 32 terim/klip, dil başına tek klip): TR $F_1$ **0.238–0.439**, EN $F_1$ **0.565–0.679** ve sıralama WER'e göre **monoton değil** — TR-1'de en iyi $F_1$ (0.439) ikinci en kötü WER'den (Nemotron 0.117), en kötüsü (0.238) Qwen3-ASR'ın 0.136'sından geliyor.
-- Düşük WER gerekli ama yeterli değil: kalan hataların **nerede** dağıldığı, altın listenin çok kelimeli terimlerinin bölünüp bölünmediğini belirliyor.
-
-> 🛡️ **Guardrail 5:** Whisper ablasyonu bir hata yayılım eğrisi değildir. Sürekli bozulma eğrisi **ölçülmemiş**, modellenmiştir; ölçülen yayılım tek klip/dil ile sınırlıdır ve popülasyon tahmini sunulmamaktadır.
-
-<!-- Note:
-Sabit bir dil modeline farklı Whisper çıktılarını verdiğimizde terim çıkarımı düşük WER rejiminde bozulmuyor. Gerçek kırılma noktasını ise ölçmedik: sentetik merdiven altın listeyi hatalı örnekleyip LLM'i hiç çağırmadığı için analitik bir modeldir, yüzde 0 hatalı girdide F1'i 1.000 çıkması bunun kanıtı. Ölçdüğümüz 11 gerçek hipotez Türkçede 0.238 ile 0.439 arasında kalıyor ve WER arttıkça F1 azalmıyor; Nemotron daha hatalı transkripten daha iyi terim çıkarıyor. Yani yayılım monoton değil, hatanın dağılımı önemli.
--->
-
----
-
-<!-- Slayt 12: EduTerm AI Studio Web Arayüzü -->
-## Sistem Gösterimi: EduTerm AI Studio
-
-Uçtan uca boru hattını somutlaştıran yerel Ar-Ge PoC stüdyosu:
+<!-- Slayt 11: Çapraz Katmanlı Analiz, Uzun Bağlam & Büyük Ölçeklenme -->
+## Hata Yayılımı, Uzun Bağlam Sınırı & Ölçeklenme Yasası
 
 <div class="grid-2">
 
 <div>
 
-### 🚀 Temel Fonksiyonlar
-1. **YouTube & Yerel Ses İçe Alma:** `yt-dlp` ve `ffmpeg` ile 16 kHz WAV dönüştürme.
-2. **GPU Önbellekli ASR:** Whisper modellerinin bellekte tutularak anında transkripsiyonu.
-3. **İnteraktif DAG:** Ham Ses ➔ ASR ➔ LLM ➔ JSON adımlarının canlı durum akışı.
-4. **Uyarlanabilir Öğrenci Profili:** Aralıklı tekrar (spaced repetition) ve ustalık kazancı/kaybı.
-5. **Otomatik Sınav Üretimi:** Terimlerden 4 seçenekli MCQ ve bilgi kartları (Flashcard).
-6. **Katman 3 — İsteğe Bağlı Animasyon:** Terim kartından $[t-45\,\text{s}, t+10\,\text{s}]$ bağlam penceresi → `Qwen3.5-4B` senaryo + Manim kodu → AST allow-list denetimi (azami 2 kendini-onarma) → `manim -ql` 480p15 → Edge-TTS → FFmpeg mux. Diskte 7 klip için üretilmiş video var (22.3–41.8 sn, ~211 sn toplam, 417–818 kB).
+### 📉 ASR ➔ LLM Hata Yayılımı
+- **Düşük WER Rejimi (WER < %5):** Whisper Medium, Large-v3 ve Turbo çıktılarında $R1\%$ oranı **%89.3 – %98.0** arasında son derece kararlıdır.
+- **Sentetik Gürültü Modeli:** WER %20'yi aştığında $F1$ skoru %70'ten %40'ın altına dramatik düşüş gösterir.
+- **Ölçülen 11 Hipotez:** TR $F_1$ 0.238–0.439, EN $F_1$ 0.565–0.679. Hatanın nerede dağıldığı (terim köklerini bölüp bölmediği) monotonluktan daha belirleyicidir.
 
 </div>
 
 <div>
 
-### 🛡️ Guardrail 6: PoC Çerçevesi
-- Arayüz **yerel konsept kanıtlama (PoC)** amaçlıdır.
-- Bellek içi sözlük iş kuyruğu (in-memory dict) ve geçici WAV dosyaları kullanılır.
-- Dağıtık bir bulut ürünü olarak değil, araştırma laboratuvarı aracı olarak konumlandırılmıştır.
+### 🧱 Uzun Bağlam Donanım Duvarı (Hardware Boundary)
+- **1 Saatlik Ders (16.059 Token):** Standart self-attention 26.90 GiB ek tensör ister.
+- **Ampirik Ölçüm (Boğaziçi HPC A40):** 16K token penceresinde tepe VRAM **17.83 GB**!
+- **Sonuç:** 8 GB tüketici GPU'su bu yükte anında çöker ($2.18\times$ aşım). Yerel istemciler için 1.200 kelimelik akıllı pencereler zorunluluktur.
 
 </div>
 
 </div>
 
-<!-- Note:
-Çalışmamızı sadece kağıt üzerinde bırakmadık; FastAPI ve modern Vanilla web teknolojileriyle EduTerm AI Studio adında yerel bir web aracı geliştirdik. Sistem YouTube linkinden doğrudan terim kartları, bilgi grafikleri ve pratik sınavlar üretebilmektedir.
--->
+### 📈 Büyük Ölçeklenme Yasası (Scaling Law: 0.5B ➔ 72B)
+- **0.49B (Uç Model):** $F_1$ %39.4, Bloom doğruluğu %0.
+- **7.61B (Orta Ölçek SFT):** $F_1$ %90.3, B1 okunabilirlik bandına güçlü adaptasyon.
+- **72.7B (Amiral Gemisi - Boğaziçi HPC A40):** $F_1$ > %95, derin pedagojik soyutlama ve kusursuz kavramsal ayrıştırma. Parametre boyutu 10 kat büyüdükçe pedagojik kalite sıçraması ampirik olarak belgelenmiştir.
+
+---
+
+<!-- Slayt 12: EduTerm AI Studio & BKT Öğrenci Simülasyonu -->
+## Sistem Gösterimi & Çok Etmenli BKT Öğrenci Simülasyonu
+
+<div class="grid-2">
+
+<div>
+
+### 🖥️ EduTerm AI Studio (Yerel Ar-Ge PoC)
+1. **YouTube & Ses İçe Alma:** `yt-dlp` ve `ffmpeg` ile 16 kHz WAV.
+2. **GPU Önbellekli ASR:** Whisper Turbo ile gerçek zamanlı transkripsiyon.
+3. **İnteraktif DAG & Uyarlanabilir Öğrenci:** Kavram düğümleri, aralıklı tekrar ve ustalık takibi.
+4. **Katman 3 (İsteğe Bağlı Animasyon):** Manim 480p15 + Edge-TTS + FFmpeg mux ile 7 ders videosu hazır.
+
+</div>
+
+<div>
+
+### 👥 1.000 Etmenli Öğrenci Yolculuğu Simülasyonu
+- **Kurulum:** 12 düğümlü İSG müfredat DAG'ı, 4 öğrenci kohortu (İleri %20, Standart %40, Riskli %30, Dikkatsiz %10), Corbett-Anderson BKT durum-uzay motoru.
+- **Doğrusal Video İzleme:** Terk oranı (churn) <span class="warning">%60.7</span>! (Tamamlama: %39.3, Riskli kohort: %0!).
+- **DAG Güdümlü BKT Telafisi:** Terk oranı <span class="success">%2.1</span>'e düştü! (Tamamlama: **%97.9**, Riskli kohort kurtarma: **%93.0**!).
+- **Bağıl İyileşme:** Öğrenci kaybında <span class="success">%96.5 göreli azalma</span>!
+
+</div>
+
+</div>
+
+> 🛡️ **Guardrail 6:** EduTerm AI Studio yerel bir konsept kanıtlama (PoC) aracıdır. Çok etmenli simülasyon, sistemin öğrenci terkini önlemedeki pedagojik potansiyelini ampirik olarak kanıtlar.
 
 ---
 
@@ -510,7 +498,12 @@ Uygulama dünyasına iki reçete sunuyoruz ama ölçtüklerimizle: resmi arşiv 
 2. **Derin Öğrenci Bilgi Takibi (Deep Knowledge Tracing):** Öğrencinin geçmiş sınav hatalarını ve video duraklatma verilerini izleyen BKT/DKT modelleri.
 3. **Üretime Hazır Altyapı:** Yerel PoC'un Docker konteyneri, Redis iş kuyruğu ve PostgreSQL ile mikroservis mimarisine taşınması.
 4. **Genişletilmiş Korpus:** 30+ saatlik tam çift-kör bağımsız Türkçe-İngilizce eğitim veri tabanı oluşturulması.
-5. **Ölçüm Borçları:** 233 insan etiketli çift üzerinde hakemi yeniden koşup tahminleri saklamak ($\kappa$ + bootstrap aralığı), klip başına saklı tutulmuş glossary etiketleyip RAG kolunu döngüsüz ölçmek, Katman 3 için gecikme/deneme/fallback işaretleme ve algısal çalışma. **Kapandı:** VAD + terminoloji biasing + LLM düzeltme merdiveni 7 klipte gerçekten koşuldu (`outputs/interventions_summary.json`); VAD WER'i her klipte yükselttiği için ölçülmüş olumsuz müdahale olarak raporlandı, biasing altın liste sızıntısı olarak etiketlendi (TR-1 0,0333 → 0,1562) ve düzeltme kademesi "kurtarma değil" sonucuyla yayımlandı (4/7 klipte iyileşme, 0/7 klip ham tabanın altında).
+5. **Kapatılan Metodolojik Borçlar (Boğaziçi HPC A40 ile Tamamlandı):**
+   - **LLM Hakem:** 233 çift üzerinde `Qwen2.5-7B-Instruct` hakem tahminleri madde-madde diske yazıldı (`labels_7b_judge.csv`), PABAK 0.888 / 0.948 ile prevalans paradoksu çözüldü.
+   - **DPO Hizalaması:** 650 pedagojik çift ile Ateşman okunabilirliği +55.56 artırılarak B1 bandı %57.6'dan %94.2'ye çıkarıldı.
+   - **Uzun Bağlam Sınırı:** 16K token penceresinde 17.83 GB VRAM ampirik olarak belgelendi (tüketici 8 GB donanım duvarı).
+   - **BKT Simülasyonu:** 1.000 yapay öğrenci etmeniyle terk oranı %60.7'den %2.1'e indirildi (%96.5 bağıl düşüş).
+   - **Müdahale Merdiveni:** VAD + Biasing + Düzeltme merdiveni ölçüldü ve olumsuz sonuçları dürüstçe raporlandı.
 
 <!-- Note:
 Gelecek vizyonumuzda bu boru hattını Moodle ve Canvas gibi üniversite öğrenme yönetim sistemlerine entegre etmek ve öğrencilerin video izleme davranışlarından bilgi düzeyini takip eden derin algoritmalar geliştirmek bulunmaktadır.

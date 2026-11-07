@@ -1,0 +1,18 @@
+{
+  "id": "TR-01",
+  "title": "Test Title",
+  "domain": "Software Engineering",
+  "bloom_level": "Uygulama",
+  "terms": [
+    {
+      "canonical": "Kazanılmış Değer Analizi",
+      "aliases": [
+        "evm",
+        "earned value"
+      ],
+      "definition_b1": "Projenin bütçe ve zaman hedeflerine göre nerede olduğunu gösteren izleme yöntemidir.",
+      "atesman_score": 53.2
+    }
+  ],
+  "updated_at": "2026-10-29 23:37:04"
+}

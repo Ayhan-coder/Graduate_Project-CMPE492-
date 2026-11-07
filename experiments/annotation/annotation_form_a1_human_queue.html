@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EduTerm etiketleme — a1</title>
+<style>
+  :root {
+    --bg: #f4f6f9; --card: #ffffff; --ink: #0f172a; --muted: #64748b;
+    --line: #d8dee9; --accent: #0e7490; --ok: #15803d; --no: #b91c1c;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 16px/1.55 "Segoe UI", system-ui, sans-serif; }
+  header { position: sticky; top: 0; z-index: 5; background: #0f172a; color: #e2e8f0;
+           padding: 10px 20px; display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+  header b { color: #67e8f9; font-weight: 600; }
+  .bar { flex: 1 1 240px; height: 8px; background: #1e293b; border-radius: 99px; overflow: hidden; min-width: 160px; }
+  .bar > i { display: block; height: 100%; width: 0; background: #22d3ee; transition: width .15s; }
+  main { max-width: 980px; margin: 26px auto 120px; padding: 0 20px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 26px 28px; }
+  .meta { color: var(--muted); font-size: 14px; letter-spacing: .02em; }
+  .term { font-size: 32px; font-weight: 650; margin: 10px 0 18px; line-height: 1.2; }
+  .label { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 4px; }
+  .expl { font-size: 19px; margin-bottom: 20px; }
+  .ctx { border-left: 0 solid; background: #f1f5f9; border-radius: 8px; padding: 14px 16px; font-size: 15px; color: #334155; }
+  .ctx mark { background: #fef3c7; padding: 0 2px; }
+  .mode { margin-top: 26px; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+  .pill { padding: 6px 14px; border-radius: 999px; font-weight: 600; font-size: 14px; }
+  .pill.r { background: #e0f2fe; color: #075985; }
+  .pill.d { background: #ede9fe; color: #5b21b6; }
+  .pill.idle { background: #e2e8f0; color: #475569; }
+  .keys { color: var(--muted); font-size: 14px; }
+  kbd { background: #0f172a; color: #e2e8f0; border-radius: 5px; padding: 2px 7px; font: 600 13px/1.4 ui-monospace, monospace; }
+  .options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+  button.opt { border: 1px solid var(--line); background: #fff; border-radius: 10px; padding: 14px;
+               font-size: 15px; cursor: pointer; text-align: left; color: var(--ink); }
+  button.opt:hover { border-color: var(--accent); }
+  button.opt b { display: block; font-size: 17px; margin-bottom: 2px; }
+  button.opt.yes b { color: var(--ok); }
+  button.opt.no b { color: var(--no); }
+  textarea { width: 100%; margin-top: 14px; border: 1px solid var(--line); border-radius: 8px;
+             padding: 10px; font: 15px/1.5 "Segoe UI", sans-serif; resize: vertical; min-height: 54px; }
+  .row { display: flex; justify-content: space-between; gap: 16px; margin-top: 18px; flex-wrap: wrap; }
+  .row button { border: 1px solid var(--line); background: #fff; border-radius: 8px; padding: 9px 16px;
+                font-size: 14px; cursor: pointer; }
+  .row button.primary { background: #0f172a; color: #fff; border-color: #0f172a; }
+  .legend { color: var(--muted); font-size: 13px; margin-top: 20px; line-height: 1.7; }
+  .done { text-align: center; padding: 40px 0; }
+  .done h2 { margin: 0 0 8px; }
+  .toast { position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%);
+           background: #0f172a; color: #e2e8f0; padding: 10px 18px; border-radius: 10px;
+           font-size: 14px; opacity: 0; transition: opacity .2s; pointer-events: none; }
+  .toast.on { opacity: 1; }
+</style>
+</head>
+<body>
+<header>
+  <span><b>EduTerm</b> · etiketleyici: a1</span>
+  <div class="bar"><i id="fill"></i></div>
+  <span id="count" class="keys">0/0</span>
+  <button class="rowbtn" id="export" style="border:0;background:#22d3ee;color:#083344;border-radius:8px;padding:7px 14px;font-weight:600;cursor:pointer">CSV indir</button>
+</header>
+<main>
+  <div class="card" id="card"></div>
+  <div class="legend">
+    <b>R1</b> terim transkript bağlamıyla tutarlı &nbsp;·&nbsp; <b>R0</b> değil (yanlış dil, derste yok, alan terimi değil)<br>
+    <b>D1</b> açıklama TDK/OED tanımına göre doğru &nbsp;·&nbsp; <b>D0</b> değil (hatalı, döngüsel, jargon)<br>
+    Emin değilsen 0 işaretle ve not bırak. <kbd>1</kbd>/<kbd>0</kbd> seç, <kbd>Backspace</kbd> geri, <kbd>s</kbd> atla, <kbd>n</kbd> not.
+  </div>
+</main>
+<div class="toast" id="toast"></div>
+<script>
+const ITEMS = [{"item_id": "EN-13-machine-003", "video_id": "EN-13", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "normal forces", "explanation": "Internal forces oriented along the axis of a beam that become compressive in the top section and tensile in the bottom section when the beam sags.", "context": "We have shear forces, oriented in the vertical direction, and we also have normal forces, which are oriented along the axis of the beam."}, {"item_id": "EN-13-machine-008", "video_id": "EN-13", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "roller supports", "explanation": "A type of support that holds the beam vertically but allows it to move horizontally and rotate.", "context": "They can have pin supports, roller supports, or be fully fixed, which each restrain the beam in different ways."}, {"item_id": "EN-16-machine-008", "video_id": "EN-16", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "coefficient representation", "explanation": "A way of storing a polynomial as a list of numbers representing the values of its individual power terms.", "context": "We will refer to this representation as the coefficient representation of polynomials."}, {"item_id": "EN-16-machine-009", "video_id": "EN-16", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "2d degree polynomials", "explanation": "A mathematical expression where the highest power of the variable is the product of two numbers, d and d.", "context": "In general, given 2d degree polynomials, the product will have a degree of 2 times d, and the running time of this algorithm, if we actually went about implementing it with the most natural distributed property approach, will be O , since each term in polynomial a will have to be multiplied by all terms in polynomial b."}, {"item_id": "EN-16-machine-006", "video_id": "EN-16", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "polynomial multiplication", "explanation": "The mathematical operation of combining two polynomials to create a new polynomial with terms resulting from multiplying all pairs of input terms.", "context": "We'll take a discovery-based approach to learning about the FFT in a context that you are all familiar with, polynomial multiplication."}, {"item_id": "EN-11-machine-004", "video_id": "EN-11", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "non-exclusion", "explanation": "The inability to prevent people who do not pay from using or benefiting from a good.", "context": "Non-exclusion is the idea that you can't exclude people that don't pay."}, {"item_id": "EN-13-machine-002", "video_id": "EN-13", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "bending moment", "explanation": "A resultant of normal internal forces that occurs when tensile and compressive forces act in opposite directions without creating a net normal force.", "context": "One, shear force, which is a resultant of the vertical internal forces, and one bending moment, which is a resultant of the normal internal forces."}, {"item_id": "EN-08-machine-003", "video_id": "EN-08", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "fundamental theorem of calculus", "explanation": "A mathematical principle linking differentiation and integration, stating that the derivative of an accumulation function equals the original function.", "context": "The fundamental theorem of calculus tells us, let me write this down because this is a big deal."}, {"item_id": "EN-09-machine-002", "video_id": "EN-09", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "special relativity", "explanation": "The scientific principle that length and time are not absolute but change based on relative motion.", "context": "But how does this work? Well, strangely enough, it's a consequence of special relativity."}, {"item_id": "EN-12-machine-003", "video_id": "EN-12", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "circuits", "explanation": "Connections formed by neurons that become the basic foundation of brain architecture.", "context": "These connections form circuits that become the basic foundation of brain architecture."}, {"item_id": "EN-14-machine-001", "video_id": "EN-14", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "CRISPR-Cas9", "explanation": "A tool that cuts DNA at specific locations to edit genes.", "context": "The CRISPR-Cas9 system is a tool for cutting DNA at a specifically targeted location."}, {"item_id": "EN-15-machine-004", "video_id": "EN-15", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "something it is like", "explanation": "The idea that there is a subjective perspective or feeling associated with being an organism.", "context": "So there is something it is like to be a bat, a dolphin, the person next to you at the gallery, and you."}, {"item_id": "EN-16-machine-016", "video_id": "EN-16", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "invertible", "explanation": "A property of a matrix meaning it can be reversed or undone to produce the original data.", "context": "One nice property of this matrix is that if each of our original points is unique, as it is in this case, the matrix will always be invertible."}, {"item_id": "EN-11-machine-006", "video_id": "EN-11", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "tragedy of the commons", "explanation": "A situation where individuals acting independently according to their own self-interest behave contrary to the best interests of the group as a whole.", "context": "The incentive to do what's best for you, rather than what's best for everyone, is the root cause of something economists call the tragedy of the commons."}, {"item_id": "EN-13-machine-007", "video_id": "EN-13", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "pin supports", "explanation": "A type of support that holds the beam in place but allows it to rotate.", "context": "They can have pin supports, roller supports, or be fully fixed, which each restrain the beam in different ways."}, {"item_id": "EN-08-machine-005", "video_id": "EN-08", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "antiderivative", "explanation": "A function whose derivative is the original function, essentially reversing the process of differentiation.", "context": "Every continuous function, every continuous f has an antiderivative capital f of x. That by itself is a cool thing."}, {"item_id": "EN-09-machine-003", "video_id": "EN-09", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "length contraction", "explanation": "The phenomenon where an object's length appears shorter when measured by an observer moving relative to the object.", "context": "Well, the truth is there are enough electrons in a wire and the electric interaction is so amazingly strong that even the minuscule effects of length contraction can produce significant charge imbalances that produce a noticeable force."}, {"item_id": "EN-12-machine-001", "video_id": "EN-12", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "neurons", "explanation": "Brain cells that send electrical signals to communicate with each other.", "context": "During this important period of brain development, billions of brain cells called neurons send electrical signals to communicate with each other."}, {"item_id": "EN-14-machine-002", "video_id": "EN-14", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "Cas9", "explanation": "A DNA-cutting protein that binds to specific sequences to make breaks.", "context": "There are two components to the system, a DNA cutting protein called Cas9, and an RNA molecule known as the guide RNA."}, {"item_id": "EN-15-machine-001", "video_id": "EN-15", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "hard problem of consciousness", "explanation": "The difficulty in explaining why physical brain processes result in subjective feelings or experiences.", "context": "In this Wi-Fi video, we'll explore this issue in what's known as the hard problem of consciousness."}, {"item_id": "EN-16-machine-004", "video_id": "EN-16", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "Towers of Noy", "explanation": "A logic puzzle game involving moving disks between rods, often used as an example of elegant recursive algorithms.", "context": "Think of the first time you saw the incredibly simple recursive implementation of Towers of Noy."}, {"item_id": "EN-11-machine-007", "video_id": "EN-11", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "environmental economics", "explanation": "A branch of economics that studies how to manage natural resources and solve problems related to the environment.", "context": "There's an entire subfield of economics focused on addressing and solving these issues. It's called environmental economics."}, {"item_id": "EN-13-machine-006", "video_id": "EN-13", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "bending moments", "explanation": "Rotational forces that cause the beam to curve or bend under load.", "context": "These resultant shear forces and bending moments will depend on the loads acting on the beam and the way in which the beam is supported."}, {"item_id": "EN-08-machine-004", "video_id": "EN-08", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "continuous function", "explanation": "A function where small changes in input result in small changes in output, with no breaks or jumps in its graph.", "context": "Well, it tells us that for any continuous function f, if I define a function that is the area under the curve between a and x right over here, that the derivative of that function is going to be f."}, {"item_id": "EN-09-machine-001", "video_id": "EN-09", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "electromagnet", "explanation": "A magnet created by passing an electric current through a metal.", "context": "But if you pass an electric current through any metal, it becomes a magnet. An electromagnet."}, {"item_id": "EN-12-machine-002", "video_id": "EN-12", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "pruning", "explanation": "A normal process where connections that are used less fade away.", "context": "Meanwhile, connections that are used less fade away through a normal process called pruning."}, {"item_id": "EN-14-machine-003", "video_id": "EN-14", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "guide RNA", "explanation": "An RNA molecule that directs the Cas9 protein to a specific DNA sequence.", "context": "There are two components to the system, a DNA cutting protein called Cas9, and an RNA molecule known as the guide RNA."}, {"item_id": "EN-15-machine-002", "video_id": "EN-15", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "conscious mental experiences", "explanation": "The subjective feelings or awareness that occur when an organism perceives or thinks.", "context": "Can it explain our conscious mental experiences? experiences."}, {"item_id": "EN-16-machine-010", "video_id": "EN-16", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "linear function", "explanation": "A mathematical relationship where the graph forms a straight line, representing a direct proportional relationship between variables.", "context": "To see the key insight here, let's take a look at one of the simplest polynomials, a degree 1 polynomial or a linear function."}, {"item_id": "EN-11-machine-002", "video_id": "EN-11", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "free rider problem", "explanation": "A situation where individuals benefit from a shared resource or service without contributing to its cost or maintenance.", "context": "This is the free rider problem. Free riders are people who benefit without paying."}, {"item_id": "EN-13-machine-001", "video_id": "EN-13", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "Shear force", "explanation": "A resultant of vertical internal forces that develop within a beam to maintain equilibrium when it is loaded.", "context": "We have shear forces, oriented in the vertical direction, and we also have normal forces, which are oriented along the axis of the beam."}, {"item_id": "EN-08-machine-001", "video_id": "EN-08", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "Riemann integral", "explanation": "A mathematical method used to calculate the area under a curve by summing up small rectangular areas.", "context": "Well, how do we denote the area under the curve between two endpoints? Well, we just use our definite integral. That's our Riemann integral."}, {"item_id": "EN-09-machine-004", "video_id": "EN-09", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "magnetite", "explanation": "A naturally occurring iron ore mineral that is magnetic and can be used to make permanent magnets.", "context": "Click here to go to MinutePhysics where we'll explore magnetite, compasses, and all the wizardry of permanent magnets."}, {"item_id": "EN-12-machine-004", "video_id": "EN-12", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "logic", "explanation": "One of the areas where neurons form strong circuits and connections during early development.", "context": "Through this process, neurons form strong circuits and connections for emotions, motor skills, behavioral control, logic, language, and memory during the early critical period of development."}, {"item_id": "EN-14-machine-004", "video_id": "EN-14", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "PAM", "explanation": "A common DNA sequence that Cas9 must locate and bind before cutting.", "context": "First, Cas9 has to locate and bind to a common sequence genome called a PAM."}, {"item_id": "EN-15-machine-003", "video_id": "EN-15", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "conscious mental states", "explanation": "Conditions where an organism has awareness or subjective feeling.", "context": "According to the philosopher Thomas Nagel, an organism has conscious mental states if and only if there is something it is like to be that organism."}, {"item_id": "EN-16-machine-011", "video_id": "EN-16", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "two-point representation", "explanation": "A specific way to describe a line using exactly two distinct locations on that line to define its position and slope.", "context": "There are actually several reasonable representations, but the one that we are going to use is the two-point representation."}, {"item_id": "EN-11-machine-005", "video_id": "EN-11", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "non-rivalry", "explanation": "The condition where one person using a good does not reduce its availability for others.", "context": "Non-rivalry is the idea that one person's consumption of the good doesn't ruin it for other people."}, {"item_id": "EN-13-machine-009", "video_id": "EN-13", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "reaction forces", "explanation": "External forces exerted by supports on a beam to keep it in balance.", "context": "This gives us a set of simple equations we can solve to calculate the reaction forces and moments."}, {"item_id": "EN-08-machine-002", "video_id": "EN-08", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "definite integral", "explanation": "A specific type of integral that calculates the exact area under a curve between two fixed points.", "context": "So this right over here, we can say, is the definite integral from a to x of f of t dt."}, {"item_id": "EN-16-machine-012", "video_id": "EN-16", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "quadratic function", "explanation": "A mathematical function involving a squared variable, resulting in a graph shaped like a parabola.", "context": "For example, if I gave you 3 random points, this means that there is exactly one quadratic function that goes through all 3 of these points."}, {"item_id": "EN-11-machine-001", "video_id": "EN-11", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "market failures", "explanation": "Situations where the free market system does not allocate resources efficiently or achieve the best outcome for society.", "context": "Today, we're going to talk about those market failures and how economists address them."}, {"item_id": "EN-13-machine-005", "video_id": "EN-13", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "shear forces", "explanation": "Internal forces that cause layers of the beam to slide past one another.", "context": "These resultant shear forces and bending moments will depend on the loads acting on the beam and the way in which the beam is supported."}, {"item_id": "EN-16-machine-007", "video_id": "EN-16", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "distributive property", "explanation": "An algebraic rule that allows multiplying a term by a group of terms by multiplying the term by each individual term in the group.", "context": "Mathematically, we know one algorithm to multiply polynomials by repeatedly applying the distributive property."}, {"item_id": "EN-11-machine-003", "video_id": "EN-11", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "public goods", "explanation": "Items that are available to everyone and cannot be used up by one person's consumption.", "context": "These are often called public goods, but the technical definition of a public good is anything that has two characteristics, non-exclusion and non-rivalry."}, {"item_id": "EN-13-machine-004", "video_id": "EN-13", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "equilibrium", "explanation": "A state where internal forces within a beam balance out so that the beam remains stable under loading conditions.", "context": "When a beam is loaded, internal forces develop within it to maintain equilibrium."}, {"item_id": "EN-16-machine-017", "video_id": "EN-16", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "value representation", "explanation": "A way of writing a polynomial as a list of input-output pairs (points).", "context": "We know multiplication is faster using the value representation, so what we'll do is evaluate each of these polynomials at 2d plus 1 points, multiply each of these points pairwise to get the value representation of the product polynomial, and then finally, somehow convert the value representation back to the final coefficient representation."}, {"item_id": "EN-11-machine-008", "video_id": "EN-11", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "externalities", "explanation": "Situations where costs or benefits affect people outside the main transaction.", "context": "There's no better example of this than what economists call externalities."}, {"item_id": "EN-16-machine-015", "video_id": "EN-16", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "determinant", "explanation": "A scalar value calculated from a matrix that indicates whether the matrix has an inverse.", "context": "The easiest way to show this is by calculating the determinant, which you will find is non-zero, but I'll link a nice linear algebraic proof of this fact in the description as well for those interested."}, {"item_id": "EN-16-machine-014", "video_id": "EN-16", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "coefficients", "explanation": "The numerical factors in a polynomial that determine its specific shape and behavior.", "context": "We want to show that for these set of points, there is only one set of coefficients."}, {"item_id": "EN-16-machine-003", "video_id": "EN-16", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "signal processing", "explanation": "The field of engineering that deals with the analysis, modification, and synthesis of signals.", "context": "So much of the modern technology that we have today such as wireless communication, GPS, and in fact anything related to the vast field of signal processing relies on the insights of the FFT."}, {"item_id": "EN-16-machine-001", "video_id": "EN-16", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "Fast Fourier Transform", "explanation": "A mathematical technique used to analyze signals by converting them from time domain to frequency domain.", "context": "Today I want to talk about an algorithm that rightfully belongs in both classes, and my personal favorite algorithm, the Fast Fourier Transform."}, {"item_id": "EN-16-machine-002", "video_id": "EN-16", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "discrete Fourier transform", "explanation": "A specific mathematical method for calculating the frequency components of a discrete set of data points.", "context": "It's often introduced in fairly complex settings that require a lot of prerequisite knowledge such as the discrete Fourier transform, time domain to frequency domain conversions, and much more."}, {"item_id": "EN-16-machine-005", "video_id": "EN-16", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "FFT", "explanation": "A fast algorithm for performing polynomial multiplication by transforming the problem into a different representation.", "context": "We'll take a discovery-based approach to learning about the FFT in a context that you are all familiar with, polynomial multiplication."}, {"item_id": "EN-16-machine-013", "video_id": "EN-16", "model": "openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B", "lang": "en", "term": "polynomial", "explanation": "A mathematical expression consisting of variables and coefficients combined using addition, subtraction, and multiplication.", "context": "So, if we actually evaluate our polynomial at each of these points, we get the following set of system of equations."}];
+const ANN = "a1";
+const KEY = "eduterm-anno-" + ANN;
+const state = JSON.parse(localStorage.getItem(KEY) || '{"labels":{},"index":0}');
+const labels = state.labels || {};
+let index = Math.min(state.index || 0, ITEMS.length);
+
+const card = document.getElementById('card');
+const fill = document.getElementById('fill');
+const countEl = document.getElementById('count');
+const toastEl = document.getElementById('toast');
+
+let mode = 'R';
+let draft = null;
+
+function save() { localStorage.setItem(KEY, JSON.stringify({labels, index})); }
+
+function toast(msg) {
+  toastEl.textContent = msg; toastEl.classList.add('on');
+  clearTimeout(toast.t); toast.t = setTimeout(() => toastEl.classList.remove('on'), 1200);
+}
+
+function esc(s) { return String(s || '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+function markTerm(ctx, term) {
+  const safe = esc(ctx);
+  if (!term) return safe;
+  const t = esc(term).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return safe.replace(new RegExp('(' + t + ')', 'ig'), '<mark>$1</mark>');
+}
+
+function labeledCount() { return ITEMS.filter(it => labels[it.item_id] && labels[it.item_id].R !== undefined && labels[it.item_id].D !== undefined).length; }
+
+function render() {
+  const done = labeledCount();
+  fill.style.width = (ITEMS.length ? (100 * done / ITEMS.length) : 0) + '%';
+  countEl.textContent = done + '/' + ITEMS.length;
+
+  if (index >= ITEMS.length) {
+    card.innerHTML = '<div class="done"><h2>Bitti.</h2><p class="meta">' + done + ' madde etiketlendi. Sağ üstteki <b>CSV indir</b> ile dosyayı dışa aktar.</p></div>';
+    return;
+  }
+  const it = ITEMS[index];
+  const cur = labels[it.item_id];
+  if (!cur || (cur.R === undefined) || (cur.D === undefined)) {
+    mode = (!cur || cur.R === undefined) ? 'R' : 'D';
+  } else {
+    mode = 'R';
+  }
+  const shown = cur ? Object.assign({}, cur) : {};
+  if (draft && draft.item_id === it.item_id) { shown.R = draft.R; shown.D = draft.D; shown.comment = draft.comment; }
+
+  const modeHtml = mode === 'R'
+    ? '<span class="pill r">şimdi: R — bağlam uyumu</span><span class="keys"><kbd>1</kbd> tutarlı · <kbd>0</kbd> değil</span>'
+    : '<span class="pill d">şimdi: D — tanım doğruluğu</span><span class="keys"><kbd>1</kbd> doğru · <kbd>0</kbd> değil</span>';
+
+  card.innerHTML =
+    '<div class="meta">' + esc(it.video_id) + ' · ' + esc(it.lang) + ' · ' + (index + 1) + '. madde' +
+      (cur && cur.R !== undefined ? ' · R=' + cur.R : '') +
+      (cur && cur.D !== undefined ? ' · D=' + cur.D : '') + '</div>' +
+    '<div class="term">' + esc(it.term) + '</div>' +
+    '<div class="label">Açıklama</div>' +
+    '<div class="expl">' + esc(it.explanation) + '</div>' +
+    (it.context ? '<div class="label">Transkript bağlamı</div><div class="ctx">' + markTerm(it.context, it.term) + '</div>' : '') +
+    '<div class="mode">' + modeHtml + '</div>' +
+    '<div class="options">' +
+      '<button class="opt yes" data-v="1"><b>1 — evet</b>' + (mode === 'R' ? 'Terim bağlama uygun' : 'Tanım doğru') + '</button>' +
+      '<button class="opt no" data-v="0"><b>0 — hayır</b>' + (mode === 'R' ? 'Bağlama uygun değil' : 'Tanım hatalı') + '</button>' +
+    '</div>' +
+    '<textarea id="comment" placeholder="Not (isteğe bağlı, n ile odaklan)">' + esc(shown.comment || '') + '</textarea>' +
+    '<div class="row">' +
+      '<button id="prev">← önceki (Backspace)</button>' +
+      '<button id="skip">atla (s) →</button>' +
+      '<button id="exp2">CSV indir</button>' +
+    '</div>';
+
+  card.querySelectorAll('button.opt').forEach(b => b.addEventListener('click', () => choose(b.dataset.v, b)));
+  document.getElementById('prev').addEventListener('click', prev);
+  document.getElementById('skip').addEventListener('click', skip);
+  document.getElementById('exp2').addEventListener('click', exportCsv);
+}
+
+function choose(v, btn) {
+  if (index >= ITEMS.length) return;
+  const it = ITEMS[index];
+  const cur = labels[it.item_id] || {};
+  const val = Number(v);
+  const comment = (document.getElementById('comment') || {}).value || cur.comment || '';
+  if (mode === 'R') {
+    labels[it.item_id] = {R: val, D: cur.D, comment};
+    draft = {item_id: it.item_id, R: val, D: cur.D, comment};
+    mode = 'D';
+    save();
+    render();
+    toast('R=' + val + ' · şimdi D');
+  } else {
+    labels[it.item_id] = {R: cur.R, D: val, comment};
+    draft = null;
+    index += 1;
+    save();
+    render();
+    toast('kaydedildi');
+  }
+}
+
+function prev() {
+  if (index > 0) { index -= 1; draft = null; save(); render(); }
+}
+
+function skip() { if (index < ITEMS.length) { index += 1; draft = null; save(); render(); } }
+
+function exportCsv() {
+  const head = ['item_id','video_id','model','lang','term','explanation','R','D','comment'];
+  const rows = [head.join(',')];
+  for (const it of ITEMS) {
+    const l = labels[it.item_id];
+    if (!l || l.R === undefined || l.D === undefined) continue;
+    const cell = x => '"' + String(x === undefined || x === null ? '' : x).replace(/"/g, '""') + '"';
+    rows.push([it.item_id, it.video_id, it.model, it.lang, it.term, it.explanation, l.R, l.D, l.comment || ''].map(cell).join(','));
+  }
+  const blob = new Blob(['\ufeff' + rows.join('\r\n')], {type: 'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'labels_' + ANN + '_new.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+  toast(rows.length - 1 + ' satır indirildi');
+}
+
+document.getElementById('export').addEventListener('click', exportCsv);
+
+document.addEventListener('keydown', e => {
+  const tag = (e.target.tagName || '').toLowerCase();
+  if (tag === 'textarea') {
+    if (e.key === 'Escape') { e.target.blur(); }
+    return;
+  }
+  if (e.key === '1' || e.key === '0') { e.preventDefault(); choose(e.key, null); }
+  else if (e.key === 'Backspace') { e.preventDefault(); prev(); }
+  else if (e.key === 's' || e.key === 'S') { e.preventDefault(); skip(); }
+  else if (e.key === 'n' || e.key === 'N') { const t = document.getElementById('comment'); if (t) { e.preventDefault(); t.focus(); } }
+});
+
+render();
+</script>
+</body>
+</html>

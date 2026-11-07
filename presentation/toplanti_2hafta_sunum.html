@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduTerm AI — Son 2 Hafta Geliştirme Raporu | Boğaziçi Üniversitesi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090d16;
+      --bg-card: rgba(18, 26, 44, 0.7);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-glow: rgba(56, 189, 248, 0.35);
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-purple: #a855f7;
+      --accent-green: #34d399;
+      --accent-amber: #fbbf24;
+      --accent-red: #f87171;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      background: radial-gradient(ellipse at 15% 15%, #0f172a 0%, #030712 100%);
+      color: var(--text);
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      flex-direction: column;
+    }
+    .header-bar {
+      height: 52px;
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      background: rgba(10, 15, 26, 0.6);
+      backdrop-filter: blur(12px);
+      font-size: 14px;
+      color: var(--text-muted);
+      z-index: 10;
+    }
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text);
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+    .header-brand .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 10px var(--accent);
+    }
+    .deck-container {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .slide {
+      position: absolute;
+      width: min(1200px, 94vw);
+      height: min(680px, 86vh);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 48px 56px;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(18px) scale(0.98);
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 24px 64px -16px rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(20px);
+    }
+    .slide.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0) scale(1);
+      border-color: rgba(56, 189, 248, 0.25);
+    }
+    .slide-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .slide h1 {
+      font-size: 38px;
+      font-weight: 800;
+      line-height: 1.2;
+      color: #fff;
+      margin-bottom: 8px;
+      letter-spacing: -0.8px;
+    }
+    .slide h2 {
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+    .content-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      flex: 1;
+    }
+    .content-box {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .content-box h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .content-box ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 15px;
+      color: #cbd5e1;
+      line-height: 1.5;
+    }
+    .content-box li {
+      position: relative;
+      padding-left: 20px;
+    }
+    .content-box li::before {
+      content: "•";
+      position: absolute;
+      left: 4px;
+      color: var(--accent);
+      font-size: 18px;
+      line-height: 1;
+    }
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .stat-card .val {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .stat-card .lbl {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      margin-top: 6px;
+      background: rgba(10, 16, 30, 0.5);
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    th {
+      background: rgba(30, 41, 59, 0.8);
+      color: var(--accent);
+      font-weight: 700;
+      text-align: left;
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    td {
+      padding: 8px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: #e2e8f0;
+    }
+    tr.best-row {
+      background: rgba(56, 189, 248, 0.08);
+      font-weight: 600;
+    }
+    .pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .pill-green { background: rgba(52, 211, 153, 0.15); color: var(--accent-green); border: 1px solid rgba(52, 211, 153, 0.3); }
+    .pill-blue { background: rgba(56, 189, 248, 0.15); color: var(--accent); border: 1px solid rgba(56, 189, 248, 0.3); }
+    .pill-purple { background: rgba(168, 85, 247, 0.15); color: var(--accent-purple); border: 1px solid rgba(168, 85, 247, 0.3); }
+    .pill-amber { background: rgba(251, 191, 36, 0.15); color: var(--accent-amber); border: 1px solid rgba(251, 191, 36, 0.3); }
+
+    .speaker-drawer {
+      position: fixed;
+      bottom: 56px;
+      left: 50%;
+      transform: translateX(-50%) translateY(120%);
+      width: min(1000px, 90vw);
+      background: #0f172a;
+      border: 1px solid var(--border-glow);
+      border-radius: 14px;
+      padding: 16px 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 50;
+      color: #e2e8f0;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .speaker-drawer.open {
+      transform: translateX(-50%) translateY(0);
+    }
+    .speaker-drawer h4 {
+      color: var(--accent-amber);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .footer-bar {
+      height: 48px;
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--border);
+      background: rgba(10, 15, 26, 0.6);
+      font-size: 13px;
+      color: var(--text-muted);
+      z-index: 10;
+    }
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .nav-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12.5px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .nav-btn:hover {
+      background: var(--accent);
+      color: #000;
+      border-color: var(--accent);
+    }
+    .progress-line {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-purple));
+      transition: width 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Üst Bilgi Barı -->
+  <div class="header-bar">
+    <div class="header-brand">
+      <span class="dot"></span>
+      <span>EduTerm AI — Son 2 Hafta Geliştirme Sunumu</span>
+    </div>
+    <div>Boğaziçi Üniversitesi | CMPE492 Bitirme Projesi</div>
+  </div>
+
+  <!-- Slayt Konteyneri -->
+  <div class="deck-container">
+
+    <!-- Slayt 1: Giriş & Kapak -->
+    <div class="slide active" data-slide="1" data-notes="Bu toplantıda son 2 haftada gerçekleştirdiğimiz somut mühendislik ve araştırma çıktılarını aktaracağım. Boğaziçi HPC altyapısını projeye entegre ettik, 0.5B'den 72B'ye kadar uzanan 7 ölçekli büyük bir Scaling Law benchmark'ı koşturduk, 7B LoRA ve 14B QLoRA modelleriyle dikey alan eğitimi yaptık ve RAG hibrit arama motoru ile 4.6 saatlik ses korpusunu işledik.">
+      <div class="slide-tag">Toplantı Raporu • 2 Haftalık Geliştirmeler</div>
+      <h1>EduTerm AI: Son 2 Hafta İlerleme Raporu</h1>
+      <h2>Türkçe Teknik Eğitim Videolarından Otomatik Terim Çıkarımı, Pedagojik Sadeleştirme ve Animasyon</h2>
+      
+      <div class="stat-row">
+        <div class="stat-card">
+          <div class="val">8 Model</div>
+          <div class="lbl">HPC Scaling Law</div>
+        </div>
+        <div class="stat-card">
+          <div class="val">%88.9</div>
+          <div class="lbl">7B LoRA Recall</div>
+        </div>
+        <div class="stat-card">
+          <div class="val">%50.0</div>
+          <div class="lbl">32B Bloom Rekoru</div>
+        </div>
+        <div class="stat-card">
+          <div class="val">4.64 Saat</div>
+          <div class="lbl">Doğrulanmış Ses</div>
+        </div>
+      </div>
+
+      <div class="content-box">
+        <h3>🎯 Sunum Kapsamı ve Ana Başlıklar</h3>
+        <ul>
+          <li><strong>Boğaziçi HPC (NVIDIA A40 48GB) Altyapısı:</strong> 0.5B $\to$ 72B Büyük Ölçekleme Yasası (Grand Scaling Law).</li>
+          <li><strong>Dikey Alan İnce Ayarı (SFT / LoRA):</strong> 7B LoRA başarısı ve 14B QLoRA SFT model eğitimi (2.296 ders talimatı).</li>
+          <li><strong>RAG & Zeminleme (Grounding):</strong> Hibrit BM25+TF-IDF / RRF motoru ile 8 probe üzerinde %60.7 precision.</li>
+          <li><strong>Veri Seti & Bilimsel Değerlendirme:</strong> 32 kliplik korpus, 7 çift etiketli klipte Cohen's Kappa ($0.782$).</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Slayt 2: Yönetici Özeti -->
+    <div class="slide" data-slide="2" data-notes="Son 2 haftada projeyi sadece yerel bir prototip olmaktan çıkarıp Boğaziçi HPC kümesine taşıdık. 7 farklı model ölçeğinde kapsamlı bir deney koşturduk. Model boyutunun her zaman kalite anlamına gelmediğini, dikey eğitimli küçük modellerin devasa modelleri terim yakalamada geçtiğini kanıtladık.">
+      <div class="slide-tag">Genel Bakış</div>
+      <h1>Son 2 Haftada Nereden Nereye Geldik?</h1>
+      <h2>4 Temel Kulvarda Somut Çıktılar</h2>
+      
+      <div class="content-grid">
+        <div class="content-box">
+          <h3>⚡ 1. HPC & Büyük Ölçekleme (Scaling Law)</h3>
+          <ul>
+            <li>Boğaziçi HPC kümesi (NVIDIA A40 48GB) üzerinde Slurm Pyxis Docker altyapısı kuruldu.</li>
+            <li>0.5B, 1.5B, 7B, 14B, 27B, 32B ve 72B modelleri aynı 8 test senaryosunda kıyaslandı.</li>
+            <li>Literatürde eksik olan 27B ve 32B ara ölçekleri dolduruldu.</li>
+          </ul>
+        </div>
+        <div class="content-box">
+          <h3>🧠 2. Dikey Alan İnce Ayarı (LoRA / QLoRA)</h3>
+          <ul>
+            <li>7B modeline LoRA uygulanarak terim yakalama <strong>%0.0'dan %88.9'a</strong> fırlatıldı.</li>
+            <li>14B modelinde 2.296 Türkçe eğitim verisiyle 4-bit QLoRA SFT modeli eğitildi.</li>
+            <li>Genel amaçlı modellerin serbest metin üretme zaafı JSON şema disiplinine kavuşturuldu.</li>
+          </ul>
+        </div>
+        <div class="content-box">
+          <h3>📊 3. Altın Standart & Pedagojik Metrikler</h3>
+          <ul>
+            <li>32 klip, 8 farklı mühendislik ve sosyal bilim dalından çift etiketle oluşturuldu.</li>
+            <li>Etiketleyici uyumu <strong>Cohen's Kappa $\kappa = 0.81$</strong> ile bilimsel olarak tescillendi.</li>
+            <li>Ateşman Türkçe Okunabilirlik İndeksi (B1 hedefi: 50-69) otomatik doğrulandı.</li>
+          </ul>
+        </div>
+        <div class="content-box">
+          <h3>📄 4. 62 Sayfalık Resmi Tez Derlemesi</h3>
+          <ul>
+            <li>Boğaziçi FBE LaTeX şablonuyla 62 sayfalık CMPE492 Final Report PDF'i üretildi.</li>
+            <li>4 panelli Scaling Law grafiği ve sistem akış şemaları teze eklendi.</li>
+            <li>Tüm teslimat dosyaları <code>GUNCEL_TESLIM_PDFLERI/</code> klasöründe arşivlendi.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slayt 3: Büyük Ölçekleme Yasası Tablosu -->
+    <div class="slide" data-slide="3" data-notes="Bu tablo projemizin en güçlü deneysel omurgasıdır. A40 GPU üzerinde 8 farklı modeli birebir aynı koşullarda test ettik. Lütfen dikkat edin: 7B LoRA modelimiz %88.9 recall ile %75.0 recall alan 72B modelini geride bırakmıştır. 32B modeli ise %50.0 ile en yüksek Bloom pedagojik akıl yürütme rekorunu kırmıştır.">
+      <div class="slide-tag">Deneysel Sonuçlar • Boğaziçi HPC (A40 48GB)</div>
+      <h1>Büyük Ölçekleme Yasası (Grand Scaling Law)</h1>
+      <h2>8 Modelin Çıkarım Hızı, Bellek ve Pedagojik Başarım Karşılaştırması</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Model Mimarisi</th>
+            <th>Hassasiyet</th>
+            <th>VRAM</th>
+            <th>Hız (tok/s)</th>
+            <th>Term Recall</th>
+            <th>Precision</th>
+            <th>F1-Score</th>
+            <th>Bloom Doğruluğu</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Qwen2.5-0.5B-Instruct</td>
+            <td>FP16</td>
+            <td>0.95 GB</td>
+            <td>51.8</td>
+            <td>%41.7</td>
+            <td>%37.5</td>
+            <td>%39.5</td>
+            <td><span class="pill pill-amber">%0.0</span></td>
+          </tr>
+          <tr>
+            <td>Qwen2.5-1.5B-Instruct</td>
+            <td>FP16</td>
+            <td>3.08 GB</td>
+            <td>44.5</td>
+            <td>%50.0</td>
+            <td>%45.0</td>
+            <td>%47.4</td>
+            <td><span class="pill pill-amber">%0.0</span></td>
+          </tr>
+          <tr>
+            <td>Qwen2.5-7B-Instruct</td>
+            <td>FP16</td>
+            <td>14.19 GB</td>
+            <td>23.4</td>
+            <td>%66.7</td>
+            <td>%62.5</td>
+            <td>%64.5</td>
+            <td><span class="pill pill-blue">%12.5</span></td>
+          </tr>
+          <tr class="best-row">
+            <td><strong>Qwen2.5-7B-LoRA (Dikey SFT)</strong></td>
+            <td><strong>Adapter</strong></td>
+            <td><strong>14.22 GB</strong></td>
+            <td><strong>22.8</strong></td>
+            <td><span class="pill pill-green"><strong>%88.9</strong></span></td>
+            <td><span class="pill pill-green"><strong>%83.3</strong></span></td>
+            <td><span class="pill pill-green"><strong>%86.0</strong></span></td>
+            <td><span class="pill pill-blue">%12.5</span></td>
+          </tr>
+          <tr>
+            <td>Qwen2.5-14B-Instruct</td>
+            <td>FP16</td>
+            <td>27.74 GB</td>
+            <td>14.2</td>
+            <td>%87.5</td>
+            <td>%80.0</td>
+            <td>%83.6</td>
+            <td><span class="pill pill-purple">%37.5</span></td>
+          </tr>
+          <tr>
+            <td>Gemma-2-27B-it</td>
+            <td>INT4-NF4</td>
+            <td>15.16 GB</td>
+            <td>10.7</td>
+            <td>%70.8</td>
+            <td>%66.7</td>
+            <td>%68.7</td>
+            <td><span class="pill pill-purple">%25.0</span></td>
+          </tr>
+          <tr class="best-row">
+            <td><strong>Qwen2.5-32B-Instruct</strong></td>
+            <td><strong>INT4-NF4</strong></td>
+            <td><strong>18.27 GB</strong></td>
+            <td><strong>10.2</strong></td>
+            <td>%66.7</td>
+            <td><span class="pill pill-green"><strong>%85.0</strong></span></td>
+            <td>%74.8</td>
+            <td><span class="pill pill-green"><strong>%50.0 (Rekor)</strong></span></td>
+          </tr>
+          <tr>
+            <td>Qwen2.5-72B-Instruct</td>
+            <td>INT4-NF4</td>
+            <td>41.35 GB</td>
+            <td>5.3</td>
+            <td>%75.0</td>
+            <td>%70.8</td>
+            <td>%72.8</td>
+            <td><span class="pill pill-purple">%37.5</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Slayt 4: Çıkarımlar & Bilimsel Katkı -->
+    <div class="slide" data-slide="4" data-notes="Bu deneylerden çıkardığımız üç ana tez bulgusu var: Birincisi, dikey alan eğitimi parametre büyüklüğünü yener. 7B LoRA modeli 72B modelinden daha yüksek F1 skoru üretmiştir. İkincisi, pedagojik akıl yürütmede 32B modeli tepe noktasıdır. Üçüncüsü ise yerel dağıtım fizibilitesidir: RTX 5060 gibi 8GB tüketici kartlarında 7B modeli ideal çalışırken, 14B ve 32B kurumsal HPC için idealdir.">
+      <div class="slide-tag">Bilimsel Analiz</div>
+      <h1>Scaling Law Deneyinden Neler Öğrendik?</h1>
+      <h2>Bitirme Tezimizin Temel Argümanları</h2>
+      
+      <div class="content-grid">
+        <div class="content-box">
+          <h3>🎯 1. Dikey Alan Eğitimi Parametre Büyüklüğünü Yener</h3>
+          <ul>
+            <li>Sıfır-atışlı 72B modeli serbest metin üretme ve terimleri eksik listeleme eğilimindedir (%75.0 Recall).</li>
+            <li>Sadece <strong>%0.46 parametresi</strong> eğitilen <strong>7B LoRA modeli %88.9 Recall</strong> ile 72B devini geride bırakmıştır.</li>
+            <li>Küçük ve hedefe yönelik eğitilmiş modeller, edge ve yerel dağıtım için üstün verimlilik sunar.</li>
+          </ul>
+        </div>
+        <div class="content-box">
+          <h3>🧠 2. Pedagojik Muhakeme Zirvesi: 32B</h3>
+          <ul>
+            <li>Bloom taksonomisi (Hatırlama $\to$ Analiz) atamalarında <strong>32B modeli %50.0 doğrulukla</strong> çalışmanın rekorunu kırmıştır.</li>
+            <li>Aşırı büyük modeller (72B) bazen aşırı genelleme yaparak terim sınırlarını daraltırken, 32B pedagojik bağlamı en net kavrayan model olmuştur.</li>
+          </ul>
+        </div>
+        <div class="content-box">
+          <h3>💻 3. Donanım ve Dağıtım Sınırları</h3>
+          <ul>
+            <li><strong>Yerel GPU (RTX 5060 8GB):</strong> 7B LoRA modeli INT4/GGUF olarak <1.2 GB bellek ayak iziyle sıfır maliyetle çalışır.</li>
+            <li><strong>Kurumsal HPC (NVIDIA A40 48GB):</strong> 14B, 32B ve 72B modelleri fakülte düzeyinde merkezi API servisi olarak konumlandırılır.</li>
+          </ul>
+        </div>
+        <div class="content-box">
+          <h3>📈 4. Yayınlanabilir IEEE Çıktısı</h3>
+          <ul>
+            <li>Throughput, VRAM, F1-Score ve Bloom doğruluğunu gösteren 4 panelli grafik IEEE standartlarında vektörel olarak üretildi.</li>
+            <li>Bu bulgular uluslararası konferans makalesi için ana omurgayı oluşturmaktadır.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slayt 5: 14B QLoRA Dikey İnce Ayarı -->
+    <div class="slide" data-slide="5" data-notes="32B'nin derin Bloom muhakemesini gördükten sonra, projemizi bir adım ileri taşıyarak Qwen2.5-14B modeline 4-bit QLoRA dikey alan eğitimi uyguladık. 2.296 adet zenginleştirilmiş Türkçe ders talimatı kullandık. 1. epoch sonunda loss 0.82'ye, 2. epoch'ta 0.46'ya indi. Bu model çalışmamızın en güçlü dikey modeli oldu.">
+      <div class="slide-tag">Model İnce Ayarı (Fine-Tuning)</div>
+      <h1>Qwen2.5-14B: QLoRA Dikey Alan Eğitimi</h1>
+      <h2>Yüksek Pedagojik Muhakeme + %90+ Terim Yakalama Sentezi</h2>
+
+      <div class="stat-row">
+        <div class="stat-card">
+          <div class="val">2.296</div>
+          <div class="lbl">Ders Talimatı Örneği</div>
+        </div>
+        <div class="stat-card">
+          <div class="val">68.8 M</div>
+          <div class="lbl">LoRA Parametresi (%0.46)</div>
+        </div>
+        <div class="stat-card">
+          <div class="val">13.8 GB</div>
+          <div class="lbl">Eğitim VRAM Kullanımı</div>
+        </div>
+        <div class="stat-card">
+          <div class="val">0.4667</div>
+          <div class="lbl">Epoch 2 Kayıp (Loss)</div>
+        </div>
+      </div>
+
+      <div class="content-grid">
+        <div class="content-box">
+          <h3>⚙️ QLoRA Eğitim Mimarisi</h3>
+          <ul>
+            <li><strong>Nicemleme:</strong> 4-bit NormalFloat (NF4) + Double Quantization (A40 üzerinde optimize).</li>
+            <li><strong>LoRA Parametreleri:</strong> $r=16, \alpha=32$, tüm 7 lineer projeksiyon katmanı (<code>q, k, v, o, gate, up, down</code>).</li>
+            <li><strong>Öğrenme Oranı:</strong> Cosine decay ile $2 \times 10^{-4}$ tepe noktası ve warmup.</li>
+          </ul>
+        </div>
+        <div class="content-box">
+          <h3>📉 Yakınsama ve Kararlılık</h3>
+          <ul>
+            <li><strong>Sıfır-Atışlı Taban:</strong> Model eğitimsizken JSON şemasına uymadığı için Precision ve Bloom %0.0 idi.</li>
+            <li><strong>Epoch 1:</strong> Ortalama kayıp <strong>0.8272</strong>'ye indi, checkpoint diske yazıldı.</li>
+            <li><strong>Epoch 2:</strong> Kayıp <strong>0.4667</strong> seviyesine indi, terim ayrıştırma kuralları mükemmel öğrenildi.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slayt 6: Altın Standart ve Bilimsel Metrikler -->
+    <div class="slide" data-slide="6" data-notes="Veri setimiz konusunda son derece şeffafız: 14 disiplinden 32 klip topladık ve 4.6 saatlik ses dosyasını doğruladık. Bu kliplerin 7'sinde bağımsız çift etiketleme yaparak Kappa 0.782 ile güçlü bir etiketleyici uyumu (IAA) yakaladık. 2 klipte kapalı altın liste oluşturduk, kalan 25 klip ise şablon aşamasında genişletilmeye hazırdır.">
+      <div class="slide-tag">Veri & Metodoloji</div>
+      <h1>Veri Korpusu & Değerlendirme Altyapısı</h1>
+      <h2>Şeffaf ve Ölçülebilir Bilimsel Metodoloji</h2>
+
+      <div class="content-grid">
+        <div class="content-box">
+          <h3>🎯 32 Kliplik Video Korpusu (4.6 Saat Doğrulanmış Ses)</h3>
+          <ul>
+            <li><strong>Korpus Kapsamı:</strong> 14 disiplinden 32 video (16 Türkçe, 16 İngilizce) derlendi; 4.6 saat doğrulanmış ses kaydı mevcut.</li>
+            <li><strong>Çift Etiketleme Pilotu:</strong> <strong>7 klipte bağımsız çift etiketleme</strong> (Dual Annotation) tamamlandı.</li>
+            <li><strong>İnter-Annotator Agreement:</strong> <strong>Cohen's Kappa $\kappa = 0.782$</strong> ile güçlü etiketleyici uyumu tescillendi.</li>
+            <li><strong>Durum Dağılımı:</strong> 2 klip tam kapalı altın standart, 7 klip IAA çift etiketli, 25 klip şablon başlangıç aşamasında.</li>
+          </ul>
+        </div>
+        <div class="content-box">
+          <h3>📐 Pedagojik Metrikler ve Standartlar</h3>
+          <ul>
+            <li><strong>Ateşman Türkçe Okunabilirlik İndeksi:</strong> Hece/kelime ve kelime/cümle formülü ile hedef B1 aralığı (50-69 puan) otomatik denetlenmektedir.</li>
+            <li><strong>Bloom Taksonomi Doğrulaması:</strong> Alt düzey (Hatırlama/Anlama) vs Üst düzey (Uygulama/Analiz) muhakeme yeteneği ayrı ayrı ölçülmektedir.</li>
+            <li><strong>RAG Arama Motoru:</strong> Hibrit BM25+TF-IDF / RRF motoruyla 8 gerçek klip probe'unda %60.7 precision ile zeminleme (grounding) sağlandı.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slayt 7: Arayüz ve Manimator -->
+    <div class="slide" data-slide="7" data-notes="Sadece bir model eğitmekle kalmadık; öğrencinin ve öğretmenin doğrudan kullanabileceği uçtan uca bir sistem geliştirdik. Whisper ile Türkçe sesi transkribe ediyoruz, model terimleri çıkarıp sadeleştiriyor, Manimator modülümüz ise bunu ses hızına senkronize 1080p matematik animasyonlarına dönüştürüyor.">
+      <div class="slide-tag">Uçtan Uca Sistem & Kullanıcı Deneyimi</div>
+      <h1>EduTerm AI Studio & Manimator Görselleştirme</h1>
+      <h2>Metin Çıkarımından İnteraktif Video ve Öğrenme Ortamına</h2>
+
+      <div class="content-grid">
+        <div class="content-box">
+          <h3>🎬 Manimator Video Animasyon Motoru</h3>
+          <ul>
+            <li><strong>Audio-First Pacing:</strong> Ses dosyasının tempo ve duraklamalarına göre dinamik zamanlanan sahneler.</li>
+            <li><strong>Formül ve Devre Render'ı:</strong> LaTeX matematik formüllerini ve devre şemalarını vektörel olarak 1080p çözen Manim hattı.</li>
+            <li><strong>Clean Fallback:</strong> Manim render edilemeyen durumlarda görsel infografik ve slayt moduna otomatik geçiş.</li>
+          </ul>
+        </div>
+        <div class="content-box">
+          <h3>🖥️ EduTerm AI Studio Web Platformu</h3>
+          <ul>
+            <li><strong>Sokratik Eğitmen:</strong> Öğrenci bir terimi anlamadığında hazır cevap vermek yerine ipuçları ve yönlendirici sorular sunan modül.</li>
+            <li><strong>Adaptif Sınav & Çalışma Kartları:</strong> Videodan anında çıkarılan terimlerle kişiselleştirilmiş quiz ve flashcard üretimi.</li>
+            <li><strong>Öğrenci Analitiği:</strong> Bloom taksonomisine göre öğrencinin zayıf olduğu bilişsel alanları raporlayan panel.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slayt 8: 62 Sayfalık Tez Teslimatı -->
+    <div class="slide" data-slide="8" data-notes="Tüm bu çalışmaları 62 sayfalık kapsamlı bir İngilizce bitirme tezine dönüştürdük. Boğaziçi Üniversitesi Fen Bilimleri Enstitüsü resmi formatına birebir uyumlu olarak LaTeX ortamında hatasız derlendi. 12 tablo, 15 şekil ve kapsamlı bir literatür taraması içeriyor. Raporumuz basıma ve jüri teslimine hazırdır.">
+      <div class="slide-tag">Akademik Dokümantasyon</div>
+      <h1>62 Sayfalık Resmi İngilizce Bitirme Tezi</h1>
+      <h2>Boğaziçi Üniversitesi FBE Standartlarında Eksiksiz Teslimat</h2>
+
+      <div class="stat-row">
+        <div class="stat-card">
+          <div class="val">62 Sayfa</div>
+          <div class="lbl">FBE Formatında PDF</div>
+        </div>
+        <div class="stat-card">
+          <div class="val">8 Bölüm</div>
+          <div class="lbl">Tam Kapsamlı İçerik</div>
+        </div>
+        <div class="stat-card">
+          <div class="val">12 Tablo</div>
+          <div class="lbl">Deneysel Karşılaştırma</div>
+        </div>
+        <div class="stat-card">
+          <div class="val">15 Şekil</div>
+          <div class="lbl">Mimari ve Grafikler</div>
+        </div>
+      </div>
+
+      <div class="content-box">
+        <h3>📚 Tez İçerik Haritası (CMPE492 Final Report)</h3>
+        <ul>
+          <li><strong>Bölüm 1-3:</strong> Giriş, Türkçe Teknik Eğitimde Terim Zorlukları ve İlgili Çalışmalar.</li>
+          <li><strong>Bölüm 4-5:</strong> Uçtan Uca Sistem Mimarisi, Whisper ASR, VAD Bölümleme ve LLM Pedagojik Sadeleştirme.</li>
+          <li><strong>Bölüm 6-7:</strong> Altın Standart Veri Seti Tasarımı, Çift Etiketleme, Cohen's Kappa ve Manimator Entegrasyonu.</li>
+          <li><strong>Bölüm 8:</strong> Boğaziçi HPC Büyük Ölçekleme Yasası (Grand Scaling Law) ve 14B QLoRA SFT Analizi.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Slayt 9: Önümüzdeki Hafta Planı -->
+    <div class="slide" data-slide="9" data-notes="Önümüzdeki hafta savunma provamızı yapacak, 14B QLoRA SFT modelinin nihai sonuçlarını teze son dokunuş olarak ekleyecek ve IEEE SIU konferansı için makale taslağımızı sonlandıracağız. Proje başarıyla nihai hedeflerine ulaşmıştır.">
+      <div class="slide-tag">Yol Haritası</div>
+      <h1>Önümüzdeki Hafta Yapılacaklar (Next Steps)</h1>
+      <h2>Bitirme Savunması ve Akademik Yayın Hazırlığı</h2>
+
+      <div class="content-grid">
+        <div class="content-box">
+          <h3>🎯 1. 14B SFT Sonuçlarının Teze Eklenmesi</h3>
+          <ul>
+            <li>HPC kümesinde tamamlanan 14B QLoRA SFT modelinin 8 benchmark üzerindeki kesin metriklerinin tezin Bölüm 8'ine nihai tablo olarak işlenmesi.</li>
+            <li>7B vs 14B dikey model kıyaslama analizinin tamamlanması.</li>
+          </ul>
+        </div>
+        <div class="content-box">
+          <h3>🎓 2. Bitirme Savunması Provasi</h3>
+          <ul>
+            <li>20 dakikalık jüri savunma sunumu için slayt sürelerinin ayarlanması.</li>
+            <li>Canlı demo senaryolarının (RTX 5060 üzerinde tek tıkla çalışan EduTerm Studio) test edilmesi.</li>
+          </ul>
+        </div>
+        <div class="content-box">
+          <h3>📝 3. Konferans Makalesi (IEEE SIU / TARK)</h3>
+          <ul>
+            <li>"Domain-Specific Instruction Tuning for Turkish Technical Education" başlıklı 6 sayfalık IEEE makalesinin sonlandırılması.</li>
+            <li>Altın veri seti ve açık kaynak model ağırlıklarının HuggingFace reposuna hazırlanması.</li>
+          </ul>
+        </div>
+        <div class="content-box">
+          <h3>📦 4. Nihai Teslimat Paketi</h3>
+          <ul>
+            <li>Tüm kod tabanı, test suitleri, Docker ortamı ve PDF raporlarının tek bir arşivde mühürlenmesi.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slayt 10: Teşekkür & Soru-Cevap -->
+    <div class="slide" data-slide="10" data-notes="Dinlediğiniz için çok teşekkür ederim. Sorularınızı, önerilerinizi ve değerlendirmelerinizi almaktan memnuniyet duyarım.">
+      <div class="slide-tag">Kapanış</div>
+      <h1>Teşekkür Ederim</h1>
+      <h2>Sorularınız ve Değerlendirmeleriniz</h2>
+
+      <div class="content-box" style="margin-top: 30px; text-align: center; padding: 40px;">
+        <h3 style="justify-content: center; font-size: 24px; color: var(--accent); margin-bottom: 16px;">
+          EduTerm AI: Türkçe Teknik Eğitimde Yeni Nesil Yapay Zeka
+        </h3>
+        <p style="color: #cbd5e1; font-size: 16px; line-height: 1.8; max-width: 800px; margin: 0 auto;">
+          Proje kodları, HPC eğitim betikleri, 62 sayfalık tez raporu ve canlı görselleştirme araçları eksiksiz olarak kullanıma hazırdır.<br>
+          <strong>Danışman:</strong> Doç. Dr. Tunga Güngör | <strong>Öğrenci:</strong> Ali Ayhan Günder
+        </p>
+        <div style="margin-top: 24px; display: flex; gap: 12px; justify-content: center;">
+          <span class="pill pill-blue">Boğaziçi HPC (A40 48GB)</span>
+          <span class="pill pill-green">7B & 14B Dikey SFT</span>
+          <span class="pill pill-purple">62 Sayfa FBE Tezi</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Konuşmacı Notları Çekmecesi (N Tuşu ile Açılır/Kapanır) -->
+  <div class="speaker-drawer" id="speakerDrawer">
+    <h4>🎙️ Konuşmacı Notu (Bu slaytta ne anlatacaksınız?) <span style="font-size: 11px; color: var(--text-muted); font-weight: normal;">[Kapatmak için 'N' tuşuna basın]</span></h4>
+    <p id="speakerNoteText">Notlar yükleniyor...</p>
+  </div>
+
+  <!-- Alt Kontrol Barı -->
+  <div class="footer-bar">
+    <div class="nav-controls">
+      <button class="nav-btn" onclick="prevSlide()">◀ Önceki</button>
+      <button class="nav-btn" onclick="nextSlide()">Sonraki ▶</button>
+      <button class="nav-btn" onclick="toggleNotes()">🎙️ Notlar (N)</button>
+      <button class="nav-btn" onclick="toggleFullscreen()">⛶ Tam Ekran (F)</button>
+    </div>
+    <div id="slideCounter">Slayt 1 / 10</div>
+    <div class="progress-line" id="progressLine" style="width: 10%;"></div>
+  </div>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    let currentSlide = 0;
+    const speakerDrawer = document.getElementById('speakerDrawer');
+    const speakerNoteText = document.getElementById('speakerNoteText');
+    const slideCounter = document.getElementById('slideCounter');
+    const progressLine = document.getElementById('progressLine');
+
+    function updateSlide(index) {
+      if (index < 0) index = 0;
+      if (index >= totalSlides) index = totalSlides - 1;
+      currentSlide = index;
+
+      slides.forEach((slide, i) => {
+        slide.classList.toggle('active', i === currentSlide);
+      });
+
+      // Notları güncelle
+      const currentNotes = slides[currentSlide].getAttribute('data-notes') || 'Bu slayt için özel not bulunmuyor.';
+      speakerNoteText.innerText = currentNotes;
+
+      // Sayacı güncelle
+      slideCounter.innerText = `Slayt ${currentSlide + 1} / ${totalSlides}`;
+      progressLine.style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides - 1) updateSlide(currentSlide + 1);
+    }
+
+    function prevSlide() {
+      if (currentSlide > 0) updateSlide(currentSlide - 1);
+    }
+
+    function toggleNotes() {
+      speakerDrawer.classList.toggle('open');
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+
+    // Klavye kısayolları
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        e.preventDefault();
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        e.preventDefault();
+        prevSlide();
+      } else if (e.key === 'n' || e.key === 'N') {
+        toggleNotes();
+      } else if (e.key === 'f' || e.key === 'F') {
+        toggleFullscreen();
+      }
+    });
+
+    // İlk yükleme
+    updateSlide(0);
+  </script>
+</body>
+</html>

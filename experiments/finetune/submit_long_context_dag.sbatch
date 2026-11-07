@@ -18,6 +18,7 @@ cd /users/ali.gunder/long-context-dag
 echo "Setting up verified wheels in /tmp/site-packages..."
 mkdir -p /tmp/site-packages
 export PYTHONPATH=/tmp/site-packages:$PYTHONPATH
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 pip install --target=/tmp/site-packages --no-deps /users/ali.gunder/wheels_clean/*.whl
 
 echo "Executing Long-Context (32K) vs Chunked DAG Benchmark..."

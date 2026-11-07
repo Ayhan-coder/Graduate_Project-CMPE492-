@@ -1,0 +1,316 @@
+{
+  "id": "EN-01",
+  "title": "Introduction to Agile Methodologies and Scrum Framework",
+  "domain": "Software Engineering & Project Management",
+  "bloom_level": "Anlama",
+  "terms": [
+    {
+      "canonical": "Agile",
+      "aliases": [
+        "agile",
+        "agile methodology",
+        "agile framework",
+        "agile methods"
+      ],
+      "atesman_score": 60.0
+    },
+    {
+      "canonical": "Scrum",
+      "aliases": [
+        "scrum",
+        "scrum methodology",
+        "scrum framework"
+      ],
+      "atesman_score": 60.0
+    },
+    {
+      "canonical": "Scrum Master",
+      "aliases": [
+        "scrum master",
+        "the scrum master"
+      ],
+      "atesman_score": 60.0
+    },
+    {
+      "canonical": "Product Owner",
+      "aliases": [
+        "product owner",
+        "the product owner"
+      ],
+      "atesman_score": 60.0
+    },
+    {
+      "canonical": "Development Team",
+      "aliases": [
+        "development team",
+        "the development team",
+        "scrum team"
+      ],
+      "atesman_score": 60.0
+    },
+    {
+      "canonical": "Sprint",
+      "aliases": [
+        "sprint",
+        "the sprint",
+        "sprints"
+      ],
+      "atesman_score": 60.0
+    },
+    {
+      "canonical": "Backlog",
+      "aliases": [
+        "backlog",
+        "the backlog",
+        "product backlog",
+        "sprint backlog"
+      ],
+      "atesman_score": 60.0
+    },
+    {
+      "canonical": "Daily Scrum",
+      "aliases": [
+        "daily scrum",
+        "stand-up",
+        "the daily scrum",
+        "daily standup"
+      ],
+      "atesman_score": 60.0
+    },
+    {
+      "canonical": "Timebox",
+      "aliases": [
+        "timebox",
+        "timebox period",
+        "timeboxing"
+      ],
+      "atesman_score": 60.0
+    },
+    {
+      "canonical": "Deliverable",
+      "aliases": [
+        "deliverable",
+        "deliverables"
+      ],
+      "atesman_score": 60.0
+    },
+    {
+      "canonical": "Iteration",
+      "aliases": [
+        "iteration",
+        "iterations"
+      ],
+      "atesman_score": 60.0
+    },
+    {
+      "canonical": "Cross-Functional Team",
+      "aliases": [
+        "cross-functional",
+        "cross-functional team",
+        "pizza-sized team"
+      ],
+      "atesman_score": 60.0
+    },
+    {
+      "canonical": "Kanban",
+      "aliases": [
+        "kanban",
+        "kanban method"
+      ],
+      "atesman_score": 60.0
+    },
+    {
+      "canonical": "Kanban Board",
+      "aliases": [
+        "kanban board",
+        "kanban chart",
+        "kanban boards"
+      ],
+      "atesman_score": 60.0
+    },
+    {
+      "canonical": "Work In Progress",
+      "aliases": [
+        "work in progress",
+        "wip",
+        "in-progress work"
+      ],
+      "atesman_score": 60.0
+    },
+    {
+      "canonical": "WIP Limit",
+      "aliases": [
+        "wip limit",
+        "work in progress limit",
+        "work-in-progress limit"
+      ],
+      "atesman_score": 60.0
+    },
+    {
+      "canonical": "Flow",
+      "aliases": [
+        "flow",
+        "create flow"
+      ],
+      "atesman_score": 60.0
+    },
+    {
+      "canonical": "Extreme Programming",
+      "aliases": [
+        "extreme programming",
+        "xp"
+      ],
+      "atesman_score": 60.0
+    },
+    {
+      "canonical": "Test-First Development",
+      "aliases": [
+        "test-first development",
+        "test-driven development",
+        "tdd"
+      ],
+      "atesman_score": 60.0
+    },
+    {
+      "canonical": "Pair Programming",
+      "aliases": [
+        "pair programming"
+      ],
+      "atesman_score": 60.0
+    },
+    {
+      "canonical": "Continuous Integration",
+      "aliases": [
+        "continuous integration",
+        "ci"
+      ],
+      "atesman_score": 60.0
+    },
+    {
+      "canonical": "Continuous Refactoring",
+      "aliases": [
+        "continuous refactoring",
+        "refactoring"
+      ],
+      "atesman_score": 60.0
+    },
+    {
+      "canonical": "Simple Design",
+      "aliases": [
+        "simple design",
+        "avoid big design up front",
+        "simplicity"
+      ],
+      "atesman_score": 60.0
+    },
+    {
+      "canonical": "Sustainable Pace",
+      "aliases": [
+        "sustainable pace"
+      ],
+      "atesman_score": 60.0
+    },
+    {
+      "canonical": "Self-Organizing Team",
+      "aliases": [
+        "self-organizing",
+        "self-organizing team",
+        "empowered team"
+      ],
+      "atesman_score": 60.0
+    },
+    {
+      "canonical": "Artifact",
+      "aliases": [
+        "artifact",
+        "scrum artifact",
+        "central artifact"
+      ],
+      "atesman_score": 60.0
+    },
+    {
+      "canonical": "Design Document",
+      "aliases": [
+        "design document",
+        "designing"
+      ],
+      "atesman_score": 60.0
+    },
+    {
+      "canonical": "Customer Requirements",
+      "aliases": [
+        "customer requirements",
+        "customer needs",
+        "listening to the customer"
+      ],
+      "atesman_score": 60.0
+    },
+    {
+      "canonical": "Lean",
+      "aliases": [
+        "lean",
+        "lean methodology",
+        "lean six sigma"
+      ],
+      "atesman_score": 60.0
+    },
+    {
+      "canonical": "Value Stream",
+      "aliases": [
+        "value stream",
+        "map value stream"
+      ],
+      "atesman_score": 60.0
+    },
+    {
+      "canonical": "Establish Pull",
+      "aliases": [
+        "establish pull",
+        "pull system",
+        "pull"
+      ],
+      "atesman_score": 60.0
+    },
+    {
+      "canonical": "Continuous Improvement",
+      "aliases": [
+        "pursue perfection",
+        "continuous improvement",
+        "continuous learning"
+      ],
+      "atesman_score": 60.0
+    },
+    {
+      "canonical": "hybrid",
+      "aliases": [
+        "hybrid",
+        "compound",
+        "amalgam",
+        "combination"
+      ],
+      "definition_b1": "",
+      "atesman_score": 60.0
+    },
+    {
+      "canonical": "backlog",
+      "aliases": [
+        "backlog",
+        "inventory",
+        "stockpile"
+      ],
+      "definition_b1": "",
+      "atesman_score": 60.0
+    },
+    {
+      "canonical": "rugby",
+      "aliases": [
+        "rugby",
+        "soccer",
+        "football"
+      ],
+      "definition_b1": "",
+      "atesman_score": 60.0
+    }
+  ],
+  "updated_at": "2026-10-30 00:18:24"
+}

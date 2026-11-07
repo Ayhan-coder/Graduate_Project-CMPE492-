@@ -1,24 +1,17 @@
 {
   "corpus_name": "TR/EN Multilingual Educational Speech Benchmark & Extended Candidate Corpus",
-  "total_records": 40,
+  "total_records": 32,
   "language_counts": {
-    "tr": 20,
-    "en": 20
+    "tr": 16,
+    "en": 16
   },
   "audio_summary": {
-    "verified_local_wav_available": 16,
-    "unverified_pending_trim_mismatch": 18,
-    "downloadable_pending_fetch": 6,
-    "total_files_on_disk": 34,
-    "verified_audio_hours": 4.64,
-    "planned_inventory_metadata_hours": 10.12
+    "local_wav_available": 8,
+    "downloadable_pending": 6
   },
   "transcript_summary": {
     "human_verified_gold": 7,
-    "automatic_asr_transcript": 8,
-    "automatic_asr_rejected_low_wpm": 18,
-    "curated_draft_caption": 7,
-    "qa_passed_total": 15
+    "curated_draft_caption": 7
   },
   "annotation_summary": {
     "closed_gold_benchmark_32": 2,
@@ -51,13 +44,11 @@
         "status": "LOCAL_PCM_WAV_EXISTS",
         "local_path": "experiments/data/TR-1.wav",
         "size_bytes": 23055780,
-        "sample_rate_target": "16kHz Mono PCM WAV",
-        "disk_duration_s": 720.5,
-        "verification": "VERIFIED_DURATION_MATCH"
+        "sample_rate_target": "16kHz Mono PCM WAV"
       },
       "transcript": {
         "status": "HUMAN_VERIFIED_GOLD",
-        "reference_source": "human_verified_gold",
+        "reference_source": "gold",
         "file_path": "experiments/data/gold/TR-1.txt",
         "word_count": 1256,
         "wpm": 104.6,
@@ -95,13 +86,11 @@
         "status": "LOCAL_PCM_WAV_EXISTS",
         "local_path": "experiments/data/TR-2.wav",
         "size_bytes": 21670054,
-        "sample_rate_target": "16kHz Mono PCM WAV",
-        "disk_duration_s": 677.2,
-        "verification": "VERIFIED_DURATION_MATCH"
+        "sample_rate_target": "16kHz Mono PCM WAV"
       },
       "transcript": {
         "status": "HUMAN_VERIFIED_GOLD",
-        "reference_source": "human_verified_gold",
+        "reference_source": "gold",
         "file_path": "experiments/data/gold/TR-2.txt",
         "word_count": 1464,
         "wpm": 129.7,
@@ -139,13 +128,11 @@
         "status": "LOCAL_PCM_WAV_EXISTS",
         "local_path": "experiments/data/TR-3.wav",
         "size_bytes": 27345754,
-        "sample_rate_target": "16kHz Mono PCM WAV",
-        "disk_duration_s": 854.6,
-        "verification": "VERIFIED_DURATION_MATCH"
+        "sample_rate_target": "16kHz Mono PCM WAV"
       },
       "transcript": {
         "status": "HUMAN_VERIFIED_GOLD",
-        "reference_source": "human_verified_gold",
+        "reference_source": "gold",
         "file_path": "experiments/data/gold/TR-3.txt",
         "word_count": 1583,
         "wpm": 111.1,
@@ -183,13 +170,11 @@
         "status": "AUDIO_UNVERIFIED_PENDING",
         "local_path": "experiments/data/audio/TR-04.wav",
         "size_bytes": 164903366,
-        "sample_rate_target": "16kHz Mono PCM WAV",
-        "disk_duration_s": 5153.2,
-        "verification": "MISMATCH (disk: 5153.2s vs metadata: 820.0s; raw capture pending slice trim)"
+        "sample_rate_target": "16kHz Mono PCM WAV"
       },
       "transcript": {
         "status": "CURATED_DRAFT_CAPTION",
-        "reference_source": "curated_draft_starter",
+        "reference_source": "verified_curated",
         "file_path": null,
         "word_count": 66,
         "wpm": 4.8,
@@ -227,13 +212,11 @@
         "status": "DOWNLOADABLE_PENDING_FETCH",
         "local_path": null,
         "size_bytes": 0,
-        "sample_rate_target": "16kHz Mono PCM WAV",
-        "verification": "NOT_DOWNLOADED",
-        "disk_duration_s": null
+        "sample_rate_target": "16kHz Mono PCM WAV"
       },
       "transcript": {
         "status": "CURATED_DRAFT_CAPTION",
-        "reference_source": "curated_draft_starter",
+        "reference_source": "verified_curated",
         "file_path": null,
         "word_count": 66,
         "wpm": 4.3,
@@ -271,13 +254,11 @@
         "status": "DOWNLOADABLE_PENDING_FETCH",
         "local_path": null,
         "size_bytes": 0,
-        "sample_rate_target": "16kHz Mono PCM WAV",
-        "verification": "NOT_DOWNLOADED",
-        "disk_duration_s": null
+        "sample_rate_target": "16kHz Mono PCM WAV"
       },
       "transcript": {
         "status": "CURATED_DRAFT_CAPTION",
-        "reference_source": "curated_draft_starter",
+        "reference_source": "verified_curated",
         "file_path": null,
         "word_count": 70,
         "wpm": 5.5,
@@ -315,13 +296,11 @@
         "status": "DOWNLOADABLE_PENDING_FETCH",
         "local_path": null,
         "size_bytes": 0,
-        "sample_rate_target": "16kHz Mono PCM WAV",
-        "verification": "NOT_DOWNLOADED",
-        "disk_duration_s": null
+        "sample_rate_target": "16kHz Mono PCM WAV"
       },
       "transcript": {
         "status": "CURATED_DRAFT_CAPTION",
-        "reference_source": "curated_draft_starter",
+        "reference_source": "verified_curated",
         "file_path": null,
         "word_count": 63,
         "wpm": 4.5,
@@ -359,13 +338,11 @@
         "status": "AUDIO_UNVERIFIED_PENDING",
         "local_path": "experiments/data/audio/TR-08.wav",
         "size_bytes": 95185546,
-        "sample_rate_target": "16kHz Mono PCM WAV",
-        "disk_duration_s": 2974.5,
-        "verification": "MISMATCH (disk: 2974.5s vs metadata: 970.0s; raw capture pending slice trim)"
+        "sample_rate_target": "16kHz Mono PCM WAV"
       },
       "transcript": {
         "status": "AUTOMATIC_ASR_REJECTED_LOW_WPM",
-        "reference_source": "whisper_large_v3_turbo_longform",
+        "reference_source": "verified_curated",
         "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/TR-08.json",
         "word_count": 36,
         "wpm": 0.7,
@@ -403,13 +380,11 @@
         "status": "AUDIO_UNVERIFIED_PENDING",
         "local_path": "experiments/data/audio/TR-09.wav",
         "size_bytes": 24463880,
-        "sample_rate_target": "16kHz Mono PCM WAV",
-        "disk_duration_s": 764.5,
-        "verification": "MISMATCH (disk: 764.5s vs metadata: 705.0s; raw capture pending slice trim)"
+        "sample_rate_target": "16kHz Mono PCM WAV"
       },
       "transcript": {
         "status": "AUTOMATIC_ASR_REJECTED_LOW_WPM",
-        "reference_source": "whisper_large_v3_turbo_longform",
+        "reference_source": "verified_curated",
         "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/TR-09.json",
         "word_count": 3,
         "wpm": 0.2,
@@ -447,13 +422,11 @@
         "status": "AUDIO_UNVERIFIED_PENDING",
         "local_path": "experiments/data/audio/TR-10.wav",
         "size_bytes": 56153508,
-        "sample_rate_target": "16kHz Mono PCM WAV",
-        "disk_duration_s": 1754.8,
-        "verification": "MISMATCH (disk: 1754.8s vs metadata: 810.0s; raw capture pending slice trim)"
+        "sample_rate_target": "16kHz Mono PCM WAV"
       },
       "transcript": {
         "status": "AUTOMATIC_ASR_REJECTED_LOW_WPM",
-        "reference_source": "whisper_large_v3_turbo_longform",
+        "reference_source": "verified_curated",
         "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/TR-10.json",
         "word_count": 2,
         "wpm": 0.1,
@@ -491,13 +464,11 @@
         "status": "AUDIO_UNVERIFIED_PENDING",
         "local_path": "experiments/data/audio/TR-11.wav",
         "size_bytes": 30830606,
-        "sample_rate_target": "16kHz Mono PCM WAV",
-        "disk_duration_s": 963.5,
-        "verification": "MISMATCH (disk: 963.5s vs metadata: 900.0s; raw capture pending slice trim)"
+        "sample_rate_target": "16kHz Mono PCM WAV"
       },
       "transcript": {
         "status": "AUTOMATIC_ASR_REJECTED_LOW_WPM",
-        "reference_source": "whisper_large_v3_turbo_longform",
+        "reference_source": "verified_curated",
         "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/TR-11.json",
         "word_count": 40,
         "wpm": 2.5,
@@ -535,13 +506,11 @@
         "status": "AUDIO_UNVERIFIED_PENDING",
         "local_path": "experiments/data/audio/TR-12.wav",
         "size_bytes": 25030818,
-        "sample_rate_target": "16kHz Mono PCM WAV",
-        "disk_duration_s": 782.2,
-        "verification": "MISMATCH (disk: 782.2s vs metadata: 655.0s; raw capture pending slice trim)"
+        "sample_rate_target": "16kHz Mono PCM WAV"
       },
       "transcript": {
         "status": "AUTOMATIC_ASR_REJECTED_LOW_WPM",
-        "reference_source": "whisper_large_v3_turbo_longform",
+        "reference_source": "verified_curated",
         "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/TR-12.json",
         "word_count": 56,
         "wpm": 4.3,
@@ -579,13 +548,11 @@
         "status": "AUDIO_UNVERIFIED_PENDING",
         "local_path": "experiments/data/audio/TR-13.wav",
         "size_bytes": 19438710,
-        "sample_rate_target": "16kHz Mono PCM WAV",
-        "disk_duration_s": 607.5,
-        "verification": "MISMATCH (disk: 607.5s vs metadata: 735.0s; raw capture pending slice trim)"
+        "sample_rate_target": "16kHz Mono PCM WAV"
       },
       "transcript": {
         "status": "AUTOMATIC_ASR_REJECTED_LOW_WPM",
-        "reference_source": "whisper_large_v3_turbo_longform",
+        "reference_source": "verified_curated",
         "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/TR-13.json",
         "word_count": 45,
         "wpm": 4.4,
@@ -623,13 +590,11 @@
         "status": "DOWNLOADABLE_PENDING_FETCH",
         "local_path": null,
         "size_bytes": 0,
-        "sample_rate_target": "16kHz Mono PCM WAV",
-        "verification": "NOT_DOWNLOADED",
-        "disk_duration_s": null
+        "sample_rate_target": "16kHz Mono PCM WAV"
       },
       "transcript": {
         "status": "CURATED_DRAFT_CAPTION",
-        "reference_source": "curated_draft_starter",
+        "reference_source": "verified_curated",
         "file_path": null,
         "word_count": 41,
         "wpm": 3.0,
@@ -667,13 +632,11 @@
         "status": "DOWNLOADABLE_PENDING_FETCH",
         "local_path": null,
         "size_bytes": 0,
-        "sample_rate_target": "16kHz Mono PCM WAV",
-        "verification": "NOT_DOWNLOADED",
-        "disk_duration_s": null
+        "sample_rate_target": "16kHz Mono PCM WAV"
       },
       "transcript": {
         "status": "CURATED_DRAFT_CAPTION",
-        "reference_source": "curated_draft_starter",
+        "reference_source": "verified_curated",
         "file_path": null,
         "word_count": 44,
         "wpm": 3.8,
@@ -711,13 +674,11 @@
         "status": "AUDIO_UNVERIFIED_PENDING",
         "local_path": "experiments/data/audio/TR-16.wav",
         "size_bytes": 44800762,
-        "sample_rate_target": "16kHz Mono PCM WAV",
-        "disk_duration_s": 1400.0,
-        "verification": "MISMATCH (disk: 1400.0s vs metadata: 880.0s; raw capture pending slice trim)"
+        "sample_rate_target": "16kHz Mono PCM WAV"
       },
       "transcript": {
         "status": "AUTOMATIC_ASR_REJECTED_LOW_WPM",
-        "reference_source": "whisper_large_v3_turbo_longform",
+        "reference_source": "verified_curated",
         "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/TR-16.json",
         "word_count": 60,
         "wpm": 2.6,
@@ -729,210 +690,6 @@
         "dual_annotator_pairs": 0,
         "template_candidate_count": 4
       }
-    },
-    {
-      "id": "TR-17",
-      "alt_id": "TR-17",
-      "lang": "tr",
-      "title": "KVKK Temel Farkındalık Eğitimi: Veri Sorumlusu, Açık Rıza ve Haklar",
-      "domain": "Corporate Compliance & Personal Data Protection (KVKK/GDPR)",
-      "duration": "21:13",
-      "duration_s": 1273.0,
-      "source": {
-        "platform": "YouTube",
-        "channel": "Arda Çetin",
-        "url": "https://www.youtube.com/watch?v=uXIrIsNvQBY",
-        "youtube_id": "uXIrIsNvQBY",
-        "status": "CONFIRMED_PUBLIC_URL"
-      },
-      "speaker": {
-        "id": "TR-SPK-17",
-        "gender": "male",
-        "accent": "native_tr",
-        "delivery": "corporate_lecture"
-      },
-      "audio": {
-        "status": "LOCAL_PCM_WAV_EXISTS",
-        "local_path": "experiments/data/audio/TR-17.wav",
-        "size_bytes": 40734116,
-        "sample_rate_target": "16kHz Mono PCM WAV",
-        "disk_duration_s": 1272.9,
-        "verification": "VERIFIED_DURATION_MATCH"
-      },
-      "transcript": {
-        "status": "AUTOMATIC_ASR_TRANSCRIPT",
-        "reference_source": "whisper_large_v3_turbo_longform",
-        "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/TR-17.json",
-        "word_count": 2375,
-        "wpm": 111.9,
-        "qa_passed": true
-      },
-      "annotation": {
-        "status": "TEMPLATE_STARTER_ONLY (4 candidates)",
-        "closed_gold_count": 0,
-        "dual_annotator_pairs": 0,
-        "template_candidate_count": 4
-      },
-      "key_domain_terms": [
-        "Açık Rıza",
-        "Veri Sorumlusu",
-        "Veri İşleyen",
-        "Özel Nitelikli Kişisel Veri",
-        "Aydınlatma Yükümlülüğü"
-      ]
-    },
-    {
-      "id": "TR-18",
-      "alt_id": "TR-18",
-      "lang": "tr",
-      "title": "KVKK Farkındalık ve Şirket İçi Bilgi Güvenliği Eğitimi",
-      "domain": "Corporate Compliance & Personal Data Protection (KVKK/GDPR)",
-      "duration": "10:17",
-      "duration_s": 617.0,
-      "source": {
-        "platform": "YouTube",
-        "channel": "İK Kütüphanem Filiz Erboğa",
-        "url": "https://www.youtube.com/watch?v=LT7oeWHNQXM",
-        "youtube_id": "LT7oeWHNQXM",
-        "status": "CONFIRMED_PUBLIC_URL"
-      },
-      "speaker": {
-        "id": "TR-SPK-18",
-        "gender": "female",
-        "accent": "native_tr",
-        "delivery": "corporate_hr_training"
-      },
-      "audio": {
-        "status": "LOCAL_PCM_WAV_EXISTS",
-        "local_path": "experiments/data/audio/TR-18.wav",
-        "size_bytes": 19712148,
-        "sample_rate_target": "16kHz Mono PCM WAV",
-        "disk_duration_s": 616.0,
-        "verification": "VERIFIED_DURATION_MATCH"
-      },
-      "transcript": {
-        "status": "AUTOMATIC_ASR_TRANSCRIPT",
-        "reference_source": "whisper_large_v3_turbo_longform",
-        "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/TR-18.json",
-        "word_count": 812,
-        "wpm": 79.1,
-        "qa_passed": true
-      },
-      "annotation": {
-        "status": "TEMPLATE_STARTER_ONLY (4 candidates)",
-        "closed_gold_count": 0,
-        "dual_annotator_pairs": 0,
-        "template_candidate_count": 4
-      },
-      "key_domain_terms": [
-        "VERBİS",
-        "Veri Envanteri",
-        "İdari ve Teknik Tedbirler",
-        "Veri İhlal Bildirimi",
-        "Anonimleştirme"
-      ]
-    },
-    {
-      "id": "TR-19",
-      "alt_id": "TR-19",
-      "lang": "tr",
-      "title": "Temel İş Sağlığı ve Güvenliği Eğitimi: Risk Değerlendirmesi ve Acil Durumlar",
-      "domain": "Occupational Health and Safety (İSG / OHS)",
-      "duration": "62:10",
-      "duration_s": 3730.0,
-      "source": {
-        "platform": "YouTube",
-        "channel": "İzka Osgb TV",
-        "url": "https://www.youtube.com/watch?v=ywsXSmfjvYs",
-        "youtube_id": "ywsXSmfjvYs",
-        "status": "CONFIRMED_PUBLIC_URL"
-      },
-      "speaker": {
-        "id": "TR-SPK-19",
-        "gender": "male",
-        "accent": "native_tr",
-        "delivery": "certified_osgb_instructor"
-      },
-      "audio": {
-        "status": "LOCAL_PCM_WAV_EXISTS",
-        "local_path": "experiments/data/audio/TR-19.wav",
-        "size_bytes": 119336528,
-        "sample_rate_target": "16kHz Mono PCM WAV",
-        "disk_duration_s": 3729.3,
-        "verification": "VERIFIED_DURATION_MATCH"
-      },
-      "transcript": {
-        "status": "AUTOMATIC_ASR_TRANSCRIPT",
-        "reference_source": "whisper_large_v3_turbo_longform",
-        "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/TR-19.json",
-        "word_count": 6572,
-        "wpm": 105.7,
-        "qa_passed": true
-      },
-      "annotation": {
-        "status": "TEMPLATE_STARTER_ONLY (4 candidates)",
-        "closed_gold_count": 0,
-        "dual_annotator_pairs": 0,
-        "template_candidate_count": 4
-      },
-      "key_domain_terms": [
-        "Ramak Kala Olayı",
-        "Risk Değerlendirmesi",
-        "Tehlike Sınıfları",
-        "Acil Durum Eylem Planı",
-        "İş Kazası"
-      ]
-    },
-    {
-      "id": "TR-20",
-      "alt_id": "TR-20",
-      "lang": "tr",
-      "title": "İş Sağlığı ve Güvenliği Eğitimi: KKD, Güvenlik İşaretleri ve Yangın",
-      "domain": "Occupational Health and Safety (İSG / OHS)",
-      "duration": "45:50",
-      "duration_s": 2750.0,
-      "source": {
-        "platform": "YouTube",
-        "channel": "Fatma AYAZ DEĞERLİ",
-        "url": "https://www.youtube.com/watch?v=i0qoHE9VO-8",
-        "youtube_id": "i0qoHE9VO-8",
-        "status": "CONFIRMED_PUBLIC_URL"
-      },
-      "speaker": {
-        "id": "TR-SPK-20",
-        "gender": "female",
-        "accent": "native_tr",
-        "delivery": "certified_isg_expert"
-      },
-      "audio": {
-        "status": "LOCAL_PCM_WAV_EXISTS",
-        "local_path": "experiments/data/audio/TR-20.wav",
-        "size_bytes": 87986616,
-        "sample_rate_target": "16kHz Mono PCM WAV",
-        "disk_duration_s": 2749.6,
-        "verification": "VERIFIED_DURATION_MATCH"
-      },
-      "transcript": {
-        "status": "AUTOMATIC_ASR_TRANSCRIPT",
-        "reference_source": "whisper_large_v3_turbo_longform",
-        "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/TR-20.json",
-        "word_count": 5508,
-        "wpm": 120.2,
-        "qa_passed": true
-      },
-      "annotation": {
-        "status": "TEMPLATE_STARTER_ONLY (4 candidates)",
-        "closed_gold_count": 0,
-        "dual_annotator_pairs": 0,
-        "template_candidate_count": 4
-      },
-      "key_domain_terms": [
-        "Kişisel Koruyucu Donanım (KKD)",
-        "Güvenlik İşaretleri",
-        "Yangın Söndürme Tüpü (KKT)",
-        "İlk Yardım ve Tahliye",
-        "Ergonomi"
-      ]
     },
     {
       "id": "EN-01",
@@ -959,21 +716,19 @@
         "status": "LOCAL_PCM_WAV_EXISTS",
         "local_path": "experiments/data/EN-1.wav",
         "size_bytes": 25512696,
-        "sample_rate_target": "16kHz Mono PCM WAV",
-        "disk_duration_s": 797.3,
-        "verification": "VERIFIED_DURATION_MATCH"
+        "sample_rate_target": "16kHz Mono PCM WAV"
       },
       "transcript": {
         "status": "HUMAN_VERIFIED_GOLD",
-        "reference_source": "human_verified_gold",
+        "reference_source": "gold",
         "file_path": "experiments/data/gold/EN-1.txt",
         "word_count": 2168,
         "wpm": 163.2,
         "qa_passed": true
       },
       "annotation": {
-        "status": "CLOSED_GOLD_BENCHMARK (32 terms)",
-        "closed_gold_count": 32,
+        "status": "CLOSED_GOLD_BENCHMARK (35 terms)",
+        "closed_gold_count": 35,
         "dual_annotator_pairs": 55,
         "template_candidate_count": 4
       }
@@ -1003,13 +758,11 @@
         "status": "LOCAL_PCM_WAV_EXISTS",
         "local_path": "experiments/data/EN-2.wav",
         "size_bytes": 17791022,
-        "sample_rate_target": "16kHz Mono PCM WAV",
-        "disk_duration_s": 556.0,
-        "verification": "VERIFIED_DURATION_MATCH"
+        "sample_rate_target": "16kHz Mono PCM WAV"
       },
       "transcript": {
         "status": "HUMAN_VERIFIED_GOLD",
-        "reference_source": "human_verified_gold",
+        "reference_source": "gold",
         "file_path": "experiments/data/gold/EN-2.txt",
         "word_count": 1267,
         "wpm": 136.7,
@@ -1047,13 +800,11 @@
         "status": "LOCAL_PCM_WAV_EXISTS",
         "local_path": "experiments/data/EN-3.wav",
         "size_bytes": 34455890,
-        "sample_rate_target": "16kHz Mono PCM WAV",
-        "disk_duration_s": 1076.7,
-        "verification": "VERIFIED_DURATION_MATCH"
+        "sample_rate_target": "16kHz Mono PCM WAV"
       },
       "transcript": {
         "status": "HUMAN_VERIFIED_GOLD",
-        "reference_source": "human_verified_gold",
+        "reference_source": "gold",
         "file_path": "experiments/data/gold/EN-3.txt",
         "word_count": 3459,
         "wpm": 192.8,
@@ -1091,13 +842,11 @@
         "status": "LOCAL_PCM_WAV_EXISTS",
         "local_path": "experiments/data/EN-4.wav",
         "size_bytes": 33679044,
-        "sample_rate_target": "16kHz Mono PCM WAV",
-        "disk_duration_s": 1052.5,
-        "verification": "VERIFIED_DURATION_MATCH"
+        "sample_rate_target": "16kHz Mono PCM WAV"
       },
       "transcript": {
         "status": "HUMAN_VERIFIED_GOLD",
-        "reference_source": "human_verified_gold",
+        "reference_source": "gold",
         "file_path": "experiments/data/gold/EN-4.txt",
         "word_count": 2270,
         "wpm": 129.4,
@@ -1135,13 +884,11 @@
         "status": "AUDIO_UNVERIFIED_PENDING",
         "local_path": "experiments/data/audio/EN-05.wav",
         "size_bytes": 24534454,
-        "sample_rate_target": "16kHz Mono PCM WAV",
-        "disk_duration_s": 766.7,
-        "verification": "MISMATCH (disk: 766.7s vs metadata: 860.0s; raw capture pending slice trim)"
+        "sample_rate_target": "16kHz Mono PCM WAV"
       },
       "transcript": {
         "status": "AUTOMATIC_ASR_REJECTED_LOW_WPM",
-        "reference_source": "whisper_large_v3_turbo_longform",
+        "reference_source": "verified_curated",
         "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/EN-05.json",
         "word_count": 93,
         "wpm": 7.3,
@@ -1179,13 +926,11 @@
         "status": "AUDIO_UNVERIFIED_PENDING",
         "local_path": "experiments/data/audio/EN-06.wav",
         "size_bytes": 681067940,
-        "sample_rate_target": "16kHz Mono PCM WAV",
-        "disk_duration_s": 21283.4,
-        "verification": "MISMATCH (disk: 21283.4s vs metadata: 760.0s; raw capture pending slice trim)"
+        "sample_rate_target": "16kHz Mono PCM WAV"
       },
       "transcript": {
         "status": "AUTOMATIC_ASR_REJECTED_LOW_WPM",
-        "reference_source": "whisper_large_v3_turbo_longform",
+        "reference_source": "verified_curated",
         "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/EN-06.json",
         "word_count": 66,
         "wpm": 0.3,
@@ -1223,13 +968,11 @@
         "status": "AUDIO_UNVERIFIED_PENDING",
         "local_path": "experiments/data/audio/EN-07.wav",
         "size_bytes": 96963320,
-        "sample_rate_target": "16kHz Mono PCM WAV",
-        "disk_duration_s": 3030.1,
-        "verification": "MISMATCH (disk: 3030.1s vs metadata: 785.0s; raw capture pending slice trim)"
+        "sample_rate_target": "16kHz Mono PCM WAV"
       },
       "transcript": {
         "status": "AUTOMATIC_ASR_REJECTED_LOW_WPM",
-        "reference_source": "whisper_large_v3_turbo_longform",
+        "reference_source": "verified_curated",
         "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/EN-07.json",
         "word_count": 61,
         "wpm": 1.2,
@@ -1267,13 +1010,11 @@
         "status": "AUDIO_UNVERIFIED_PENDING",
         "local_path": "experiments/data/audio/EN-08.wav",
         "size_bytes": 15439304,
-        "sample_rate_target": "16kHz Mono PCM WAV",
-        "disk_duration_s": 482.5,
-        "verification": "MISMATCH (disk: 482.5s vs metadata: 910.0s; raw capture pending slice trim)"
+        "sample_rate_target": "16kHz Mono PCM WAV"
       },
       "transcript": {
         "status": "AUTOMATIC_ASR_REJECTED_LOW_WPM",
-        "reference_source": "whisper_large_v3_turbo_longform",
+        "reference_source": "verified_curated",
         "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/EN-08.json",
         "word_count": 84,
         "wpm": 10.4,
@@ -1311,13 +1052,11 @@
         "status": "AUDIO_UNVERIFIED_PENDING",
         "local_path": "experiments/data/audio/EN-09.wav",
         "size_bytes": 8280500,
-        "sample_rate_target": "16kHz Mono PCM WAV",
-        "disk_duration_s": 258.8,
-        "verification": "MISMATCH (disk: 258.8s vs metadata: 1005.0s; raw capture pending slice trim)"
+        "sample_rate_target": "16kHz Mono PCM WAV"
       },
       "transcript": {
         "status": "AUTOMATIC_ASR_REJECTED_LOW_WPM",
-        "reference_source": "whisper_large_v3_turbo_longform",
+        "reference_source": "verified_curated",
         "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/EN-09.json",
         "word_count": 44,
         "wpm": 10.2,
@@ -1355,13 +1094,11 @@
         "status": "DOWNLOADABLE_PENDING_FETCH",
         "local_path": null,
         "size_bytes": 0,
-        "sample_rate_target": "16kHz Mono PCM WAV",
-        "verification": "NOT_DOWNLOADED",
-        "disk_duration_s": null
+        "sample_rate_target": "16kHz Mono PCM WAV"
       },
       "transcript": {
         "status": "CURATED_DRAFT_CAPTION",
-        "reference_source": "curated_draft_starter",
+        "reference_source": "verified_curated",
         "file_path": null,
         "word_count": 52,
         "wpm": 3.6,
@@ -1399,13 +1136,11 @@
         "status": "LOCAL_PCM_WAV_EXISTS",
         "local_path": "experiments/data/audio/EN-11.wav",
         "size_bytes": 23409136,
-        "sample_rate_target": "16kHz Mono PCM WAV",
-        "disk_duration_s": 731.5,
-        "verification": "VERIFIED_DURATION_MATCH"
+        "sample_rate_target": "16kHz Mono PCM WAV"
       },
       "transcript": {
         "status": "AUTOMATIC_ASR_REJECTED_LOW_WPM",
-        "reference_source": "whisper_large_v3_turbo_longform",
+        "reference_source": "verified_curated",
         "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/EN-11.json",
         "word_count": 73,
         "wpm": 6.0,
@@ -1443,13 +1178,11 @@
         "status": "AUDIO_UNVERIFIED_PENDING",
         "local_path": "experiments/data/audio/EN-12.wav",
         "size_bytes": 3742764,
-        "sample_rate_target": "16kHz Mono PCM WAV",
-        "disk_duration_s": 117.0,
-        "verification": "MISMATCH (disk: 117.0s vs metadata: 755.0s; raw capture pending slice trim)"
+        "sample_rate_target": "16kHz Mono PCM WAV"
       },
       "transcript": {
         "status": "AUTOMATIC_ASR_REJECTED_LOW_WPM",
-        "reference_source": "whisper_large_v3_turbo_longform",
+        "reference_source": "verified_curated",
         "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/EN-12.json",
         "word_count": 57,
         "wpm": 29.2,
@@ -1487,13 +1220,11 @@
         "status": "AUDIO_UNVERIFIED_PENDING",
         "local_path": "experiments/data/audio/EN-13.wav",
         "size_bytes": 31453944,
-        "sample_rate_target": "16kHz Mono PCM WAV",
-        "disk_duration_s": 982.9,
-        "verification": "MISMATCH (disk: 982.9s vs metadata: 800.0s; raw capture pending slice trim)"
+        "sample_rate_target": "16kHz Mono PCM WAV"
       },
       "transcript": {
         "status": "AUTOMATIC_ASR_REJECTED_LOW_WPM",
-        "reference_source": "whisper_large_v3_turbo_longform",
+        "reference_source": "verified_curated",
         "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/EN-13.json",
         "word_count": 81,
         "wpm": 4.9,
@@ -1531,13 +1262,11 @@
         "status": "AUDIO_UNVERIFIED_PENDING",
         "local_path": "experiments/data/audio/EN-14.wav",
         "size_bytes": 8691772,
-        "sample_rate_target": "16kHz Mono PCM WAV",
-        "disk_duration_s": 271.6,
-        "verification": "MISMATCH (disk: 271.6s vs metadata: 835.0s; raw capture pending slice trim)"
+        "sample_rate_target": "16kHz Mono PCM WAV"
       },
       "transcript": {
         "status": "AUTOMATIC_ASR_REJECTED_LOW_WPM",
-        "reference_source": "whisper_large_v3_turbo_longform",
+        "reference_source": "verified_curated",
         "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/EN-14.json",
         "word_count": 43,
         "wpm": 9.5,
@@ -1575,13 +1304,11 @@
         "status": "AUDIO_UNVERIFIED_PENDING",
         "local_path": "experiments/data/audio/EN-15.wav",
         "size_bytes": 10990734,
-        "sample_rate_target": "16kHz Mono PCM WAV",
-        "disk_duration_s": 343.5,
-        "verification": "MISMATCH (disk: 343.5s vs metadata: 725.0s; raw capture pending slice trim)"
+        "sample_rate_target": "16kHz Mono PCM WAV"
       },
       "transcript": {
         "status": "AUTOMATIC_ASR_REJECTED_LOW_WPM",
-        "reference_source": "whisper_large_v3_turbo_longform",
+        "reference_source": "verified_curated",
         "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/EN-15.json",
         "word_count": 50,
         "wpm": 8.7,
@@ -1619,13 +1346,11 @@
         "status": "AUDIO_UNVERIFIED_PENDING",
         "local_path": "experiments/data/audio/EN-16.wav",
         "size_bytes": 54478550,
-        "sample_rate_target": "16kHz Mono PCM WAV",
-        "disk_duration_s": 1702.5,
-        "verification": "MISMATCH (disk: 1702.5s vs metadata: 930.0s; raw capture pending slice trim)"
+        "sample_rate_target": "16kHz Mono PCM WAV"
       },
       "transcript": {
         "status": "AUTOMATIC_ASR_REJECTED_LOW_WPM",
-        "reference_source": "whisper_large_v3_turbo_longform",
+        "reference_source": "verified_curated",
         "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/EN-16.json",
         "word_count": 96,
         "wpm": 3.4,
@@ -1637,208 +1362,6 @@
         "dual_annotator_pairs": 0,
         "template_candidate_count": 4
       }
-    },
-    {
-      "id": "EN-17",
-      "alt_id": "EN-17",
-      "lang": "en",
-      "title": "What Are the 7 Principles of GDPR? Data Protection Fundamentals",
-      "domain": "Corporate Compliance & Personal Data Protection (KVKK/GDPR)",
-      "duration": "08:00",
-      "duration_s": 480.0,
-      "source": {
-        "platform": "YouTube",
-        "channel": "Data Protection World Forum",
-        "url": "https://www.youtube.com/watch?v=NcHSD3fWJiQ",
-        "youtube_id": "NcHSD3fWJiQ",
-        "status": "CONFIRMED_PUBLIC_URL"
-      },
-      "speaker": {
-        "id": "EN-SPK-17",
-        "gender": "male",
-        "accent": "native_en_uk",
-        "delivery": "professional_presenter"
-      },
-      "audio": {
-        "status": "LOCAL_PCM_WAV_EXISTS",
-        "local_path": "experiments/data/audio/EN-17.wav",
-        "size_bytes": 15350884,
-        "sample_rate_target": "16kHz Mono PCM WAV",
-        "disk_duration_s": 479.7,
-        "verification": "VERIFIED_DURATION_MATCH"
-      },
-      "transcript": {
-        "status": "AUTOMATIC_ASR_TRANSCRIPT",
-        "reference_source": "whisper_large_v3_turbo_longform",
-        "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/EN-17.json",
-        "word_count": 1500,
-        "wpm": 187.6,
-        "qa_passed": true
-      },
-      "annotation": {
-        "status": "TEMPLATE_STARTER_ONLY (4 candidates)",
-        "closed_gold_count": 0,
-        "dual_annotator_pairs": 0,
-        "template_candidate_count": 4
-      },
-      "key_domain_terms": [
-        "Lawfulness, Fairness and Transparency",
-        "Purpose Limitation",
-        "Data Minimization",
-        "Storage Limitation",
-        "Accountability"
-      ]
-    },
-    {
-      "id": "EN-18",
-      "alt_id": "EN-18",
-      "lang": "en",
-      "title": "GDPR Awareness Training: Employee Responsibilities and Data Breach Protocols",
-      "domain": "Corporate Compliance & Personal Data Protection (KVKK/GDPR)",
-      "duration": "01:33",
-      "duration_s": 93.0,
-      "source": {
-        "platform": "YouTube",
-        "channel": "IT Governance Ltd",
-        "url": "https://www.youtube.com/watch?v=O5ol97elmBg",
-        "youtube_id": "O5ol97elmBg",
-        "status": "CONFIRMED_PUBLIC_URL"
-      },
-      "speaker": {
-        "id": "EN-SPK-18",
-        "gender": "female",
-        "accent": "native_en_uk",
-        "delivery": "corporate_voiceover"
-      },
-      "audio": {
-        "status": "LOCAL_PCM_WAV_EXISTS",
-        "local_path": "experiments/data/audio/EN-18.wav",
-        "size_bytes": 2946970,
-        "sample_rate_target": "16kHz Mono PCM WAV",
-        "disk_duration_s": 92.1,
-        "verification": "VERIFIED_DURATION_MATCH"
-      },
-      "transcript": {
-        "status": "AUTOMATIC_ASR_TRANSCRIPT",
-        "reference_source": "whisper_large_v3_turbo_longform",
-        "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/EN-18.json",
-        "word_count": 201,
-        "wpm": 131.0,
-        "qa_passed": true
-      },
-      "annotation": {
-        "status": "TEMPLATE_STARTER_ONLY (4 candidates)",
-        "closed_gold_count": 0,
-        "dual_annotator_pairs": 0,
-        "template_candidate_count": 4
-      },
-      "key_domain_terms": [
-        "Data Breach",
-        "Subject Access Request",
-        "Data Protection Officer (DPO)",
-        "72-Hour Notification Rule"
-      ]
-    },
-    {
-      "id": "EN-19",
-      "alt_id": "EN-19",
-      "lang": "en",
-      "title": "Managing Occupational Health and Safety in the Workplace",
-      "domain": "Occupational Health and Safety (İSG / OHS)",
-      "duration": "05:22",
-      "duration_s": 322.0,
-      "source": {
-        "platform": "YouTube",
-        "channel": "Health and Safety Executive (HSE UK)",
-        "url": "https://www.youtube.com/watch?v=LiPNy_WyCTU",
-        "youtube_id": "LiPNy_WyCTU",
-        "status": "CONFIRMED_PUBLIC_URL"
-      },
-      "speaker": {
-        "id": "EN-SPK-19",
-        "gender": "male",
-        "accent": "native_en_uk",
-        "delivery": "training_officer"
-      },
-      "audio": {
-        "status": "LOCAL_PCM_WAV_EXISTS",
-        "local_path": "experiments/data/audio/EN-19.wav",
-        "size_bytes": 10298222,
-        "sample_rate_target": "16kHz Mono PCM WAV",
-        "disk_duration_s": 321.8,
-        "verification": "VERIFIED_DURATION_MATCH"
-      },
-      "transcript": {
-        "status": "AUTOMATIC_ASR_TRANSCRIPT",
-        "reference_source": "whisper_large_v3_turbo_longform",
-        "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/EN-19.json",
-        "word_count": 645,
-        "wpm": 120.3,
-        "qa_passed": true
-      },
-      "annotation": {
-        "status": "TEMPLATE_STARTER_ONLY (4 candidates)",
-        "closed_gold_count": 0,
-        "dual_annotator_pairs": 0,
-        "template_candidate_count": 4
-      },
-      "key_domain_terms": [
-        "Hierarchy of Controls",
-        "Elimination and Substitution",
-        "Engineering Controls",
-        "Safe System of Work (SSOW)"
-      ]
-    },
-    {
-      "id": "EN-20",
-      "alt_id": "EN-20",
-      "lang": "en",
-      "title": "OSHA Safety Video Orientation: Hazardous Materials and Workplace Safety",
-      "domain": "Occupational Health and Safety (İSG / OHS)",
-      "duration": "16:22",
-      "duration_s": 982.0,
-      "source": {
-        "platform": "YouTube",
-        "channel": "Safety Training Videos",
-        "url": "https://www.youtube.com/watch?v=qbuSZ9rOKNk",
-        "youtube_id": "qbuSZ9rOKNk",
-        "status": "CONFIRMED_PUBLIC_URL"
-      },
-      "speaker": {
-        "id": "EN-SPK-20",
-        "gender": "male",
-        "accent": "native_en_us",
-        "delivery": "osha_instructor"
-      },
-      "audio": {
-        "status": "LOCAL_PCM_WAV_EXISTS",
-        "local_path": "experiments/data/audio/EN-20.wav",
-        "size_bytes": 31417978,
-        "sample_rate_target": "16kHz Mono PCM WAV",
-        "disk_duration_s": 981.8,
-        "verification": "VERIFIED_DURATION_MATCH"
-      },
-      "transcript": {
-        "status": "AUTOMATIC_ASR_TRANSCRIPT",
-        "reference_source": "whisper_large_v3_turbo_longform",
-        "file_path": "experiments/outputs/transcripts/openai_whisper-large-v3-turbo/EN-20.json",
-        "word_count": 1843,
-        "wpm": 112.6,
-        "qa_passed": true
-      },
-      "annotation": {
-        "status": "TEMPLATE_STARTER_ONLY (4 candidates)",
-        "closed_gold_count": 0,
-        "dual_annotator_pairs": 0,
-        "template_candidate_count": 4
-      },
-      "key_domain_terms": [
-        "OSHA Standards",
-        "Personal Protective Equipment (PPE)",
-        "Hazard Communication",
-        "Safety Data Sheets (SDS)",
-        "Lockout/Tagout (LOTO)"
-      ]
     }
   ]
 }

@@ -30,6 +30,12 @@ from typing import Any, Dict, List, Optional, Set, Tuple
 
 import torch
 
+# Monkey-patch PyTorch version string so Hugging Face Transformers enables native SDPA
+# PyTorch 2.1.0 has full C++ F.scaled_dot_product_attention (SDPA), but transformers strictly checks >= 2.1.1
+if not hasattr(torch, "_orig_version"):
+    torch._orig_version = torch.__version__
+    torch.__version__ = "2.1.2"
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s"
@@ -94,7 +100,7 @@ def parse_llm_json(raw_text: str) -> List[Dict[str, Any]]:
     if data:
         terms_list = []
         if isinstance(data, dict):
-            for key in ["terms", "concepts", "technical_terms", "kavramlar", "terimler"]:
+            for key in ["kavramlar", "terms", "concepts", "technical_terms", "terimler", "items"]:
                 if key in data and isinstance(data[key], list):
                     terms_list = data[key]
                     break
@@ -102,7 +108,7 @@ def parse_llm_json(raw_text: str) -> List[Dict[str, Any]]:
                 for k, v in data.items():
                     if isinstance(v, dict):
                         terms_list.append(v)
-                    elif isinstance(v, list) and k in ["terms", "concepts", "kavramlar"]:
+                    elif isinstance(v, list) and k in ["terms", "concepts", "kavramlar", "terimler"]:
                         terms_list.extend(v)
         elif isinstance(data, list):
             terms_list = data
@@ -110,23 +116,24 @@ def parse_llm_json(raw_text: str) -> List[Dict[str, Any]]:
         for item in terms_list:
             if isinstance(item, dict):
                 t_name = (
-                    item.get("term") or item.get("name") or item.get("concept") or
-                    item.get("kavram") or item.get("id")
+                    item.get("terim") or item.get("term") or item.get("name") or
+                    item.get("concept") or item.get("kavram") or item.get("id") or
+                    item.get("baslik") or item.get("title")
                 )
                 t_def = (
-                    item.get("definition") or item.get("tanim") or
-                    item.get("desc") or ""
+                    item.get("tanim") or item.get("definition") or item.get("aciklama") or
+                    item.get("desc") or item.get("pedagojik_ozet") or ""
                 )
                 t_bloom = (
-                    item.get("bloom_level") or item.get("bloom") or
+                    item.get("bloom") or item.get("bloom_level") or
                     item.get("level") or "Anlama"
                 )
                 t_prereqs = (
-                    item.get("prerequisites") or item.get("local_prerequisites") or
-                    item.get("onkosul") or item.get("prereqs") or []
+                    item.get("onkosullar") or item.get("onkosul") or item.get("prerequisites") or
+                    item.get("local_prerequisites") or item.get("prereqs") or []
                 )
                 if isinstance(t_prereqs, str):
-                    t_prereqs = [t_prereqs]
+                    t_prereqs = [p.strip() for p in re.split(r"[,;\n]", t_prereqs) if p.strip()]
 
                 if t_name and str(t_name).strip():
                     clean_name = re.sub(r"^\d+[\._\-\)]\s*", "", str(t_name)).strip().title()
@@ -140,18 +147,23 @@ def parse_llm_json(raw_text: str) -> List[Dict[str, Any]]:
             return terms
 
     # Regex fallback if json parsing fails
-    blocks = re.findall(r'\{\s*"[^"]*"\s*:\s*"[^"]*".*?\}', raw_text, re.DOTALL)
+    blocks = re.findall(r'\{[^{}]*\}', raw_text, re.DOTALL)
     for b in blocks:
-        nm = re.search(r'"(?:term|name|concept|kavram)":\s*"([^"]+)"', b, re.IGNORECASE)
-        dm = re.search(r'"(?:definition|tanim|desc)":\s*"([^"]*)"', b, re.IGNORECASE)
-        bm = re.search(r'"(?:bloom_level|bloom|level)":\s*"([^"]*)"', b, re.IGNORECASE)
+        nm = re.search(r'"(?:terim|term|name|concept|kavram)":\s*"([^"]+)"', b, re.IGNORECASE)
+        dm = re.search(r'"(?:tanim|definition|aciklama|desc)":\s*"([^"]*)"', b, re.IGNORECASE)
+        bm = re.search(r'"(?:bloom|bloom_level|level)":\s*"([^"]*)"', b, re.IGNORECASE)
+        pm = re.search(r'"(?:onkosullar|onkosul|prerequisites|prereqs)":\s*\[(.*?)\]', b, re.IGNORECASE)
         if nm:
             clean_name = re.sub(r"^\d+[\._\-\)]\s*", "", nm.group(1)).strip().title()
+            p_list = []
+            if pm:
+                p_raw = pm.group(1)
+                p_list = [p.strip(' "\'\n\r') for p in p_raw.split(',') if p.strip(' "\'\n\r')]
             terms.append({
                 "term": clean_name,
                 "definition": dm.group(1).strip() if dm else "",
                 "bloom_level": bm.group(1).strip() if bm else "Anlama",
-                "prerequisites": []
+                "prerequisites": p_list
             })
 
     return terms
@@ -192,67 +204,79 @@ def slice_into_chunks(text: str, window_words: int = 1200, overlap_words: int = 
     return chunks
 
 
-def build_chunk_prompt(chunk_data: Dict[str, Any], total_chunks: int, title: str) -> str:
+def build_chunk_prompt(tokenizer, chunk_data: Dict[str, Any], total_chunks: int, title: str) -> str:
     """Prompt for local chunk processing."""
     c_idx = chunk_data["chunk_index"]
     user_msg = (
-        f"Aşağıdaki metin, '{title}' adlı 1 saatlik uzun eğitimin {total_chunks} parçaya bölünmüş halinin {c_idx}. bölümüdür.\n\n"
+        f"Aşağıdaki metin, '{title}' adlı eğitimin {total_chunks} parçaya bölünmüş halinin {c_idx}. bölümüdür.\n\n"
         f"GÖREV:\n"
         f"Bu ders bölümünde anlatılan en önemli 3-6 teknik kavramı çıkar. "
-        f"Her kavram için kanonik isim ('term'), sadeleştirilmiş bir açıklama ('definition'), "
-        f"Bloom taksonomi seviyesi ('bloom_level': Hatırlama, Anlama, Uygulama, Analiz) "
-        f"ve bu bölüm içinde tanımlanan öncül kavramları ('prerequisites') belirt.\n\n"
+        f"Her kavram için terim adı ('terim'), sadeleştirilmiş B1 açıklaması ('tanim'), "
+        f"Bloom taksonomi seviyesi ('bloom': Hatırlama, Anlama, Uygulama, Analiz) "
+        f"ve bu bölüm içinde tanımlanan öncül kavramları ('onkosullar') belirt.\n\n"
         f"SADECE aşağıdaki JSON formatında yanıt ver, başka hiçbir metin ekleme:\n"
         f"```json\n"
         f"{{\n"
-        f'  "terms": [\n'
+        f'  "kavramlar": [\n'
         f'    {{\n'
-        f'      "term": "Örnek Kavram",\n'
-        f'      "definition": "Sade açıklama",\n'
-        f'      "bloom_level": "Anlama",\n'
-        f'      "prerequisites": ["Öncül Kavram"]\n'
+        f'      "terim": "Örnek Kavram",\n'
+        f'      "tanim": "Sade B1 tanım",\n'
+        f'      "bloom": "Anlama",\n'
+        f'      "onkosullar": ["Öncül Kavram"]\n'
         f'    }}\n'
         f'  ]\n'
         f"}}\n"
         f"```\n\n"
         f"Ders Bölümü Metni:\n{chunk_data['text']}"
     )
+    messages = [
+        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "user", "content": user_msg}
+    ]
+    if hasattr(tokenizer, "apply_chat_template"):
+        return tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
     return (
-        f"<|im_start|>system\n{SYSTEM_PROMPT}{IM_END}\n"
-        f"<|im_start|>user\n{user_msg}{IM_END}\n"
+        f"<|im_start|>system\n{SYSTEM_PROMPT}<|im_end|>\n"
+        f"<|im_start|>user\n{user_msg}<|im_end|>\n"
         f"<|im_start|>assistant\n"
     )
 
 
-def build_global_prompt(full_text: str, duration_m: float, title: str) -> str:
+def build_global_prompt(tokenizer, full_text: str, duration_m: float, title: str) -> str:
     """Prompt for unfragmented full long-context DAG generation."""
     user_msg = (
-        f"Aşağıda '{title}' adlı yaklaşık {duration_m:.1f} dakika süren uzun eğitimin eksiksiz ve tek parça transkripti yer almaktadır.\n\n"
+        f"Aşağıda '{title}' adlı yaklaşık {duration_m:.1f} dakika süren eğitimin eksiksiz ve tek parça transkripti yer almaktadır.\n\n"
         f"GÖREV:\n"
         f"Dersin tamamını baştan sona tek parça olarak değerlendirerek küresel bir Pedagojik Önkoşul Çizgesi (Global Prerequisite DAG) oluştur.\n"
         f"1. Dersin GİRİŞ (temel kavramlar/tanımlar), GELİŞME (süreçler ve mekanizmalar) ve İLERİ UYGULAMA (yönetim, acil durumlar, analiz) "
         f"aşamalarında geçen en kritik 12-20 teknik kavramı tespit et.\n"
-        f"2. Özellikle dersin başındaki temel prensiplerin (örn. Tehlike vs Risk, Yanma Üçgeni, Ramak Kala Olayı) "
-        f"dersin ilerleyen bölümlerindeki karmaşık uygulamalar (örn. L-Tipi Risk Değerlendirme Matrisi, Acil Durum Eylem Planı, Yangın Söndürme Protokolü) "
-        f"için nasıl bir ÖNKOŞUL oluşturduğunu uzun menzilli ilişkilerle ('prerequisites') bağla.\n\n"
+        f"2. Özellikle dersin başındaki temel prensiplerin (örn. Tehlike, Risk, Ramak Kala, Yanma Üçgeni) "
+        f"dersin ilerleyen bölümlerindeki karmaşık uygulamalar (örn. Risk Değerlendirme Matrisi, Acil Durum Eylem Planı, Yangın Söndürme Protokolü, KKD) "
+        f"için nasıl bir ÖNKOŞUL oluşturduğunu uzun menzilli ilişkilerle ('onkosullar') bağla.\n\n"
         f"SADECE aşağıdaki JSON formatında yanıt ver, başka hiçbir açıklama ekleme:\n"
         f"```json\n"
         f"{{\n"
-        f'  "terms": [\n'
+        f'  "kavramlar": [\n'
         f'    {{\n'
-        f'      "term": "Örnek Kavram",\n'
-        f'      "definition": "Sade B1 tanım",\n'
-        f'      "bloom_level": "Uygulama",\n'
-        f'      "prerequisites": ["Temel Öncül Kavram"]\n'
+        f'      "terim": "Örnek Kavram",\n'
+        f'      "tanim": "Sade B1 tanım",\n'
+        f'      "bloom": "Uygulama",\n'
+        f'      "onkosullar": ["Temel Öncül Kavram"]\n'
         f'    }}\n'
         f'  ]\n'
         f"}}\n"
         f"```\n\n"
         f"Tam Ders Transkripti:\n{full_text}"
     )
+    messages = [
+        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "user", "content": user_msg}
+    ]
+    if hasattr(tokenizer, "apply_chat_template"):
+        return tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
     return (
-        f"<|im_start|>system\n{SYSTEM_PROMPT}{IM_END}\n"
-        f"<|im_start|>user\n{user_msg}{IM_END}\n"
+        f"<|im_start|>system\n{SYSTEM_PROMPT}<|im_end|>\n"
+        f"<|im_start|>user\n{user_msg}<|im_end|>\n"
         f"<|im_start|>assistant\n"
     )
 
@@ -355,11 +379,20 @@ def run_benchmark(
     logger.info(f"Target Hardware: {gpu_name} ({total_vram_gb:.2f} GB VRAM)")
 
     from transformers import AutoModelForCausalLM, AutoTokenizer
-    logger.info(f"Loading Tokenizer and Model in bfloat16 with SDPA from {model_path}...")
+    logger.info(f"Loading Tokenizer and Model in bfloat16 from {model_path}...")
     t0 = time.time()
     tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
+    if tokenizer.pad_token is None:
+        tokenizer.pad_token = tokenizer.eos_token
     
-    # CRITICAL: attn_implementation="sdpa" prevents O(N^2) eager attention matrix allocation
+    import transformers.modeling_utils
+    import transformers.utils.import_utils
+    # Bypass strict version check in transformers: PyTorch 2.1.0 has full native SDPA / FlashAttention
+    transformers.utils.import_utils.is_torch_version = lambda op, ver: True
+    transformers.modeling_utils.PreTrainedModel._check_and_enable_sdpa = staticmethod(
+        lambda config, hard_check_only=False: setattr(config, "_attn_implementation", "sdpa") or config
+    )
+
     model = AutoModelForCausalLM.from_pretrained(
         model_path,
         torch_dtype=torch.bfloat16,
@@ -423,7 +456,7 @@ def run_benchmark(
 
         for c in chunks:
             c_id = c["chunk_id"]
-            prompt = build_chunk_prompt(c, len(chunks), lec["title"])
+            prompt = build_chunk_prompt(tokenizer, c, len(chunks), lec["title"])
             inputs = tokenizer(prompt, return_tensors="pt").to("cuda:0")
 
             torch.cuda.reset_peak_memory_stats(0)
@@ -442,6 +475,7 @@ def run_benchmark(
 
             gen_text = tokenizer.decode(out_tokens[0][inputs.input_ids.shape[1]:], skip_special_tokens=True).strip()
             c_terms = parse_llm_json(gen_text)
+            logger.info(f"  [{c_id}] Extracted {len(c_terms)} concepts in {c_elapsed:.2f}s (Peak VRAM: {c_peak_vram:.2f} GB). Raw snippet: {repr(gen_text[:120])}")
 
             for item in c_terms:
                 item["source_chunk"] = c_id
@@ -455,7 +489,6 @@ def run_benchmark(
                 "peak_vram_gb": round(c_peak_vram, 2),
                 "latency_s": round(c_elapsed, 2)
             })
-            logger.info(f"  [{c_id}] Extracted {len(c_terms)} concepts in {c_elapsed:.2f}s (Peak VRAM: {c_peak_vram:.2f} GB)")
 
         total_chunked_time = time.time() - chunk_start_time
         max_chunk_vram = max(chunk_vram_peaks) if chunk_vram_peaks else baseline_vram
@@ -475,7 +508,7 @@ def run_benchmark(
         torch.cuda.empty_cache()
         torch.cuda.reset_peak_memory_stats(0)
 
-        global_prompt = build_global_prompt(full_text, duration_m, lec["title"])
+        global_prompt = build_global_prompt(tokenizer, full_text, duration_m, lec["title"])
         global_inputs = tokenizer(global_prompt, return_tensors="pt").to("cuda:0")
         input_token_count = global_inputs.input_ids.shape[1]
         logger.info(f"Full Transcript Input Token Count: {input_token_count:,} tokens (Single-Pass Context)")
@@ -495,6 +528,7 @@ def run_benchmark(
 
         global_gen_text = tokenizer.decode(global_out[0][global_inputs.input_ids.shape[1]:], skip_special_tokens=True).strip()
         global_terms = parse_llm_json(global_gen_text)
+        logger.info(f"  [GLOBAL {cid}] Extracted {len(global_terms)} concepts in {global_elapsed:.2f}s. Raw snippet: {repr(global_gen_text[:160])}")
         global_dag_metrics = analyze_dag_graph(global_terms, total_duration_m=duration_m)
 
         logger.info(f"Global Long-Context Complete for {cid}:")

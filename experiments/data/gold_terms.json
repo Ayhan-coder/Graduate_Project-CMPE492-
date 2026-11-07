@@ -4,38 +4,281 @@
     "target_level": "CEFR B1 / Beginner Project Management",
     "lecture_title": "Projenin İzlenmesi ve Kontrolü (Anadolu Üniversitesi Ünite 7)",
     "terms": [
-      {"canonical": "Proje Yönetimi", "aliases": ["proje yönetimi", "project management", "management"]},
-      {"canonical": "Proje Yöneticisi", "aliases": ["proje yöneticisi", "proje yönetici", "project manager"]},
-      {"canonical": "Proje Yönetim Planı", "aliases": ["proje yönetim planı", "proje yönetim plan", "project management plan"]},
-      {"canonical": "İzleme", "aliases": ["izleme", "proje izleme", "projenin izlenmesi", "monitoring"]},
-      {"canonical": "Kontrol", "aliases": ["kontrol", "proje kontrolü", "projenin kontrolü", "kontrol işlemleri", "controlling", "control"]},
-      {"canonical": "Kazanılmış Değer Yönetimi", "aliases": ["kazanılmış değer yönetimi", "evm", "earned value management"]},
-      {"canonical": "Kazanılmış Değer", "aliases": ["kazanılmış değer", "earned value", "ev"]},
-      {"canonical": "Planlanmış Değer", "aliases": ["planlanmış değer", "planned value", "pv"]},
-      {"canonical": "Gerçekleşen Maliyet", "aliases": ["gerçekleşen maliyet", "actual cost", "ac", "maliyet", "cost", "maliyetler"]},
-      {"canonical": "Maliyet Sapması", "aliases": ["maliyet sapması", "cost variance", "cv"]},
-      {"canonical": "Çizelge Sapması", "aliases": ["çizelge sapması", "schedule variance", "sv"]},
-      {"canonical": "Maliyet Performans İndeksi", "aliases": ["maliyet performans indeksi", "maliyet performans endeksi", "cpi", "cost performance index"]},
-      {"canonical": "Çizelge Performans İndeksi", "aliases": ["çizelge performans indeksi", "çizelge performans endeksi", "spi", "schedule performance index"]},
-      {"canonical": "Temel Çizgi", "aliases": ["temel çizgi", "baseline", "performans temel çizgisi"]},
-      {"canonical": "İş Kırılım Yapısı", "aliases": ["iş kırılım yapısı", "wbs", "work breakdown structure"]},
-      {"canonical": "Gantt Şeması", "aliases": ["gant şeması", "gantt şeması", "gantt chart"]},
-      {"canonical": "Bütçe", "aliases": ["bütçe", "onaylanmış bütçe", "budget"]},
-      {"canonical": "Maliyet Kontrolü", "aliases": ["maliyet kontrolü", "maliyet kontrol", "cost control"]},
-      {"canonical": "Maliyet Yönetimi", "aliases": ["maliyet yönetimi", "maliyet yönetim", "cost management"]},
-      {"canonical": "Kapsam", "aliases": ["kapsam", "proje kapsamı", "scope"]},
-      {"canonical": "Değişiklik Talebi", "aliases": ["değişiklik talepleri", "değişiklik talebi", "change request", "change requests"]},
-      {"canonical": "Değişim Kontrol Prosedürleri", "aliases": ["değişim kontrol prosedürleri", "değişiklik kontrolü", "change control procedures"]},
-      {"canonical": "Düzeltici Eylemler", "aliases": ["düzeltici eylemler", "düzeltici eylem", "düzeltici önlemler", "corrective action", "corrective actions"]},
-      {"canonical": "Önleyici Eylemler", "aliases": ["önleyici eylemler", "önleyici eylem", "önleyici önlemler", "preventive action", "preventive actions"]},
-      {"canonical": "Kazanılmış Dersler", "aliases": ["kazanılmış dersler", "lessons learned"]},
-      {"canonical": "Nakit Akışı", "aliases": ["nakit akışı", "proje nakit akışı", "cash flow"]},
-      {"canonical": "Paydaş", "aliases": ["paydaş", "paydaşlar", "stakeholder", "stakeholders"]},
-      {"canonical": "Performans Raporları", "aliases": ["performans raporları", "performans raporu", "performance reports", "performance reporting", "performance"]},
-      {"canonical": "Çevresel İşletme Faktörleri", "aliases": ["çevresel işletme faktörleri", "enterprise environmental factors", "external environmental factors"]},
-      {"canonical": "Kurumsal Süreç Varlıkları", "aliases": ["kurumsal süreç varlıkları", "organizational process assets", "organisational processes", "process"]},
-      {"canonical": "Erken Uyarı Sistemi", "aliases": ["erken uyarı sistemi", "early warning system"]},
-      {"canonical": "Performans Kısıtları", "aliases": ["performans kısıtları", "zaman maliyet kısıtları", "proje kısıtları", "quality", "documentation", "time"]}
+      {
+        "canonical": "Proje Yönetimi",
+        "aliases": [
+          "proje yönetimi",
+          "project management",
+          "management"
+        ]
+      },
+      {
+        "canonical": "Proje Yöneticisi",
+        "aliases": [
+          "proje yöneticisi",
+          "proje yönetici",
+          "project manager"
+        ]
+      },
+      {
+        "canonical": "Proje Yönetim Planı",
+        "aliases": [
+          "proje yönetim planı",
+          "proje yönetim plan",
+          "project management plan"
+        ]
+      },
+      {
+        "canonical": "İzleme",
+        "aliases": [
+          "izleme",
+          "proje izleme",
+          "projenin izlenmesi",
+          "monitoring"
+        ]
+      },
+      {
+        "canonical": "Kontrol",
+        "aliases": [
+          "kontrol",
+          "proje kontrolü",
+          "projenin kontrolü",
+          "kontrol işlemleri",
+          "controlling",
+          "control"
+        ]
+      },
+      {
+        "canonical": "Kazanılmış Değer Yönetimi",
+        "aliases": [
+          "kazanılmış değer yönetimi",
+          "evm",
+          "earned value management"
+        ]
+      },
+      {
+        "canonical": "Kazanılmış Değer",
+        "aliases": [
+          "kazanılmış değer",
+          "earned value",
+          "ev"
+        ]
+      },
+      {
+        "canonical": "Planlanmış Değer",
+        "aliases": [
+          "planlanmış değer",
+          "planned value",
+          "pv"
+        ]
+      },
+      {
+        "canonical": "Gerçekleşen Maliyet",
+        "aliases": [
+          "gerçekleşen maliyet",
+          "actual cost",
+          "ac",
+          "maliyet",
+          "cost",
+          "maliyetler"
+        ]
+      },
+      {
+        "canonical": "Maliyet Sapması",
+        "aliases": [
+          "maliyet sapması",
+          "cost variance",
+          "cv"
+        ]
+      },
+      {
+        "canonical": "Çizelge Sapması",
+        "aliases": [
+          "çizelge sapması",
+          "schedule variance",
+          "sv"
+        ]
+      },
+      {
+        "canonical": "Maliyet Performans İndeksi",
+        "aliases": [
+          "maliyet performans indeksi",
+          "maliyet performans endeksi",
+          "cpi",
+          "cost performance index"
+        ]
+      },
+      {
+        "canonical": "Çizelge Performans İndeksi",
+        "aliases": [
+          "çizelge performans indeksi",
+          "çizelge performans endeksi",
+          "spi",
+          "schedule performance index"
+        ]
+      },
+      {
+        "canonical": "Temel Çizgi",
+        "aliases": [
+          "temel çizgi",
+          "baseline",
+          "performans temel çizgisi"
+        ]
+      },
+      {
+        "canonical": "İş Kırılım Yapısı",
+        "aliases": [
+          "iş kırılım yapısı",
+          "wbs",
+          "work breakdown structure"
+        ]
+      },
+      {
+        "canonical": "Gantt Şeması",
+        "aliases": [
+          "gant şeması",
+          "gantt şeması",
+          "gantt chart"
+        ]
+      },
+      {
+        "canonical": "Bütçe",
+        "aliases": [
+          "bütçe",
+          "onaylanmış bütçe",
+          "budget"
+        ]
+      },
+      {
+        "canonical": "Maliyet Kontrolü",
+        "aliases": [
+          "maliyet kontrolü",
+          "maliyet kontrol",
+          "cost control"
+        ]
+      },
+      {
+        "canonical": "Maliyet Yönetimi",
+        "aliases": [
+          "maliyet yönetimi",
+          "maliyet yönetim",
+          "cost management"
+        ]
+      },
+      {
+        "canonical": "Kapsam",
+        "aliases": [
+          "kapsam",
+          "proje kapsamı",
+          "scope"
+        ]
+      },
+      {
+        "canonical": "Değişiklik Talebi",
+        "aliases": [
+          "değişiklik talepleri",
+          "değişiklik talebi",
+          "change request",
+          "change requests"
+        ]
+      },
+      {
+        "canonical": "Değişim Kontrol Prosedürleri",
+        "aliases": [
+          "değişim kontrol prosedürleri",
+          "değişiklik kontrolü",
+          "change control procedures"
+        ]
+      },
+      {
+        "canonical": "Düzeltici Eylemler",
+        "aliases": [
+          "düzeltici eylemler",
+          "düzeltici eylem",
+          "düzeltici önlemler",
+          "corrective action",
+          "corrective actions"
+        ]
+      },
+      {
+        "canonical": "Önleyici Eylemler",
+        "aliases": [
+          "önleyici eylemler",
+          "önleyici eylem",
+          "önleyici önlemler",
+          "preventive action",
+          "preventive actions"
+        ]
+      },
+      {
+        "canonical": "Kazanılmış Dersler",
+        "aliases": [
+          "kazanılmış dersler",
+          "lessons learned"
+        ]
+      },
+      {
+        "canonical": "Nakit Akışı",
+        "aliases": [
+          "nakit akışı",
+          "proje nakit akışı",
+          "cash flow"
+        ]
+      },
+      {
+        "canonical": "Paydaş",
+        "aliases": [
+          "paydaş",
+          "paydaşlar",
+          "stakeholder",
+          "stakeholders"
+        ]
+      },
+      {
+        "canonical": "Performans Raporları",
+        "aliases": [
+          "performans raporları",
+          "performans raporu",
+          "performance reports",
+          "performance reporting",
+          "performance"
+        ]
+      },
+      {
+        "canonical": "Çevresel İşletme Faktörleri",
+        "aliases": [
+          "çevresel işletme faktörleri",
+          "enterprise environmental factors",
+          "external environmental factors"
+        ]
+      },
+      {
+        "canonical": "Kurumsal Süreç Varlıkları",
+        "aliases": [
+          "kurumsal süreç varlıkları",
+          "organizational process assets",
+          "organisational processes",
+          "process"
+        ]
+      },
+      {
+        "canonical": "Erken Uyarı Sistemi",
+        "aliases": [
+          "erken uyarı sistemi",
+          "early warning system"
+        ]
+      },
+      {
+        "canonical": "Performans Kısıtları",
+        "aliases": [
+          "performans kısıtları",
+          "zaman maliyet kısıtları",
+          "proje kısıtları",
+          "quality",
+          "documentation",
+          "time"
+        ]
+      }
     ]
   },
   "EN-1": {
@@ -43,38 +286,597 @@
     "target_level": "CEFR B1 / Beginner Software Engineering",
     "lecture_title": "Agile Methodologies: Scrum, Kanban, and XP",
     "terms": [
-      {"canonical": "Agile", "aliases": ["agile", "agile methodology", "agile framework", "agile methods"]},
-      {"canonical": "Scrum", "aliases": ["scrum", "scrum methodology", "scrum framework"]},
-      {"canonical": "Scrum Master", "aliases": ["scrum master", "the scrum master"]},
-      {"canonical": "Product Owner", "aliases": ["product owner", "the product owner"]},
-      {"canonical": "Development Team", "aliases": ["development team", "the development team", "scrum team"]},
-      {"canonical": "Sprint", "aliases": ["sprint", "the sprint", "sprints"]},
-      {"canonical": "Backlog", "aliases": ["backlog", "the backlog", "product backlog", "sprint backlog"]},
-      {"canonical": "Daily Scrum", "aliases": ["daily scrum", "stand-up", "the daily scrum", "daily standup"]},
-      {"canonical": "Timebox", "aliases": ["timebox", "timebox period", "timeboxing"]},
-      {"canonical": "Deliverable", "aliases": ["deliverable", "deliverables"]},
-      {"canonical": "Iteration", "aliases": ["iteration", "iterations"]},
-      {"canonical": "Cross-Functional Team", "aliases": ["cross-functional", "cross-functional team", "pizza-sized team"]},
-      {"canonical": "Kanban", "aliases": ["kanban", "kanban method"]},
-      {"canonical": "Kanban Board", "aliases": ["kanban board", "kanban chart", "kanban boards"]},
-      {"canonical": "Work In Progress", "aliases": ["work in progress", "wip", "in-progress work"]},
-      {"canonical": "WIP Limit", "aliases": ["wip limit", "work in progress limit", "work-in-progress limit"]},
-      {"canonical": "Flow", "aliases": ["flow", "create flow"]},
-      {"canonical": "Extreme Programming", "aliases": ["extreme programming", "xp"]},
-      {"canonical": "Test-First Development", "aliases": ["test-first development", "test-driven development", "tdd"]},
-      {"canonical": "Pair Programming", "aliases": ["pair programming"]},
-      {"canonical": "Continuous Integration", "aliases": ["continuous integration", "ci"]},
-      {"canonical": "Continuous Refactoring", "aliases": ["continuous refactoring", "refactoring"]},
-      {"canonical": "Simple Design", "aliases": ["simple design", "avoid big design up front", "simplicity"]},
-      {"canonical": "Sustainable Pace", "aliases": ["sustainable pace"]},
-      {"canonical": "Self-Organizing Team", "aliases": ["self-organizing", "self-organizing team", "empowered team"]},
-      {"canonical": "Artifact", "aliases": ["artifact", "scrum artifact", "central artifact"]},
-      {"canonical": "Design Document", "aliases": ["design document", "designing"]},
-      {"canonical": "Customer Requirements", "aliases": ["customer requirements", "customer needs", "listening to the customer"]},
-      {"canonical": "Lean", "aliases": ["lean", "lean methodology", "lean six sigma"]},
-      {"canonical": "Value Stream", "aliases": ["value stream", "map value stream"]},
-      {"canonical": "Establish Pull", "aliases": ["establish pull", "pull system", "pull"]},
-      {"canonical": "Continuous Improvement", "aliases": ["pursue perfection", "continuous improvement", "continuous learning"]}
+      {
+        "canonical": "Agile",
+        "aliases": [
+          "agile",
+          "agile methodology",
+          "agile framework",
+          "agile methods"
+        ]
+      },
+      {
+        "canonical": "Scrum",
+        "aliases": [
+          "scrum",
+          "scrum methodology",
+          "scrum framework"
+        ]
+      },
+      {
+        "canonical": "Scrum Master",
+        "aliases": [
+          "scrum master",
+          "the scrum master"
+        ]
+      },
+      {
+        "canonical": "Product Owner",
+        "aliases": [
+          "product owner",
+          "the product owner"
+        ]
+      },
+      {
+        "canonical": "Development Team",
+        "aliases": [
+          "development team",
+          "the development team",
+          "scrum team"
+        ]
+      },
+      {
+        "canonical": "Sprint",
+        "aliases": [
+          "sprint",
+          "the sprint",
+          "sprints"
+        ]
+      },
+      {
+        "canonical": "Backlog",
+        "aliases": [
+          "backlog",
+          "the backlog",
+          "product backlog",
+          "sprint backlog"
+        ]
+      },
+      {
+        "canonical": "Daily Scrum",
+        "aliases": [
+          "daily scrum",
+          "stand-up",
+          "the daily scrum",
+          "daily standup"
+        ]
+      },
+      {
+        "canonical": "Timebox",
+        "aliases": [
+          "timebox",
+          "timebox period",
+          "timeboxing"
+        ]
+      },
+      {
+        "canonical": "Deliverable",
+        "aliases": [
+          "deliverable",
+          "deliverables"
+        ]
+      },
+      {
+        "canonical": "Iteration",
+        "aliases": [
+          "iteration",
+          "iterations"
+        ]
+      },
+      {
+        "canonical": "Cross-Functional Team",
+        "aliases": [
+          "cross-functional",
+          "cross-functional team",
+          "pizza-sized team"
+        ]
+      },
+      {
+        "canonical": "Kanban",
+        "aliases": [
+          "kanban",
+          "kanban method"
+        ]
+      },
+      {
+        "canonical": "Kanban Board",
+        "aliases": [
+          "kanban board",
+          "kanban chart",
+          "kanban boards"
+        ]
+      },
+      {
+        "canonical": "Work In Progress",
+        "aliases": [
+          "work in progress",
+          "wip",
+          "in-progress work"
+        ]
+      },
+      {
+        "canonical": "WIP Limit",
+        "aliases": [
+          "wip limit",
+          "work in progress limit",
+          "work-in-progress limit"
+        ]
+      },
+      {
+        "canonical": "Flow",
+        "aliases": [
+          "flow",
+          "create flow"
+        ]
+      },
+      {
+        "canonical": "Extreme Programming",
+        "aliases": [
+          "extreme programming",
+          "xp"
+        ]
+      },
+      {
+        "canonical": "Test-First Development",
+        "aliases": [
+          "test-first development",
+          "test-driven development",
+          "tdd"
+        ]
+      },
+      {
+        "canonical": "Pair Programming",
+        "aliases": [
+          "pair programming"
+        ]
+      },
+      {
+        "canonical": "Continuous Integration",
+        "aliases": [
+          "continuous integration",
+          "ci"
+        ]
+      },
+      {
+        "canonical": "Continuous Refactoring",
+        "aliases": [
+          "continuous refactoring",
+          "refactoring"
+        ]
+      },
+      {
+        "canonical": "Simple Design",
+        "aliases": [
+          "simple design",
+          "avoid big design up front",
+          "simplicity"
+        ]
+      },
+      {
+        "canonical": "Sustainable Pace",
+        "aliases": [
+          "sustainable pace"
+        ]
+      },
+      {
+        "canonical": "Self-Organizing Team",
+        "aliases": [
+          "self-organizing",
+          "self-organizing team",
+          "empowered team"
+        ]
+      },
+      {
+        "canonical": "Artifact",
+        "aliases": [
+          "artifact",
+          "scrum artifact",
+          "central artifact"
+        ]
+      },
+      {
+        "canonical": "Design Document",
+        "aliases": [
+          "design document",
+          "designing"
+        ]
+      },
+      {
+        "canonical": "Customer Requirements",
+        "aliases": [
+          "customer requirements",
+          "customer needs",
+          "listening to the customer"
+        ]
+      },
+      {
+        "canonical": "Lean",
+        "aliases": [
+          "lean",
+          "lean methodology",
+          "lean six sigma"
+        ]
+      },
+      {
+        "canonical": "Value Stream",
+        "aliases": [
+          "value stream",
+          "map value stream"
+        ]
+      },
+      {
+        "canonical": "Establish Pull",
+        "aliases": [
+          "establish pull",
+          "pull system",
+          "pull"
+        ]
+      },
+      {
+        "canonical": "Continuous Improvement",
+        "aliases": [
+          "pursue perfection",
+          "continuous improvement",
+          "continuous learning"
+        ]
+      }
+    ]
+  },
+  "EN-01": {
+    "domain": "Software Engineering & Project Management",
+    "target_level": "CEFR B1",
+    "lecture_title": "Introduction to Agile Methodologies and Scrum Framework",
+    "bloom_level": "Anlama",
+    "terms": [
+      {
+        "canonical": "Agile",
+        "aliases": [
+          "agile",
+          "agile methodology",
+          "agile framework",
+          "agile methods"
+        ],
+        "definition_b1": "",
+        "atesman_score": 60.0
+      },
+      {
+        "canonical": "Scrum",
+        "aliases": [
+          "scrum",
+          "scrum methodology",
+          "scrum framework"
+        ],
+        "definition_b1": "",
+        "atesman_score": 60.0
+      },
+      {
+        "canonical": "Scrum Master",
+        "aliases": [
+          "scrum master",
+          "the scrum master"
+        ],
+        "definition_b1": "",
+        "atesman_score": 60.0
+      },
+      {
+        "canonical": "Product Owner",
+        "aliases": [
+          "product owner",
+          "the product owner"
+        ],
+        "definition_b1": "",
+        "atesman_score": 60.0
+      },
+      {
+        "canonical": "Development Team",
+        "aliases": [
+          "development team",
+          "the development team",
+          "scrum team"
+        ],
+        "definition_b1": "",
+        "atesman_score": 60.0
+      },
+      {
+        "canonical": "Sprint",
+        "aliases": [
+          "sprint",
+          "the sprint",
+          "sprints"
+        ],
+        "definition_b1": "",
+        "atesman_score": 60.0
+      },
+      {
+        "canonical": "Backlog",
+        "aliases": [
+          "backlog",
+          "the backlog",
+          "product backlog",
+          "sprint backlog"
+        ],
+        "definition_b1": "",
+        "atesman_score": 60.0
+      },
+      {
+        "canonical": "Daily Scrum",
+        "aliases": [
+          "daily scrum",
+          "stand-up",
+          "the daily scrum",
+          "daily standup"
+        ],
+        "definition_b1": "",
+        "atesman_score": 60.0
+      },
+      {
+        "canonical": "Timebox",
+        "aliases": [
+          "timebox",
+          "timebox period",
+          "timeboxing"
+        ],
+        "definition_b1": "",
+        "atesman_score": 60.0
+      },
+      {
+        "canonical": "Deliverable",
+        "aliases": [
+          "deliverable",
+          "deliverables"
+        ],
+        "definition_b1": "",
+        "atesman_score": 60.0
+      },
+      {
+        "canonical": "Iteration",
+        "aliases": [
+          "iteration",
+          "iterations"
+        ],
+        "definition_b1": "",
+        "atesman_score": 60.0
+      },
+      {
+        "canonical": "Cross-Functional Team",
+        "aliases": [
+          "cross-functional",
+          "cross-functional team",
+          "pizza-sized team"
+        ],
+        "definition_b1": "",
+        "atesman_score": 60.0
+      },
+      {
+        "canonical": "Kanban",
+        "aliases": [
+          "kanban",
+          "kanban method"
+        ],
+        "definition_b1": "",
+        "atesman_score": 60.0
+      },
+      {
+        "canonical": "Kanban Board",
+        "aliases": [
+          "kanban board",
+          "kanban chart",
+          "kanban boards"
+        ],
+        "definition_b1": "",
+        "atesman_score": 60.0
+      },
+      {
+        "canonical": "Work In Progress",
+        "aliases": [
+          "work in progress",
+          "wip",
+          "in-progress work"
+        ],
+        "definition_b1": "",
+        "atesman_score": 60.0
+      },
+      {
+        "canonical": "WIP Limit",
+        "aliases": [
+          "wip limit",
+          "work in progress limit",
+          "work-in-progress limit"
+        ],
+        "definition_b1": "",
+        "atesman_score": 60.0
+      },
+      {
+        "canonical": "Flow",
+        "aliases": [
+          "flow",
+          "create flow"
+        ],
+        "definition_b1": "",
+        "atesman_score": 60.0
+      },
+      {
+        "canonical": "Extreme Programming",
+        "aliases": [
+          "extreme programming",
+          "xp"
+        ],
+        "definition_b1": "",
+        "atesman_score": 60.0
+      },
+      {
+        "canonical": "Test-First Development",
+        "aliases": [
+          "test-first development",
+          "test-driven development",
+          "tdd"
+        ],
+        "definition_b1": "",
+        "atesman_score": 60.0
+      },
+      {
+        "canonical": "Pair Programming",
+        "aliases": [
+          "pair programming"
+        ],
+        "definition_b1": "",
+        "atesman_score": 60.0
+      },
+      {
+        "canonical": "Continuous Integration",
+        "aliases": [
+          "continuous integration",
+          "ci"
+        ],
+        "definition_b1": "",
+        "atesman_score": 60.0
+      },
+      {
+        "canonical": "Continuous Refactoring",
+        "aliases": [
+          "continuous refactoring",
+          "refactoring"
+        ],
+        "definition_b1": "",
+        "atesman_score": 60.0
+      },
+      {
+        "canonical": "Simple Design",
+        "aliases": [
+          "simple design",
+          "avoid big design up front",
+          "simplicity"
+        ],
+        "definition_b1": "",
+        "atesman_score": 60.0
+      },
+      {
+        "canonical": "Sustainable Pace",
+        "aliases": [
+          "sustainable pace"
+        ],
+        "definition_b1": "",
+        "atesman_score": 60.0
+      },
+      {
+        "canonical": "Self-Organizing Team",
+        "aliases": [
+          "self-organizing",
+          "self-organizing team",
+          "empowered team"
+        ],
+        "definition_b1": "",
+        "atesman_score": 60.0
+      },
+      {
+        "canonical": "Artifact",
+        "aliases": [
+          "artifact",
+          "scrum artifact",
+          "central artifact"
+        ],
+        "definition_b1": "",
+        "atesman_score": 60.0
+      },
+      {
+        "canonical": "Design Document",
+        "aliases": [
+          "design document",
+          "designing"
+        ],
+        "definition_b1": "",
+        "atesman_score": 60.0
+      },
+      {
+        "canonical": "Customer Requirements",
+        "aliases": [
+          "customer requirements",
+          "customer needs",
+          "listening to the customer"
+        ],
+        "definition_b1": "",
+        "atesman_score": 60.0
+      },
+      {
+        "canonical": "Lean",
+        "aliases": [
+          "lean",
+          "lean methodology",
+          "lean six sigma"
+        ],
+        "definition_b1": "",
+        "atesman_score": 60.0
+      },
+      {
+        "canonical": "Value Stream",
+        "aliases": [
+          "value stream",
+          "map value stream"
+        ],
+        "definition_b1": "",
+        "atesman_score": 60.0
+      },
+      {
+        "canonical": "Establish Pull",
+        "aliases": [
+          "establish pull",
+          "pull system",
+          "pull"
+        ],
+        "definition_b1": "",
+        "atesman_score": 60.0
+      },
+      {
+        "canonical": "Continuous Improvement",
+        "aliases": [
+          "pursue perfection",
+          "continuous improvement",
+          "continuous learning"
+        ],
+        "definition_b1": "",
+        "atesman_score": 60.0
+      },
+      {
+        "canonical": "hybrid",
+        "aliases": [
+          "hybrid",
+          "compound",
+          "amalgam",
+          "combination"
+        ],
+        "definition_b1": "",
+        "atesman_score": 60.0
+      },
+      {
+        "canonical": "backlog",
+        "aliases": [
+          "backlog",
+          "inventory",
+          "stockpile"
+        ],
+        "definition_b1": "",
+        "atesman_score": 60.0
+      },
+      {
+        "canonical": "rugby",
+        "aliases": [
+          "rugby",
+          "soccer",
+          "football"
+        ],
+        "definition_b1": "",
+        "atesman_score": 60.0
+      }
     ]
   }
 }
