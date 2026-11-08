@@ -15,7 +15,7 @@ import json
 import logging
 import time
 import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 from peft import PeftModel
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -36,11 +36,16 @@ MODELS_CONFIG = [
         "family": "qwen",
         "base_path": "/users/ali.gunder/models/Qwen2.5-14B-Instruct",
         "adapter_path": "/users/ali.gunder/eduterm-finetune/checkpoints/eduterm_14b_cefr_qlora",
-        "max_ctx": 4096,
-        "load_kwargs": {
-            "load_in_4bit": True,
-            "device_map": "auto"
-        }
+        "max_ctx": 8192,
+        "use_nf4": True
+    },
+    {
+        "id": "EduTerm-14B-Omni",
+        "family": "qwen",
+        "base_path": "/users/ali.gunder/models/Qwen2.5-14B-Instruct",
+        "adapter_path": "/users/ali.gunder/eduterm-finetune/checkpoints/eduterm_14b_omni_merged",
+        "max_ctx": 8192,
+        "use_nf4": True
     }
 ]
 
@@ -54,7 +59,9 @@ BACKGROUND_PARAGRAPHS = [
 NEEDLE_TERMS = [
     {"needle": "Kazanılmış Değer Analizi", "domain": "Proje Yönetimi"},
     {"needle": "Okazaki Parçacıkları", "domain": "Moleküler Biyoloji"},
-    {"needle": "Kirchhoff Akım Yasası", "domain": "Elektrik-Elektronik"}
+    {"needle": "Kirchhoff Akım Yasası", "domain": "Elektrik-Elektronik"},
+    {"needle": "Likidite Karşılama Oranı", "domain": "Bankacılık & Finans"},
+    {"needle": "Sendikasyon Kredisi", "domain": "Bankacılık & Finans"}
 ]
 
 def generate_haystack(target_tokens, needle_info, position_pct, tokenizer):
@@ -113,7 +120,17 @@ def benchmark_long_context(cfg):
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
-    model = AutoModelForCausalLM.from_pretrained(cfg["base_path"], trust_remote_code=True, **cfg["load_kwargs"])
+    load_kwargs = dict(cfg.get("load_kwargs", {}))
+    if cfg.get("use_nf4", False):
+        load_kwargs["quantization_config"] = BitsAndBytesConfig(
+            load_in_4bit=True,
+            bnb_4bit_quant_type="nf4",
+            bnb_4bit_use_double_quant=True,
+            bnb_4bit_compute_dtype=torch.bfloat16
+        )
+        load_kwargs["device_map"] = "auto"
+
+    model = AutoModelForCausalLM.from_pretrained(cfg["base_path"], trust_remote_code=True, **load_kwargs)
     if os.path.exists(cfg["adapter_path"]):
         logging.info(f"  Loading LoRA adapter: {cfg['adapter_path']}")
         model = PeftModel.from_pretrained(model, cfg["adapter_path"])
@@ -135,7 +152,7 @@ def benchmark_long_context(cfg):
             for item in NEEDLE_TERMS:
                 text = generate_haystack(length, item, pos, tokenizer)
                 prompt = format_prompt(cfg["family"], text)
-                inputs = tokenizer(prompt, return_tensors="pt", truncation=True, max_length=cfg["max_ctx"]).to(DEVICE)
+                inputs = tokenizer(prompt, return_tensors="pt", truncation=True, max_length=cfg["max_ctx"]).to(model.device)
                 input_ids = inputs["input_ids"]
                 gen_kwargs = {
                     "max_new_tokens": 64,

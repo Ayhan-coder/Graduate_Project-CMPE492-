@@ -1,10 +1,10 @@
 #!/bin/bash
 #SBATCH --job-name=eval-haystack
 #SBATCH --container-image='nvcr.io#nvidia/pytorch:23.10-py3'
-#SBATCH --gres=gpu:1
-#SBATCH --cpus-per-task=8
+#SBATCH --gpus=1
+#SBATCH --cpus-per-gpu=8
 #SBATCH --mem-per-gpu=44G
-#SBATCH --time=01:00:00
+#SBATCH --time=02:30:00
 #SBATCH --output=/users/ali.gunder/eduterm-finetune/slurm-haystack-%j.out
 
 echo "================================================================="
