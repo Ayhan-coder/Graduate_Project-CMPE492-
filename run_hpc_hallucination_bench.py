@@ -114,26 +114,40 @@ def format_prompt(model_family: str, text: str, extra_instruction: str = "") -> 
         return f"<|im_start|>system\n{sys_prompt}<|im_end|>\n<|im_start|>user\n{user_content}<|im_end|>\n<|im_start|>assistant\n"
 
 def extract_terms_from_generation(raw_gen: str) -> List[str]:
-    candidate = raw_gen
-    json_match = re.search(r"```json\s*(.*?)\s*```", raw_gen, re.DOTALL)
+    candidate = raw_gen.strip()
+    json_match = re.search(r"```(?:json)?\s*([\s\S]*?)\s*```", candidate)
     if json_match:
-        candidate = json_match.group(1)
+        candidate = json_match.group(1).strip()
+
+    data = None
     try:
         data = json.loads(candidate)
     except Exception:
-        first_b = candidate.find("{")
-        last_b = candidate.rfind("}")
-        if first_b != -1 and last_b != -1:
+        first_b = candidate.find("[")
+        last_b = candidate.rfind("]")
+        if first_b != -1 and last_b != -1 and last_b > first_b:
             try:
                 data = json.loads(candidate[first_b:last_b+1])
             except Exception:
-                data = None
-        else:
-            data = None
+                pass
+        if data is None:
+            first_c = candidate.find("{")
+            last_c = candidate.rfind("}")
+            if first_c != -1 and last_c != -1 and last_c > first_c:
+                try:
+                    data = json.loads(candidate[first_c:last_c+1])
+                except Exception:
+                    pass
 
     extracted = []
-    if isinstance(data, dict):
-        terms_val = data.get("terimler") or data.get("terms") or []
+    if isinstance(data, list):
+        for item in data:
+            if isinstance(item, str):
+                extracted.append(item)
+            elif isinstance(item, dict):
+                extracted.append(item.get("terim") or item.get("term") or list(item.values())[0])
+    elif isinstance(data, dict):
+        terms_val = data.get("terimler") or data.get("terms") or data.get("teknik_terimler") or []
         if isinstance(terms_val, list):
             for t in terms_val:
                 if isinstance(t, str):
@@ -142,6 +156,17 @@ def extract_terms_from_generation(raw_gen: str) -> List[str]:
                     extracted.append(t.get("terim") or t.get("term") or "")
         elif isinstance(terms_val, dict):
             extracted.extend(terms_val.keys())
+        else:
+            for v in data.values():
+                if isinstance(v, list):
+                    extracted.extend([str(x) for x in v if isinstance(x, str)])
+
+    if not extracted:
+        lines = [line.strip("-* \t") for line in raw_gen.split("\n") if line.strip()]
+        for line in lines:
+            if len(line) < 45 and not any(skip in line.lower() for skip in ["terim", "json", "metin", "açıklama", "not:"]):
+                extracted.append(line)
+
     return [t.strip() for t in extracted if t and len(t.strip()) > 1]
 
 def evaluate_model_hallucination(model, tokenizer, model_family: str, device: str) -> Dict[str, Any]:
@@ -270,15 +295,21 @@ def main():
             "family": "kumru"
         },
         {
-            "name": "Trendyol-LLM-8B (EduTerm SFT)",
-            "base": "/users/ali.gunder/models/Trendyol-LLM-8B-T1",
-            "adapter": "/users/ali.gunder/eduterm-finetune/checkpoints/eduterm_trendyol_8b_cefr",
+            "name": "EduTerm-14B-SFT",
+            "base": "/users/ali.gunder/models/Qwen2.5-14B-Instruct",
+            "adapter": "/users/ali.gunder/eduterm-finetune/checkpoints/eduterm_14b_cefr_qlora",
             "family": "qwen"
         },
         {
-            "name": "EduTerm-14B-TR (Full CEFR SFT)",
+            "name": "EduTerm-14B-DPO",
             "base": "/users/ali.gunder/models/Qwen2.5-14B-Instruct",
-            "adapter": "/users/ali.gunder/eduterm-finetune/checkpoints/eduterm_14b_cefr_qlora",
+            "adapter": "/users/ali.gunder/eduterm-dpo-14b/checkpoints/eduterm_14b_dpo",
+            "family": "qwen"
+        },
+        {
+            "name": "EduTerm-14B-Omni",
+            "base": "/users/ali.gunder/models/Qwen2.5-14B-Instruct",
+            "adapter": "/users/ali.gunder/eduterm-finetune/checkpoints/eduterm_14b_omni_merged",
             "family": "qwen"
         }
     ]
