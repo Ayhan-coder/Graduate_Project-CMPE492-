@@ -1,0 +1,310 @@
+{
+  "Kumru-2B (EduTerm SFT)": {
+    "summary": {
+      "mean_term_recall_pct": 4.2,
+      "mean_root_harmony_rate_pct": 0.0,
+      "turkish_language_integrity_pct": 0.0,
+      "mean_atesman": 56.59,
+      "b1_compliance_pct": 100.0
+    },
+    "details": [
+      {
+        "case_id": "CS_BACKPROP",
+        "eval": {
+          "term_recall_pct": 0.0,
+          "root_harmony_rate_pct": 0.0,
+          "turkish_language_maintained": false,
+          "atesman": 55.94,
+          "b1_compliant": true
+        },
+        "text_snippet": "Konuyu öğrenirken temel ilkeleri kavramayı sağlar...."
+      },
+      {
+        "case_id": "CS_PIPELINE",
+        "eval": {
+          "term_recall_pct": 0.0,
+          "root_harmony_rate_pct": 0.0,
+          "turkish_language_maintained": false,
+          "atesman": 55.94,
+          "b1_compliant": true
+        },
+        "text_snippet": "Konuyu öğrenirken temel ilkeleri kavramayı sağlar...."
+      },
+      {
+        "case_id": "BIO_CRISPR",
+        "eval": {
+          "term_recall_pct": 25.0,
+          "root_harmony_rate_pct": 0.0,
+          "turkish_language_maintained": false,
+          "atesman": 59.82,
+          "b1_compliant": true
+        },
+        "text_snippet": "Konu: DNA çift sarmalının yapısı, replikasyon, non-homolog rekombinasyon, non-homolog kromozom ayrımı..."
+      },
+      {
+        "case_id": "EE_IMPEDANCE",
+        "eval": {
+          "term_recall_pct": 0.0,
+          "root_harmony_rate_pct": 0.0,
+          "turkish_language_maintained": false,
+          "atesman": 55.94,
+          "b1_compliant": true
+        },
+        "text_snippet": "Konuyu öğrenirken temel ilkeleri kavramayı sağlar...."
+      },
+      {
+        "case_id": "FIN_VOLATILITY",
+        "eval": {
+          "term_recall_pct": 0.0,
+          "root_harmony_rate_pct": 0.0,
+          "turkish_language_maintained": false,
+          "atesman": 55.94,
+          "b1_compliant": true
+        },
+        "text_snippet": "Konuyu öğrenirken temel ilkeleri kavramayı sağlar...."
+      },
+      {
+        "case_id": "ML_DROPOUT",
+        "eval": {
+          "term_recall_pct": 0.0,
+          "root_harmony_rate_pct": 0.0,
+          "turkish_language_maintained": false,
+          "atesman": 55.94,
+          "b1_compliant": true
+        },
+        "text_snippet": "Konuyu öğrenirken temel ilkeleri kavramayı sağlar...."
+      }
+    ]
+  },
+  "EduTerm-14B-SFT": {
+    "summary": {
+      "mean_term_recall_pct": 87.5,
+      "mean_root_harmony_rate_pct": 70.8,
+      "turkish_language_integrity_pct": 50.0,
+      "mean_atesman": 47.35,
+      "b1_compliance_pct": 66.7
+    },
+    "details": [
+      {
+        "case_id": "CS_BACKPROP",
+        "eval": {
+          "term_recall_pct": 100.0,
+          "root_harmony_rate_pct": 100.0,
+          "turkish_language_maintained": true,
+          "atesman": 34.46,
+          "b1_compliant": false
+        },
+        "text_snippet": "**Anahtar Teknik Terimler**\n\n- **Backpropagation**: Gradient Descent algoritmasında hata yönlendirmesini sağlayan ve sinir ağının geriye doğru梯度下降算法中用于将误差反向传播以训..."
+      },
+      {
+        "case_id": "CS_PIPELINE",
+        "eval": {
+          "term_recall_pct": 100.0,
+          "root_harmony_rate_pct": 50.0,
+          "turkish_language_maintained": false,
+          "atesman": 53.02,
+          "b1_compliant": true
+        },
+        "text_snippet": "**Anahtar Teknik Terimler**\n\n- **Branch Prediction**: Instruction reordering'de kullanılan ileri tahmin mekanizması.\n- **Stall**: İşlemci içinde veri transferi ..."
+      },
+      {
+        "case_id": "BIO_CRISPR",
+        "eval": {
+          "term_recall_pct": 50.0,
+          "root_harmony_rate_pct": 0.0,
+          "turkish_language_maintained": false,
+          "atesman": 44.55,
+          "b1_compliant": true
+        },
+        "text_snippet": "**Anahtar Konsept:** Cas9 Nükleazı  \n**Çeviri Sonucu:** Cas9 nükleazı, genetik mühendislik kapsamında 'Hücre Toplama ve Fosfolipid Adipoqlar' öğrenimi için teme..."
+      },
+      {
+        "case_id": "EE_IMPEDANCE",
+        "eval": {
+          "term_recall_pct": 75.0,
+          "root_harmony_rate_pct": 100.0,
+          "turkish_language_maintained": true,
+          "atesman": 52.92,
+          "b1_compliant": true
+        },
+        "text_snippet": "**Anahtar Teknik Terimler**\n\n- **Power Reflection**: Şarj edilmiş olan taraf (dürüst taraf) ile şarj edilmeyen taraf (bozuk taraf) arasındaki enerji geri döndür..."
+      },
+      {
+        "case_id": "FIN_VOLATILITY",
+        "eval": {
+          "term_recall_pct": 100.0,
+          "root_harmony_rate_pct": 100.0,
+          "turkish_language_maintained": false,
+          "atesman": 65.21,
+          "b1_compliant": true
+        },
+        "text_snippet": "**Anahtar Teknik Terimler**\n\n1. **Implied Volatility (Sürdürülebilir Olumsallık)**\n2. **Delta Hedging (Delta Koruma)**\n3. **High-Frequency Order Flow (Yüksek Sı..."
+      },
+      {
+        "case_id": "ML_DROPOUT",
+        "eval": {
+          "term_recall_pct": 100.0,
+          "root_harmony_rate_pct": 75.0,
+          "turkish_language_maintained": true,
+          "atesman": 33.97,
+          "b1_compliant": false
+        },
+        "text_snippet": "**Anahtar Teknik Terimler**\n- **Overfitting** (İngilizce)\n- **Weight Decay** (İngilizce)\n- **Dropout** (İngilizce)\n- **Early Stopping** (İngilizce)\n\n**Birleşik ..."
+      }
+    ]
+  },
+  "EduTerm-14B-DPO": {
+    "summary": {
+      "mean_term_recall_pct": 87.5,
+      "mean_root_harmony_rate_pct": 79.2,
+      "turkish_language_integrity_pct": 66.7,
+      "mean_atesman": 51.26,
+      "b1_compliance_pct": 83.3
+    },
+    "details": [
+      {
+        "case_id": "CS_BACKPROP",
+        "eval": {
+          "term_recall_pct": 100.0,
+          "root_harmony_rate_pct": 100.0,
+          "turkish_language_maintained": true,
+          "atesman": 6.48,
+          "b1_compliant": false
+        },
+        "text_snippet": "**Anahtar Teknik Terimler**\n\n- **Backpropagation**: Biçimsel Takımları Eğitmek İçin Gradyanları Hesaplama Algoritması\n- **Gradient Vanishing**: Saklı Yaprak Dağ..."
+      },
+      {
+        "case_id": "CS_PIPELINE",
+        "eval": {
+          "term_recall_pct": 75.0,
+          "root_harmony_rate_pct": 100.0,
+          "turkish_language_maintained": true,
+          "atesman": 54.8,
+          "b1_compliant": true
+        },
+        "text_snippet": "**Anahtar Teknik Terimler**\n\n- **Branch Prediction**: Instruction reordering'inde kullanılan ileri tahmin mekanizması.\n- **Stall**: İşlemci içinde veri veya指令流水..."
+      },
+      {
+        "case_id": "BIO_CRISPR",
+        "eval": {
+          "term_recall_pct": 50.0,
+          "root_harmony_rate_pct": 0.0,
+          "turkish_language_maintained": false,
+          "atesman": 62.37,
+          "b1_compliant": true
+        },
+        "text_snippet": "**Anahtar Konsept:** Cas9 Nükleazı  \n**Çeviri Sonucu:** Cas9 nükleazı, genetik mühendislik alanında pratik bir araç sağlayan bir teknikdir. Temel ilkeleri hızlı..."
+      },
+      {
+        "case_id": "EE_IMPEDANCE",
+        "eval": {
+          "term_recall_pct": 100.0,
+          "root_harmony_rate_pct": 100.0,
+          "turkish_language_maintained": true,
+          "atesman": 48.59,
+          "b1_compliant": true
+        },
+        "text_snippet": "**Anahtar Teknik Terimler**\n\n- **Power Reflection**: Şarj edilmiş olan taraf (dürüst taraf) ile şarj edilmeyen taraf (bozuk taraf) arasındaki enerji geri döndür..."
+      },
+      {
+        "case_id": "FIN_VOLATILITY",
+        "eval": {
+          "term_recall_pct": 100.0,
+          "root_harmony_rate_pct": 100.0,
+          "turkish_language_maintained": false,
+          "atesman": 76.21,
+          "b1_compliant": true
+        },
+        "text_snippet": "**Anahtar Teknik Terimler**\n\n1. **Implied Volatility (Sürdürülebilir Olumsallık)**\n2. **Delta Hedging (Delta Koruma)**\n3. **High-Frequency Order Flow (Yüksek Sı..."
+      },
+      {
+        "case_id": "ML_DROPOUT",
+        "eval": {
+          "term_recall_pct": 100.0,
+          "root_harmony_rate_pct": 75.0,
+          "turkish_language_maintained": true,
+          "atesman": 59.11,
+          "b1_compliant": true
+        },
+        "text_snippet": "**Anahtar Teknik Terimler**\n\n1. **Overfitting**\n2. **Weight Decay**\n3. **Dropout**\n4. **Early Stopping**\n\n**Birliker Birlesikler Ülkeleri Standartlaştırması (CE..."
+      }
+    ]
+  },
+  "EduTerm-14B-Omni": {
+    "summary": {
+      "mean_term_recall_pct": 30.6,
+      "mean_root_harmony_rate_pct": 29.2,
+      "turkish_language_integrity_pct": 16.7,
+      "mean_atesman": 63.61,
+      "b1_compliance_pct": 100.0
+    },
+    "details": [
+      {
+        "case_id": "CS_BACKPROP",
+        "eval": {
+          "term_recall_pct": 0.0,
+          "root_harmony_rate_pct": 0.0,
+          "turkish_language_maintained": true,
+          "atesman": 61.23,
+          "b1_compliant": true
+        },
+        "text_snippet": "Büyük daimioverlord'un o zamanlardaki koşullarında -: \n1. Güçlenen toprakların yenilenmesi ve çoğaltılması.\n2. Yerli popülasyona yenilgiye uğratmak için hukuken..."
+      },
+      {
+        "case_id": "CS_PIPELINE",
+        "eval": {
+          "term_recall_pct": 0.0,
+          "root_harmony_rate_pct": 0.0,
+          "turkish_language_maintained": false,
+          "atesman": 55.87,
+          "b1_compliant": true
+        },
+        "text_snippet": "Büyük çapkınlar porsiyonu, her bir parçası ayrı bir zaman ve yerde önceden ayarlanmış olan basit baretlerin birleşimi idi...."
+      },
+      {
+        "case_id": "BIO_CRISPR",
+        "eval": {
+          "term_recall_pct": 75.0,
+          "root_harmony_rate_pct": 100.0,
+          "turkish_language_maintained": false,
+          "atesman": 49.85,
+          "b1_compliant": true
+        },
+        "text_snippet": "Cas9 nükleazı guide RNA'yı bind edip DNA double-strand break'i meydana getirdiğinde otonom vesilesini kullanarak kuralı tamamlar...."
+      },
+      {
+        "case_id": "EE_IMPEDANCE",
+        "eval": {
+          "term_recall_pct": 0.0,
+          "root_harmony_rate_pct": 0.0,
+          "turkish_language_maintained": false,
+          "atesman": 122.7,
+          "b1_compliant": true
+        },
+        "text_snippet": "**CHALLENGE** \nİnteraktif 设定挑战，要求学生确定在高频频带下操作时需要考虑哪些参数。\n\n**SOLUTION**\n高频频带下的关键参数包括信号传播速度、频率波长和相位。这些值用于确定信号在给定距离内如何变化。..."
+      },
+      {
+        "case_id": "FIN_VOLATILITY",
+        "eval": {
+          "term_recall_pct": 33.3,
+          "root_harmony_rate_pct": 0.0,
+          "turkish_language_maintained": false,
+          "atesman": 41.83,
+          "b1_compliant": true
+        },
+        "text_snippet": "Mevcut senaryoda sorunu решить: Delta hedging, sıradaki adımların(constants) kullanarak verilen bağıntısız olasılık dağılımı çözün...."
+      },
+      {
+        "case_id": "ML_DROPOUT",
+        "eval": {
+          "term_recall_pct": 75.0,
+          "root_harmony_rate_pct": 75.0,
+          "turkish_language_maintained": false,
+          "atesman": 50.21,
+          "b1_compliant": true
+        },
+        "text_snippet": "**Çeviri Sıfatları:**  \n- **Overfitting** (English) - > -' > -' > -(Turkish)  \n- **Early Stopping** (English) - > -' > -' > -(Turkish)  \n- **Weight Decay** (Eng..."
+      }
+    ]
+  }
+}

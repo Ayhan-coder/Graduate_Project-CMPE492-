@@ -1,0 +1,58 @@
+{
+  "Kumru-2B (EduTerm SFT)": {
+    "clean_baseline": {
+      "precision_pct": 80.0,
+      "recall_pct": 22.2,
+      "f1_pct": 34.8
+    },
+    "adversarial_metrics": {
+      "contradiction_resistance_rate_pct": 33.3,
+      "distractor_rejection_rate_pct": 50.0,
+      "truncation_grounding_rate_pct": 100.0,
+      "overall_faithfulness_index": 57.0,
+      "overall_hallucination_rate": 43.0
+    }
+  },
+  "EduTerm-14B-SFT": {
+    "clean_baseline": {
+      "precision_pct": 0.0,
+      "recall_pct": 0.0,
+      "f1_pct": 0.0
+    },
+    "adversarial_metrics": {
+      "contradiction_resistance_rate_pct": 0.0,
+      "distractor_rejection_rate_pct": 100.0,
+      "truncation_grounding_rate_pct": 100.0,
+      "overall_faithfulness_index": 30.0,
+      "overall_hallucination_rate": 70.0
+    }
+  },
+  "EduTerm-14B-DPO": {
+    "clean_baseline": {
+      "precision_pct": 100.0,
+      "recall_pct": 22.2,
+      "f1_pct": 36.4
+    },
+    "adversarial_metrics": {
+      "contradiction_resistance_rate_pct": 0.0,
+      "distractor_rejection_rate_pct": 100.0,
+      "truncation_grounding_rate_pct": 100.0,
+      "overall_faithfulness_index": 70.0,
+      "overall_hallucination_rate": 30.0
+    }
+  },
+  "EduTerm-14B-Omni": {
+    "clean_baseline": {
+      "precision_pct": 50.0,
+      "recall_pct": 5.6,
+      "f1_pct": 10.0
+    },
+    "adversarial_metrics": {
+      "contradiction_resistance_rate_pct": 0.0,
+      "distractor_rejection_rate_pct": 83.3,
+      "truncation_grounding_rate_pct": 33.3,
+      "overall_faithfulness_index": 45.0,
+      "overall_hallucination_rate": 55.0
+    }
+  }
+}

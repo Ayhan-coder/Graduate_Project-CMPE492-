@@ -1,0 +1,390 @@
+{
+  "Kumru-2B (EduTerm SFT)": {
+    "summary": {
+      "mean_conceptual_correctness": 3.49,
+      "mean_pedagogical_tone": 1.73,
+      "mean_analogy_vividness": 1.97,
+      "mean_misconception_preemption": 1.0,
+      "mean_bloom_depth": 2.5,
+      "mean_atesman": 44.89,
+      "b1_compliance_pct": 50.0
+    },
+    "details": [
+      {
+        "concept_id": "CS_VIRTUAL_MEM",
+        "concept": "Sanal Bellek ve Sayfalama (Virtual Memory & Paging)",
+        "rubric": {
+          "conceptual_correctness": 2.6,
+          "pedagogical_tone": 1.5,
+          "analogy_vividness": 4.3,
+          "misconception_preemption": 1.0,
+          "bloom_depth": 3.0,
+          "atesman": 70.12,
+          "b1_compliant": true
+        },
+        "text_snippet": "**Analoji: Sanal Bellek ve Sayfalama (Virtual Memory & Paging)**\n\n> Bir bilgisayarda çalışan bellek gibi, web sitesinde de veriler depolanır. Veriler, web sitesi sayfalarına yazıla..."
+      },
+      {
+        "concept_id": "BIO_OKAZAKI",
+        "concept": "DNA Helikaz ve Okazaki Parçacıkları",
+        "rubric": {
+          "conceptual_correctness": 3.0,
+          "pedagogical_tone": 1.5,
+          "analogy_vividness": 1.5,
+          "misconception_preemption": 1.0,
+          "bloom_depth": 2.0,
+          "atesman": 46.58,
+          "b1_compliant": true
+        },
+        "text_snippet": "**DNA Helikaz ve Okazaki Parçacıkları**\n\n> DNA helikaz, DNA’daki fosfodiester bağlarını kırarak çift sarmal yapıyı onaran kimyasal bir mekanizmadır. Okazaki parçacıkları ise DNA’da..."
+      },
+      {
+        "concept_id": "EE_KIRCHHOFF",
+        "concept": "Kirchhoff Akım Yasası ve Düğüm Gerilimleri",
+        "rubric": {
+          "conceptual_correctness": 4.2,
+          "pedagogical_tone": 1.5,
+          "analogy_vividness": 1.5,
+          "misconception_preemption": 1.0,
+          "bloom_depth": 2.0,
+          "atesman": 39.43,
+          "b1_compliant": false
+        },
+        "text_snippet": "**Düğüm Gerilimleri (Kirchhoff Akım Yasası)**\n\\[f(x) = e^{-\\Delta x}\\]\n\nBu denklemde geçen \\(\\Delta x\\) ifadesi, bir noktadaki gerilimi, \\(e^{-\\Delta x}\\) ifadesi ise o noktadaki a..."
+      },
+      {
+        "concept_id": "BANK_LCR",
+        "concept": "Likidite Karşılama Oranı (LCR) ve Basel III",
+        "rubric": {
+          "conceptual_correctness": 4.33,
+          "pedagogical_tone": 2.2,
+          "analogy_vividness": 1.5,
+          "misconception_preemption": 1.0,
+          "bloom_depth": 4.0,
+          "atesman": 11.21,
+          "b1_compliant": false
+        },
+        "text_snippet": "**Likidite Karşılama Oranı (LCR) ve Basel III**\n\nTemel Kavramlar:\n- **Likidite Karşılama Oranı (LCR)**: Bankanın 30 günlük ciddi bir kriz ve stres senaryosunda ortaya çıkabilecek n..."
+      },
+      {
+        "concept_id": "ML_OVERFITTING",
+        "concept": "Aşırı Öğrenme (Overfitting) ve Gradyan İnişi",
+        "rubric": {
+          "conceptual_correctness": 3.4,
+          "pedagogical_tone": 2.2,
+          "analogy_vividness": 1.5,
+          "misconception_preemption": 1.0,
+          "bloom_depth": 2.0,
+          "atesman": 59.62,
+          "b1_compliant": true
+        },
+        "text_snippet": "**Aşırı Öğrenme (Overfitting) ve Gradyan İnişi**\n\nKonu: Aşırı Öğrenme (Overfitting) ve Gradyan İnişi\n\nTarih: 2017-04-10\n\nÖğrenci: Lise 1. sınıf öğrencisi\n\n**Aşırı Öğrenme (Overfitt..."
+      },
+      {
+        "concept_id": "MED_ACTION_POTENTIAL",
+        "concept": "Nöronlarda Aksiyon Potansiyeli ve Sodyum Pompası",
+        "rubric": {
+          "conceptual_correctness": 3.4,
+          "pedagogical_tone": 1.5,
+          "analogy_vividness": 1.5,
+          "misconception_preemption": 1.0,
+          "bloom_depth": 2.0,
+          "atesman": 42.36,
+          "b1_compliant": false
+        },
+        "text_snippet": "**Analoji:** Nöronlarda aksiyon potansiyeli, sinir hücreleri arasında elektriksel sinyallerin iletimini sağlayan kimyasal mekanizmanın fiziksel sürecidir. Bu kavram, lise ve üniver..."
+      }
+    ]
+  },
+  "EduTerm-14B-SFT": {
+    "summary": {
+      "mean_conceptual_correctness": 3.62,
+      "mean_pedagogical_tone": 1.85,
+      "mean_analogy_vividness": 2.48,
+      "mean_misconception_preemption": 1.0,
+      "mean_bloom_depth": 4.33,
+      "mean_atesman": 50.29,
+      "b1_compliance_pct": 50.0
+    },
+    "details": [
+      {
+        "concept_id": "CS_VIRTUAL_MEM",
+        "concept": "Sanal Bellek ve Sayfalama (Virtual Memory & Paging)",
+        "rubric": {
+          "conceptual_correctness": 3.4,
+          "pedagogical_tone": 1.5,
+          "analogy_vividness": 4.8,
+          "misconception_preemption": 1.0,
+          "bloom_depth": 6.0,
+          "atesman": 43.84,
+          "b1_compliant": false
+        },
+        "text_snippet": "**Sanal Bellek ve Sayfalama (Virtual Memory & Paging)**\n\n**Temel Anlama:** \nBilgisayarın işlediği programlar ve verileri daha büyük görünümle kolayca yönetmek için bellek içinde da..."
+      },
+      {
+        "concept_id": "BIO_OKAZAKI",
+        "concept": "DNA Helikaz ve Okazaki Parçacıkları",
+        "rubric": {
+          "conceptual_correctness": 3.67,
+          "pedagogical_tone": 2.2,
+          "analogy_vividness": 1.5,
+          "misconception_preemption": 1.0,
+          "bloom_depth": 6.0,
+          "atesman": 21.47,
+          "b1_compliant": false
+        },
+        "text_snippet": "DNA helikaz ve Okazaki parçacıkları'na ilişkin temel kavramları öğrenmeyi sağlar. Konuyu öğretemeyecek olan engellerden biri, DNA helikazının iki zincirinin farklı yönlerini ve Oka..."
+      },
+      {
+        "concept_id": "EE_KIRCHHOFF",
+        "concept": "Kirchhoff Akım Yasası ve Düğüm Gerilimleri",
+        "rubric": {
+          "conceptual_correctness": 4.2,
+          "pedagogical_tone": 1.5,
+          "analogy_vividness": 1.5,
+          "misconception_preemption": 1.0,
+          "bloom_depth": 3.0,
+          "atesman": 56.6,
+          "b1_compliant": true
+        },
+        "text_snippet": "**Kirchhoff Akım Yasası ve Düğüm Gerilimleri** konusunun tam ve doğru açıklamasıdır. Konuyu öğrenirken temel ilkeleri kavramayı sağlar.\n\n**Kurumsal Kurumsal Kurumsal**\nKirchhoff Ak..."
+      },
+      {
+        "concept_id": "BANK_LCR",
+        "concept": "Likidite Karşılama Oranı (LCR) ve Basel III",
+        "rubric": {
+          "conceptual_correctness": 3.67,
+          "pedagogical_tone": 2.2,
+          "analogy_vividness": 1.5,
+          "misconception_preemption": 1.0,
+          "bloom_depth": 5.0,
+          "atesman": 65.46,
+          "b1_compliant": true
+        },
+        "text_snippet": "**Likidite Karşılama Oranı (LCR) ve Basel III** konusunun tamamlayıcı bir şekilde anlatılması için aşağıdaki benzetme örnekleri değerlendirilmiştir. Vize veya finalden önce çabalam..."
+      },
+      {
+        "concept_id": "ML_OVERFITTING",
+        "concept": "Aşırı Öğrenme (Overfitting) ve Gradyan İnişi",
+        "rubric": {
+          "conceptual_correctness": 3.4,
+          "pedagogical_tone": 1.5,
+          "analogy_vividness": 2.8,
+          "misconception_preemption": 1.0,
+          "bloom_depth": 3.0,
+          "atesman": 82.02,
+          "b1_compliant": true
+        },
+        "text_snippet": "**Aşırı Öğrenme (Overfitting) ve Gradyan İnişi** konusunun tam ve doğru anlatımı:\n\n**Kavram Saati:**\nAşırı Öğrenme (Overfitting), makine öğrenimi alanında pratik bir kavramdır. Tem..."
+      },
+      {
+        "concept_id": "MED_ACTION_POTENTIAL",
+        "concept": "Nöronlarda Aksiyon Potansiyeli ve Sodyum Pompası",
+        "rubric": {
+          "conceptual_correctness": 3.4,
+          "pedagogical_tone": 2.2,
+          "analogy_vividness": 2.8,
+          "misconception_preemption": 1.0,
+          "bloom_depth": 3.0,
+          "atesman": 32.38,
+          "b1_compliant": false
+        },
+        "text_snippet": "**Kavram:** Nöronlarda Aksiyon Potansiyeli ve Sodyum Pompası\n\n**CEFR Hedefi:** B1\n\n**Benzetme:** \nNöronun içindeki sodyum pompasına ve aksiyon potansiyelinine benzetmek için, bir d..."
+      }
+    ]
+  },
+  "EduTerm-14B-DPO": {
+    "summary": {
+      "mean_conceptual_correctness": 3.8,
+      "mean_pedagogical_tone": 1.97,
+      "mean_analogy_vividness": 2.48,
+      "mean_misconception_preemption": 1.25,
+      "mean_bloom_depth": 3.5,
+      "mean_atesman": 47.52,
+      "b1_compliance_pct": 66.7
+    },
+    "details": [
+      {
+        "concept_id": "CS_VIRTUAL_MEM",
+        "concept": "Sanal Bellek ve Sayfalama (Virtual Memory & Paging)",
+        "rubric": {
+          "conceptual_correctness": 5.0,
+          "pedagogical_tone": 2.2,
+          "analogy_vividness": 1.5,
+          "misconception_preemption": 1.0,
+          "bloom_depth": 3.0,
+          "atesman": 56.73,
+          "b1_compliant": true
+        },
+        "text_snippet": "**Sanal Bellek ve Sayfalama (Virtual Memory & Paging)**\n\n**Temel Ayrım:** \nBilgisayarın fiziksel belleği sınırlı olduğünde, işletim sistemi dosyaları ve uygulamaları hard diskteki ..."
+      },
+      {
+        "concept_id": "BIO_OKAZAKI",
+        "concept": "DNA Helikaz ve Okazaki Parçacıkları",
+        "rubric": {
+          "conceptual_correctness": 3.0,
+          "pedagogical_tone": 2.2,
+          "analogy_vividness": 4.3,
+          "misconception_preemption": 1.0,
+          "bloom_depth": 3.0,
+          "atesman": 48.41,
+          "b1_compliant": true
+        },
+        "text_snippet": "DNA helikaz ve Okazaki parçacıkları konusunun tam ve doğru anlaşılabilmesi için önkoşul olarak DNA çoğaltılmasının temel ilkeleri bilinmesi gerekir. Konuyu öğrenirken en çok yapıla..."
+      },
+      {
+        "concept_id": "EE_KIRCHHOFF",
+        "concept": "Kirchhoff Akım Yasası ve Düğüm Gerilimleri",
+        "rubric": {
+          "conceptual_correctness": 4.2,
+          "pedagogical_tone": 2.2,
+          "analogy_vividness": 2.4,
+          "misconception_preemption": 2.5,
+          "bloom_depth": 2.0,
+          "atesman": 44.04,
+          "b1_compliant": false
+        },
+        "text_snippet": "**Kirchhoff Akım Yasası ve Düğüm Gerilimleri** konusunun tam ve doğru açıklaması:\n\n**Temel Konuyu Anlama:** \nKirchhoff Akım Yasası, doğrusal olmayan akım döngüleri için düğümlerind..."
+      },
+      {
+        "concept_id": "BANK_LCR",
+        "concept": "Likidite Karşılama Oranı (LCR) ve Basel III",
+        "rubric": {
+          "conceptual_correctness": 3.0,
+          "pedagogical_tone": 1.5,
+          "analogy_vividness": 2.4,
+          "misconception_preemption": 1.0,
+          "bloom_depth": 5.0,
+          "atesman": 47.0,
+          "b1_compliant": true
+        },
+        "text_snippet": "**Likidite Karşılama Oranı (LCR) ve Basel III** konusunun tamamlayıcı bir şekilde anlatılması için aşağıdaki benzetme örnekleri değerlendirilmiştir. Vize veya finalden önce çabalam..."
+      },
+      {
+        "concept_id": "ML_OVERFITTING",
+        "concept": "Aşırı Öğrenme (Overfitting) ve Gradyan İnişi",
+        "rubric": {
+          "conceptual_correctness": 4.2,
+          "pedagogical_tone": 2.2,
+          "analogy_vividness": 2.8,
+          "misconception_preemption": 1.0,
+          "bloom_depth": 2.0,
+          "atesman": 51.59,
+          "b1_compliant": true
+        },
+        "text_snippet": "**Aşırı Öğrenme (Overfitting) ve Gradyan İnişi** konusunun tam ve doğru anlatımı:\n\n**Kavram Saati:**\nAşırı Öğrenme (Overfitting), makine öğrenimi alanında pratik bir kavramdır. Tem..."
+      },
+      {
+        "concept_id": "MED_ACTION_POTENTIAL",
+        "concept": "Nöronlarda Aksiyon Potansiyeli ve Sodyum Pompası",
+        "rubric": {
+          "conceptual_correctness": 3.4,
+          "pedagogical_tone": 1.5,
+          "analogy_vividness": 1.5,
+          "misconception_preemption": 1.0,
+          "bloom_depth": 6.0,
+          "atesman": 37.37,
+          "b1_compliant": false
+        },
+        "text_snippet": "**Kavram:** Nöronlarda Aksiyon Potansiyeli ve Sodyum Pompası\n\n**CEFR Hedefi:** B1\n\n**Benzetme:** \nNöronun içindeki sodyum pompası, enerji üretmek için elektrikli bir kapıyı kullanı..."
+      }
+    ]
+  },
+  "EduTerm-14B-Omni": {
+    "summary": {
+      "mean_conceptual_correctness": 2.2,
+      "mean_pedagogical_tone": 1.5,
+      "mean_analogy_vividness": 1.5,
+      "mean_misconception_preemption": 1.0,
+      "mean_bloom_depth": 2.0,
+      "mean_atesman": 81.45,
+      "b1_compliance_pct": 83.3
+    },
+    "details": [
+      {
+        "concept_id": "CS_VIRTUAL_MEM",
+        "concept": "Sanal Bellek ve Sayfalama (Virtual Memory & Paging)",
+        "rubric": {
+          "conceptual_correctness": 1.8,
+          "pedagogical_tone": 1.5,
+          "analogy_vividness": 1.5,
+          "misconception_preemption": 1.0,
+          "bloom_depth": 2.0,
+          "atesman": 100.95,
+          "b1_compliant": true
+        },
+        "text_snippet": "• **Zero Page** : İlk 256 byte (0-0x0100) yani 1-16 dahil 16 bit ADDRESS'in son iki bitsi.\n• **Page** : 256 byte (0-0x0100) uzunluğunda KIL avonajında sabit bir alan. İlk 16 taşına..."
+      },
+      {
+        "concept_id": "BIO_OKAZAKI",
+        "concept": "DNA Helikaz ve Okazaki Parçacıkları",
+        "rubric": {
+          "conceptual_correctness": 3.0,
+          "pedagogical_tone": 1.5,
+          "analogy_vividness": 1.5,
+          "misconception_preemption": 1.0,
+          "bloom_depth": 1.0,
+          "atesman": 71.89,
+          "b1_compliant": true
+        },
+        "text_snippet": "DNA Helikaz ve Okazaki Parçacıkları'na related bir kavram🌎-'DNA Hücresel Sınırı' (CH-01) burada senaryoya uygun bir giriş öncesi testini sağlar. Test tamamlanmadıkça devam edilmeye..."
+      },
+      {
+        "concept_id": "EE_KIRCHHOFF",
+        "concept": "Kirchhoff Akım Yasası ve Düğüm Gerilimleri",
+        "rubric": {
+          "conceptual_correctness": 1.0,
+          "pedagogical_tone": 1.5,
+          "analogy_vividness": 1.5,
+          "misconception_preemption": 1.0,
+          "bloom_depth": 1.0,
+          "atesman": 64.01,
+          "b1_compliant": true
+        },
+        "text_snippet": "Kurumsel Kurumsal Mevziada::. Yanda resimdeki simetrik bir çember kalesi yandaki resme bakarak soluk alıp nefes veren bir individüumun ruh halini tahmin etmeye çalışın...."
+      },
+      {
+        "concept_id": "BANK_LCR",
+        "concept": "Likidite Karşılama Oranı (LCR) ve Basel III",
+        "rubric": {
+          "conceptual_correctness": 3.0,
+          "pedagogical_tone": 1.5,
+          "analogy_vividness": 1.5,
+          "misconception_preemption": 1.0,
+          "bloom_depth": 4.0,
+          "atesman": 79.12,
+          "b1_compliant": true
+        },
+        "text_snippet": "• **Likidite Karşılama Oranı (LCR) ve Basel III**'e ilişkinᐉ soruların önafişesi:\n  \n  - LCR nedir? Vadede donanmaya ihtiyaç duydukше время на ответ составляет 30 saniye.\n  - Basel..."
+      },
+      {
+        "concept_id": "ML_OVERFITTING",
+        "concept": "Aşırı Öğrenme (Overfitting) ve Gradyan İnişi",
+        "rubric": {
+          "conceptual_correctness": 1.0,
+          "pedagogical_tone": 1.5,
+          "analogy_vividness": 1.5,
+          "misconception_preemption": 1.0,
+          "bloom_depth": 3.0,
+          "atesman": 44.02,
+          "b1_compliant": false
+        },
+        "text_snippet": "• **Güvenli Doyuk Ağırlığı** (Eğitim & Meşaka): \n    - _Eğitim ve meşaka teamleyici olarak kullanılan veri hareketlerini engelleyen barikalardan bahsediyoruz._\n    - **Chief Pro**:..."
+      },
+      {
+        "concept_id": "MED_ACTION_POTENTIAL",
+        "concept": "Nöronlarda Aksiyon Potansiyeli ve Sodyum Pompası",
+        "rubric": {
+          "conceptual_correctness": 3.4,
+          "pedagogical_tone": 1.5,
+          "analogy_vividness": 1.5,
+          "misconception_preemption": 1.0,
+          "bloom_depth": 1.0,
+          "atesman": 128.72,
+          "b1_compliant": true
+        },
+        "text_snippet": "Nöronlarda Aksiyon Potansiyeli ve Sodyum Pompası otonom sistemlerin çalışmasında operasyonel süreçleri yönetir. Veri流转过程如下：\n1. 感受器接收刺激。\n2. 刺激沿传入神经传递至大脑。\n3. 大脑处理信息并作出决策。\n4. 决策通过传出神经..."
+      }
+    ]
+  }
+}

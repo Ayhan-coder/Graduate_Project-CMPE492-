@@ -1,0 +1,46 @@
+{
+  "Kumru-2B_fp16": {
+    "model_name": "Kumru-2B",
+    "quant_mode": "fp16",
+    "weights_vram_gb": 4.42,
+    "peak_vram_gb": 4.44,
+    "kv_cache_mb": 20.5,
+    "mean_ttft_ms": 17.5,
+    "mean_total_latency_ms": 2117.6,
+    "throughput_tokens_per_sec": 60.4,
+    "latency_per_token_ms": 16.54
+  },
+  "EduTerm-14B (NF4)_nf4": {
+    "model_name": "EduTerm-14B (NF4)",
+    "quant_mode": "nf4",
+    "weights_vram_gb": 9.26,
+    "peak_vram_gb": 9.53,
+    "kv_cache_mb": 276.5,
+    "mean_ttft_ms": 233.4,
+    "mean_total_latency_ms": 10209.6,
+    "throughput_tokens_per_sec": 12.5,
+    "latency_per_token_ms": 79.76
+  },
+  "EduTerm-14B (INT8)_int8": {
+    "model_name": "EduTerm-14B (INT8)",
+    "quant_mode": "int8",
+    "weights_vram_gb": 15.22,
+    "peak_vram_gb": 15.58,
+    "kv_cache_mb": 368.6,
+    "mean_ttft_ms": 277.2,
+    "mean_total_latency_ms": 29535.0,
+    "throughput_tokens_per_sec": 4.3,
+    "latency_per_token_ms": 230.74
+  },
+  "EduTerm-14B (BF16 Unquantized)_bf16": {
+    "model_name": "EduTerm-14B (BF16 Unquantized)",
+    "quant_mode": "bf16",
+    "weights_vram_gb": 27.52,
+    "peak_vram_gb": 27.55,
+    "kv_cache_mb": 30.7,
+    "mean_ttft_ms": 67.2,
+    "mean_total_latency_ms": 7497.4,
+    "throughput_tokens_per_sec": 17.1,
+    "latency_per_token_ms": 58.57
+  }
+}
