@@ -83,7 +83,7 @@
 
   \vskip-0.3ex
   \begin{exampleblock}{GOAL AND SCOPE (AIM)}
-    \textbf{Objective:} Benchmark Whisper, Qwen3-ASR, Nemotron, local SLMs/LLMs (Qwen 2.5/3.5), and EVREN AI Platform (H200) across accuracy, latency, VRAM, and term $F_1$ on a 40-video corpus (12 disciplines, 10.1~h) with rigorous double-annotation verification ($N=115$).
+    \textbf{Objective:} Benchmark Whisper, Qwen3-ASR, Nemotron, local SLMs/LLMs (Qwen 2.5/3.5), and EVREN AI Platform (H200) across accuracy, latency, VRAM, and term $F_1$ on a 7-lecture gold core, 40-video curated inventory (33 verified / 125+99+8 expanded), and single-annotator (\texttt{A1}) plus cross-family judge audits.
   \end{exampleblock}
 
   \vskip-0.3ex
@@ -113,8 +113,8 @@
 
   \begin{block}{40-VIDEO EDUCATIONAL CORPUS}
     \begin{itemize}
-      \item \textbf{12 Disciplines:} STEM, medicine, social sciences, and corporate compliance (KVKK/GDPR, OHS). 7-lecture verified core test set.
-      \item \textbf{Inter-Annotator Agreement:} Double-annotation on $N=115$ items yields Cohen's $\kappa_R=0.782$ (context) and $\kappa_D=1.000$ (definition).
+      \item \textbf{12 Disciplines:} STEM, medicine, social sciences, and corporate compliance (KVKK/GDPR, OHS). 7-lecture gold core; 125-clip ($26+99$) machine pool + 133-clip HPC batch.
+      \item \textbf{Human & Judge Audits:} Single-annotator (\texttt{A1}) review ($233$ pilot + $180$ recovered = $59$ direct CSV + $121$ browser state; $55$ EN queued). Cross-family judge: Qwen2.5-7B ($184$ clean; $270$ parse fallbacks excluded) vs.\ Mistral-7B-v0.3 ($454/454$ valid).
     \end{itemize}
 
     \vskip0.3ex
@@ -148,7 +148,7 @@
       \textbf{EVREN Qwen 3.8F} & \textbf{6.11 s} & \textbf{4.23 s} & National Cloud (H200) \\
       \textbf{Boğaziçi HPC (A40)} & \textbf{15.28 s} & \textbf{12.45 s} & 7B LoRA (48GB A40) \\
       \textbf{EVREN DeepSeek} & 27.68 s & 24.12 s & High Throughput \\
-      \textbf{Qwen 3.5-4B (Local)} & 39.80 s & 34.20 s & RTX 5060 (4-bit NF4) \\
+      \textbf{Qwen 3.5-4B (Local)} & 39.55 s & 34.20 s & RTX 5060 (4-bit NF4) \\
       \textbf{Qwen 3.5-9B (Local)} & 513.19 s & 322.29 s & CPU Offload \\
       \bottomrule
     \end{tabularx}

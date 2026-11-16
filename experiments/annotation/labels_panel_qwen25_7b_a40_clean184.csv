@@ -1,0 +1,745 @@
+item_id,video_id,lang,term,explanation,context,judge_R,judge_D,judge_why,judge_raw,judge_model,prompt_version
+TR-01-machine-001,TR-01,tr,İzleme,Projenin ilerlemesini takip ederek gerçekleştirdiği işlemleri ve sonuçları gözlemleme sürecidir.,"Bu konularla ilgili olarak kullanılacak anahtar kavramlar şunlardır. İzleme, kontrol ve kazanılmış değer.",1,1,!Bağl!am!!!!T!er!im!!der!!st!e!r!ge!!!s!t!e!n!a!l!a!l,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!Bağl!am!!!!T!er!im!!der!!st!e!r!ge!!!s!t!e!n!a!l!a!l",Qwen2.5-7B-Instruct,protocol-v1
+TR-01-machine-004,TR-01,tr,Gant şeması,Projede hangi aşamada hangi işin yapılacağını görsel olarak gösteren ve gerçek zamanlı karşılaştırmayı sağlayan planlama aracıdır.,"Gant şeması, projenin hangi aşamasında hangi faaliyetin yürütülüyor olması gerektiğini gösterdiğinden gerçek zamanlı faaliyetlerle karşılaştırma olanağı verir.",1,1,!R:!!!!Gant!!Ş!em!s!ı!s!i!s!i!n!!!!der!s!t!e!s!t!e,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!R:!!!!Gant!!Ş!em!s!ı!s!i!s!i!n!!!!der!s!t!e!s!t!e",Qwen2.5-7B-Instruct,protocol-v1
+TR-02-machine-001,TR-02,tr,turizm,"Turizm, sadece seyahat değil; bir kişinin bir yere gitme isteğiyle birlikte o bölgeye olan bağları ve etkileşimleri içeren karmaşık bir sosyal ve ekonomik süreçtir.","Turizm çelimesinin içini dolduralım. Bu sadece bir yerden bir yere gitmek, tatil yapmak demek değil. Hayır, çok daha fazlası.",1,1,!R:!!!!Terim!!der!s!çer!s!da!!ge!n!n!ve!!!a!l!!!a!n!a!,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!R:!!!!Terim!!der!s!çer!s!da!!ge!n!n!ve!!!a!l!!!a!n!a!",Qwen2.5-7B-Instruct,protocol-v1
+TR-02-machine-002,TR-02,tr,turist,"Turist, belirli bir süre içinde bir ülkeye veya bölgeye seyahat eden ve o bölgeyi sadece geçici olarak ziyaret eden kişidir.",Bu özel video incelemesinde siz değerli turist rehberleri için mesleğinizin tam da kalbinde yer alan turizm konusunu en ince ayrıntısına kadar ele alacağız.,1,1,!R:!!! Terim!der!!stinde!!geç!n!r!ve!!!a!l!a!n!a!!öz!lu!!!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!R:!!! Terim!der!!stinde!!geç!n!r!ve!!!a!l!a!n!a!!öz!lu!!!!",Qwen2.5-7B-Instruct,protocol-v1
+TR-02-machine-003,TR-02,tr,coğrafya,"Yeryüzünün fiziksel özellikleri, iklim ve insan faaliyetlerinin etkisiyle oluşan alanları inceleyen bilim dalı.","Çünkü bu liman kenti coğrafi konumu sayesinde o kadar zenginleşti ki, ekonomisi o kadar büyüdü ki diye başlayıp coğrafyayı, ekonomiyi, o dönemin sosyal hayatını hikayenize katmak var.",1,1,!R:!!!!Terim!!!der!!s!t!n!ge!l!n!m!i!n!e!l!d!i!n!e!,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!R:!!!!Terim!!!der!!s!t!n!ge!l!n!m!i!n!e!l!d!i!n!e!",Qwen2.5-7B-Instruct,protocol-v1
+TR-02-machine-004,TR-02,tr,multidisipliner yapı,Farklı bilim dallarının bir araya gelerek tek bir konuyu kapsadığı yapı.,"Üçüncüsü, multidisipliner yapı. Yani turizmin tek bir renkten değil, bir gökkuşağının tüm renklerinden oluşması.",1,1,!Bağlaml! Terim!!!der!s!t!n!!ge!n!n!a!al!!n!a!!!a!n!a!l!,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!Bağlaml! Terim!!!der!s!t!n!!ge!n!n!a!al!!n!a!!!a!n!a!l!",Qwen2.5-7B-Instruct,protocol-v1
+TR-03-machine-001,TR-03,tr,Big Data,Çok büyük hacimli ve karmaşık veri setlerini ifade eden modern terimdir.,Büyük veri anlamına gelen Big Data artık herkes tarafından duyulan bir kavram oldu.,1,1,!Bağlaml! Terim!!!!!der!s!!te!!ge!n!n!a!ve!!!a!l!!!!!a!n!,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!Bağlaml! Terim!!!!!der!s!!te!!ge!n!n!a!ve!!!a!l!!!!!a!n!",Qwen2.5-7B-Instruct,protocol-v1
+TR-03-machine-002,TR-03,tr,veri ön işleme,"Verilerin analiz edilebilir hale getirilmesi sürecidir. Eksiklikleri giderme, hataları düzeltme ve veri tiplerini ayırt etme işlemleri bu aşamada yapılır.",Ardından veri analize hazır hale getirilir. Buna veri ön işleme denir.,1,1,!R:!!!!!Ter!der!!stek!!!!ge!ç!n!n!a!!s!u!l!t!a!m!l!a,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!R:!!!!!Ter!der!!stek!!!!ge!ç!n!n!a!!s!u!l!t!a!m!l!a",Qwen2.5-7B-Instruct,protocol-v1
+TR-03-machine-003,TR-03,tr,model validation,Oluşturulan yapay zeka modelinin gerçek veriler üzerinde ne kadar doğru çalıştığını test etme ve doğrulama işlemidir.,Modeli kurduk ama bu model ne kadar doğru olduğunu anlamak için model validation kullanılır.,1,1,!R:!!!!Terim!!!!!derst!de!!!ge!n!n!ve!!!!!al!n!a!!s!a!l,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!R:!!!!Terim!!!!!derst!de!!!ge!n!n!ve!!!!!al!n!a!!s!a!l",Qwen2.5-7B-Instruct,protocol-v1
+TR-03-machine-004,TR-03,tr,Python,"Veri bilimi alanında en yaygın kullanılan programlama dillerinden biri olup, veri analizi ve makine öğrenimi projelerinde tercih edilir.",Veri bilimi için birçok programlama dili kullanılmaktadır. Bu diller arasında en çok kullanılan Python'dır.,1,1,!R:!!!!Terim!!der!s!t!ç!n!da!!ge!n!m!k!!ve!!!a!l!!!a!,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!R:!!!!Terim!!der!s!t!ç!n!da!!ge!n!m!k!!ve!!!a!l!!!a!",Qwen2.5-7B-Instruct,protocol-v1
+TR-03-machine-005,TR-03,tr,hiperparametreleri,"Modelin yapısını ve davranışını belirleyen, model eğitimi sırasında değiştirilemeyen ve dışarıdan ayarlanan özel parametrelerdir.",Modelin performansı iyi değil ise o zaman modelin hiperparametrelerini düzenleyerek ya da model sınıfını değiştirerek modelin veri üzerindeki doğruluğunu arttırabiliriz.,1,1,!R:!!!!Terim!!!der!!s!t!c!e!s!t!l!a!n!a!n!a!n!a!n!,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!R:!!!!Terim!!!der!!s!t!c!e!s!t!l!a!n!a!n!a!n!a!n!",Qwen2.5-7B-Instruct,protocol-v1
+TR-03-machine-006,TR-03,tr,TensorFlow,Derin öğrenme ve yapay zeka modelleri eğitmek için kullanılan güçlü bir açık kaynak kütüphane.,"Örneğin Python'daki TensorFlow, Cyclet Learn, NumPy ve Pandas gibi kütüphaneler veri analizini kolaylaştıran ve hızlandıran kütüphanelerden birkaçıdır.",1,1,![,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""![]!![]!![]!Ter![]!im!![]!der!![]!st![]!e![]!s![]!e![]!t!![]!g",Qwen2.5-7B-Instruct,protocol-v1
+TR-04-machine-003,TR-04,tr,Atari,"1970'lerden beri bilinen ve piksel tabanlı grafikler ile tanınan, günümüzde de nostaljik olarak anılan önemli bir video oyunu markası.",Atari oyunu diye bugün aslında belki referans verebileceğimiz oyunlar. İşte pikseller üzerinden daha fazla piksel piksel her şeyi uğraştığınız diyelim.,1,1,!R:!! Atari!!!!! trans!kript!!!de!!geç!n!er!ve!!!a!l!an!!!!a!l,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""!R:!! Atari!!!!! trans!kript!!!de!!geç!n!er!ve!!!a!l!an!!!!a!l",Qwen2.5-7B-Instruct,protocol-v1
+TR-04-machine-005,TR-04,tr,tenebbüs,İslami terimdir; dinî görevleri yerine getirmek için vakit geçiren veya ibadetle meşgul olan kişiyi ifade eder.,Öğrencilerin kullanabileceği ve onu da genelde tenebbüslerde.,0,0,!R:!!T!n!e!r!i!m!!d!i!r!;!a!l!a!!!n!!a!l!a!s!,"{
+  ""R"": 0,
+  ""D"": 0,
+  ""Why"": ""!R:!!T!n!e!r!i!m!!d!i!r!;!a!l!a!!!n!!a!l!a!s!",Qwen2.5-7B-Instruct,protocol-v1
+TR-04-machine-008,TR-04,tr,Visual Basic,"Microsoft tarafından geliştirilen, görsel bileşenler kullanarak hızlıca program yazılabilmesini sağlayan, Quick Basic'in modern ve gelişmiş bir versiyonudur.",Quick Basic'ten Visual Basic'e geçtim.,1,1,!Transkri!t!da!!Visual!!B!a!sic!i!n!a!r!a!n!a!t!a!l!a!n!a!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""!Transkri!t!da!!Visual!!B!a!sic!i!n!a!r!a!n!a!t!a!l!a!n!a!",Qwen2.5-7B-Instruct,protocol-v1
+TR-04-machine-010,TR-04,tr,VB,"Visual Basic, Microsoft tarafından geliştirilen görsel programlama dili ve geliştirme ortamıdır.",Sanırım VB'ye geçtikten sonra tabii VB 3.0'a geçtikten sonra yavaş yavaş olay şeye dönüşmüştü.,1,1,!Terim!!!!!!!!der!de!!s!ge!ç!n!n!a!a!l!a!!s!u!n!u!l!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""!Terim!!!!!!!!der!de!!s!ge!ç!n!n!a!a!l!a!!s!u!n!u!l!",Qwen2.5-7B-Instruct,protocol-v1
+TR-04-machine-013,TR-04,tr,Flash,Görsel animasyonlar ve interaktif web sayfaları oluşturmak için kullanılan eski bir grafik programıdır.,Flash animasyonlarını VB programının üzerine com objesi olarak yerleştirip pardon com objesi olarak yerleştirip VB ile Flash'in içerisindeki animasyonları yönetiyorum.,1,1,!闪动画!!!在!!!!课!!!!境!!!!下!!!!被!!作为!!!编程!!!!环境!!!!或!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""!闪动画!!!在!!!!课!!!!境!!!!下!!!!被!!作为!!!编程!!!!环境!!!!或!",Qwen2.5-7B-Instruct,protocol-v1
+TR-04-machine-014,TR-04,tr,3D Studio Max,"Üç boyutlu (3D) modelleme, animasyon ve renderlama işlemlerini gerçekleştirmek için kullanılan profesyonel bir yazılımdır.",3D Studio Max'a sulanmıştım ki. Yani böyle işte CD'ye ilk açıldığında böyle 3D animasyonlarla hani böyle bir welcome animasyonu olsun falan.,1,1,!R:!!!! '!!!3!D! Studio!! Max!\'!a!!! s!ul!an!m!t!!!!!!!!!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""!R:!!!! '!!!3!D! Studio!! Max!\'!a!!! s!ul!an!m!t!!!!!!!!!!",Qwen2.5-7B-Instruct,protocol-v1
+TR-04-machine-015,TR-04,tr,Yapay zeka,"Makine öğrenimi ve derin öğrenme tekniklerini kullanarak insan zekasını taklit eden, veri setlerinden öğrenen ve kararlar üreten yapay sistemlerdir.",Yapay zeka da o doğal olarak yansıyor. Yapay zekanın sektördeki yeri nerede sorusu bence daha enteresan bir soru.,1,1,,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!Bağla""
+}",Qwen2.5-7B-Instruct,protocol-v1
+TR-04-machine-016,TR-04,tr,AI,"Yapay zeka (Artificial Intelligence) kelimesinin kısaltılmış hali olup, yapay zekâ teknolojilerini ifade eder.","Tabi yapay zeka derken de AI'dan bahsediyoruz, ML'den bahsetmiyoruz diye varsayıyorum.",1,1,!Bağl!am!!! tutar!l!k!l!ık! 1!:!!!!!!! Ter!!!!im!! de!r!s!,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!Bağl!am!!! tutar!l!k!l!ık! 1!:!!!!!!! Ter!!!!im!! de!r!s!",Qwen2.5-7B-Instruct,protocol-v1
+TR-04-machine-017,TR-04,tr,ML,"Makine Öğrenmesi (Machine Learning) olarak bilinen, algoritmaların verilerden öğrenip kendi modellerini oluşturma yeteneğidir.","Tabi yapay zeka derken de AI'dan bahsediyoruz, ML'den bahsetmiyoruz diye varsayıyorum.",0,1,!R:!!!! '!!!!!!!Terim!!dereste!!!geç!m!i!y!o!n!u!r!u!m!,"{
+  ""R"": 0,
+  ""D"": 1,
+  ""Why"": ""!R:!!!! '!!!!!!!Terim!!dereste!!!geç!m!i!y!o!n!u!r!u!m!",Qwen2.5-7B-Instruct,protocol-v1
+TR-04-machine-019,TR-04,tr,machine learning,"Makine öğrenimi, verilerden öğrenerek kendi kuralları oluşturabilen yapay zeka alt dallarıdır.",Yani biraz önce bahsettiğim machine learning ve AI ayrımı da tartışılır bir konu.,1,1,!R:!!!!!Terim!!!der!st!de!!ge!n!n!ve!!!!al!!!n!a!!!s!u!,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!R:!!!!!Terim!!!der!st!de!!ge!n!n!ve!!!!al!!!n!a!!!s!u!",Qwen2.5-7B-Instruct,protocol-v1
+TR-04-machine-020,TR-04,tr,Vision API,Görüntüleri otomatik olarak analiz eden ve işlemlerini tamamlamak için görsel verileri işleyen bir yapay zeka servisi.,"Yani tamamen gidip bugün işte Vision API'yını alırsın, AWS'den, Microsoft'tan neredeyse.",1,1,!Bağl!am!!!! tutar!l!k!l!ık! 1!:!!!!!!! Ter!!im!!!!!! de!r,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!Bağl!am!!!! tutar!l!k!l!ık! 1!:!!!!!!! Ter!!im!!!!!! de!r",Qwen2.5-7B-Instruct,protocol-v1
+TR-04-machine-022,TR-04,tr,Java,"Platform bağımsız, derlenen programlama dillerinden biri olup büyük ölçekli uygulamalarda yaygın kullanılır.","C sharp var, Java var, C++ var, C var.",1,1,!{terim!!!der!s!t!s!e!n!a!l!a!r!a!g!!!e!r!e!n!a!r!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""!{terim!!!der!s!t!s!e!n!a!l!a!r!a!g!!!e!r!e!n!a!r!",Qwen2.5-7B-Instruct,protocol-v1
+TR-04-machine-023,TR-04,tr,data science,"Veri bilimi, büyük veri setlerini analiz ederek anlamlı bulgular çıkarmayı ve tahminler yapmayı içeren disiplindir.","Örneğin şey tarafında da sürekli, machine learning ve data science tarafında da sürekli şeyden bahsediyoruz.",1,1,!Bağlanca tutarılı çünkü!!! Terim!! de!! ders!!!!! bağ!l!am!!!!a!!!!!!!!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!Bağlanca tutarılı çünkü!!! Terim!! de!! ders!!!!! bağ!l!am!!!!a!!!!!!!!!",Qwen2.5-7B-Instruct,protocol-v1
+TR-04-machine-024,TR-04,tr,Data engineering,"Veri mühendisliği, verilerin toplanması, temizlenmesi ve sistemlere entegre edilmesi süreçlerini yönetir.",Data engineering. Hep şey muhabbeti sektörde çok döner işte.,1,1,!Bağlaç:!! Terim!!!! '!!!!!!Data!! Engineering! !'!!!!!!! de!! transkript!!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!Bağlaç:!! Terim!!!! '!!!!!!Data!! Engineering! !'!!!!!!! de!! transkript!!!",Qwen2.5-7B-Instruct,protocol-v1
+TR-08-machine-001,TR-08,tr,ısı kapasitesi,Bir sistemin sıcaklığını bir derece artırmak için gereken ısı miktarıdır.,Hatırlarsanız kısaca bu ısı kapasitesi gibi termodinamik değerlerinin ölçümünde son derece kullanışlı bir yol.,1,1,!terim!!açılım!!!!derst!da!!geç!en!ve!!!s!ist!em!!!!s!ist!em!!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""!terim!!açılım!!!!derst!da!!geç!en!ve!!!s!ist!em!!!!s!ist!em!!!",Qwen2.5-7B-Instruct,protocol-v1
+TR-08-machine-002,TR-08,tr,kalorimetre,İçine bir ısı kaynağı ve akım kaynağı konularak ısı miktarı ölçülerek sıcaklık değişimi hesaplanan bir cihazdır.,Burada incelenecek olan sistem kalorimetre içine konuyordu.,1,1,!Kalorimètre!!! Terim!!!!!!!!! ders!!!!!! transkript!!!!! iç!!!!!!!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!Kalorimètre!!! Terim!!!!!!!!! ders!!!!!! transkript!!!!! iç!!!!!!!!",Qwen2.5-7B-Instruct,protocol-v1
+TR-08-machine-003,TR-08,tr,faz geçişleri,"Maddelerin katı, sıvı veya gaz halleri arasında geçirdikleri değişim süreçleridir.",Örneğin faz geçişleri normal termodinamik reaksiyon için son derece uygun bu tip termodinamik hesapları yapmak için sabit basınç ve sabit azıcım kalorimetreleri rutin olarak kullanılmaktadır.,1,1,![,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""![]!![]!![]!Terim!![]!![]!![]!![]!![]!der!![]!![]!![]!![]!![]!!",Qwen2.5-7B-Instruct,protocol-v1
+TR-08-machine-004,TR-08,tr,tepken,Moleküllerdeki atomları birbirine bağlayan ve enerji depolayan kimyasal bağlantı türüdür.,Bu hesabı yaparken önce tepkenleri alır.,0,0,!R:!!!T!terim!!!!der!!s!t!n!ge!ç!n!n!a!l!a!r!a!!d!a,"{
+  ""R"": 0,
+  ""D"": 0,
+  ""Why"": ""!R:!!!T!terim!!!!der!!s!t!n!ge!ç!n!n!a!l!a!r!a!!d!a",Qwen2.5-7B-Instruct,protocol-v1
+TR-08-machine-006,TR-08,tr,enerji değişimi,Bir kimyasal tepkime sonucunda sistemin iç enerjisinin artması veya azalması durumudur.,Bu durumda net bir enerji değişimi söz konusudur.,1,1,!Bağlanca tutarılı:!!! Terim!! de!!er!!st!e!n!! dur!m!!da!!! geçen!!! !ve!,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!Bağlanca tutarılı:!!! Terim!! de!!er!!st!e!n!! dur!m!!da!!! geçen!!! !ve!",Qwen2.5-7B-Instruct,protocol-v1
+TR-09-machine-001,TR-09,tr,Kirşof'un gerilim yasası,"Kapalı bir elektrik devresinde, kaynaklar tarafından üretilen toplam gerilimin, alıcılar (direktorlar) üzerinde düşen gerilimlerin toplamına eşit olduğunu ifade eden temel elektrik yasasıdır.",Kısacası Kirşof'un gerilim yasası kapalı bir elektrik devresinde gerilimlerin düşümü toplamı sıfırdır.,1,1,![,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""![]!![]!![]!Terim!![]!![]!der!![]!ders!![]!![]!![]!![]!![]!![]!![]",Qwen2.5-7B-Instruct,protocol-v1
+TR-09-machine-002,TR-09,tr,akımın yönü,"Elektrik akımının akış yönü, genellikle artı (+) kutuptan eksi (-) kutuya doğru kabul edilir ve devre analizlerinde referans yönü belirler.",Bakın kıymetli arkadaşlar. Ben akımın yönünü önceki derslerde de anlatmıştım. Akımın yönü artıdan eksiye doğru demiştim sizlere.,1,1,!Ak!m!!n! !y!u!n!u!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""!Ak!m!!n! !y!u!n!u!""!!! !!t!e!r!i!m!! !!!!!d!e!r!",Qwen2.5-7B-Instruct,protocol-v1
+TR-09-machine-003,TR-09,tr,Kirchhoff'un gerilim yasası,Elektrik devresinde kapalı bir döngüde bulunan tüm gerilimlerin alınıp çıkarılması sonucu sıfır değerine eşit olması kuralıdır.,Dolayısıyla Kirchhoff'un gerilim yasasında çevredeki akım gerilimlerin bir çevredeki kapalı bir elektrik çevresindeki gerilimlerin toplamı sıfırdır.,1,1,!R:!!因为!!!!!术语!!在!!!!课堂!!!!讲!!!!述!!!!，!!且!!与!!!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!R:!!因为!!!!!术语!!在!!!!课堂!!!!讲!!!!述!!!!，!!且!!与!!!!",Qwen2.5-7B-Instruct,protocol-v1
+TR-09-machine-004,TR-09,tr,Kirchhoff'un voltaj yasası,"Elektrik devresinde, bir döngüdeki tüm gerilimlerin cebirsel toplamının sıfır olduğu temel elektrik yasasıdır.",Evet şimdi burada Kirchhoff'un voltaj yasasını uygulayalım. Bakın neydi? Bir çevredeki gerilimlerin toplamı sıfırdı.,1,1,!R:!!!!Terim!!!der!st!de!!ge!n!n!ve!!!al!!!a!!!s!u!l!n!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""!R:!!!!Terim!!!der!st!de!!ge!n!n!ve!!!al!!!a!!!s!u!l!n!",Qwen2.5-7B-Instruct,protocol-v1
+TR-10-machine-001,TR-10,tr,izomorfu,İki matematiksel yapı arasında aynı yapısal özellikleri koruyan eşanlamlı bir dönüşüm veya karşılık.,Bu K'ya izomorfu.,1,1,!R:!!K'ya!!!!!izom!om!u! diz!iş!inde!!ge!ç!ti!;!D:!Aç!ı!ı!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""!R:!!K'ya!!!!!izom!om!u! diz!iş!inde!!ge!ç!ti!;!D:!Aç!ı!ı!",Qwen2.5-7B-Instruct,protocol-v1
+TR-10-machine-003,TR-10,tr,alt halka,"Büyük bir matematiksel yapı içindeki, toplama ve çarpma işlemlerine kapalı olan ve kendi içindeki yapıyı koruyan küçük bir alt yapı.",Nedir k ve fi tarafından üretilen alt halka?,1,1,!terim!!açıkla!m!!der!s!t!n!a!g!e!l!i!n!e!g!!a!r!a!n,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""!terim!!açıkla!m!!der!s!t!n!a!g!e!l!i!n!e!g!!a!r!a!n",Qwen2.5-7B-Instruct,protocol-v1
+TR-10-machine-005,TR-10,tr,polinom,Değişkenlerin kuvvetleri ile oluşturulan matematiksel ifade.,"Sıfırlayan derecesi en fazla 5. Bulun bakalım. Peki. A eşittir. A eşittir. 1, 2, eksi 2, 3. Bunu sıfırlayan ikinci dereceden bir polinom bulun bakalım. İkinci dereceden.",1,1,!R:!!!!!Terim!!!der!st!ge!n!n!a!a!s!lan!a!a!s!a!l!a!a!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""!R:!!!!!Terim!!!der!st!ge!n!n!a!a!s!lan!a!a!s!a!l!a!a!",Qwen2.5-7B-Instruct,protocol-v1
+TR-11-machine-001,TR-11,tr,dairesel yörünge,Bir cismin sabit hızla ve sabit yarıçaplı bir yörünge üzerinde sürekli hareket etmesi durumudur.,Dairesel yörüngede düzgün dairesel bir hareket izliyor burada.,1,1,!R:!!!!Ter!der!!st!!de!!ge!n!n!a!!a!!l!s!!a!!s!!t!!l,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!R:!!!!Ter!der!!st!!de!!ge!n!n!a!!a!!l!s!!a!!s!!t!!l",Qwen2.5-7B-Instruct,protocol-v1
+TR-11-machine-004,TR-11,tr,çekim kuvveti,İki cisim arasındaki çekim kuvvetini sağlayan temel fiziksel etkidir.,Dolayısıyla yapmam gereken şey bu radyal imenin kaynağı olan çekim kuvveti.,1,1,!R:!!!!Terim!!!!!der!!s!t!n!a!l!a!n!a!a!!g!u!z!!!a,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!R:!!!!Terim!!!!!der!!s!t!n!a!l!a!n!a!a!!g!u!z!!!a",Qwen2.5-7B-Instruct,protocol-v1
+TR-11-machine-005,TR-11,tr,gravitasyon,Cisimlerin birbirini çektiği temel kuvvetin adıdır.,Şimdi bu kuvvet yani F gravitasyon neye eşit?,1,1,!['!Terim!!!der!!s!t!n!!ge!n!n!!a!l!a!n!a!!a!n!a!n!a,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""!['!Terim!!!der!!s!t!n!!ge!n!n!!a!l!a!n!a!!a!n!a!n!a",Qwen2.5-7B-Instruct,protocol-v1
+TR-12-machine-001,TR-12,tr,emek talebi,"İşletmelerin, mal ve hizmet üretmek için istediği işçi sayısı.",Çalışma ekonomisi dersimizin 3. ünitesinde emek talebinde sizlerle birlikteyiz.,1,1,!R:!!! Terim!! d!er!st!m!z!n! 3!!!!!!!! ü!n!it!s!nde! kullan!l,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!R:!!! Terim!! d!er!st!m!z!n! 3!!!!!!!! ü!n!it!s!nde! kullan!l",Qwen2.5-7B-Instruct,protocol-v1
+TR-12-machine-004,TR-12,tr,teknoloji,Üretim sürecinde kullanılan sabit varsayılan teknolojik bilgi ve yöntemler.,"Ve burada T demişiz, teknolojiyi de sabit varsayıyoruz.",1,1,!R:!!T!!der!s!ge!!n!!a!l!a!n!a!!s!!a!v!a!s!a!y!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!R:!!T!!der!s!ge!!n!!a!l!a!n!a!!s!!a!v!a!s!a!y!!",Qwen2.5-7B-Instruct,protocol-v1
+TR-12-machine-005,TR-12,tr,Azalan verimler yasası,"Tek değişken girdisi artırıldığında, eklenen birim girdinin üretime sağladığı katkının önce artıp sonra azaldığı ekonomik ilke.","Azalan verimler yasası belli bir toprak parçası ve sabit bir sermaye ile tek değişken girdinin emek olması durumunda marjinal ürünün yani her işe aldığınız son işçinin toplam üretime katkısının önce artarak artan, sonra azalarak artan maksimum ulaşan ve azalan bir biçimde olduğunu söylüyor.",1,1,!R:!!!!!Terim!!!!!derst!nde!!ge!n!n!t!l!m!!a!!!s!a!l!t,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!R:!!!!!Terim!!!!!derst!nde!!ge!n!n!t!l!m!!a!!!s!a!l!t",Qwen2.5-7B-Instruct,protocol-v1
+TR-13-machine-001,TR-13,tr,duysal bellek,Görme ve duyma duyularıyla algılanan bilgilerin geçici olarak saklandığı zihinsel kayıt mekanizmasıdır.,İlk aşama girdinin alınmasıdır. Bu duysal bellekte gerçekleşiyor.,1,1,!R:!!因为!!该!!!术语!!在!!!!!课堂!!!!!讲!!述!!到!，!!且!!与!!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!R:!!因为!!该!!!术语!!在!!!!!课堂!!!!!讲!!述!!到!，!!且!!与!!!",Qwen2.5-7B-Instruct,protocol-v1
+TR-13-machine-002,TR-13,tr,ikonik bellek,Görme duyusu aracılığıyla algılanan görsel bilgileri geçici olarak tutan hafıza türüdür.,Duyusal bellek gördüklerimizi kaydeden ikonik bellekten ve duyduklarımızı kaydeden ekoik yani yankısal bellekten oluşuyor.,1,1,Terim!!!!! Dersta! Geç! Açılım! Doğal! Ba! Bağ! Ba! Ba! Ba! Ba! Ba! Ba! Ba! Ba! Ba!,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""Terim!!!!! Dersta! Geç! Açılım! Doğal! Ba! Bağ! Ba! Ba! Ba! Ba! Ba! Ba! Ba! Ba! Ba!",Qwen2.5-7B-Instruct,protocol-v1
+TR-16-machine-003,TR-16,tr,lezyonlar,Virusun vücutta oluşturduğu hasarlı dokular veya görünür belirtilerdir.,Neden o spesifik lezyonları gördüğümüzün hücresel mekanizmalarına inelim diyorum.,1,1,!lezyon!!! Terim!! d!er!st!n!! bağ!la!m!!!!a!!!!!!!!!!!!!!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""!lezyon!!! Terim!! d!er!st!n!! bağ!la!m!!!!a!!!!!!!!!!!!!!!",Qwen2.5-7B-Instruct,protocol-v1
+TR-16-machine-008,TR-16,tr,transkripsiyon,DNA'dan RNA sentezlenmesi sürecidir.,"Kendi RNA polimerazlarını, transkripsiyon sistemlerini, hatta mRNA şapkalama ve metilasyon enzimlerini bile.",1,1,!R:!!! Terim!! d!er!st!n!n!!!! bağ!la!m!!!a!!!!!!!!!!!!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!R:!!! Terim!! d!er!st!n!n!!!! bağ!la!m!!!a!!!!!!!!!!!!!",Qwen2.5-7B-Instruct,protocol-v1
+EN-01-machine-005,EN-01,en,backlog,"A central list where all ideas, features, or tasks are captured for the team to work on.","The backlog is the central artifact in Scrum where all possible ideas, deliverables, features, or tasks are captured for the team to work on.",1,1,The!! backlog!!!!! occurs!! in! the!!!!!!!!!!!transcript! and!!!! matches!!! the!!! description!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! backlog!!!!! occurs!! in! the!!!!!!!!!!!transcript! and!!!! matches!!! the!!! description!",Qwen2.5-7B-Instruct,protocol-v1
+EN-01-machine-006,EN-01,en,sprint,A fixed time period during which the team performs their work.,The sprint is the name of the time box period in Scrum where work is done.,1,1,The!! '!!!s!p!r!t!n!'!!! occurs!!! in!! the!!!!!!!!!transcript! and!!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! '!!!s!p!r!t!n!'!!! occurs!!! in!! the!!!!!!!!!transcript! and!!!",Qwen2.5-7B-Instruct,protocol-v1
+EN-01-machine-007,EN-01,en,daily scrum,A brief daily meeting where the team checks their progress toward the goal.,"And then there's a practice called the daily scrum, also called the stand-up. This is where the team meets for 15 minutes or less every day of the sprint to inspect their progress toward their goal.",1,1,The!! '!Term!is!!! correctly!! described!! in!! the!!!!! explanation! and!!!!! the!!!! explanation!! matches!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! '!Term!is!!! correctly!! described!! in!! the!!!!! explanation! and!!!!! the!!!! explanation!! matches!!",Qwen2.5-7B-Instruct,protocol-v1
+EN-02-machine-001,EN-02,en,sustainability,The practice of meeting current needs without compromising the ability of future generations to meet theirs.,"Today I'm going to talk to you about the most important thing in travel, sustainability.",1,1,The!!word!is!!!!in!trans!and!ex!prec!ly!defines!!!s!u!s!t!a!i!n!a!b!i,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!!word!is!!!!in!trans!and!ex!prec!ly!defines!!!s!u!s!t!a!i!n!a!b!i",Qwen2.5-7B-Instruct,protocol-v1
+EN-02-machine-004,EN-02,en,booking.com,An online travel agency that conducted a survey on traveler preferences for sustainable travel.,a large majority of travelers 87% say that they want to travel more sustainably and this was found in a survey that was done by booking.com,1,1,The!!Term!occurred!!!in!!!trans!cript!and!is!!!relevant!to!!travel!industry!and!s!urveys!con!duct!d,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!!Term!occurred!!!in!!!trans!cript!and!is!!!relevant!to!!travel!industry!and!s!urveys!con!duct!d",Qwen2.5-7B-Instruct,protocol-v1
+EN-03-machine-002,EN-03,en,ChatGPT,A specific product mentioned as an example where users have already encountered generative AI.,"We call this technology generative AI, and you may have encountered it already through products like ChatGPT.",1,1,!The!!transcript!!explicitly!!mentions!!!‘!Ch!at!!G!P!T!’!and!!!defines!!!!!!it!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""!The!!transcript!!explicitly!!mentions!!!‘!Ch!at!!G!P!T!’!and!!!defines!!!!!!it!!",Qwen2.5-7B-Instruct,protocol-v1
+EN-03-machine-004,EN-03,en,Large language models,A type of generative AI capable of communicating using normal human language.,"Large language models, or LLMs, are a type of generative AI that can communicate using normal human language.",1,1,The!! terms! occur!!!! in!!! the!!!!!!!!!!!!! !!transcript! and!!!! the!! explanation!! !,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! terms! occur!!!! in!!! the!!!!!!!!!!!!! !!transcript! and!!!! the!! explanation!! !",Qwen2.5-7B-Instruct,protocol-v1
+EN-03-machine-008,EN-03,en,parameters,Specific settings or values within a system that determine how it processes input and generates output.,Basically a bunch of numbers or parameters connected to each other.,1,1,The!! '!parameters!\'!! occur!!!!! in!!!! the!!!!!!!!!!!!transcript!and!describe!specific!values!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! '!parameters!\'!! occur!!!!! in!!!! the!!!!!!!!!!!!transcript!and!describe!specific!values!",Qwen2.5-7B-Instruct,protocol-v1
+EN-03-machine-010,EN-03,en,reinforcement learning with human feedback,A training method where humans evaluate a model's output over many hours and provide feedback to guide its behavior.,"This is called reinforcement learning with human feedback, and it involves thousands of hours of humans painstakingly testing and evaluating output from the model and giving feedback.",1,1,The!! phrase! occurs!!!! in!!! the!!!!!!!!!!!!!!!!!transcript! and!!! the!!!!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! phrase! occurs!!!! in!!! the!!!!!!!!!!!!!!!!!transcript! and!!! the!!!!!",Qwen2.5-7B-Instruct,protocol-v1
+EN-03-machine-012,EN-03,en,open source,"Software or models that are freely available for anyone to download, use, and modify without cost.",Some are free or open source. Others are commercial products.,1,1,The!! phrase!!!!! 'Some! are!!!!!!!!!!!!free! or!!!public! domain! or!! other!! forms! of!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! phrase!!!!! 'Some! are!!!!!!!!!!!!free! or!!!public! domain! or!! other!! forms! of!",Qwen2.5-7B-Instruct,protocol-v1
+EN-03-machine-013,EN-03,en,GPT-3.5,A specific version of a large language model that generates text based on input prompts.,"The difference between, for example, GPT-3.5 and GPT-4 is massive.",0,1,The!!transcript!!!does!notin!include!!!any!!reference!to!GTP!-!3!.!!The!explanations!!!!!!is!,"{
+  ""R"": 0,
+  ""D"": 1,
+  "" why"": ""The!!transcript!!!does!notin!include!!!any!!reference!to!GTP!-!3!.!!The!explanations!!!!!!is!",Qwen2.5-7B-Instruct,protocol-v1
+EN-04-machine-001,EN-04,en,electromagnetic waves,"Energy that travels through space as waves, including light, heat, and X-rays.",Did you know that any object that has a temperature greater than absolute zero is constantly emitting electromagnetic waves that travel through space at the speed of light?,1,1,The!!Term!occ!r!s!!in!!th!e!trans!cri!t!and!th!e!ex!pl!an!at!ion!!!is!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!!Term!occ!r!s!!in!!th!e!trans!cri!t!and!th!e!ex!pl!an!at!ion!!!is!",Qwen2.5-7B-Instruct,protocol-v1
+EN-04-machine-003,EN-04,en,photovoltaic cells,Devices that convert sunlight directly into electricity.,"Whether it's to design photovoltaic cells, heat exchangers, or energy efficient structures, engineers need to be able to model the effects of thermal radiation.",1,1,The!! phrase! occurs!!!!! in!!!! the!!!!!!!!!!!!transcript! and!!! is!!!!!! relevant!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! phrase! occurs!!!!! in!!!! the!!!!!!!!!!!!transcript! and!!! is!!!!!! relevant!",Qwen2.5-7B-Instruct,protocol-v1
+EN-04-machine-004,EN-04,en,emissive power,The total energy a body radiates each second per unit of surface area.,"The total energy radiated by a body each second, per unit area, is called the emissive power E.",1,1,The!!transcript!!includes!!and!defines!em!iss!e!v!e!p!o!w!e!r!;!and!th!e!!!ex,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!!transcript!!includes!!and!defines!em!iss!e!v!e!p!o!w!e!r!;!and!th!e!!!ex",Qwen2.5-7B-Instruct,protocol-v1
+EN-04-machine-005,EN-04,en,black body,A theoretical object that emits the maximum possible amount of thermal radiation at a given temperature.,This theoretical object is called a black body.,1,1,The!! '!!!!!black!!!! Body! is!! correctly!! mentioned!! in!! the!!!!!!!transcript! and!!!! its!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! '!!!!!black!!!! Body! is!! correctly!! mentioned!! in!! the!!!!!!!transcript! and!!!! its!",Qwen2.5-7B-Instruct,protocol-v1
+EN-04-machine-006,EN-04,en,Stefan-Boltzmann law,A simple law used to calculate the emissive power of a black body based on temperature.,The emissive power of a black body can be calculated using a surprisingly simple law called the Stefan-Boltzmann law.,1,1,The!! Stefan!B!l!t!z!a!n!n!s!n!s!n!n!n!n!n!n!n!n!n!n!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! Stefan!B!l!t!z!a!n!n!s!n!s!n!n!n!n!n!n!n!n!n!n!",Qwen2.5-7B-Instruct,protocol-v1
+EN-04-machine-007,EN-04,en,blackbody,An idealized physical object that absorbs all incident electromagnetic radiation and emits energy based solely on its temperature.,"As the temperature of the blackbody increases, the total emissive power increases very quickly, so we'll need to switch to a log scale graph to be able to compare distributions for different temperatures.",1,1,The!! '!!!!!black!!bod!y! is!!!! mentioned! in!!!! the!!!!!!!trans!!c!ri!t,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! '!!!!!black!!bod!y! is!!!! mentioned! in!!!! the!!!!!!!trans!!c!ri!t",Qwen2.5-7B-Instruct,protocol-v1
+EN-04-machine-008,EN-04,en,Wien's displacement law,A physical law stating that the wavelength at which a black body emits the most radiation is inversely proportional to its temperature.,It varies with temperature and is given by a relation called Wien's displacement law.,1,1,The!! 'W!en's!dis!placement!!!!l!aw! occurs!!!in!!!th!e!!!!!!trans!cript!and!is!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! 'W!en's!dis!placement!!!!l!aw! occurs!!!in!!!th!e!!!!!!trans!cript!and!is!",Qwen2.5-7B-Instruct,protocol-v1
+EN-05-machine-002,EN-05,en,neural network,A computer system inspired by the human brain that learns by recognizing patterns in data.,"Here we tackle backpropagation, the core algorithm behind how neural networks learn.",1,1,The!! '!neural!network!occ!ur!s!!!in!!!th!e!!!!!trans!cri!t!t!c!and!bel!ongs,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! '!neural!network!occ!ur!s!!!in!!!th!e!!!!!trans!cri!t!t!c!and!bel!ongs",Qwen2.5-7B-Instruct,protocol-v1
+EN-05-machine-004,EN-05,en,cost function,A measure that calculates how wrong the network's predictions are compared to the correct answers.,And how what we mean by learning is that we want to find which weights and biases minimize a certain cost function.,1,1,The!! '!!!!!cost! function! occurs!!! in!!!! the!!!!!!!transcript!! and!!!!! describes!! a!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! '!!!!!cost! function! occurs!!! in!!!! the!!!!!!!transcript!! and!!!!! describes!! a!",Qwen2.5-7B-Instruct,protocol-v1
+EN-05-machine-005,EN-05,en,negative gradient,The direction and magnitude indicating how to adjust weights to most efficiently reduce the cost function.,"And as if that's not enough to think about, as described in the last video, the thing that we're looking for is the negative gradient of this cost function, which tells you how you need to change all of the weights and biases, all of these connections, so as to most efficiently decrease the cost.",1,1,The!! '!negative!!!!gradient!occ!r!s!i!n!t!h!!!e!!!!!!trans!c!ri!p!t!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! '!negative!!!!gradient!occ!r!s!i!n!t!h!!!e!!!!!!trans!c!ri!p!t!",Qwen2.5-7B-Instruct,protocol-v1
+EN-06-machine-005,EN-06,en,attributes,"Specific characteristics or properties used to describe an entity, like name, description, price, and manufacturer.","Products sold by the Sci-Fi Collective are entities, and each can be described by at least four attributes, the name, description, price, and manufacturer.",1,1,The!!Term!occ!r!s!!in!!!th!e!!!!!trans!cri!t!and!d!e!f!!!n!i!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!!Term!occ!r!s!!in!!!th!e!!!!!trans!cri!t!and!d!e!f!!!n!i!!",Qwen2.5-7B-Instruct,protocol-v1
+EN-06-machine-007,EN-06,en,data redundancy,"When the same data appears in multiple places, causing issues like needing to delete it from every location when one item changes.","You can spot the data redundancy issues first, like this.",1,1,The!!transcript!!mentions!data!!!redundance!and!providing!!!an!!!explanations!!that!!is!!!!!in,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!!transcript!!mentions!data!!!redundance!and!providing!!!an!!!explanations!!that!!is!!!!!in",Qwen2.5-7B-Instruct,protocol-v1
+EN-06-machine-010,EN-06,en,RDBMS,Software that manages how data is stored and organized in relational databases.,"The relational database management system, short for RDBMS.",1,1,! The!!!! !terms!! occur!! in!!!! the!!!!!!!!!!!!!transcript!and!describe!!!a!definition!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""! The!!!! !terms!! occur!! in!!!! the!!!!!!!!!!!!!transcript!and!describe!!!a!definition!",Qwen2.5-7B-Instruct,protocol-v1
+EN-06-machine-012,EN-06,en,product table,A specific table within the database that stores information about products.,But the product table is all you need to focus your attention on for now.,1,1,The!! '!product! !'!! !!is!!!! !!in! the!!!!!!!!transcript! and!!! !!!! !! !,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! '!product! !'!! !!is!!!! !!in! the!!!!!!!!transcript! and!!! !!!! !! !",Qwen2.5-7B-Instruct,protocol-v1
+EN-06-machine-013,EN-06,en,SQLite Online,A cloud-based database tool used to run SQL scripts without installing software locally.,"However here we will go with the easiest approach, which is to use a tool named SQLite Online.",1,1,The!!Term!occ!r!s!!!in!!!th!e!!!!!!trans!cri!t!t!and!d!es!c!ri!b,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!!Term!occ!r!s!!!in!!!th!e!!!!!!trans!cri!t!t!and!d!es!c!ri!b",Qwen2.5-7B-Instruct,protocol-v1
+EN-06-machine-014,EN-06,en,SQLite,"A lightweight, self-contained database engine that can run on various platforms.",Essentially SQLite Online is a database running on the cloud.,1,1,The!!transcript!!mentions!.SQLite!and!its!cloud!!capabilities!which!is!!!!in!line!with!both!!!terms!and!!!ex!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!!transcript!!mentions!.SQLite!and!its!cloud!!capabilities!which!is!!!!in!line!with!both!!!terms!and!!!ex!",Qwen2.5-7B-Instruct,protocol-v1
+EN-06-machine-015,EN-06,en,VS coding,A code editor environment used to open and manage database project files.,"I already have the repo cloned locally on my machine, so I'm gonna open it in the VS coding environment.",0,0,The!! '!vs! coding! '!! is!!!!! not!!!!!!!!! a!!!!!!!!!!!!!!! common,"{
+  ""R"": 0,
+  ""D"": 0,
+  "" why"": ""The!! '!vs! coding! '!! is!!!!! not!!!!!!!!! a!!!!!!!!!!!!!!! common",Qwen2.5-7B-Instruct,protocol-v1
+EN-06-machine-019,EN-06,en,SELECT,A SQL clause used to specify which columns or data fields the user wants to retrieve from a database table.,"First, the SELECT clause allows you to specify the columns you want to retrieve from a table.",1,1,The!! '!TERM! '! occurs!!!! in!!!! the!!! transcripts! and!!!!!! describes!!! the!! domain!!! correctly!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! '!TERM! '! occurs!!!! in!!!! the!!! transcripts! and!!!!!! describes!!! the!! domain!!! correctly!",Qwen2.5-7B-Instruct,protocol-v1
+EN-06-machine-020,EN-06,en,FROM,A SQL clause that identifies the source table or tables from which the data should be retrieved.,"Second, the FROM clause specifies the source that you want to retrieve data from.",1,1,The!! '!TERM! is!!!! correctly!!!! identified!! in!!!! the!!!!!!!transcript! and!!!!! matches!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! '!TERM! is!!!! correctly!!!! identified!! in!!!! the!!!!!!!transcript! and!!!!! matches!!",Qwen2.5-7B-Instruct,protocol-v1
+EN-06-machine-021,EN-06,en,table,"A structured collection of data organized into rows and columns within a database, representing entities like products.",Imagine that there's a table representing products in this database.,1,1,The!!word!is!!!in!!use!!and!!!relevant!to!database!domain!and!definition!!!is!!!!! accurate!and!!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!!word!is!!!in!!use!!and!!!relevant!to!database!domain!and!definition!!!is!!!!! accurate!and!!!",Qwen2.5-7B-Instruct,protocol-v1
+EN-06-machine-022,EN-06,en,WHERE,A clause in a query that specifies conditions to filter which rows of data are returned.,"Whenever you need only a subset of data that meets some criteria, you will need the help of the where clause to filter the data.",1,1,The!! '!WHERE! clause!!!! is!!!!!! mentioned!!! in!! the!!!!!!!!!!!!!!!!!trans,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! '!WHERE! clause!!!! is!!!!!! mentioned!!! in!! the!!!!!!!!!!!!!!!!!trans",Qwen2.5-7B-Instruct,protocol-v1
+EN-06-machine-024,EN-06,en,numeric,A type of data representing numbers that can be used with mathematical comparisons like greater than or equal to.,"In the product table, the data type of the price column is numeric. That's why you can filter price via the logical operators such as bigger than or bigger than or equal to.",1,1,The!!word!occ!r!s!!in!!!th!e!!!!!trans!cri!t!!!!and!d!es!c!ri!b!e,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!!word!occ!r!s!!in!!!th!e!!!!!trans!cri!t!!!!and!d!es!c!ri!b!e",Qwen2.5-7B-Instruct,protocol-v1
+EN-07-machine-001,EN-07,en,graph search,A method for exploring a network of connected items to find specific information or paths.,We return today to graph search.,1,1,The!! '!Graph! Search! '!! occurs!!!!! in!!!! the!!!!!!!!!!!!!transcript! and!!! describes,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! '!Graph! Search! '!! occurs!!!!! in!!!! the!!!!!!!!!!!!!transcript! and!!! describes",Qwen2.5-7B-Instruct,protocol-v1
+EN-07-machine-002,EN-07,en,breadth-first search,An algorithm that explores a network by visiting neighbors layer by layer from a starting point.,"Last time we saw breadth-first search,",1,1,The!!Term!occ!r!s!!in!!t!he!!!!!trans!cri!pt!and!!!!!!!is!!!a!d!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!!Term!occ!r!s!!in!!t!he!!!!!trans!cri!pt!and!!!!!!!is!!!a!d!",Qwen2.5-7B-Instruct,protocol-v1
+EN-07-machine-003,EN-07,en,depth first search,An algorithm that explores a network by going as deep as possible along one path before backtracking.,Today we're going to do depth first search.,1,1,The!! Term!occ!r!s!!in!!th!e!!!!trans!cri!pt!and!th!e!!!!!!ex!pla!nation!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! Term!occ!r!s!!in!!th!e!!!!trans!cri!pt!and!th!e!!!!!!ex!pla!nation!",Qwen2.5-7B-Instruct,protocol-v1
+EN-07-machine-006,EN-07,en,BFS,A search algorithm that explores a graph by visiting all neighbors at the current depth before moving to the next.,"This trick could be used for BFS or for DFS. But we're going to do it here for DFS because that's more common, let's say.",0,0,The!!transcript!does!!refer!to!B!F!S!but!!!states!!that!!it!!will!use!!!!!DFS!in!!,"{
+  ""R"": 0,
+  ""D"": 0,
+  "" why"": ""The!!transcript!does!!refer!to!B!F!S!but!!!states!!that!!it!!will!use!!!!!DFS!in!!",Qwen2.5-7B-Instruct,protocol-v1
+EN-07-machine-007,EN-07,en,backtrack,The action of returning to a previous point in a search to try a different path when stuck.,"So a high level description is we're going to just recursively explore the graph, backtracking as necessary, kind of like how you solve a maze.",1,1,The!! word!!!!! '!!back!track!'''! is!!!!!!!! mentioned!!! in!!! the!!!!!!!!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! word!!!!! '!!back!track!'''! is!!!!!!!! mentioned!!! in!!! the!!!!!!!!!",Qwen2.5-7B-Instruct,protocol-v1
+EN-07-machine-008,EN-07,en,recursion,A method where a function calls itself to solve a problem by breaking it into smaller similar problems.,"And this can be done very easily on a computer using recursion. So a high level description is we're going to just recursively explore the graph, backtracking as necessary, kind of like how you solve a maze.",1,1,The!! word!!!!! '!!recursive!'! is!!!!! explicitly!!! mentioned!! in!! the!!!!!!!!!!!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! word!!!!! '!!recursive!'! is!!!!! explicitly!!! mentioned!! in!! the!!!!!!!!!!!!",Qwen2.5-7B-Instruct,protocol-v1
+EN-07-machine-009,EN-07,en,adjacency list,A data structure representation where each vertex is associated with a list of its neighboring vertices.,So we're given the adjacency list.,1,1,The!!Term!occ!r!s!!in!!th!e!!!!trans!cri!t!and!th!e!ex!pl!an!at!i!o,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!!Term!occ!r!s!!in!!th!e!!!!trans!cri!t!and!th!e!ex!pl!an!at!i!o",Qwen2.5-7B-Instruct,protocol-v1
+EN-07-machine-011,EN-07,en,strongly connected,A property where every node in a graph can reach every other node through a directed path.,"If it's a disconnected graph or not a strongly connected graph, We might have to start our search multiple times.",1,1,The!!_term!occ!r!es!!in!!!!th!e!!!!!!trans!cri!pt!and!th!e!!!!!ex!pl,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!!_term!occ!r!es!!in!!!!th!e!!!!!!trans!cri!pt!and!th!e!!!!!ex!pl",Qwen2.5-7B-Instruct,protocol-v1
+EN-07-machine-015,EN-07,en,recursively,"A method of calling a function or process within itself to handle sub-problems, often used in graph traversal.",So we're going to recursively visit everything reachable from A.,1,1,The!!word!occ!r!s!!in!!!th!e!!!!!trans!cri!t!!!!and!d!es!c!ri!b!e,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!!word!occ!r!s!!in!!!th!e!!!!!trans!cri!t!!!!and!d!es!c!ri!b!e",Qwen2.5-7B-Instruct,protocol-v1
+EN-07-machine-016,EN-07,en,outgoing edges,The connections or links that extend from a specific node to other nodes in a graph.,We were going over the outgoing edges from B.,1,1,The!! phrase!!!!! '!out!going!!! edges! '!!is!!!!!!!!! correctly!!! described!! in!! the!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! phrase!!!!! '!out!going!!! edges! '!!is!!!!!!!!! correctly!!! described!! in!! the!!",Qwen2.5-7B-Instruct,protocol-v1
+EN-07-machine-017,EN-07,en,reachable,Capable of being reached or accessed from a starting point through a series of connections.,So we're done recursively visiting everything reachable from A.,1,1,The!!word!is!!!in!!both!!transcript!!and!!explanations!and!!!!does!!bel!!ong!!to!!!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!!word!is!!!in!!both!!transcript!!and!!explanations!and!!!!does!!bel!!ong!!to!!!!",Qwen2.5-7B-Instruct,protocol-v1
+EN-07-machine-018,EN-07,en,edges,The lines or connections that link two vertices together in a graph.,"And in the end, we visit all the vertices, and in a certain sense, all the edges as well.",1,1,The!! '!!!edges!in!!th!e!!!!trans!c!t!r!i!o!n!refer!to!!!th!e!!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! '!!!edges!in!!th!e!!!!trans!c!t!r!i!o!n!refer!to!!!th!e!!!",Qwen2.5-7B-Instruct,protocol-v1
+EN-07-machine-019,EN-07,en,running time,The amount of time an algorithm takes to complete its execution.,So let's talk about running time. What do you think the running time of this algorithm is?,1,1,The!! '!running! time! '!! occurs!!!!! in!!!! the!!!!!!!!!!!!!!!!!! !!trans,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! '!running! time! '!! occurs!!!!! in!!!! the!!!!!!!!!!!!!!!!!! !!trans",Qwen2.5-7B-Instruct,protocol-v1
+EN-07-machine-021,EN-07,en,handshaking lemma,A rule stating that the sum of vertex degrees equals twice the number of edges in an undirected graph.,This is the handshaking lemma from last time.,1,1,The!!Term!occ!r!s!!!in!!!th!e!!!!!trans!cri!t!and!ex!pl!an!at!ion!!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!!Term!occ!r!s!!!in!!!th!e!!!!!trans!cri!t!and!ex!pl!an!at!ion!!!",Qwen2.5-7B-Instruct,protocol-v1
+EN-07-machine-022,EN-07,en,tree edges,"Edges in a graph traversal that lead to newly discovered vertices, forming the structure of a tree.",We call those tree edges.,1,1,The!! phrase!!!!! occurs!! in! the!!!!!!!!!!!transcript! and!!! describes!! the!!! technical!! terminology!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! phrase!!!!! occurs!! in! the!!!!!!!!!!!transcript! and!!! describes!! the!!! technical!! terminology!",Qwen2.5-7B-Instruct,protocol-v1
+EN-08-machine-002,EN-08,en,definite integral,A specific type of integral that calculates the exact area under a curve between two fixed points.,"So this right over here, we can say, is the definite integral from a to x of f of t dt.",1,1,The!! '!!!!def!in!e!t!e! !!!i!!!nt!e!g!ra!l! !'!!!occ!ur!s,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! '!!!!def!in!e!t!e! !!!i!!!nt!e!g!ra!l! !'!!!occ!ur!s",Qwen2.5-7B-Instruct,protocol-v1
+EN-08-machine-003,EN-08,en,fundamental theorem of calculus,"A mathematical principle linking differentiation and integration, stating that the derivative of an accumulation function equals the original function.","The fundamental theorem of calculus tells us, let me write this down because this is a big deal.",1,1,The!! '!!!!!fund!!m!al!t!o!m!e!l! !!o!f!!!c!a!l!c!u!l,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! '!!!!!fund!!m!al!t!o!m!e!l! !!o!f!!!c!a!l!c!u!l",Qwen2.5-7B-Instruct,protocol-v1
+EN-08-machine-005,EN-08,en,antiderivative,"A function whose derivative is the original function, essentially reversing the process of differentiation.","Every continuous function, every continuous f has an antiderivative capital f of x. That by itself is a cool thing.",1,1,The!!word!is!!!in!!th!e!trans!cript!and!th!e!!!ex!pla!nation!!!!!is!!!!!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!!word!is!!!in!!th!e!trans!cript!and!th!e!!!ex!pla!nation!!!!!is!!!!!!",Qwen2.5-7B-Instruct,protocol-v1
+EN-09-machine-001,EN-09,en,electromagnet,A magnet created by passing an electric current through a metal.,"But if you pass an electric current through any metal, it becomes a magnet. An electromagnet.",1,1,The!!_term!occ!r!es!!in!!th!e!!!!!trans!cri!t!and!and!!!th!e!!!!ex!pl,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!!_term!occ!r!es!!in!!th!e!!!!!trans!cri!t!and!and!!!th!e!!!!ex!pl",Qwen2.5-7B-Instruct,protocol-v1
+EN-09-machine-004,EN-09,en,magnetite,A naturally occurring iron ore mineral that is magnetic and can be used to make permanent magnets.,"Click here to go to MinutePhysics where we'll explore magnetite, compasses, and all the wizardry of permanent magnets.",1,1,The!!Term!occ!r!s!!!in!!!th!e!!!!!!trans!cri!t!and!d!ef!!n!i!!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!!Term!occ!r!s!!!in!!!th!e!!!!!!trans!cri!t!and!d!ef!!n!i!!!",Qwen2.5-7B-Instruct,protocol-v1
+EN-11-machine-001,EN-11,en,market failures,Situations where the free market system does not allocate resources efficiently or achieve the best outcome for society.,"Today, we're going to talk about those market failures and how economists address them.",1,1,The!! '!!!!Term!is!!!in!!th!e!!!trans!c!ri!pt!and!!!!!bel!ongs!!!to!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! '!!!!Term!is!!!in!!th!e!!!trans!c!ri!pt!and!!!!!bel!ongs!!!to!",Qwen2.5-7B-Instruct,protocol-v1
+EN-11-machine-002,EN-11,en,free rider problem,A situation where individuals benefit from a shared resource or service without contributing to its cost or maintenance.,This is the free rider problem. Free riders are people who benefit without paying.,1,1,The!!!! !!transcript!! !!explicitly! !defines!! !'!!free!! !r!! !der!!'! !!as!! !'!! people! !,"{
+!R: 1,
+!D: 1,
+! why: ""The!!!! !!transcript!! !!explicitly! !defines!! !'!!free!! !r!! !der!!'! !!as!! !'!! people! !",Qwen2.5-7B-Instruct,protocol-v1
+EN-11-machine-004,EN-11,en,non-exclusion,The inability to prevent people who do not pay from using or benefiting from a good.,Non-exclusion is the idea that you can't exclude people that don't pay.,1,1,The!! phrase!!!!! occurs!! in! the!!!!!!!!!!!!!transcript! and!!!! matches!!! the!! domain!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! phrase!!!!! occurs!! in! the!!!!!!!!!!!!!transcript! and!!!! matches!!! the!! domain!",Qwen2.5-7B-Instruct,protocol-v1
+EN-11-machine-005,EN-11,en,non-rivalry,The condition where one person using a good does not reduce its availability for others.,Non-rivalry is the idea that one person's consumption of the good doesn't ruin it for other people.,1,1,The!! terms! occur!!!! in!!! the!!!!!!!!!!!!! !!transcript! and!!!!!! the!!!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! terms! occur!!!! in!!! the!!!!!!!!!!!!! !!transcript! and!!!!!! the!!!!",Qwen2.5-7B-Instruct,protocol-v1
+EN-11-machine-006,EN-11,en,tragedy of the commons,A situation where individuals acting independently according to their own self-interest behave contrary to the best interests of the group as a whole.,"The incentive to do what's best for you, rather than what's best for everyone, is the root cause of something economists call the tragedy of the commons.",1,1,The!! '!!!!!tr!ag!dy!of!!!!commons!is!!c!orrect!ly!!!!de!f!in!e!d!and,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! '!!!!!tr!ag!dy!of!!!!commons!is!!c!orrect!ly!!!!de!f!in!e!d!and",Qwen2.5-7B-Instruct,protocol-v1
+EN-11-machine-007,EN-11,en,environmental economics,A branch of economics that studies how to manage natural resources and solve problems related to the environment.,There's an entire subfield of economics focused on addressing and solving these issues. It's called environmental economics.,1,1,The!! phrase! fits!!!!! the!!!! phrase! in!!! the!!!!!!!!!!!!transcript! and!!! describes!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! phrase! fits!!!!! the!!!! phrase! in!!! the!!!!!!!!!!!!transcript! and!!! describes!!",Qwen2.5-7B-Instruct,protocol-v1
+EN-12-machine-001,EN-12,en,neurons,Brain cells that send electrical signals to communicate with each other.,"During this important period of brain development, billions of brain cells called neurons send electrical signals to communicate with each other.",1,1,The!!word!is!!!in!!domain!and!!!does!contr!ad!ict!!!!!th!e!!!!!trans!cri!pt!;,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!!word!is!!!in!!domain!and!!!does!contr!ad!ict!!!!!th!e!!!!!trans!cri!pt!;",Qwen2.5-7B-Instruct,protocol-v1
+EN-12-machine-002,EN-12,en,pruning,A normal process where connections that are used less fade away.,"Meanwhile, connections that are used less fade away through a normal process called pruning.",1,1,The!!word!occ!r!s!in!!th!e!!!!trans!cri!t!and!th!e!!!!ex!pl!an!at!i,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!!word!occ!r!s!in!!th!e!!!!trans!cri!t!and!th!e!!!!ex!pl!an!at!i",Qwen2.5-7B-Instruct,protocol-v1
+EN-12-machine-003,EN-12,en,circuits,Connections formed by neurons that become the basic foundation of brain architecture.,These connections form circuits that become the basic foundation of brain architecture.,1,1,The!!_term!occ!r!es!!in!!th!e!!!!trans!cri!pt!and!th!e!!!!ex!pl!an!at!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!!_term!occ!r!es!!in!!th!e!!!!trans!cri!pt!and!th!e!!!!ex!pl!an!at!",Qwen2.5-7B-Instruct,protocol-v1
+EN-13-machine-004,EN-13,en,equilibrium,A state where internal forces within a beam balance out so that the beam remains stable under loading conditions.,"When a beam is loaded, internal forces develop within it to maintain equilibrium.",1,1,The!!word!occ!r!s!!in!!!th!e!!!!!trans!cri!t!and!de!f!i!n!it!i!o,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!!word!occ!r!s!!in!!!th!e!!!!!trans!cri!t!and!de!f!i!n!it!i!o",Qwen2.5-7B-Instruct,protocol-v1
+EN-13-machine-005,EN-13,en,shear forces,Internal forces that cause layers of the beam to slide past one another.,These resultant shear forces and bending moments will depend on the loads acting on the beam and the way in which the beam is supported.,1,0,The!! '!!!she!ar!! forces! occur! in!!!!! the!!!!!!!!!!!!!!trans!!c!!ri!,"{
+  ""R"": 1,
+  ""D"": 0,
+  "" why"": ""The!! '!!!she!ar!! forces! occur! in!!!!! the!!!!!!!!!!!!!!trans!!c!!ri!",Qwen2.5-7B-Instruct,protocol-v1
+EN-13-machine-006,EN-13,en,bending moments,Rotational forces that cause the beam to curve or bend under load.,These resultant shear forces and bending moments will depend on the loads acting on the beam and the way in which the beam is supported.,1,0,The!! '!b!e!n!d!i!n!g!!!!!g! !!!!m!o!m!e!n!t!s! occur!,"{
+  ""R"": 1,
+  ""D"": 0,
+  "" why"": ""The!! '!b!e!n!d!i!n!g!!!!!g! !!!!m!o!m!e!n!t!s! occur!",Qwen2.5-7B-Instruct,protocol-v1
+EN-13-machine-007,EN-13,en,pin supports,A type of support that holds the beam in place but allows it to rotate.,"They can have pin supports, roller supports, or be fully fixed, which each restrain the beam in different ways.",1,1,The!! '!!!pin! supports! occur!!! in!! the!!!!!!!!!!!transcript! and!!!describe!! the!! behavior!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! '!!!pin! supports! occur!!! in!! the!!!!!!!!!!!transcript! and!!!describe!! the!! behavior!",Qwen2.5-7B-Instruct,protocol-v1
+EN-14-machine-001,EN-14,en,CRISPR-Cas9,A tool that cuts DNA at specific locations to edit genes.,The CRISPR-Cas9 system is a tool for cutting DNA at a specifically targeted location.,1,1,! The!!!!! !!terms!! occur!! in!!!! the!!!!!!!!!!!!!transcript!and!describe!a!tool!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""! The!!!!! !!terms!! occur!! in!!!! the!!!!!!!!!!!!!transcript!and!describe!a!tool!",Qwen2.5-7B-Instruct,protocol-v1
+EN-14-machine-003,EN-14,en,guide RNA,An RNA molecule that directs the Cas9 protein to a specific DNA sequence.,"There are two components to the system, a DNA cutting protein called Cas9, and an RNA molecule known as the guide RNA.",1,1,The!! '!guide!RNA!is!!c!orrect!and!!!!occ!ur!s!!!!in!!!th!e!!!!!!trans!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! '!guide!RNA!is!!c!orrect!and!!!!occ!ur!s!!!!in!!!th!e!!!!!!trans!",Qwen2.5-7B-Instruct,protocol-v1
+EN-15-machine-001,EN-15,en,hard problem of consciousness,The difficulty in explaining why physical brain processes result in subjective feelings or experiences.,"In this Wi-Fi video, we'll explore this issue in what's known as the hard problem of consciousness.",1,1,The!! '!!!!!hard!! problem! of!!!!!!!!!conscience!!'! is!!!! correctly!!! mentioned!! in!!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! '!!!!!hard!! problem! of!!!!!!!!!conscience!!'! is!!!! correctly!!! mentioned!! in!!!",Qwen2.5-7B-Instruct,protocol-v1
+EN-15-machine-002,EN-15,en,conscious mental experiences,The subjective feelings or awareness that occur when an organism perceives or thinks.,Can it explain our conscious mental experiences? experiences.,1,1,The!! terms!!!!! occur!!! in! the!!!!!!!!!!!!!!!!!!!transcript! and!!! the!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! terms!!!!! occur!!! in! the!!!!!!!!!!!!!!!!!!!transcript! and!!! the!!",Qwen2.5-7B-Instruct,protocol-v1
+EN-15-machine-003,EN-15,en,conscious mental states,Conditions where an organism has awareness or subjective feeling.,"According to the philosopher Thomas Nagel, an organism has conscious mental states if and only if there is something it is like to be that organism.",1,1,The!!_term!occ!r!ss!n!t!t!h!!e!!!!l!e!!!c!t!a!r!o!u!s!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!!_term!occ!r!ss!n!t!t!h!!e!!!!l!e!!!c!t!a!r!o!u!s!",Qwen2.5-7B-Instruct,protocol-v1
+EN-16-machine-001,EN-16,en,Fast Fourier Transform,A mathematical technique used to analyze signals by converting them from time domain to frequency domain.,"Today I want to talk about an algorithm that rightfully belongs in both classes, and my personal favorite algorithm, the Fast Fourier Transform.",1,1,The!!Fast!Fourier!Transform!is!!!inde!ed!in!th!trans!cript!and!!!th!e!ex!plan!ation!!!!!is,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!!Fast!Fourier!Transform!is!!!inde!ed!in!th!trans!cript!and!!!th!e!ex!plan!ation!!!!!is",Qwen2.5-7B-Instruct,protocol-v1
+EN-16-machine-002,EN-16,en,discrete Fourier transform,A specific mathematical method for calculating the frequency components of a discrete set of data points.,"It's often introduced in fairly complex settings that require a lot of prerequisite knowledge such as the discrete Fourier transform, time domain to frequency domain conversions, and much more.",1,1,The!! '!!!!!discrete!Four!r!e!a!n!!t!r!a!!m!s!'!!occ!ur!s!!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! '!!!!!discrete!Four!r!e!a!n!!t!r!a!!m!s!'!!occ!ur!s!!!",Qwen2.5-7B-Instruct,protocol-v1
+EN-16-machine-003,EN-16,en,signal processing,"The field of engineering that deals with the analysis, modification, and synthesis of signals.","So much of the modern technology that we have today such as wireless communication, GPS, and in fact anything related to the vast field of signal processing relies on the insights of the FFT.",1,1,The!! '!signal!processing!\'!occ!ur!s!!!!in!!!!th!e!!!!!!!trans!cri!t!c!t!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! '!signal!processing!\'!occ!ur!s!!!!in!!!!th!e!!!!!!!trans!cri!t!c!t!",Qwen2.5-7B-Instruct,protocol-v1
+EN-16-machine-007,EN-16,en,distributive property,An algebraic rule that allows multiplying a term by a group of terms by multiplying the term by each individual term in the group.,"Mathematically, we know one algorithm to multiply polynomials by repeatedly applying the distributive property.",1,1,The!! '!!!!!distr!b!t!v!e!! property! is!!!!! mentioned!!! in!!!!! the!!!!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! '!!!!!distr!b!t!v!e!! property! is!!!!! mentioned!!! in!!!!! the!!!!!",Qwen2.5-7B-Instruct,protocol-v1
+EN-16-machine-011,EN-16,en,two-point representation,A specific way to describe a line using exactly two distinct locations on that line to define its position and slope.,"There are actually several reasonable representations, but the one that we are going to use is the two-point representation.",1,1,The!! '! two!-!! point!!!!!!!!!!! representation! is!!!! correctly!!! described!! in!! the!!!!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! '! two!-!! point!!!!!!!!!!! representation! is!!!! correctly!!! described!! in!! the!!!!!",Qwen2.5-7B-Instruct,protocol-v1
+EN-16-machine-015,EN-16,en,determinant,A scalar value calculated from a matrix that indicates whether the matrix has an inverse.,"The easiest way to show this is by calculating the determinant, which you will find is non-zero, but I'll link a nice linear algebraic proof of this fact in the description as well for those interested.",1,1,,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!!word!Occurred!!in!!trans!cript!and!its!definition!!!!is!!!c!orrect!.""
+}",Qwen2.5-7B-Instruct,protocol-v1
+TR-1-openai/whisper-medium|Qwen/Qwen3.5-4B-010,TR-1,tr,Gantt Şeması,Projenin hangi aşamında hangi işlerin yapılacağını gösteren ve gerçek zamanla ilerlemeyi takip etmek için kullanılan temel araçtır.,"…psam, maliyet ve zaman unsurlarının, kontrol altında tutulması gereken özel niteliklerinin dikkatli bir biçimde belirlenmesi gereklidir. Kontrol edilmesi gereken özelliklerin neler olduğu ve ne boyutta ele alınmaları gerektiği açıkça ortaya konulmalıdır. Gant şeması, projenin hangi aşamasında hangi faaliyetin yürütülüyor olması gerektiğini gösterdiğinden gerçek zamanlı faaliyetlerle karşılaştırma olanağı verir. Bu sebeple projenin izleme ve kontrol aşamasında faydalı olan en temel araçlarından biridir. Proje planının sür…",1,1,!Gant_shaması!!derst!!!a!n!a!l!a!n!a!s!u!z!u!!g!e!l!i!n!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""!Gant_shaması!!derst!!!a!n!a!l!a!n!a!s!u!z!u!!g!e!l!i!n!",Qwen2.5-7B-Instruct,protocol-v1
+TR-2-openai/whisper-medium|Qwen/Qwen3.5-4B-001,TR-2,tr,turizm,"Turizm sadece tatil yapmak demek değildir; bir zincir gibi çalışan büyük bir sistemdir. Turistlerin uçağa binmesi, otellere yerleşmesi, yemek yemesi ve rehberlerle konuşması gibi tüm bu olaylar ve ilişkiler turizminin bir parçasıdır.","Forteliber'den herkese merhaba. Bu özel video incelemesinde siz değerli turist rehberleri için mesleğinizin tam da kalbinde yer alan turizm konusunu en ince ayrıntısına kadar ele alacağız. Bu açıklayıcının tamamı Türkçe olarak hazırlandı. Amacımız ne mi? Hem mesleki bilgi dağarcığınızı daha da zenginleştirmek, hem de yaklaşan sınavlarınızda sizi bir adım öne geçirecek o kilit bilgileri vermek. Ha…",1,1,!R:!!!! '!!!!!! turiz!m! !!s!a!d!e!s!t!e!r! !!t!a!t!,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!R:!!!! '!!!!!! turiz!m! !!s!a!d!e!s!t!e!r! !!t!a!t!",Qwen2.5-7B-Instruct,protocol-v1
+TR-2-openai/whisper-medium|Qwen/Qwen3.5-4B-002,TR-2,tr,turist,"Turist, sadece yolda gezgin değildir. Bir turist, yaşadığı yerden ayrılır, en az bir gece konaklamayı yapar ve seyahatinin temel amacı para kazanmak değildir. Örneğin, iş değiştirmek için giden biri turist değildir.","Forteliber'den herkese merhaba. Bu özel video incelemesinde siz değerli turist rehberleri için mesleğinizin tam da kalbinde yer alan turizm konusunu en ince ayrıntısına kadar ele alacağız. Bu açıklayıcının tamamı Türkçe olarak hazırlandı. Amacımız ne mi? Hem mesleki bilgi dağarcığınızı daha da zenginleştirmek, hem de yaklaşan sınavların…",1,0,!Bağlaml! Derst!!da!!!!! tur!!ist!! k!!elim!!!!!!!!!!! !!!!!!!!,"{
+  ""R"": 1,
+  ""D"": 0,
+  ""Why"": ""!Bağlaml! Derst!!da!!!!! tur!!ist!! k!!elim!!!!!!!!!!! !!!!!!!!",Qwen2.5-7B-Instruct,protocol-v1
+TR-2-openai/whisper-medium|Qwen/Qwen3.5-4B-003,TR-2,tr,multidisipliner yapı,"Turizm tek bir bilim dalına bağlı değildir; coğrafya, ekonomi, sosyoloji, tarih ve hukuk gibi birçok farklı bilim dalının bir araya gelmesiyle oluşur. Bir turizm rehberi aynı anda bu farklı alanlardan bilgiyi kullanır.","…konuyu gerçekten anlıyorsunuz demektir. Ve işte ilk bölümümüzün özeti, zihnimizdeki bilgi kartları. Birincisi, turizm. Bu neydi? Bir olaylar ve ilişkiler sistemi. İkincisi, turist. Sistemin geçici, konaklamalı ve para kazanma amacı gütmeyen aktörü. Üçüncüsü, multidisipliner yapı. Yani turizmin tek bir renkten değil, bir gökkuşağının tüm renklerinden oluşması. Bu üç anahtar kavramı cebimize koyup yolumuza devam ediyoruz. Harika, temelleri hallettik. Artık sağlam bir zeminimiz var. Şimdi bu zeminin üzerine kat çıkma zamanı. İkinci bölü…",1,1,!R:!!!!Ter!der!!st!!de!!ge!n!n!!a!n!l!a!r!da!!!a!r!a!,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!R:!!!!Ter!der!!st!!de!!ge!n!n!!a!n!l!a!r!da!!!a!r!a!",Qwen2.5-7B-Instruct,protocol-v1
+TR-2-openai/whisper-medium|Qwen/Qwen3.5-4B-004,TR-2,tr,kitle turizmi,"Kitle turizmi, herkesin bildiği deniz, kum ve güneş kombinasyonudur. Bu model, büyük grup insanı aynı anda aynı yerlere çekerek popüler bir turistik merke oluşturmayı hedefler.","…e bir yerin nasıl adım adım popüler bir turistik merkeze dönüştüğünün sırlarına bakacağız. Turizm dediğimiz şey tek tip bir elbise değil. Her zevki, her ihtiyaca uygun kocaman bir gardırop gibi. Mesela herkesin bildiği o meşhur deniz-kum-güneş üçlüsü, işte o, kitle turizmi. Ama ben tarihi yerleri, müzeleri göreceğim diyenler kültür turizmi yapıyor. İş için bir fuara veya kongreye gidenler onlar MICE yani kongre turizminin bir parçası. Afyon'un şifalı sularına gireceğim diyenler sağlık turizmine, Erciyes'te kayak yapacağım diyen…",1,1,!R:!!!!!Ter!der!!st!!de!!ge!n!n!a!!a!!l!s!!a!!!s!!a!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""!R:!!!!!Ter!der!!st!!de!!ge!n!n!a!!a!!l!s!!a!!!s!!a!",Qwen2.5-7B-Instruct,protocol-v1
+TR-2-openai/whisper-medium|Qwen/Qwen3.5-4B-007,TR-2,tr,turizm talebi,"Turizm talebi, turistlerin seyahat etme istekleridir. Bu talep rüzgâr gibi değişkendir; bir turist bugün bir yere gitmek istiyorsa, yarın olumsuz bir haber gördüğünde rotasını değiştirebilir. Yani kararsız ve hareketlidir.","…ir sınav sorusu değil. Bu, aynı zamanda bizim mesleğimizin ve sektörümüzün geleceği üzerine hep birlikte kafa yormamızı sağlayan çok önemli bir soru. Ve geldik üçüncü bölümün finaline zihin kartlarımızı güncelleyelim. Turizm arzı yerinden oynamayan sabit dev. Turizm talebi rüzgarda savrulan değişken yaprak. Ve en en en kritik kavram stoklanamazlık. Bu kelimeyi asla unutmayın. Turizm sektöründe zaman geri alınamaz. Boş kalan o koltuk, satılmayan o oda, sonsuza dek kaybolmuş bir gelirdir. İşte bu yüzden bu sektör bu kadar dinamik…",1,1,!R:!!!! '!!!!!!!! turiz!m!! !!t!a!l!e!b!i!'!!! !!der!st,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""!R:!!!! '!!!!!!!! turiz!m!! !!t!a!l!e!b!i!'!!! !!der!st",Qwen2.5-7B-Instruct,protocol-v1
+TR-2-openai/whisper-medium|Qwen/Qwen3.5-4B-008,TR-2,tr,stoklanamaz,"Turizm sektöründe zaman geri alınamaz ve boş kalan yerler kaybedilmiştir. Örneğin, boş kalan bir otel odası veya koltuk, o geliri sonsuza dek kaybetmiş sayılır. Bu nedenle turizm sektörü çok dinamik ve kırılgandır.","…ın ve bu karşılaştırmayı dikkatle dinleyin. Çünkü bu turizm ekonomisinin tam kalbidir. Bir tarafta arz var, mağrur, sabit, yerinden oynamayan, tıpkı Pamukkale'deki travertenler gibi onu paketleyip İstanbul'a götüremezsiniz ve en acımasız özelliği affı yoktur, stoklanamaz. Yani bu akşam o otel odası boş kaldıysa o odanın geliri sonsuza dek uçtu gitti. Diğer taraftaysa talep var. Rüzgârdaki bir yaprak gibi değişken, kararsız, hareketli, yani turist, bugün Antalya'ya gitmeyi çok ister, yarın olumsuz bir haber görür, Rotasını anı…",1,1,!Terim!!!!!der!s!t!ç!e!n!g!i!n!e!l!i!r!a!n!a!l!ı!m,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""!Terim!!!!!der!s!t!ç!e!n!g!i!n!e!l!i!r!a!n!a!l!ı!m",Qwen2.5-7B-Instruct,protocol-v1
+TR-3-openai/whisper-medium|Qwen/Qwen3.5-4B-001,TR-3,tr,Veri Bilimi,"Veri bilimi, büyük miktarda veriden önemli bilgileri çıkarmayı ve bu verileri analiz etmeyi içeren bir bilim dalıdır.",Selam herkese Tirendaz Akademi'ye hoş geldiniz. Bu derste veri bilimi ve Python'dan bahsedeceğim. Derse geçmeden önce kanalımıza yeniyseniz en güncel derslerden haberdar olmak için abone olmayı ve düşüncelerinizi yorumlar kısmında paylaşmayı unutmayın. Son zamanlarda veri bilimi ismini çok duyar olduk. Sosyal medyanın ve intern…,1,1,!Veri!!!!Bilim!da!!genel!açıklı!tan!de!!!veri!bilim!i!benim!cins!i!!ve,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!Veri!!!!Bilim!da!!genel!açıklı!tan!de!!!veri!bilim!i!benim!cins!i!!ve",Qwen2.5-7B-Instruct,protocol-v1
+TR-3-openai/whisper-medium|Qwen/Qwen3.5-4B-004,TR-3,tr,Veri Ön İşleme,Veri analizi başlamadan önce eksik veya hatalı olan verileri temizleyip hazırlama sürecidir.,"…rılır. Sayısal veri türünde ise değerler örneğin öğrencilerin İngilizce notları gibi ölçümlerden oluşur. Veri birkaç adımda analiz edilebilir. Önce problem tanımlanır. Daha sonra veri çalışma alanına aktarılır. Ardından veri analize hazır hale getirilir. Buna veri ön işleme denir. Veri ön işleme en zor süreçlerden biridir. Çünkü verideki eksik veri, aykırı veri, veri tipini ayarlama gibi işlemler bu adımda yapılır. Daha sonra görselleştirme ile veri hakkında ön bilgi edinilir. Veriyi tanıdıktan sonra model kurulur. Süper! Modeli…",1,1,!R:!!!!!!!Terim!!!der!st!de!!ge!n!n!ve!!!!al!!!!n!!a!!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""!R:!!!!!!!Terim!!!der!st!de!!ge!n!n!ve!!!!al!!!!n!!a!!!",Qwen2.5-7B-Instruct,protocol-v1
+TR-3-openai/whisper-medium|Qwen/Qwen3.5-4B-006,TR-3,tr,Python,"Veri bilimi alanında en çok kullanılan, açık kaynaklı, ücretsiz ve kolay öğrenilebilen bir programlama dilidir.",Selam herkese Tirendaz Akademi'ye hoş geldiniz. Bu derste veri bilimi ve Python'dan bahsedeceğim. Derse geçmeden önce kanalımıza yeniyseniz en güncel derslerden haberdar olmak için abone olmayı ve düşüncelerinizi yorumlar kısmında paylaşmayı unutmayın. Son zamanlarda veri bilimi ismini çok duyar olduk. Sosyal medyanın ve internetin geliş…,1,1,!R:!!!! Terim!der!!st!de!ge!n!n!r!d!r! !al!an!!sa!l!!n!a!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!R:!!!! Terim!der!!st!de!ge!n!n!r!d!r! !al!an!!sa!l!!n!a!!",Qwen2.5-7B-Instruct,protocol-v1
+TR-3-openai/whisper-medium|Qwen/Qwen3.5-4B-008,TR-3,tr,Anaconda,"Veri bilimi için kullanılan, Python ve birçok gerekli kütüphani tek bir yerde barındıran özel bir platformdur.",…pip install paket ismini yazarsınız. Örneğin numpy yüklemek istiyorsanız numpy yazıp enter tuşuna bastığınız zaman numpy kütüphanesi yüklenmiş olur. Veri bilimi için çeşitli araçlar kullanmanız gerekebilir. Python'ı özellikle veri analizi için kullanacaksanız Anaconda platformunu kullanmanızı şiddetle tavsiye ederim. Anaconda ile 350'den fazla Python paketi yüklü olarak gelir. Anaconda da ayrıca kodları yazmakta kolaylık sağlayan Jupyter Notebook ve Spyder gibi editörler yüklü olarak gelir. Anaconda'yı açtığınız zaman böyl…,1,1,![,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""![]!![]!![]!![]!Terim!![]!![]!![]!![]!![]!dereste!![]!![]!geç!en!ve",Qwen2.5-7B-Instruct,protocol-v1
+EN-1-openai/whisper-medium|Qwen/Qwen3.5-4B-008,EN-1,en,Work in progress limit,A rule that says the team can only have a certain number of tasks they are working on at the same time.,"…When you use Scrum for project management, you form a team that will work together to quickly develop and test a deliverable. The work is completed in short cycles, and the team meets daily to discuss current tasks and clear up anything that's blocking their progress. First, let's review some terms and concepts specific to Scrum. The backlog is the central artifact in Scrum, where all possible ideas, deliverables, features, or tasks are captured for the team to work on. It's prioritized and proactively managed by the team…",0,0,The!! '!!!!! work! in!!!!!!!!!!!!progress!!! limit! '! is!!!! not!!!! mentioned!!,"{
+  ""R"": 0,
+  ""D"": 0,
+  "" why"": ""The!! '!!!!! work! in!!!!!!!!!!!!progress!!! limit! '! is!!!! not!!!! mentioned!!",Qwen2.5-7B-Instruct,protocol-v1
+EN-1-openai/whisper-medium|Qwen/Qwen3.5-4B-014,EN-1,en,Lean,"A set of rules for making projects better by removing waste, listening to customers, and improving the process constantly.","…of rugby, you may recognize the term. For those that aren't familiar with rugby, it's similar to American football, a full-contact sport played on a field with a similar-shaped ball. ""Scrum"" refers to a formation in rugby where all of the players on the team lean forward, lock their heads together, and then work as one unit to try and gain precious yards towards the scoring line. The originators of the Scrum methodology saw their team as a heads-down group, working very closely together to get that ball down the field…",0,0,The!! '!!!!!Lean! in!! the!!!transcript!! is!!!a!met!aph!or!and!!does!! not!!!appear,"{
+  ""R"": 0,
+  ""D"": 0,
+  "" why"": ""The!! '!!!!!Lean! in!! the!!!transcript!! is!!!a!met!aph!or!and!!does!! not!!!appear",Qwen2.5-7B-Instruct,protocol-v1
+EN-2-openai/whisper-medium|Qwen/Qwen3.5-4B-007,EN-2,en,The three pillars of sustainability,"These are the three main areas we must look after to make tourism sustainable: the environment (nature), the economy (money and jobs), and society (people and culture).","Today I'm going to talk to you about the most important thing in travel: sustainability.
+While there are companies who claim to be sustainable in order to get good PR, and greenwashing happens far more than we care to admit, the reality is that sustainability is quite literally a matter of life and death.
+As highlighted by a guru, David Attenbor…",0,1,The!!transcript!does!!refer!to!s!omething!related!to!!!s!ust!ain!abil!ity!but!!!!does!!ot!!!,"{
+  ""R"": 0,
+  ""D"": 1,
+  "" why"": ""The!!transcript!does!!refer!to!s!omething!related!to!!!s!ust!ain!abil!ity!but!!!!does!!ot!!!",Qwen2.5-7B-Instruct,protocol-v1
+EN-3-openai/whisper-medium|Qwen/Qwen3.5-4B-004,EN-3,en,Artificial Neural Networks,These are computer systems that work like the human brain. They are made of many connected numbers that can learn from data and make guesses about what comes next.,…five-star chef and having him chop onions the more you interact with Einstein the more you will discover surprising and Powerful ways for him to help you or your company okay enough fluffy metaphors let's clarify some terms AI as you probably know stands for artificial intelligence AI is not new Fields like machine learning and computer vision have been around for decades whenever you see a YouTube recommendation or a web search result or whenever you get a credit card transaction approved that's traditional AI in action ge…,0,0,The!!transcript!does!!refer!to!!!artificial!!!neural!network!and!!!its!definition!!is!!!in!line!with!!,"{
+  ""R"": 0,
+  ""D"": 0,
+  "" why"": ""The!!transcript!does!!refer!to!!!artificial!!!neural!network!and!!!its!definition!!is!!!in!line!with!!",Qwen2.5-7B-Instruct,protocol-v1
+EN-4-openai/whisper-medium|Qwen/Qwen3.5-4B-007,EN-4,en,emissivity,This is a number that tells us how well a real object emits heat compared to a perfect black object.,"…'s an idealisation of the perfect emitter, the total emissive power of the real body is less than that of the black body. We can still use the Stefan-Boltzmann law to calculate the emissive power of a real body, we just need to include an additional term, the emissivity Epsilon, that defines how much the real body emits relative to a black body. It's defined more formally as the emissive power of the real body divided by the emissive power of a black body at the same temperature. Emissivity values, which tend to vary with te…",1,1,The!! word! appears!!!!! in!! the!!!!!!!!!!!!!!transcript! and!!! the!!!! explanation!! correctly,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""The!! word! appears!!!!! in!! the!!!!!!!!!!!!!!transcript! and!!! the!!!! explanation!! correctly",Qwen2.5-7B-Instruct,protocol-v1
+TR-1-openai/whisper-large-v3|Qwen/Qwen3.5-4B-007,TR-1,tr,Gant Şeması,Projenin hangi aşamında hangi faaliyetlerin yapılması gerektiğini gösteren ve gerçek zamanlı ilerlemeyi takip etmek için kullanılan temel araçtır.,"…in kapsam, maliyet ve zaman unsurlarının, kontrol altında tutulması gereken özel niteliklerinin dikkatli bir biçimde belirlenmesi gereklidir. Kontrol edilmesi gereken özelliklerin neler olduğu ve ne boyutta ele alınmaları gerektiği açıkça ortaya konulmalıdır. Gant şeması, projenin hangi aşamasında hangi faaliyetin yürütülüyor olması gerektiğini gösterdiğinden gerçek zamanlı faaliyetlerle karşılaştırma olanağı verir. Bu sebeple projenin izleme ve kontrol aşamasında faydalı olan en temel araçlarından biridir. Proje planının sür…",1,1,!Gant!!!!Ş!ema!s!ı!s!ı!s!ı!s!ı!s!ı!s!ı!s!ı!s!ı!s!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""!Gant!!!!Ş!ema!s!ı!s!ı!s!ı!s!ı!s!ı!s!ı!s!ı!s!ı!s!",Qwen2.5-7B-Instruct,protocol-v1
+TR-1-openai/whisper-large-v3|Qwen/Qwen3.5-4B-008,TR-1,tr,İzleme,"Projenin performansına dair bilgileri toplamak, kaydetmek ve raporlamak sürecidir.","…arı, makineler, materyaller, para, zaman, görevler ve kalite özellikleri gibi çeşitli proje bileşenleri izlenir. Kontrol için ise zaman, maliyet ve performans kısıtları ön plana çıkmaktadır. Bu konularla ilgili olarak kullanılacak anahtar kavramlar şunlardır. İzleme, kontrol ve kazanılmış değer. Bu programı izledikten sonra projenin izlenmesi ve kontrolü ne demektir? Maliyetlerin izlenmesi ve kontrolü nasıl gerçekleştirilir? Sorularına cevap bulabileceksiniz. Projenin izlenmesi temel olarak proje yöneticisi veya paydaşla…",1,1,!Terim!!!der!!s!t!n!!ge!n!n!a!l!a!s!a!a!n!a!l!a!s!a,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""!Terim!!!der!!s!t!n!!ge!n!n!a!l!a!s!a!a!n!a!l!a!s!a",Qwen2.5-7B-Instruct,protocol-v1
+TR-1-openai/whisper-large-v3|Qwen/Qwen3.5-4B-009,TR-1,tr,Kontrol,İzlenen verilerle planlanan hedefler arasındaki farkı belirlemek ve gerekli düzeltici veya önleyici eylemleri planlamaktır.,"Proje ne kadar iyi planlanırsa planlansın, öngörülebilen veya öngörülemeyen çeşitli nedenlerden dolayı proje adımlarında bazı sapmalar meydana gelebilir. Kontrol işlemleri, proje yöneticisinin projenin yürütülmesi sırasında ortaya çıkabilen olumsuzlukları mümkün olduğunca çabuk tespit etmesine ve gerekli planları çabucak gerçekleştirmesine olanak verir. Proje yöneticisi projeyi kontrol ederken, ortaya çıkan problemler…",1,1,!R:!!!!!Terim!!!der!!s!t!n!!!!ge!n!n!da!!!ge!n!m!k!!ve,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""!R:!!!!!Terim!!!der!!s!t!n!!!!ge!n!n!da!!!ge!n!m!k!!ve",Qwen2.5-7B-Instruct,protocol-v1
+TR-1-openai/whisper-large-v3|Qwen/Qwen3.5-4B-010,TR-1,tr,Önleme,"Projenin istenilen şekilde ilerlemesi için, olası sorunların ve sapmaların ortaya çıkmasını engellemeye yönelik çalışmadır.","…eylemleri belirlemeyi ve gerçekleştirilen eylemlerin performans sorununu çözüp çözmediğini belirlemek üzere eylem planlarının izlenmesini ya da yeniden yapılanmasını içerir. İyi bir proje yöneticisi, proje kontrolünün ne olduğunu tam olarak kavrayabilmek için önleme, tespit etme ve eylem olmak üzere üç eylem üzerinde durmalıdır. Önleme, projenin istenildiği biçimde ilerleyebilmesini sağlamak için proje planından olası sapmaların ortaya çıkmasının engellenmesidir. Tespit etme, projede gerçekleşebilecek olası sapmaları bel…",1,1,!R:!!!!Terim!!!!!der!s!t!ç!n!da!!ge!n!n!ve!!!!a!!!l!n,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""!R:!!!!Terim!!!!!der!s!t!ç!n!da!!ge!n!n!ve!!!!a!!!l!n",Qwen2.5-7B-Instruct,protocol-v1
+TR-1-openai/whisper-large-v3|Qwen/Qwen3.5-4B-011,TR-1,tr,Tespit Etme,Projenin ilerlemesinde olası sorunları erken uyarı olarak belirlemek ve fark ettirmektir.,"…planlanırsa planlansın, öngörülebilen veya öngörülemeyen çeşitli nedenlerden dolayı proje adımlarında bazı sapmalar meydana gelebilir. Kontrol işlemleri, proje yöneticisinin projenin yürütülmesi sırasında ortaya çıkabilen olumsuzlukları mümkün olduğunca çabuk tespit etmesine ve gerekli planları çabucak gerçekleştirmesine olanak verir. Proje yöneticisi projeyi kontrol ederken, ortaya çıkan problemlerin çözümü için önerilen alternatiflerden hangisinin proje amaçlarına daha uygun olduğuna karar vermek durumundadır. Öte yandan pr…",1,1,!T!Terim!!!!!der!s!t!n!!!g!l!s!i!n!a!l!a!n!a!n!a!n,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""!T!Terim!!!!!der!s!t!n!!!g!l!s!i!n!a!l!a!n!a!n!a!n",Qwen2.5-7B-Instruct,protocol-v1
+TR-2-openai/whisper-large-v3|Qwen/Qwen3.5-4B-001,TR-2,tr,turizm,"Turizm, sadece tatil yapmak değil, bir kişinin yaşadığı yerden ayrılması, geçici olarak konaklaması ve para kazanmak için gitmemesi gereken bir olaylar ve ilişkiler bütünüdür.","Forteliber'den herkese merhaba. Bu özel video incelemesinde siz değerli turist rehberleri için mesleğinizin tam da kalbinde yer alan turizm konusunu en ince ayrıntısına kadar ele alacağız. Bu açıklayıcının tamamı Türkçe olarak hazırlandı. Amacımız ne mi? Hem mesleki bilgi dağarcığınızı daha da zenginleştirmek, hem de yaklaşan sınavlarınızda sizi bir adım öne geçirecek o kilit bilgileri vermek. Ha…",1,0,!R:!!! Turiz!m!!-!!der!st!e!ge!n!ge!l!i!n!e!n!e!r!-!!a,"{
+  ""R"": 1,
+  ""D"": 0,
+  ""Why"": ""!R:!!! Turiz!m!!-!!der!st!e!ge!n!ge!l!i!n!e!n!e!r!-!!a",Qwen2.5-7B-Instruct,protocol-v1
+TR-2-openai/whisper-large-v3|Qwen/Qwen3.5-4B-002,TR-2,tr,turist,"Turist, yaşadığı yerden ayrılacak, en az bir gece konaklayacak ve seyahatinin temel amacı para kazanmak değil, sadece eğlence veya keşif için gitmiş olan kişidir.","Forteliber'den herkese merhaba. Bu özel video incelemesinde siz değerli turist rehberleri için mesleğinizin tam da kalbinde yer alan turizm konusunu en ince ayrıntısına kadar ele alacağız. Bu açıklayıcının tamamı Türkçe olarak hazırlandı. Amacımız ne mi? Hem mesleki bilgi dağarcığınızı daha da zenginleştirmek, hem de yaklaşan sınavların…",1,0,!['!Terim!!!derst!!da!!!!!!ge!!!!!!n!!!!!!i!n!!!!!!a!!,"{
+  ""R"": 1,
+  ""D"": 0,
+  ""Why"": ""!['!Terim!!!derst!!da!!!!!!ge!!!!!!n!!!!!!i!n!!!!!!a!!",Qwen2.5-7B-Instruct,protocol-v1
+TR-2-openai/whisper-large-v3|Qwen/Qwen3.5-4B-003,TR-2,tr,multidisipliner yapı,"Turizmin çok disiplinli yapısı, bu alanda çalışan birinin aynı anda coğrafya, ekonomi, sosyoloji, tarih ve hukuk gibi birçok bilim dalını kullanmasını gerektirir.","…konuyu gerçekten anlıyorsunuz demektir. Ve işte ilk bölümümüzün özeti, zihnimizdeki bilgi kartları. Birincisi, turizm. Bu neydi? Bir olaylar ve ilişkiler sistemi. İkincisi, turist. Sistemin geçici, konaklamalı ve para kazanma amacı gütmeyen aktörü. Üçüncüsü, multidisipliner yapı. Yani turizmin tek bir renkten değil, bir gökkuşağının tüm renklerinden oluşması. Bu üç anahtar kavramı cebimize koyup yolumuza devam ediyoruz. Harika, temelleri hallettik. Artık sağlam bir zeminimiz var. Şimdi bu zeminin üzerine kat çıkma zamanı. İkinci bölü…",1,1,!R:!!!!!Ter!der!!!st!!e!!s!!t!!c!e!l!a!r!!!l!a!n!a,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""!R:!!!!!Ter!der!!!st!!e!!s!!t!!c!e!l!a!r!!!l!a!n!a",Qwen2.5-7B-Instruct,protocol-v1
+TR-2-openai/whisper-large-v3|Qwen/Qwen3.5-4B-004,TR-2,tr,kitle turizmi,"Kitle turizmi, büyük grupların belirli bir modelle seyahat etmesi ve genellikle deniz, kum ve güneş gibi temel unsurları içeren popüler turistik merkezleri ziyaret etmesidir.","…e bir yerin nasıl adım adım popüler bir turistik merkeze dönüştüğünün sırlarına bakacağız. Turizm dediğimiz şey tek tip bir elbise değil. Her zevki, her ihtiyaca uygun kocaman bir gardırop gibi. Mesela herkesin bildiği o meşhur deniz-kum-güneş üçlüsü, işte o, kitle turizmi. Ama ben tarihi yerleri, müzeleri göreceğim diyenler kültür turizmi yapıyor. İş için bir fuara veya kongreye gidenler onlar MICE yani kongre turizminin bir parçası. Afyon'un şifalı sularına gireceğim diyenler sağlık turizmine, Erciyes'te kayak yapacağım diyen…",1,1,!R:!!!!!Ter!der!!st!!de!!ge!n!!ge!n!!ve!!!!a!l!a!n!!!a,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""!R:!!!!!Ter!der!!st!!de!!ge!n!!ge!n!!ve!!!!a!l!a!n!!!a",Qwen2.5-7B-Instruct,protocol-v1
+TR-2-openai/whisper-large-v3|Qwen/Qwen3.5-4B-005,TR-2,tr,UKTG modeli,"UKTG (Ulaşım, Konaklama, Tanıtım, Kamu desteği ve Güven), bir bölgenin nasıl gelişen bir turistik merkeze dönüştüğünü anlatan beş önemli adımın kısaltmasıdır.","…sihirli kelimemiz UKTKG. Ulaşım, konaklama, tanıtım, kamu ve güven. Bu kısaltmayı zihninize kazıyın. Bu sadece bir sıralama değil, turizm gelişiminin mantıksal akışıdır. Sınavda size sadece puan değil, altın değerini de zamanda kazandıracaktır. Hadi bu UKTKG modelini gerçek bir örnekle test edelim. Aklımıza neresi gelsin? Tabii ki Türkiye'nin turizm başkenti Antalya. Ulaşım, devasa havalimanı, modern yollar, marinalar. Tamam. Konaklama, sahil şeridini dolduran binlerce otel ve tesis. O da tamam. Tanıtım, yıllardır yapıl…",1,1,!Terim!!!!!!der!st!e!ge!n!m!a!r!d!a!r!a!n!a!l!a!r!a!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""!Terim!!!!!!der!st!e!ge!n!m!a!r!d!a!r!a!n!a!l!a!r!a!",Qwen2.5-7B-Instruct,protocol-v1
+TR-2-openai/whisper-large-v3|Qwen/Qwen3.5-4B-006,TR-2,tr,turizm arzı,"Turizm arzı, bir bölgede turistik ürünleri sunan sabit unsurları ifade eder; bunlar ulaşım, konaklama, çekicilikler (tarih/doğa) ve destekleyici hizmetlerdir.","…bi değişken, kararsız, hareketli, yani turist, bugün Antalya'ya gitmeyi çok ister, yarın olumsuz bir haber görür, Rotasını anında Yunanistan'a çevirebilir, biri kaya gibi sabit, diğeri su gibi akışken, işte bütün oyun, bütün denge bu ikisi arasında oynanıyor. Turizm arzı dediğimiz şey tek bir parçadan oluşmaz. Bu bir takım oyunudur. Bakın bu şemaya. Ulaştırma ve konaklama takımın en güçlü oyuncuları gibidir. Yeme içme oyunu kuran orta saha görevindedir. Ama takımın ruhu, kalbi nerede atar? İşte o, çekicilikler diliminde. Yani…",1,1,!R:!!!!!Terim!!!!der!!st!de!!ge!n!n!!ve!!!!al!!n!a!!!s!,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!R:!!!!!Terim!!!!der!!st!de!!ge!n!n!!ve!!!!al!!n!a!!!s!",Qwen2.5-7B-Instruct,protocol-v1
+TR-2-openai/whisper-large-v3|Qwen/Qwen3.5-4B-008,TR-2,tr,stoklanamaz,"Turizm sektöründe 'stoklanamaz' demektir; boş kalan bir oda veya kullanılmayan bir zaman, geri kazanılamaz kayıp anlamına gelir ve sektör çok dinamiktir.","…ın ve bu karşılaştırmayı dikkatle dinleyin. Çünkü bu turizm ekonomisinin tam kalbidir. Bir tarafta arz var, mağrur, sabit, yerinden oynamayan, tıpkı Pamukkale'deki travertenler gibi onu paketleyip İstanbul'a götüremezsiniz ve en acımasız özelliği affı yoktur, stoklanamaz. Yani bu akşam o otel odası boş kaldıysa o odanın geliri sonsuza dek uçtu gitti. Diğer taraftaysa talep var. Rüzgârdaki bir yaprak gibi değişken, kararsız, hareketli, yani turist, bugün Antalya'ya gitmeyi çok ister, yarın olumsuz bir haber görür, Rotasını anı…",1,1,!Terim!!!!!der!s!t!s!e!r!a!n!g!a!n!a!m!a!z!!d!e!r!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""!Terim!!!!!der!s!t!s!e!r!a!n!g!a!n!a!m!a!z!!d!e!r!",Qwen2.5-7B-Instruct,protocol-v1
+TR-3-openai/whisper-large-v3|Qwen/Qwen3.5-4B-001,TR-3,tr,Veri Bilimi,"Veri bilimi, verilerden bilgi çıkarma sürecidir. Bilgisayar, istatistik ve matematik gibi bilimlerin bir araya gelmesinden oluşur.",Selam herkese Tirendaz Akademi'ye hoş geldiniz. Bu derste veri bilimi ve Python'dan bahsedeceğim. Derse geçmeden önce kanalımıza yeniyseniz en güncel derslerden haberdar olmak için abone olmayı ve düşüncelerinizi yorumlar kısmında paylaşmayı unutmayın. Son zamanlarda veri bilimi ismini çok duyar olduk. Sosyal medyanın ve intern…,1,1,!Veri!!!!Bilim!i!a!da!!geç!er!ve!!!!a!!der!este!de!!ver!i!bil!im,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!Veri!!!!Bilim!i!a!da!!geç!er!ve!!!!a!!der!este!de!!ver!i!bil!im",Qwen2.5-7B-Instruct,protocol-v1
+TR-3-openai/whisper-large-v3|Qwen/Qwen3.5-4B-004,TR-3,tr,Kategorik Veri,"Verilerin kategorilere veya gruplara ayrıldığı türüdür. Örneğin, 'erkek' veya 'kadın' gibi değerler kategorik veridir.","…book gibi şirketlerin bu kadar gelişmesi veri bilimine yaptıkları yatırımdan kaynaklanmaktadır. Veri altın değerinde olduğu için bu şirketler veri bilimine büyük önem vermektedirler. Veri analizinin temeli veriye dayanır. Veriyi iki türlü görebilirsiniz. Biri kategorik veri, diğeri sayısal veridir. Kategorik veri türünde değerler örneğin erkek veya kadın şeklinde kategorilere veya gruplara ayrılır. Sayısal veri türünde ise değerler örneğin öğrencilerin İngilizce notları gibi ölçümlerden oluşur. Veri birkaç adımda analiz edilebil…",1,1,!R:!!!!!Terim!!!der!!s!t!n!n!!!!!ge!ç!n!m!s!!ve!!!!al,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!R:!!!!!Terim!!!der!!s!t!n!n!!!!!ge!ç!n!m!s!!ve!!!!al",Qwen2.5-7B-Instruct,protocol-v1
+TR-3-openai/whisper-large-v3|Qwen/Qwen3.5-4B-005,TR-3,tr,Sayısal Veri,"Verilerin ölçümlerden oluştuğu türüdür. Örneğin, öğrencilerin İngilizce notları gibi sayısal değerler sayısal veridir.","…u kadar gelişmesi veri bilimine yaptıkları yatırımdan kaynaklanmaktadır. Veri altın değerinde olduğu için bu şirketler veri bilimine büyük önem vermektedirler. Veri analizinin temeli veriye dayanır. Veriyi iki türlü görebilirsiniz. Biri kategorik veri, diğeri sayısal veridir. Kategorik veri türünde değerler örneğin erkek veya kadın şeklinde kategorilere veya gruplara ayrılır. Sayısal veri türünde ise değerler örneğin öğrencilerin İngilizce notları gibi ölçümlerden oluşur. Veri birkaç adımda analiz edilebilir. Önce problem tanı…",1,1,!R:!!!!!Terim!!!der!!s!t!n!ge!n!n!a!l!a!n!a!!g!!!a!,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!R:!!!!!Terim!!!der!!s!t!n!ge!n!n!a!l!a!n!a!!g!!!a!",Qwen2.5-7B-Instruct,protocol-v1
+TR-3-openai/whisper-large-v3|Qwen/Qwen3.5-4B-007,TR-3,tr,Model Validation,Kurulan modelin doğru olup olmadığını ve performansını test etme sürecidir. Modelin doğruluğunu artırmak için bu adımda parametreler değiştirilebilir.,"…ideki eksik veri, aykırı veri, veri tipini ayarlama gibi işlemler bu adımda yapılır. Daha sonra görselleştirme ile veri hakkında ön bilgi edinilir. Veriyi tanıdıktan sonra model kurulur. Süper! Modeli kurduk ama bu modelin ne kadar doğru olduğunu anlamak için model validation kullanılır. Modelin performansı iyi değil ise o zaman modelin hiperparametrelerini düzenleyerek ya da model sınıfını değiştirerek modelin veri üzerindeki doğruluğunu artırabiliriz. Modeli ne kadar doğru kurarsak model o kadar doğru tahmin yapar. En iyi modeli…",1,1,!R:!!!!! Terim!! d!er!st!n!n!!!! bağ!l!am!!!a!!!!!!!!!!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""!R:!!!!! Terim!! d!er!st!n!n!!!! bağ!l!am!!!a!!!!!!!!!!!",Qwen2.5-7B-Instruct,protocol-v1
+TR-3-openai/whisper-large-v3|Qwen/Qwen3.5-4B-008,TR-3,tr,Python,"Veri bilimi alanında en çok kullanılan, açık kaynaklı, ücretsiz ve kolay öğrenilebilir bir programlama dilidir.",Selam herkese Tirendaz Akademi'ye hoş geldiniz. Bu derste veri bilimi ve Python'dan bahsedeceğim. Derse geçmeden önce kanalımıza yeniyseniz en güncel derslerden haberdar olmak için abone olmayı ve düşüncelerinizi yorumlar kısmında paylaşmayı unutmayın. Son zamanlarda veri bilimi ismini çok duyar olduk. Sosyal medyanın ve internetin geliş…,1,1,!R:!!!! Terim!der!!st!de!ge!n!n!r!d!r! !al!an!!a!!!z!!!n!,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!R:!!!! Terim!der!!st!de!ge!n!n!r!d!r! !al!an!!a!!!z!!!n!",Qwen2.5-7B-Instruct,protocol-v1
+TR-3-openai/whisper-large-v3|Qwen/Qwen3.5-4B-010,TR-3,tr,Anaconda,"Veri bilimi için kullanılan, Python kütüphanelerini ve editörleri (Jupyter Notebook) içeren hazır bir platformdur.",…pip install paket ismini yazarsınız. Örneğin numpy yüklemek istiyorsanız numpy yazıp enter tuşuna bastığınız zaman numpy kütüphanesi yüklenmiş olur. Veri bilimi için çeşitli araçlar kullanmanız gerekebilir. Python'ı özellikle veri analizi için kullanacaksanız Anaconda platformunu kullanmanızı şiddetle tavsiye ederim. Anaconda ile 350'den fazla Python paketi yüklü olarak gelir. Anaconda da ayrıca kodları yazmakta kolaylık sağlayan Jupyter Notebook ve Spyder gibi editörler yüklü olarak gelir. Anaconda'yı açtığınız zaman böyl…,1,1,!Bağlaml! Terim!!!! Der!st!e!ge!n!er!ve!al!a!n!a!l!ı!g!i!!a!,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!Bağlaml! Terim!!!! Der!st!e!ge!n!er!ve!al!a!n!a!l!ı!g!i!!a!",Qwen2.5-7B-Instruct,protocol-v1
+EN-1-openai/whisper-large-v3|Qwen/Qwen3.5-4B-016,EN-1,en,Lean,"A set of five principles that helps teams remove waste, listen to customers, and continuously improve their work.","…of rugby, you may recognize the term. For those that aren't familiar with rugby, it's similar to American football, a full-contact sport played on a field with a similar-shaped ball. ""Scrum"" refers to a formation in rugby where all of the players on the team lean forward, lock their heads together, and then work as one unit to try and gain precious yards towards the scoring line. The originators of the Scrum methodology saw their team as a heads-down group, working very closely together to get that ball down the field…",0,0,The!! '!!!!!Lean! in!! the!!!transcript!! is!!!!a!!reference!to!players!!!leaning!!!forward!in,"{
+  ""R"": 0,
+  ""D"": 0,
+  "" why"": ""The!! '!!!!!Lean! in!! the!!!transcript!! is!!!!a!!reference!to!players!!!leaning!!!forward!in",Qwen2.5-7B-Instruct,protocol-v1
+EN-1-openai/whisper-large-v3|Qwen/Qwen3.5-4B-021,EN-1,en,Pursue perfection,The final step of keeping the team motivated to keep getting better and improving their work every day.,"…about this final methodology, called Lean, in the context of Lean Six Sigma. Lean methodology consists of five principles that serve as a recipe for improving project outcomes. They are ""define value,"" ""map value stream,"" ""create flow,"" ""establish pull,"" and ""pursue perfection."" Let's break these down. ""Define value"" means identifying and focusing on what the customer wants and including the customer in the process. A product's value is the sum of all the things the customer wants. ""Map value stream"" means mapping out the process,…",0,0,The!! R! criteria!!! is!! not!!!!!!!!!!!!!!!!!! consistent!! as!!!! the!!!!!,"{
+  ""R"": 0,
+  ""D"": 0,
+  "" why"": ""The!! R! criteria!!! is!! not!!!!!!!!!!!!!!!!!! consistent!! as!!!! the!!!!!",Qwen2.5-7B-Instruct,protocol-v1
+EN-2-openai/whisper-large-v3|Qwen/Qwen3.5-4B-003,EN-2,en,three pillars of sustainability,"The three main areas that must be managed to make tourism sustainable: the environment, the economy, and society.","Today I'm going to talk to you about the most important thing in travel: sustainability.
+While there are companies who claim to be sustainable in order to get good PR, and greenwashing happens far more than we care to admit, the reality is that sustainability is quite literally a matter of life and death.
+As highlighted by a guru, David Attenbor…",0,1,The!! '!R'!! value!! is! 0! due! to!!! the!!!!! phrase!! 'The!! most!!!!!! important!,"{
+  ""R"": 0,
+  ""D"": 1,
+  "" why"": ""The!! '!R'!! value!! is! 0! due! to!!! the!!!!! phrase!! 'The!! most!!!!!! important!",Qwen2.5-7B-Instruct,protocol-v1
+EN-3-openai/whisper-large-v3|Qwen/Qwen3.5-4B-003,EN-3,en,Artificial Neural Networks,These are computer systems made of many connected numbers that work similarly to how our brains work with neurons. They are used to process information and make predictions.,…five-star chef and having him chop onions the more you interact with Einstein the more you will discover surprising and Powerful ways for him to help you or your company okay enough fluffy metaphors let's clarify some terms AI as you probably know stands for artificial intelligence AI is not new Fields like machine learning and computer vision have been around for decades whenever you see a YouTube recommendation or a web search result or whenever you get a credit card transaction approved that's traditional AI in action ge…,0,1,The!!transcript!does!!refer!to!!!artificial!!!neural!network!and!!its!definition!!!is!!!in!line!with!!,"{
+  ""R"": 0,
+  ""D"": 1,
+  "" why"": ""The!!transcript!does!!refer!to!!!artificial!!!neural!network!and!!its!definition!!!is!!!in!line!with!!",Qwen2.5-7B-Instruct,protocol-v1
+TR-1-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-004,TR-1,tr,Çizelge Sapması,Projedeki işlerin tamamlanma hızı ile planlanan zaman çizelgesi arasındaki farktır. Projenin ne kadarını ve ne kadar sürede tamamladığını gösterir.,…rını karşılaştırma olanağına kavuşur. Kazanılmış değer şeması yöneticiye karşılaştırma yaparken projenin ilerlemesine ilişkin iki farklı bilgiyi elde etmesinde yardımcı olacaktır. Bu bilgiler planlanan projeden sapma miktarlarıdır. Planlanan projeden sapmalar çizelge sapması ve maliyet sapmasıdır. Çizelge sapması bir projedeki zaman çizelgesi performansının bir ölçümüdür. Maliyet sapması ise bir projedeki maliyet performansının ölçümüdür. Maliyet sapması kazanılmış değerden gerçekleşen maliyetin çıkarılmasıyla elde edilir. Çizelg…,1,1,!Bağlaml! tutar!la!!ter!der!st!!!a!!al!an!!a!!!s!u!z!u!n!u!n,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""!Bağlaml! tutar!la!!ter!der!st!!!a!!al!an!!a!!!s!u!z!u!n!u!n",Qwen2.5-7B-Instruct,protocol-v1
+TR-1-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-007,TR-1,tr,Proje Bileşenleri,"Bir projeyi oluşturan temel parçaları ifade eder. Bunlar insan kaynakları, makineler, materyaller, para, zaman, görevler ve kalite özellikleri gibi unsurlardır.","…liştirilmesi ayrı bir önem taşır. Faaliyetler devam ederken maliyetler izlenmeli ve gerektiğinde düzeltici önlemler çok geç olmadan alınmalıdır. Proje süresince insan kaynakları, makineler, materyaller, para, zaman, görevler ve kalite özellikleri gibi çeşitli proje bileşenleri izlenir. Kontrol için ise zaman, maliyet ve performans kısıtları ön plana çıkmaktadır. Bu konularla ilgili olarak kullanılacak anahtar kavramlar şunlardır. İzleme, kontrol ve kazanılmış değer. Bu programı izledikten sonra projenin izlenmesi ve kontrolü ne dem…",1,1,!Terim!!!!!!der!s!t!ç!e!s!m!da!ge!ç!m!i!r!d!r!a!n!a!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""!Terim!!!!!!der!s!t!ç!e!s!m!da!ge!ç!m!i!r!d!r!a!n!a!",Qwen2.5-7B-Instruct,protocol-v1
+TR-1-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-008,TR-1,tr,Proje Yöneticisi,"Projeyi planlayan, yürüten ve kontrol eden kişidir. Bu kişi projenin başarılı olması için izleme ve kontrol süreçlerini yönetmelidir.","Proje ne kadar iyi planlanırsa planlansın, öngörülebilen veya öngörülemeyen çeşitli nedenlerden dolayı proje adımlarında bazı sapmalar meydana gelebilir. Kontrol işlemleri, proje yöneticisinin projenin yürütülmesi sırasında ortaya çıkabilen olumsuzlukları mümkün olduğunca çabuk tespit etmesine ve gerekli planları çabucak gerçekleştirmesine olanak verir. Proje yöneticisi projeyi kontrol ederken, ortaya çıkan problemlerin çözümü için önerilen alte…",1,1,!R:!!!!!Terim!!!der!s!t!n!!!!!ge!n!n!!!a!n!l!m!!!!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""!R:!!!!!Terim!!!der!s!t!n!!!!!ge!n!n!!!a!n!l!m!!!!!",Qwen2.5-7B-Instruct,protocol-v1
+TR-2-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-001,TR-2,tr,turizm,"Turizm, sadece tatil yapmak değil, bir zincir gibi birbirine bağlı olaylar ve ilişkiler bütünüdür. Turist uçağa bindiği andan, otelde yerleşene ve yemek yediğine kadar olan tüm süreçler turizmin bir parçasıdır.","Forteliber'den herkese merhaba. Bu özel video incelemesinde siz değerli turist rehberleri için mesleğinizin tam da kalbinde yer alan turizm konusunu en ince ayrıntısına kadar ele alacağız. Bu açıklayıcının tamamı Türkçe olarak hazırlandı. Amacımız ne mi? Hem mesleki bilgi dağarcığınızı daha da zenginleştirmek, hem de yaklaşan sınavlarınızda sizi bir adım öne geçirecek o kilit bilgileri vermek. Ha…",1,1,!R:!!!! '!!!!!! turiz!m! !!derst!nde!!!ge!ç!en!!al!!an!!!!a!,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!R:!!!! '!!!!!! turiz!m! !!derst!nde!!!ge!ç!en!!al!!an!!!!a!",Qwen2.5-7B-Instruct,protocol-v1
+TR-2-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-002,TR-2,tr,turist,"Turist, sadece gezginler değildir; belirli kriterlere sahip kişilerdir. Örneğin, yaşadığı yerden ayrılacak, en az bir gece konaklayacak ve seyahatinin temel amacı para kazanmak değilse, o kişi turist sayılır.","Forteliber'den herkese merhaba. Bu özel video incelemesinde siz değerli turist rehberleri için mesleğinizin tam da kalbinde yer alan turizm konusunu en ince ayrıntısına kadar ele alacağız. Bu açıklayıcının tamamı Türkçe olarak hazırlandı. Amacımız ne mi? Hem mesleki bilgi dağarcığınızı daha da zenginleştirmek, hem de yaklaşan sınavların…",1,1,!Bağlaml! Derst!da!!!! tur!ist! k!elim!e!!!!!! değ!er!l!i!n!e!!!!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!Bağlaml! Derst!da!!!! tur!ist! k!elim!e!!!!!! değ!er!l!i!n!e!!!!!",Qwen2.5-7B-Instruct,protocol-v1
+TR-2-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-003,TR-2,tr,multidisipliner yapı,"Turizm tek bir bilim dalına bağlı değildir; coğrafya, ekonomi, sosyoloji, tarih ve hukuk gibi birçok farklı bilim dalının bir araya gelerek oluşturduğu çok renkli ve geniş kapsamlı bir yapıdır.","…konuyu gerçekten anlıyorsunuz demektir. Ve işte ilk bölümümüzün özeti, zihnimizdeki bilgi kartları. Birincisi, turizm. Bu neydi? Bir olaylar ve ilişkiler sistemi. İkincisi, turist. Sistemin geçici, konaklamalı ve para kazanma amacı gütmeyen aktörü. Üçüncüsü, multidisipliner yapı. Yani turizmin tek bir renkten değil, bir gökkuşağının tüm renklerinden oluşması. Bu üç anahtar kavramı cebimize koyup yolumuza devam ediyoruz. Harika, temelleri hallettik. Artık sağlam bir zeminimiz var. Şimdi bu zeminin üzerine kat çıkma zamanı. İkinci bölü…",1,1,!Bağl!am!! tutar!l!!!ılı!!:!!!!! Ter!!im!!!!!!!!!! d!er!s!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!Bağl!am!! tutar!l!!!ılı!!:!!!!! Ter!!im!!!!!!!!!! d!er!s!!",Qwen2.5-7B-Instruct,protocol-v1
+TR-2-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-004,TR-2,tr,kitle turizmi,"Kitle turizmi, herkesin bildiği deniz, kum ve güneş kombinasyonunu seven büyük grupların seyahat etmesiyle oluşan, Türkiye'de çok önemli bir turizm modelidir.","…e bir yerin nasıl adım adım popüler bir turistik merkeze dönüştüğünün sırlarına bakacağız. Turizm dediğimiz şey tek tip bir elbise değil. Her zevki, her ihtiyaca uygun kocaman bir gardırop gibi. Mesela herkesin bildiği o meşhur deniz-kum-güneş üçlüsü, işte o, kitle turizmi. Ama ben tarihi yerleri, müzeleri göreceğim diyenler kültür turizmi yapıyor. İş için bir fuara veya kongreye gidenler onlar MICE yani kongre turizminin bir parçası. Afyon'un şifalı sularına gireceğim diyenler sağlık turizmine, Erciyes'te kayak yapacağım diyen…",1,1,!R:!!!!!Ter!der!!st!!de!!ge!n!n!a!!a!!l!!s!!a!!l!!a!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""!R:!!!!!Ter!der!!st!!de!!ge!n!n!a!!a!!l!!s!!a!!l!!a!",Qwen2.5-7B-Instruct,protocol-v1
+TR-2-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-005,TR-2,tr,UKTG modeli,"Bir bölgenin turistik merkeze dönüşümünde izlenmesi gereken beş önemli adımın kısaltmasıdır. Bu adımlar sırasıyla ulaşım, konaklama, tanıtım, kamu desteği ve güveni ifade eder.","…sihirli kelimemiz UKTKG. Ulaşım, konaklama, tanıtım, kamu ve güven. Bu kısaltmayı zihninize kazıyın. Bu sadece bir sıralama değil, turizm gelişiminin mantıksal akışıdır. Sınavda size sadece puan değil, altın değerini de zamanda kazandıracaktır. Hadi bu UKTKG modelini gerçek bir örnekle test edelim. Aklımıza neresi gelsin? Tabii ki Türkiye'nin turizm başkenti Antalya. Ulaşım, devasa havalimanı, modern yollar, marinalar. Tamam. Konaklama, sahil şeridini dolduran binlerce otel ve tesis. O da tamam. Tanıtım, yıllardır yapıl…",1,1,!Terim!!!!!!der!st!e!!ge!ç!en!!ve!!!!a!l!!!a!n!a!!!!!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""!Terim!!!!!!der!st!e!!ge!ç!en!!ve!!!!a!l!!!a!n!a!!!!!!",Qwen2.5-7B-Instruct,protocol-v1
+TR-2-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-007,TR-2,tr,turizm talebi,"Turizm talebi, rüzgardaki bir yaprak gibi değişken ve hareketli olan unsundur. Turistlerin istekleri ve tercihleri anında değişebilir; bugün bir yere gitmek isterken yarın başka bir yere yönelme durumundadır.","…ir sınav sorusu değil. Bu, aynı zamanda bizim mesleğimizin ve sektörümüzün geleceği üzerine hep birlikte kafa yormamızı sağlayan çok önemli bir soru. Ve geldik üçüncü bölümün finaline zihin kartlarımızı güncelleyelim. Turizm arzı yerinden oynamayan sabit dev. Turizm talebi rüzgarda savrulan değişken yaprak. Ve en en en kritik kavram stoklanamazlık. Bu kelimeyi asla unutmayın. Turizm sektöründe zaman geri alınamaz. Boş kalan o koltuk, satılmayan o oda, sonsuza dek kaybolmuş bir gelirdir. İşte bu yüzden bu sektör bu kadar dinamik…",1,1,!R:!!!!!Ter!der!!stres!!!!s!!!de!!!!!ge!!!!!ç!!!!!en!!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""!R:!!!!!Ter!der!!stres!!!!s!!!de!!!!!ge!!!!!ç!!!!!en!!!",Qwen2.5-7B-Instruct,protocol-v1
+TR-2-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-008,TR-2,tr,stoklanamaz,"Turizm sektöründe zaman geri alınamaz ve boş kalan koltuklar veya satılmayan odalar, sonsuza kadar kaybolmuş bir gelirdir. Bu nedenle turizm ürünleri (odalar, biletler vb.) biriktirilemez veya stoklanamaz.","…ın ve bu karşılaştırmayı dikkatle dinleyin. Çünkü bu turizm ekonomisinin tam kalbidir. Bir tarafta arz var, mağrur, sabit, yerinden oynamayan, tıpkı Pamukkale'deki travertenler gibi onu paketleyip İstanbul'a götüremezsiniz ve en acımasız özelliği affı yoktur, stoklanamaz. Yani bu akşam o otel odası boş kaldıysa o odanın geliri sonsuza dek uçtu gitti. Diğer taraftaysa talep var. Rüzgârdaki bir yaprak gibi değişken, kararsız, hareketli, yani turist, bugün Antalya'ya gitmeyi çok ister, yarın olumsuz bir haber görür, Rotasını anı…",1,1,!Terim!!!!!der!s!t!ç!e!n!g!i!n!e!l!i!r!a!n!a!l!ı!m,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""!Terim!!!!!der!s!t!ç!e!n!g!i!n!e!l!i!r!a!n!a!l!ı!m",Qwen2.5-7B-Instruct,protocol-v1
+TR-3-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-001,TR-3,tr,Veri Bilimi,"Veri bilimi, verilerden bilgi çıkarma sürecidir. Bilgisayar, istatistik ve matematik gibi bilimlerin bir araya gelmesinden oluşur.",Selam herkese Tirendaz Akademi'ye hoş geldiniz. Bu derste veri bilimi ve Python'dan bahsedeceğim. Derse geçmeden önce kanalımıza yeniyseniz en güncel derslerden haberdar olmak için abone olmayı ve düşüncelerinizi yorumlar kısmında paylaşmayı unutmayın. Son zamanlarda veri bilimi ismini çok duyar olduk. Sosyal medyanın ve intern…,1,1,!Veri!!!!Bilim!i!a!da!!geç!er!ve!!!!a!!der!este!de!!ver!i!bil!im,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!Veri!!!!Bilim!i!a!da!!geç!er!ve!!!!a!!der!este!de!!ver!i!bil!im",Qwen2.5-7B-Instruct,protocol-v1
+TR-3-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-002,TR-3,tr,Büyük Veri (Big Data),Çok büyük miktarda verinin ortaya çıkmasıdır. Bu durumda verinin tamamı analiz edilir ve klasik yöntemler yerine yeni teknikler kullanılır.,"…mıza yeniyseniz en güncel derslerden haberdar olmak için abone olmayı ve düşüncelerinizi yorumlar kısmında paylaşmayı unutmayın. Son zamanlarda veri bilimi ismini çok duyar olduk. Sosyal medyanın ve internetin gelişmesiyle devasa boyutlarda veri ortaya çıktı. Büyük veri anlamına gelen Big Data artık herkes tarafından duyulan bir kavram oldu. Özetle bu derste veri bilimi nedir, veri bilimi niye önemlidir, Python'ın avantajları nelerdir, veri bilimi için neden Python kullanılır, veri bilimi için Python ile kullanılan araç…",1,1,!Terim!!!der!!stte!!geç!!n!r!ve!!!!al!!ana!!!!!!!a!!!s!!öz,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""!Terim!!!der!!stte!!geç!!n!r!ve!!!!al!!ana!!!!!!!a!!!s!!öz",Qwen2.5-7B-Instruct,protocol-v1
+TR-3-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-003,TR-3,tr,Makine Öğrenmesi,Veriler üzerinde yapay zeka teknikleri kullanılarak gizli ilişkilerin keşfedilmesi ve analiz edilmesi sürecidir.,…yi kullanıyor ve bu alana yatırım yapıyorlar. Büyük veri direkt veya dolaylı hayatımızın bir parçası haline geldi. Devasa veriler var ama bu veriler analiz edilmezse hiçbir işe yaramazlar. Veri zenginiyiz fakat bu veriler analiz edilmezse bilgi fakiri oluruz. Makine öğrenmesi gibi yapay zeka alanları ile veriler analiz edilmektedir. Verileri görselleştirerek veri setinde bazı bilgileri sezebiliriz ama yapay zeka teknikleri ile veri setindeki gizli ilişkileri keşfedebiliriz. Veri analizini kolaylaştıran ve derin öğrenmeye olanak sa…,1,1,!R:!!!!!!Ter!der!!!st!!de!!ge!n!n!al!an!a!sa!l!r!dir!ve!!!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""!R:!!!!!!Ter!der!!!st!!de!!ge!n!n!al!an!a!sa!l!r!dir!ve!!!",Qwen2.5-7B-Instruct,protocol-v1
+TR-3-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-004,TR-3,tr,Kategorik Veri,"Verilerin kategorilere veya gruplara ayrıldığı türüdür. Örneğin, 'erkek' veya 'kadın' gibi değerler bu türdür.","…book gibi şirketlerin bu kadar gelişmesi veri bilimine yaptıkları yatırımdan kaynaklanmaktadır. Veri altın değerinde olduğu için bu şirketler veri bilimine büyük önem vermektedirler. Veri analizinin temeli veriye dayanır. Veriyi iki türlü görebilirsiniz. Biri kategorik veri, diğeri sayısal veridir. Kategorik veri türünde değerler örneğin erkek veya kadın şeklinde kategorilere veya gruplara ayrılır. Sayısal veri türünde ise değerler örneğin öğrencilerin İngilizce notları gibi ölçümlerden oluşur. Veri birkaç adımda analiz edilebil…",1,1,!R:!!!!!Terim!!der!!st!e!ge!n!n!!ve!a!lan!!!a!l!a!n!!!a,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""!R:!!!!!Terim!!der!!st!e!ge!n!n!!ve!a!lan!!!a!l!a!n!!!a",Qwen2.5-7B-Instruct,protocol-v1
+TR-3-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-005,TR-3,tr,Sayısal Veri,"Verilerin ölçümlerden oluştuğu türüdür. Örneğin, öğrencilerin İngilizce notları gibi sayısal değerler bu türdür.","…u kadar gelişmesi veri bilimine yaptıkları yatırımdan kaynaklanmaktadır. Veri altın değerinde olduğu için bu şirketler veri bilimine büyük önem vermektedirler. Veri analizinin temeli veriye dayanır. Veriyi iki türlü görebilirsiniz. Biri kategorik veri, diğeri sayısal veridir. Kategorik veri türünde değerler örneğin erkek veya kadın şeklinde kategorilere veya gruplara ayrılır. Sayısal veri türünde ise değerler örneğin öğrencilerin İngilizce notları gibi ölçümlerden oluşur. Veri birkaç adımda analiz edilebilir. Önce problem tanı…",1,1,!R:!!!!!Terim!!!der!!s!t!n!ge!n!n!a!l!a!n!a!!s!t!l!,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!R:!!!!!Terim!!!der!!s!t!n!ge!n!n!a!l!a!n!a!!s!t!l!",Qwen2.5-7B-Instruct,protocol-v1
+TR-3-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-006,TR-3,tr,Veri Ön İşleme,Veri analize hazır hale getirme sürecidir. Eksik veya yanlış verileri düzeltmek ve veriyi düzenlemek için yapılır.,"…rılır. Sayısal veri türünde ise değerler örneğin öğrencilerin İngilizce notları gibi ölçümlerden oluşur. Veri birkaç adımda analiz edilebilir. Önce problem tanımlanır. Daha sonra veri çalışma alanına aktarılır. Ardından veri analize hazır hale getirilir. Buna veri ön işleme denir. Veri ön işleme en zor süreçlerden biridir. Çünkü verideki eksik veri, aykırı veri, veri tipini ayarlama gibi işlemler bu adımda yapılır. Daha sonra görselleştirme ile veri hakkında ön bilgi edinilir. Veriyi tanıdıktan sonra model kurulur. Süper! Modeli…",1,1,!R:!!!!!!!Terim!!!der!!st!e!ge!n!ç!n!l!n!m!!ve!!!a!l!,"{
+  ""R"": 1,
+  ""D"": 1,
+  "" why"": ""!R:!!!!!!!Terim!!!der!!st!e!ge!n!ç!n!l!n!m!!ve!!!a!l!",Qwen2.5-7B-Instruct,protocol-v1
+TR-3-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-008,TR-3,tr,Python,"Veri bilimi alanında en çok kullanılan, açık kaynaklı, ücretsiz ve kolay öğrenilebilir bir programlama dilidir.",Selam herkese Tirendaz Akademi'ye hoş geldiniz. Bu derste veri bilimi ve Python'dan bahsedeceğim. Derse geçmeden önce kanalımıza yeniyseniz en güncel derslerden haberdar olmak için abone olmayı ve düşüncelerinizi yorumlar kısmında paylaşmayı unutmayın. Son zamanlarda veri bilimi ismini çok duyar olduk. Sosyal medyanın ve internetin geliş…,1,1,!R:!!!! Terim!der!!st!de!ge!n!n!r!d!r! !al!an!!a!!!z!!!n!,"{
+  ""R"": 1,
+  ""D"": 1,
+  ""Why"": ""!R:!!!! Terim!der!!st!de!ge!n!n!r!d!r! !al!an!!a!!!z!!!n!",Qwen2.5-7B-Instruct,protocol-v1
+EN-1-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-008,EN-1,en,Work in Progress Limit,A rule that says the team can only have a certain number of tasks they are working on at the same time so they do not get too busy.,"…When you use Scrum for project management, you form a team that will work together to quickly develop and test a deliverable. The work is completed in short cycles, and the team meets daily to discuss current tasks and clear up anything that's blocking their progress. First, let's review some terms and concepts specific to Scrum. The backlog is the central artifact in Scrum, where all possible ideas, deliverables, features, or tasks are captured for the team to work on. It's prioritized and proactively managed by the team…",0,0,The!! '!!!!!Back!back!back!back!back!back!back!back!back!back!back!back!back!back!back!back!back!back!,"{
+  ""R"": 0,
+  ""D"": 0,
+  "" why"": ""The!! '!!!!!Back!back!back!back!back!back!back!back!back!back!back!back!back!back!back!back!back!back!",Qwen2.5-7B-Instruct,protocol-v1
+EN-1-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-015,EN-1,en,Lean,A set of ideas that helps teams remove waste and work together to continuously improve how they make things.,"…of rugby, you may recognize the term. For those that aren't familiar with rugby, it's similar to American football, a full-contact sport played on a field with a similar-shaped ball. ""Scrum"" refers to a formation in rugby where all of the players on the team lean forward, lock their heads together, and then work as one unit to try and gain precious yards towards the scoring line. The originators of the Scrum methodology saw their team as a heads-down group, working very closely together to get that ball down the field…",0,0,The!! '!!!!!Lean! in!! the!!!transcript!! is!!!!a!reference!to!players!!!leaning!!!forward!in!,"{
+  ""R"": 0,
+  ""D"": 0,
+  "" why"": ""The!! '!!!!!Lean! in!! the!!!transcript!! is!!!!a!reference!to!players!!!leaning!!!forward!in!",Qwen2.5-7B-Instruct,protocol-v1
+EN-2-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-003,EN-2,en,three pillars of sustainability,"The three main areas that must be taken care of to make tourism sustainable: the environment, the economy, and society.","Today I'm going to talk to you about the most important thing in travel: sustainability.
+While there are companies who claim to be sustainable in order to get good PR, and greenwashing happens far more than we care to admit, the reality is that sustainability is quite literally a matter of life and death.
+As highlighted by a guru, David Attenbor…",0,1,The!! '!R'!! criteria!!! is!! not!!!!!!!!!!!!!!!!!!!!!!!!!!!!,"{
+  ""R"": 0,
+  ""D"": 1,
+  "" why"": ""The!! '!R'!! criteria!!! is!! not!!!!!!!!!!!!!!!!!!!!!!!!!!!!",Qwen2.5-7B-Instruct,protocol-v1
+EN-3-openai/whisper-large-v3-turbo|Qwen/Qwen3.5-4B-004,EN-3,en,Artificial Neural Networks,These are computer systems that work like the human brain. They are made of many connected numbers or parts that learn from data to make predictions and understand complex topics.,…five-star chef and having him chop onions the more you interact with Einstein the more you will discover surprising and Powerful ways for him to help you or your company okay enough fluffy metaphors let's clarify some terms AI as you probably know stands for artificial intelligence AI is not new Fields like machine learning and computer vision have been around for decades whenever you see a YouTube recommendation or a web search result or whenever you get a credit card transaction approved that's traditional AI in action ge…,0,0,The!!transcript!does!!refer!to!!!art!!ificial!ne!!ral!!network!s!but!!does!!!!t!describe!!!them,"{
+  ""R"": 0,
+  ""D"": 0,
+  "" why"": ""The!!transcript!does!!refer!to!!!art!!ificial!ne!!ral!!network!s!but!!does!!!!t!describe!!!them",Qwen2.5-7B-Instruct,protocol-v1

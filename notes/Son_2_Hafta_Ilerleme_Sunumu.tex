@@ -1,0 +1,346 @@
+\documentclass[aspectratio=169,10pt]{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{xcolor}
+
+\usetheme{Madrid}
+\usecolortheme{whale}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+
+\definecolor{bounblue}{RGB}{0,51,102}
+\definecolor{accentgreen}{RGB}{0,120,70}
+\setbeamercolor{structure}{fg=bounblue}
+
+\title[EduTerm AI -- Son 2 Hafta \& Envanter]{EduTerm AI: Son 2 Hafta İlerleme Özeti\\ve Mevcut Proje Envanteri}
+\subtitle{Boğaziçi Üniversitesi CMPE 492 Bitirme Projesi (29 Ekim -- 12 Kasım 2026)}
+\author{Ali Günder}
+\institute{Bilgisayar Mühendisliği Bölümü, Boğaziçi Üniversitesi}
+\date{12 Kasım 2026}
+
+\begin{document}
+
+% =========================================================================
+% SAYFA 1: KAPAK & GENEL BAKIŞ
+% =========================================================================
+\begin{frame}
+\titlepage
+\vspace{-0.4cm}
+\begin{block}{Son 2 Haftanın 4 Ana Ekseni (29 Ekim -- 12 Kasım 2026)}
+\scriptsize
+\begin{enumerate}
+    \item \textbf{Korpus Ölçekleme \& Uzlaştırma:} 40 küratörlü ders envanterinin tamamlanması, 99 yeni derslik \texttt{100+} genişleme korpusundan \textbf{999 makine terimi} ve \textbf{180 tabakalı örneklem} üretimi, 133 derslik HPC toplu çıkarım.
+    \item \textbf{Model Ölçekleme (7B $\to$ 14B QLoRA SFT \& DPO):} 7B SFT/DPO şema kayması teşhisi (\texttt{Job 34561}) ve \textbf{EduTerm-14B-CEFR} (\texttt{Job 34027}: \%100 JSON, \%70.8 CEFR kontrolü) + \textbf{14B DPO} (\texttt{Job 34288/34292}: \%62.5 Arena kazanma oranı).
+    \item \textbf{Çapraz-Aile LLM Hakem Denetimi:} 270 Qwen parse fallback ayıklaması, 7B \texttt{bfloat16} doğrulaması (\texttt{Job 34562}: 2/454 fallback, $TN=0$) ve \textbf{14B Hakem} (\texttt{Job 34567}: 0/454 fallback, $TN_R=7/12$, $TN_D=6/8$).
+    \item \textbf{Donanım/Veri Hijyeni \& Teslim Paketi:} SRM token/RTF doğrulaması, Etiketleme Stüdyosu otomatik eş anlamlı (alias) motoru, provenance/SHA-256 kayıtları ve 5 ana teslim PDF'inin sıfır hatayla derlenmesi.
+\end{enumerate}
+\end{block}
+\end{frame}
+
+% =========================================================================
+% SAYFA 2: VERİ KORPUSU GENİŞLEMESİ VE KAPSAM UZLAŞTIRMASI
+% =========================================================================
+\begin{frame}{1. Veri Korpusu Genişlemesi ve Kapsam Uzlaştırma Matrisi}
+\scriptsize
+Son 2 haftada tüm veri alt kümeleri (\texttt{7 / 33 / 40 / 99 / 125 / 133}) tek bir denetlenebilir matriste (\texttt{scope\_reconciliation\_matrix.json}) ve güncel \texttt{data\_inventory.json} dosyasında birleştirildi:
+
+\vspace{0.15cm}
+\begin{table}
+\centering
+\scriptsize
+\begin{tabular}{lccp{8.2cm}}
+\toprule
+\textbf{Bölüm (Partition)} & \textbf{Klip} & \textbf{Etiket Durumu} & \textbf{Doğrulanmış Kapsam ve Dosya İzlenebilirliği} \\
+\midrule
+Pilot Altın Set & \textbf{7} & \texttt{human\_gold} & 3 TR (\texttt{TR-1..3}) + 4 EN (\texttt{EN-1..4}); $95.6$ dk ses, $13{,}467$ altın kelime (\texttt{manifest.jsonl}); \texttt{TR-1} ve \texttt{EN-1} için 32'şer kapalı altın terim (\texttt{gold\_terms.json}). \\
+HPC Job 33600 & \textbf{33} & \texttt{mixed} & 40'lık envanterin ilk hazır transkript alt kümesi ($504.5$ sn, $12{,}609$ token, $118$ terim, $19$ önkoşul açığı). \\
+Küratörlü Envanter & \textbf{40} & \texttt{mixed} & 32 akademik (\texttt{TR/EN-01..16}) + 8 kurumsal (\texttt{TR/EN-17..20}); diskte \textbf{34 WAV} ($16$ tam süre eşleşmeli = $4.64$ sa), $15$ QA-geçen transkript, \textbf{160 şablon terim}. \\
+100+ Genişleme & \textbf{99} & \texttt{machine\_only} & 100 kliplik iş listesinden indirilen 99 ders (\texttt{EN-44} erişilemez); \textbf{34.78 saat} doğrulanmış WAV ve 99 Whisper transkripti (\texttt{manifest\_100plus.jsonl}). \\
+Birleşik Makine & \textbf{125} & \texttt{machine\_only} & Ayrık birleşim: $26$ (32'lik akademik sesli) $+ 99$ (100+ genişleme) $= \textbf{125}$ ders (\textbf{48.70 saat}). \\
+HPC Batch-133 & \textbf{133} & \texttt{mixed} & \texttt{Job 34006}: $125$ birleşik $+ 8$ kurumsal klip; \textbf{2{,}079.1 sn} ($\approx 34.7$ dk), \textbf{54{,}385 üretilen token}, $143$ terim, \textbf{\%78.9} CEFR B1 okunabilirlik uyumu. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{itemize}
+    \item \textbf{Envanter Hijyeni:} \texttt{append\_corporate\_videos.py} çalıştırılarak 8 kurumsal ders (\texttt{TR-17..20}, \texttt{EN-17..20}) \texttt{data\_inventory.json} ve \texttt{data\_inventory.csv} içine tam süre/transkript/şablon sayılarıyla işlendi.
+\end{itemize}
+\end{frame}
+
+% =========================================================================
+% SAYFA 3: 100+ TERİM ÇIKARIMI VE TABAKALI ÖRNEKLEM TASARIMI
+% =========================================================================
+\begin{frame}{2. 100+ Korpus Terim Üretimi (999 Aday) ve Tabakalı Örneklem}
+\scriptsize
+\begin{columns}[T]
+\begin{column}{0.52\textwidth}
+\begin{block}{A. 99 Yeni Klipte Makine Terim Çıkarımı}
+\begin{itemize}
+    \item \textbf{Önceki Durum:} Yerel \texttt{Qwen3.5-4B} çıkarımı \texttt{11/99} klipte ($88$ aday) kalmıştı.
+    \item \textbf{Tamamlanan İşlem:} \texttt{build\_100plus\_machine\_and\_sample.py} ile önbellek ve transkript tabanlı çıkarım kesintisiz tamamlandı.
+    \item \textbf{Sonuç (\texttt{labels\_todo\_100plus\_machine.csv}):}
+    \begin{itemize}
+        \item İşlenen geçerli ders: \textbf{98 / 99 klip} (\texttt{EN-50} kısa/boş transkript nedeniyle 0 terim)
+        \item Toplam makine terim adayı: \textbf{999 satır}
+        \item Dil dağılımı: \textbf{421 Türkçe} + \textbf{578 İngilizce}
+        \item Özet metrikler: \texttt{machine\_labels\_100plus\_summary.json}
+    \end{itemize}
+\end{itemize}
+\end{block}
+\end{column}
+
+\begin{column}{0.45\textwidth}
+\begin{block}{B. Deterministik 180 Maddelik Örneklem}
+\begin{itemize}
+    \item \textbf{Yöntem:} Dil $\times$ Alan $\times$ Klip tabakalı deterministik örnekleme (\texttt{seed = 42}, klip başına tavan = 2 terim).
+    \item \textbf{Kapsam (\texttt{labels\_todo\_sample\_100plus.csv}):}
+    \begin{itemize}
+        \item Toplam örneklem: \textbf{180 aday terim}
+        \item Kapsanan ders: \textbf{95 farklı klip}
+        \item Dil kırılımı: \textbf{74 TR} (\%41.1) + \textbf{106 EN} (\%58.9)
+    \end{itemize}
+    \item \textbf{Etiketleme Arayüzü:} Tek-dosya çevrimdışı HTML değerlendirme formu üretildi (\texttt{annotation\_form\_a1\_sample\_100plus.html}).
+    \item \textbf{Bilimsel Dürüstlük:} İnsan etiketlemesi tamamlanana kadar \texttt{0/180} (\texttt{machine\_only}) olarak raporlandı; sentetik insan etiketi üretilmedi.
+\end{itemize}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
+% =========================================================================
+% SAYFA 4: 7B SFT/DPO SINIRLARI -> 14B CEFR-SFT & DPO GEÇİŞİ
+% =========================================================================
+\begin{frame}{3. Model Ölçekleme: 7B Teşhisi $\to$ 14B CEFR-SFT ve 14B DPO}
+\scriptsize
+\begin{table}
+\centering
+\scriptsize
+\begin{tabular}{llccccp{4.6cm}}
+\toprule
+\textbf{Model / Kontrol Noktası} & \textbf{Slurm İş} & \textbf{Geçerli JSON} & \textbf{B1 Uyum} & \textbf{Ort. Ateşman} & \textbf{F1 / Win-Rate} & \textbf{Temel Bulgu} \\
+\midrule
+Qwen2.5-7B Base (\texttt{TR-1/EN-1}) & \texttt{34561} & \%62.5 & \%25.0 & 48.03 & \%0.0 F1 & Şema kısmen korunuyor ancak terim eşleşmesi düşük. \\
+EduTerm-7B-TR SFT ($2{,}296$ örn.) & \texttt{33602/34561} & \%0.0 & \%0.0 & -- & \%0.0 F1 & Dar LoRA adaptöründe JSON anahtar/şema kayması. \\
+EduTerm-7B-DPO (\texttt{beta=0.1}) & \texttt{33750/34561} & \textbf{\%12.5} & \%0.0 & 37.35 & \%0.0 F1 & DPO şemayı kısmen (\%0$\to$\%12.5) kurtarıyor, metin ağır (B2). \\
+\midrule
+\textbf{EduTerm-14B-CEFR SFT} ($4{,}666$) & \texttt{34027} & \textbf{\%100.0} & \textbf{\%70.8*} & B1/B2/C1 & \textbf{\%47.2 F1} & \textbf{\%87.5 Kesinlik}, \%50.0 Bloom doğruluğu, 0 şema hatası. \\
+\textbf{EduTerm-14B-DPO} (Arena) & \texttt{34288/34292} & \textbf{\%100.0} & \textbf{\%50.0} & \textbf{51.9} & \textbf{\%62.5 Win} & 14B SFT'ye karşı \%62.5 üstünlük; \%87.5 analoji temellendirme. \\
+\bottomrule
+\end{tabular}
+\end{table}
+\vspace{-0.15cm}
+{\tiny *\%70.8: Üç hedef CEFR bandı (B1: 50--70, B2: 35--50, C1: 0--35 Ateşman) genelinde dinamik karmaşıklık kontrol başarısı (\texttt{eduterm\_14b\_cefr\_sft\_report.json}).}
+
+\vspace{0.15cm}
+\begin{itemize}
+    \item \textbf{Neden 14B'ye Geçildi?} \texttt{Job 34561} (\texttt{dpo\_7b\_generative\_eval.json}) 7B ölçeğinde Türkçe pedagojik stil uyumu ile katı JSON şeması arasında kapasite darboğazı oluştuğunu ampirik olarak kanıtladı.
+    \item \textbf{14B Çok-Görevli Yetenekler (\texttt{Job 34292}):} Sokratik kavram yanılgısı diyaloglarında ($10$ tur) \textbf{\%100.0 kavram yanılgısı giderimi} ve \%40.0 Sokratik soru yönlendirme oranı (\texttt{socratic\_misconception\_report.json}).
+\end{itemize}
+\end{frame}
+
+% =========================================================================
+% SAYFA 5: ÇAPRAZ-AİLE HAKEM DENETİMİ (270 FALLBACK TEMİZLİĞİ & 7B BF16)
+% =========================================================================
+\begin{frame}{4. Çapraz-Aile Hakem Denetimi: Veri Hijyeni ve 7B \texttt{bfloat16} Koşusu}
+\scriptsize
+\textbf{Problem:} İlk çapraz-aile hakem koşusunda (\texttt{Job 33983}, \texttt{max\_new\_tokens=65}) \texttt{Qwen2.5-7B} modelinin \textbf{270/454 (\%59.5)} maddede JSON'u tamamlayamayıp sessizce \texttt{\{"R":1, "D":1\}} varsayılanına düştüğü saptandı (\texttt{Mistral-7B}: \textbf{454/454 gerçek karar, 0 fallback}).
+
+\begin{block}{Adım 1: Fiziksel Ayrıştırma ve Yeniden Hesaplama (\texttt{recompute\_cross\_family\_clean.py})}
+\begin{itemize}
+    \item 270 fallback satırı \texttt{labels\_panel\_qwen25\_7b\_a40\_fallback270.csv} dosyasına ayrıldı.
+    \item Yalnızca \textbf{184 gerçek Qwen kararı} (\texttt{labels\_panel\_qwen25\_7b\_a40\_clean184.csv}) üzerinden uyum yeniden hesaplandı:
+    \begin{itemize}
+        \item \textbf{Qwen2.5-7B (184) $\times$ Mistral-7B:} $P_{o,R} = \textbf{\%90.22}$ ($\kappa=0.211$, $TN=3$), $P_{o,D} = \textbf{\%92.39}$ ($\kappa=0.336$, $TN=4$).
+        \item \textbf{Qwen2.5-7B (184) $\times$ İnsan A1 ($N=155$):} $P_{o,R} = \%86.45$, $P_{o,D} = \%87.74$, ancak \textbf{$TN = 0$}.
+    \end{itemize}
+\end{itemize}
+\end{block}
+
+\begin{block}{Adım 2: Doğal \texttt{bfloat16} + 192 Token Doğrulama Koşusu (\texttt{Slurm Job 34562})}
+\begin{itemize}
+    \item \texttt{Qwen2.5-7B-Instruct} 4-bit nicemleme olmadan doğal \texttt{bfloat16} ve \texttt{max\_new\_tokens=192} ile tüm 454 maddede yeniden koşturuldu (\texttt{cross\_family\_judge\_report\_bf16.json}):
+    \item \textbf{Parse Fallback:} $270/454 \longrightarrow \textbf{2/454 (\%0.4)}$ seviyesine indi!
+    \item \textbf{Sonuç:} Qwen $\times$ Mistral uyumu $R$'de \textbf{\%94.71} ($\kappa=0.175$), $D$'de \textbf{\%88.33} ($\kappa=0.184$) çıktı; fakat İnsan \texttt{A1} ($N=399$) karşısında \textbf{$TN = 0$} kalarak 7B hakemin insan-negatiflerini yakalayamamasının nicemleme değil \textbf{model ölçeği sınırı} olduğu kanıtlandı.
+\end{itemize}
+\end{block}
+\end{frame}
+
+% =========================================================================
+% SAYFA 6: 14B HAKEM ÖLÇEKLEMESİ (JOB 34567 - TN>0 ATILIMI)
+% =========================================================================
+\begin{frame}{5. 14B Hakem Ölçeklemesi (\texttt{Job 34567}): $TN = 0$ Sınırının Aşılması}
+\scriptsize
+7B hakemlerin insan-negatiflerini yakalayamaması üzerine bugün Boğaziçi HPC A40 üzerinde \textbf{\texttt{Qwen2.5-14B-Instruct}} (\texttt{bfloat16}, \texttt{max\_new\_tokens=192}, \texttt{Slurm Job 34567}) 454 maddelik tam panelde koşturuldu:
+
+\vspace{0.1cm}
+\begin{table}
+\centering
+\scriptsize
+\begin{tabular}{lcccccccc}
+\toprule
+\textbf{Hakem Çifti} & \textbf{Ölçüt} & \textbf{$N$} & \textbf{Fallback} & \textbf{$P_o$ (\%)} & \textbf{$\kappa$} & \textbf{[TP, TN, FP, FN]} & \textbf{Özgüllük (Spec)} & \textbf{BalAcc} \\
+\midrule
+Mistral-7B $\times$ İnsan A1 & $R$ / $D$ & 399 & 0 / 454 & 94.2 / 96.2 & -0.03 / -0.02 & [376, \textbf{0}, 12, 11] / [384, \textbf{0}, 8, 7] & \%0.0 / \%0.0 & \%48.6 / \%49.1 \\
+Qwen2.5-7B (\texttt{bf16}) $\times$ İnsan A1 & $R$ / $D$ & 399 & 2 / 454 & 92.5 / 84.7 & -0.04 / -0.03 & [369, \textbf{0}, 12, 18] / [338, \textbf{0}, 8, 53] & \%0.0 / \%0.0 & \%47.7 / \%43.2 \\
+\midrule
+\textbf{Qwen2.5-14B (\texttt{bf16}) $\times$ İnsan A1} & \textbf{$R$ (Bağlam)} & \textbf{399} & \textbf{0 / 454} & \textbf{69.67\%} & \textbf{+0.052} & \textbf{[271, 7, 5, 116]} & \textbf{\%58.3 (7/12)} & \textbf{\%64.2} \\
+\textbf{Qwen2.5-14B (\texttt{bf16}) $\times$ İnsan A1} & \textbf{$D$ (Tanım)} & \textbf{399} & \textbf{0 / 454} & \textbf{55.64\%} & \textbf{+0.026} & \textbf{[216, 6, 2, 175]} & \textbf{\%75.0 (6/8)} & \textbf{\%65.1} \\
+\midrule
+\textbf{EVREN-Auto (TÜBİTAK/SSB) $\times$ İnsan A1} & \textbf{$R$ (Bağlam)} & \textbf{399} & \textbf{1 / 454} & \textbf{92.73\%} & \textbf{+0.183} & \textbf{[366, 4, 8, 21]} & \textbf{\%33.3 (4/12)} & \textbf{\%64.0} \\
+\textbf{EVREN-Auto (TÜBİTAK/SSB) $\times$ İnsan A1} & \textbf{$D$ (Tanım)} & \textbf{399} & \textbf{1 / 454} & \textbf{90.23\%} & \textbf{+0.142} & \textbf{[356, 4, 4, 35]} & \textbf{\%50.0 (4/8)} & \textbf{\%70.5} \\
+\midrule
+EVREN-Auto $\times$ Mistral-7B & $R$ / $D$ & 454 & 1 / 454 & 93.2 / 89.7 & +0.13 / +0.05 & [420, 3, 8, 23] / [405, 2, 6, 41] & \%27.3 / \%25.0 & \%61.1 / \%57.9 \\
+\midrule
+Qwen2.5-14B (\texttt{bf16}) $\times$ Mistral-7B & $R$ / $D$ & 454 & 0 / 454 & 73.3 / 57.7 & +0.09 / +0.04 & [324, \textbf{9}, 2, 119] / [254, \textbf{8}, 0, 192] & \%81.8 / \%100.0 & \%77.3 / \%86.7 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{itemize}
+    \item \textbf{14B \& Ulusal Bulut (EVREN) Başarısı:} \texttt{Qwen2.5-14B} ($TN_R=7, TN_D=6$) ve \textbf{TÜBİTAK/SSB EVREN} ($TN_R=4, TN_D=4$, $\kappa=+0.183$) 7B açık modellerin $TN=0$ sınırını aşmıştır.
+    \item \textbf{Denge:} EVREN hem \%90--93 seviyesinde yüksek insan uyumunu korumuş hem de pozitif Kappa ile insan-negatifi ayrımcılığını (\%70.5 dengeli doğruluk) kanıtlamıştır.
+\end{itemize}
+\end{frame}
+
+% =========================================================================
+% SAYFA 7: KENAR (EDGE) SRM/SLM PROFİLLEME VE ETİKETLEME STÜDYOSU
+% =========================================================================
+\begin{frame}{6. Kenar (Edge) SRM/SLM Doğrulaması ve Etiketleme Stüdyosu Geliştirmeleri}
+\scriptsize
+\begin{columns}[T]
+\begin{column}{0.53\textwidth}
+\begin{block}{A. SRM Token Sayısı ve RTF Denetimi (RTX 5060 8 GB)}
+7 altın klip ($5{,}734.5$ sn = $95.6$ dk) üzerinde üretilen tam token sayıları ve saniye başı üretim hızları ölçüldü (\texttt{srm\_asr\_measured.json}):
+\vspace{0.1cm}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{ASR Modeli} & \textbf{Param.} & \textbf{RTF} & \textbf{Üretilen Tok.} & \textbf{Tok/sn} \\
+\midrule
+Whisper Tiny & 39M & 0.1557 & 21{,}546 & \textbf{29.4} \\
+Whisper Base & 74M & 0.1852 & 21{,}449 & 24.5 \\
+Whisper Small & 244M & 0.2871 & 21{,}334 & 15.7 \\
+Qwen3-ASR-0.6B & 600M & 0.3114 & 18{,}901 & 13.5 \\
+\bottomrule
+\end{tabular}
+\vspace{0.1cm}
+\begin{itemize}
+    \item \textbf{RTF Açıklaması (\texttt{rtf\_path\_audit.json}):} \texttt{run\_asr.py} sabit 30 sn pencere dolgusu kullandığından küçük modellerde pencere başı sabit yük, \texttt{benchmark\_srm\_slm.py}'deki ham tensör yolundan farklı RTF üretir.
+    \item \textbf{BENCH-8 Sınırı:} 8 vaka / 28 altın terimli yerel vs.\ A40 SLM probunda $\pm 0.07$ F1 varyansı açık metodolojik sınır olarak eklendi.
+\end{itemize}
+\end{block}
+\end{column}
+
+\begin{column}{0.44\textwidth}
+\begin{block}{B. Altın Standart Etiketleme Stüdyosu (\texttt{annotator.py})}
+\begin{itemize}
+    \item \textbf{Yeni Özellik -- Otomatik Eş Anlamlı (Alias) Çekme:}
+    \begin{itemize}
+        \item Kullanıcı terimi yazdığında (350 ms debounce veya \textit{``Sözlükten Çek''} butonu) eş anlamlılar otomatik doldurulur.
+        \item \textbf{Çevrimdışı Katman:} \texttt{gold\_terms.json}, \texttt{gold\_annotations/}, \texttt{domain\_rag.py} ontolojisi ve yerleşik TR/EN akademik sözlük.
+        \item \textbf{Çevrimiçi Katman (\texttt{/api/synonyms}):} \texttt{Datamuse} (EN eş anlamlı) ve \texttt{MyMemory} (TR$\leftrightarrow$EN çapraz dil karşılıkları).
+    \end{itemize}
+    \item \textbf{Birim Test Doğrulaması:} Yeni \texttt{test\_annotator\_synonyms.py} dahil toplam \textbf{73/73 birim test} (\texttt{1.04s}) hatasız geçmektedir.
+\end{itemize}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
+% =========================================================================
+% SAYFA 8: METODOLOJİK HİJYEN, PROVENANCE VE YENİDEN ÜRETİLEBİLİRLİK
+% =========================================================================
+\begin{frame}{7. Metodolojik Şeffaflık, Provenance ve Yeniden Üretilebilirlik}
+\scriptsize
+\begin{enumerate}
+    \item \textbf{İnsan Etiket Provenance Kaydı (\texttt{annotation\_provenance\_180.json}):}
+    \begin{itemize}
+        \item Tek insan değerlendirici (\texttt{A1}) toplam \textbf{413 karar} üretti: \textbf{233 pilot} (7 klip $\times$ 3 ASR + şablon) + \textbf{180 makine adayı} (235'lik havuzdan; 55 EN aday \texttt{labels\_todo\_human\_queue.csv} içinde açık kuyrukta).
+        \item 180 aday etiketin \textbf{59'u doğrudan indirilen CSV} (\texttt{tier\_1}), \textbf{121'i tarayıcı durum kurtarması} (\texttt{tier\_2}) olup 59 örtüşen kayıtta \textbf{0 çelişki} doğrulandı. Çift-kör insan IAA iddiaları tüm metinlerden kaldırıldı.
+    \end{itemize}
+    \item \textbf{Altın Anotasyon Hijyeni ve Taksonomi Netleştirmesi:}
+    \begin{itemize}
+        \item Test amaçlı \texttt{gold\_annotations/TR-01.json} (``Test Title'', 1 terim) silindi.
+        \item \texttt{gold\_terms.json} içindeki yinelenen \texttt{EN-01} (35 terim) kaldırılarak kanonik kapalı altın liste \texttt{TR-1} (\textbf{32 terim}) ve \texttt{EN-1} (\textbf{32 terim}) olarak sabitlendi.
+        \item \texttt{manifest.jsonl} içindeki \texttt{gold\_how} (\texttt{caption\_corrected}, \texttt{official\_caption\_corrected}, \texttt{independent\_transcription}) ile tezdeki \texttt{human\_gold} ($13{,}467$ kelime) taksonomisi dipnotla açıklandı.
+    \end{itemize}
+    \item \textbf{Kriptografik ve Donanımsal İzlenebilirlik (\texttt{reproducibility\_registry.json} \& \texttt{reproduce.md}):}
+    \begin{itemize}
+        \item 6 Hugging Face temel modelin tam commit revizyon hash'leri, 4 LoRA adaptörünün \textbf{SHA-256} özetleri ve 13 Boğaziçi HPC Slurm işinin (\texttt{33600}..\texttt{34568}) komut/donanım kayıtları belgelendi.
+    \end{itemize}
+\end{enumerate}
+\end{frame}
+
+% =========================================================================
+% SAYFA 9: SONUÇ OLARAK ELİMİZDE NELER VAR? (VERİ, MODEL, YAZILIM)
+% =========================================================================
+\begin{frame}{8. Sonuç Olarak Elimizde Neler Var? (1/2: Veri, Model ve Yazılım)}
+\scriptsize
+\begin{columns}[T]
+\begin{column}{0.32\textwidth}
+\begin{block}{1. Doğrulanmış Veri Varlıkları}
+\begin{itemize}
+    \item \textbf{7 Altın Pilot Klip:} $95.6$ dk WAV, $13{,}467$ altın kelime, \texttt{TR-1}/\texttt{EN-1} için $32+32=64$ kapalı altın terim.
+    \item \textbf{40 Küratörlü Ders Envanteri:} 32 akademik + 8 kurumsal ders, 34 yerel WAV, 160 şablon terim (\texttt{data\_inventory.json}).
+    \item \textbf{99 Yeni Genişleme Dersi:} $34.78$ saat ses, 99 transkript, \textbf{999 makine terimi} ve \textbf{180 tabakalı örneklem}.
+    \item \textbf{413 İnsan (\texttt{A1}) Kararı} + \textbf{454 Maddelik 3-Hakemli Panel} (\texttt{Mistral-7B}, \texttt{Qwen2.5-7B bf16}, \texttt{Qwen2.5-14B bf16}).
+\end{itemize}
+\end{block}
+\end{column}
+
+\begin{column}{0.33\textwidth}
+\begin{block}{2. Eğitilmiş Modeller \& Deneyler}
+\begin{itemize}
+    \item \textbf{EduTerm-14B-CEFR-SFT:} $4{,}666$ örnekte eğitilmiş QLoRA adaptörü (\%100 JSON, \%87.5 kesinlik, \%70.8 CEFR kontrolü).
+    \item \textbf{EduTerm-14B-DPO:} Tercih hizalamalı 14B adaptör (\%62.5 Arena win-rate).
+    \item \textbf{EduTerm-7B-TR SFT \& DPO:} $2{,}296$ SFT ve 432 DPO çifti kontrol noktaları (SHA-256 kayıtlı).
+    \item \textbf{35+ Deneysel JSON Raporu:} ASR WER/CER, Scaling Law, Cross-Layer, 32K Long-Context DAG, Quantization, BKT, Socratic, Judge.
+\end{itemize}
+\end{block}
+\end{column}
+
+\begin{column}{0.32\textwidth}
+\begin{block}{3. Çalışan Yazılım \& Araçlar}
+\begin{itemize}
+    \item \textbf{Uçtan Uca Boru Hattı (\texttt{pipeline.py}):} Ses $\to$ ASR $\to$ LLM Terim/Tanım $\to$ Hibrit RAG $\to$ NetworkX Önkoşul DAG.
+    \item \textbf{Etiketleme Stüdyosu (\texttt{annotator.py}):} Otomatik eş anlamlı (alias) çekme, Ateşman/CEFR canlı ölçümü, çok-düzeyli (B1/B2/C1) düzenleyici.
+    \item \textbf{Çevrimdışı HTML Formları:} \texttt{A1} aday ve 180 örneklem etiketleme formları.
+    \item \textbf{Test Paketi:} \textbf{73/73} geçen birim testi (\texttt{experiments/tests/}).
+\end{itemize}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
+% =========================================================================
+% SAYFA 10: SONUÇ OLARAK ELİMİZDE NELER VAR? (TESLİM PAKETİ & AÇIK KALEMLER)
+% =========================================================================
+\begin{frame}{9. Sonuç Olarak Elimizde Neler Var? (2/2: Teslim PDF Paketi \& Açık Kalemler)}
+\scriptsize
+\begin{block}{Teslime Hazır Güncel Doküman Paketi (\texttt{GUNCEL\_TESLIM\_PDFLERI/})}
+\begin{tabular}{llp{7.8cm}}
+\toprule
+\textbf{\#} & \textbf{Teslim Dosyası} & \textbf{İçerik ve Doğrulama Durumu} \\
+\midrule
+1 & \texttt{1\_Bogazici\_CMPE492\_Final\_Report\_ENG.pdf} & \textbf{İngilizce CMPE 492 Final Tez Raporu} (0 LaTeX hatası, 0 tanımsız referans, tüm P0/P1/P2 ve \texttt{Job 34567} 14B hakem bulguları işlenmiş). \\
+2 & \texttt{2\_Bitirme\_Projesi\_Kapsamli\_Rapor\_TR.pdf} & \textbf{Türkçe Kapsamlı Bitirme Projesi Raporu} (\texttt{Bitirme\_Projesi\_Raporu.md} ile tam senkron). \\
+3 & \texttt{3\_Bitirme\_Projesi\_A0\_Sunum\_Posteri.pdf} & \textbf{A0 Dikey Akademik Sunum Posteri} (TR ve EN versiyonları mevcut). \\
+4 & \texttt{4\_Bitirme\_Projesi\_A3\_Masaustu\_Posteri.pdf} & \textbf{A3 Yatay Masaüstü Jüri Özeti Posteri}. \\
+5 & \texttt{5\_Akademik\_Bildiri\_IEEE\_Paper.pdf} & \textbf{IEEE Konferans Formatında Akademik Bildiri} (\texttt{paper/main.tex}). \\
+6 & \texttt{6\_Son\_2\_Hafta\_Ilerleme\_Sunumu\_10Sayfa.pdf} & \textbf{Bu 10 Sayfalık İlerleme ve Envanter Sunumu} (\texttt{notes/Son\_2\_Hafta\_Ilerleme\_Sunumu.pdf}). \\
+\bottomrule
+\end{tabular}
+\end{block}
+
+\begin{alertblock}{Bilimsel Dürüstlükle Açık Bırakılan / Devam Eden Kalemler}
+\begin{itemize}
+    \item \textbf{İnsan Etiket Kuyruğu:} 32-klip havuzunda kalan \textbf{55 EN aday} (\texttt{labels\_todo\_human\_queue.csv}) ve 100+ genişleme korpusundaki \textbf{180 tabakalı örneklem} (\texttt{0/180}, form hazır) insan etiketlemesi beklemektedir.
+    \item \textbf{Tamamlanan Bulut Hakemi:} \texttt{EVREN} Ulusal Platformu (\texttt{evren/auto}) 454 maddede \textbf{453/454} geçerli kararla tamamlanmış ve İnsan A1 karşısında $TN=4$, $\kappa=+0.183$ ile doğrulanmıştır (\texttt{cross\_family\_judge\_report\_evren.json}). 2-shot kalibre 14B hakem işi (\texttt{Slurm Job 34568}) HPC kuyruğundadır.
+\end{itemize}
+\end{alertblock}
+\end{frame}
+
+\end{document}
+

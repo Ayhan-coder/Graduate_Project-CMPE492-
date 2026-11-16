@@ -45,16 +45,27 @@ _load_env_files()
 
 
 def get_evren_api_key() -> str:
-    """Return the EVREN API key from the environment or a .env file.
+    """Return the EVREN API key from .env file (preferred) or the environment.
 
     The key is never hardcoded: it grants access to a national inference platform
     that is billed per token and is tracked in version control.
     """
-    key = (
-        os.environ.get("EVREN_API_KEY")
-        or os.environ.get("EVREN_TOKEN")
-        or ""
-    ).strip()
+    key = None
+    for cand in [ROOT / ".env", ROOT / "experiments" / ".env"]:
+        if cand.exists():
+            for line in cand.read_text(encoding="utf-8").splitlines():
+                line = line.strip()
+                if line.startswith("EVREN_API_KEY="):
+                    key = line.split("=", 1)[1].strip()
+                    break
+            if key:
+                break
+    if not key:
+        key = (
+            os.environ.get("EVREN_API_KEY")
+            or os.environ.get("EVREN_TOKEN")
+            or ""
+        ).strip()
     if not key:
         raise RuntimeError(
             "EVREN API key is not configured. Set EVREN_API_KEY in the environment "

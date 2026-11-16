@@ -114,7 +114,9 @@ def run_judge_arm(
     model_path: str,
     items: List[Dict[str, str]],
     out_csv: Path,
-    device: str = "cuda"
+    device: str = "cuda",
+    max_new_tokens: int = 192,
+    use_bf16: bool = False,
 ) -> Dict[str, Dict[str, Any]]:
     logger.info("=" * 70)
     logger.info("RUNNING JUDGE ARM: %s (%s)", model_name, model_path)
@@ -138,24 +140,31 @@ def run_judge_arm(
         logger.info("All %d items already judged for %s", len(items), model_name)
         return done
 
-    logger.info("Loading Tokenizer and Model for %s in 4-bit NF4...", model_name)
+    logger.info("Loading Tokenizer and Model for %s (%s)...", model_name, "bfloat16" if use_bf16 else "4-bit NF4")
     tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
-    bnb_config = BitsAndBytesConfig(
-        load_in_4bit=True,
-        bnb_4bit_quant_type="nf4",
-        bnb_4bit_use_double_quant=True,
-        bnb_4bit_compute_dtype=torch.bfloat16
-    )
-
-    model = AutoModelForCausalLM.from_pretrained(
-        model_path,
-        quantization_config=bnb_config,
-        device_map=device,
-        trust_remote_code=True
-    )
+    if use_bf16:
+        model = AutoModelForCausalLM.from_pretrained(
+            model_path,
+            torch_dtype=torch.bfloat16,
+            device_map=device,
+            trust_remote_code=True,
+        )
+    else:
+        bnb_config = BitsAndBytesConfig(
+            load_in_4bit=True,
+            bnb_4bit_quant_type="nf4",
+            bnb_4bit_use_double_quant=True,
+            bnb_4bit_compute_dtype=torch.bfloat16
+        )
+        model = AutoModelForCausalLM.from_pretrained(
+            model_path,
+            quantization_config=bnb_config,
+            device_map=device,
+            trust_remote_code=True
+        )
     model.eval()
 
     fields = ["item_id", "video_id", "lang", "term", "explanation", "context",
@@ -185,7 +194,7 @@ def run_judge_arm(
         with torch.inference_mode():
             outputs = model.generate(
                 **inputs,
-                max_new_tokens=65,
+                max_new_tokens=max_new_tokens,
                 temperature=0.01,
                 do_sample=False,
                 pad_token_id=tokenizer.eos_token_id
@@ -283,14 +292,23 @@ def calculate_agreement_stats(
 
 
 def main():
+    ap = argparse.ArgumentParser(description="Cross-Family LLM Judge Benchmark on Boğaziçi HPC A40.")
+    ap.add_argument("--max-new-tokens", type=int, default=192)
+    ap.add_argument("--bf16", action="store_true", help="Load Qwen in native bfloat16 (avoids 4-bit bnb degradation)")
+    ap.add_argument("--only-qwen", action="store_true", help="Reuse existing Mistral CSV and rerun only Qwen2.5-7B")
+    ap.add_argument("--qwen-out", type=str, default="annotation/labels_panel_qwen25_7b_a40_bf16.csv")
+    ap.add_argument("--mistral-out", type=str, default="annotation/labels_panel_mistral7b_a40.csv")
+    ap.add_argument("--report-out", type=str, default="outputs/cross_family_judge_report_bf16.json")
+    args = ap.parse_args()
+
     root_dir = Path(__file__).resolve().parent
     panel_csv = root_dir / "annotation" / "labels_panel_input.csv"
     human_csv = root_dir / "annotation" / "labels_a1.csv"
-    out_qwen_csv = root_dir / "annotation" / "labels_panel_qwen25_7b_a40.csv"
-    out_mistral_csv = root_dir / "annotation" / "labels_panel_mistral7b_a40.csv"
-    report_json = root_dir / "outputs" / "cross_family_judge_report.json"
+    out_qwen_csv = root_dir / args.qwen_out
+    out_mistral_csv = root_dir / args.mistral_out
+    report_json = root_dir / args.report_out
 
-    logger.info("Initializing Cross-Family LLM Judge Protocol on Boğaziçi HPC A40...")
+    logger.info("Initializing Cross-Family LLM Judge Protocol on Boğaziçi HPC A40 (max_new_tokens=%d)...", args.max_new_tokens)
 
     # Load 454 panel items
     panel_items = []
@@ -303,10 +321,27 @@ def main():
     mistral_path = "/users/ali.gunder/hf_cache/models--unsloth--mistral-7b-instruct-v0.3-bnb-4bit/snapshots/d5f623888f1415cf89b5c208d09cb620694618ee"
 
     # 1. Run Arm 1: Qwen2.5-7B-Instruct
-    qwen_results = run_judge_arm("Qwen2.5-7B-Instruct", qwen_path, panel_items, out_qwen_csv)
+    qwen_results = run_judge_arm(
+        "Qwen2.5-7B-Instruct", qwen_path, panel_items, out_qwen_csv,
+        max_new_tokens=args.max_new_tokens, use_bf16=args.bf16
+    )
 
-    # 2. Run Arm 2: Mistral-7B-Instruct-v0.3
-    mistral_results = run_judge_arm("Mistral-7B-Instruct-v0.3", mistral_path, panel_items, out_mistral_csv)
+    # 2. Load or Run Arm 2: Mistral-7B-Instruct-v0.3
+    if args.only_qwen and out_mistral_csv.exists():
+        mistral_results: Dict[str, Dict[str, Any]] = {}
+        with out_mistral_csv.open("r", encoding="utf-8-sig") as fh:
+            for row in csv.DictReader(fh):
+                if row.get("judge_R") != "":
+                    mistral_results[row["item_id"]] = {
+                        "R": int(row["judge_R"]),
+                        "D": int(row["judge_D"]),
+                        "why": row.get("judge_why", ""),
+                    }
+        logger.info("Reused %d existing Mistral verdicts from %s", len(mistral_results), out_mistral_csv)
+    else:
+        mistral_results = run_judge_arm(
+            "Mistral-7B-Instruct-v0.3", mistral_path, panel_items, out_mistral_csv, max_new_tokens=args.max_new_tokens
+        )
 
     # 3. Load Human A1 Ground Truth
     human_a1: Dict[str, Dict[str, int]] = {}

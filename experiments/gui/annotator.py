@@ -20,7 +20,9 @@ import socketserver
 import sys
 import threading
 import time
+import unicodedata
 import urllib.parse
+import urllib.request
 import webbrowser
 from pathlib import Path
 
@@ -30,9 +32,16 @@ DATA_DIR = ROOT_DIR / "experiments" / "data"
 MANIFEST_FILE = DATA_DIR / "manifest_30plus.jsonl"
 INVENTORY_FILE = DATA_DIR / "data_inventory.json"
 GOLD_TERMS_FILE = DATA_DIR / "gold_terms.json"
+REF_TR_FILE = DATA_DIR / "reference_defs_tr.json"
+REF_EN_FILE = DATA_DIR / "oxford_refs_en.json"
 ANNOTATIONS_DIR = DATA_DIR / "gold_annotations"
 
 ANNOTATIONS_DIR.mkdir(parents=True, exist_ok=True)
+
+_SYNONYM_CACHE: dict[tuple[str, str], dict] = {}
+_SYNONYM_LOCK = threading.Lock()
+_TURKISH_LOWER_MAP = str.maketrans({"I": "ı", "İ": "i"})
+_ASCII_FOLD_MAP = str.maketrans({"ı": "i", "ğ": "g", "ü": "u", "ş": "s", "ö": "o", "ç": "c"})
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("Annotator")
@@ -241,6 +250,278 @@ def save_clip_annotation(cid: str, data: dict):
         json.dump(gold_terms_dict, f, ensure_ascii=False, indent=2)
 
     logger.info("Saved annotation for %s with %d terms to disk (Multi-level CEFR).", cid, len(data.get("terms", [])))
+
+
+def _tr_lower(text: str) -> str:
+    return text.translate(_TURKISH_LOWER_MAP).lower().strip()
+
+
+def _fold_key(text: str) -> str:
+    lowered = _tr_lower(text).translate(_ASCII_FOLD_MAP)
+    norm = unicodedata.normalize("NFKD", lowered)
+    norm = "".join(c for c in norm if not unicodedata.combining(c))
+    norm = re.sub(r"[^a-z0-9]+", " ", norm)
+    return " ".join(norm.split())
+
+
+def _append_alias(seen_keys: set[str], target: list[str], candidate: str, canonical_folded: str) -> None:
+    clean = re.sub(r"\s+", " ", (candidate or "").strip(" ,;:-"))
+    if not clean or len(clean) < 2 or len(clean) > 64:
+        return
+    fkey = _fold_key(clean)
+    if not fkey or fkey == canonical_folded or fkey in seen_keys:
+        return
+    seen_keys.add(fkey)
+    target.append(clean if any(c.isupper() for c in clean) and clean.isupper() else _tr_lower(clean))
+
+
+def _load_rag_ontology() -> list[dict]:
+    """Load DEFAULT_KB from experiments/rag/domain_rag_extractor.py cleanly."""
+    try:
+        if str(ROOT_DIR) not in sys.path:
+            sys.path.insert(0, str(ROOT_DIR))
+        from experiments.rag.domain_rag_extractor import DEFAULT_KB
+        return list(DEFAULT_KB)
+    except Exception:
+        return []
+
+
+def _collect_local_synonyms(term: str, aliases: list[str], seen_keys: set[str],
+                            sources: list[str], canonical_folded: str) -> str:
+    """Query gold_terms.json, gold_annotations, RAG ontology, and static TR/EN glossaries."""
+    def_hint = ""
+    candidates_dicts: list[tuple[str, list[dict]]] = []
+
+    if GOLD_TERMS_FILE.exists():
+        try:
+            gdata = json.loads(GOLD_TERMS_FILE.read_text(encoding="utf-8"))
+            gold_entries = []
+            for entry in gdata.values():
+                if isinstance(entry, dict):
+                    gold_entries.extend(entry.get("terms", []))
+            candidates_dicts.append(("Altın Sözlük", gold_entries))
+        except Exception:
+            pass
+
+    annot_entries = []
+    for p in sorted(ANNOTATIONS_DIR.glob("*.json")):
+        try:
+            adata = json.loads(p.read_text(encoding="utf-8"))
+            annot_entries.extend(adata.get("terms", []))
+        except Exception:
+            pass
+    if annot_entries:
+        candidates_dicts.append(("Stüdyo Geçmişi", annot_entries))
+
+    rag_entries = _load_rag_ontology()
+    if rag_entries:
+        candidates_dicts.append(("RAG Ontolojisi", rag_entries))
+
+    for src_name, entries in candidates_dicts:
+        matched_src = False
+        for item in entries:
+            canon = item.get("canonical") or item.get("canonical_name") or ""
+            stem = re.sub(r"\s*\([^)]*\)\s*", " ", canon).strip()
+            item_aliases = item.get("aliases", []) or []
+            item_keys = {_fold_key(k) for k in [canon, stem, *item_aliases] if k}
+            if canonical_folded in item_keys:
+                matched_src = True
+                for cand in [canon, stem, *item_aliases]:
+                    _append_alias(seen_keys, aliases, cand, canonical_folded)
+                if not def_hint:
+                    def_hint = item.get("definition_b1") or item.get("definition") or ""
+        if matched_src and src_name not in sources:
+            sources.append(src_name)
+
+    for src_name, ref_path in [("TDK Referans", REF_TR_FILE), ("Oxford Referans", REF_EN_FILE)]:
+        if ref_path.exists():
+            try:
+                rdata = json.loads(ref_path.read_text(encoding="utf-8"))
+                for k, v in rdata.items():
+                    if _fold_key(k) == canonical_folded and isinstance(v, str) and v.strip():
+                        if not def_hint:
+                            def_hint = v.strip()
+                        if src_name not in sources:
+                            sources.append(src_name)
+                        for par in re.findall(r"\(([A-Za-z0-9\-/]{2,12})\)", v):
+                            _append_alias(seen_keys, aliases, par, canonical_folded)
+                        break
+            except Exception:
+                pass
+    return def_hint
+
+
+def _http_get_json(url: str, timeout: float = 1.5):
+    req = urllib.request.Request(url, headers={"User-Agent": "EduTermStudio/1.0"})
+    with urllib.request.urlopen(req, timeout=timeout) as resp:
+        return json.loads(resp.read().decode("utf-8"))
+
+
+def _lookup_tdk_online(term: str, aliases: list[str], seen_keys: set[str],
+                       sources: list[str], canonical_folded: str) -> str:
+    """Extract synonyms ('; ...' and '► ...') and short definition from TDK GTS."""
+    q = urllib.parse.quote(_tr_lower(term))
+    try:
+        data = _http_get_json(f"https://sozluk.gov.tr/gts?ara={q}", timeout=1.5)
+    except Exception:
+        return ""
+    if not isinstance(data, list) or not data or not isinstance(data[0], dict):
+        return ""
+    meanings = data[0].get("anlamlarListe") or []
+    def_hint = ""
+    found = False
+    for m in meanings[:5]:
+        anlam = (m.get("anlam") or "").strip()
+        if not anlam:
+            continue
+        if not def_hint:
+            def_hint = anlam
+        syns_chunk = ""
+        if anlam.startswith("►"):
+            syns_chunk = anlam.lstrip("► ").strip()
+        elif "; " in anlam:
+            syns_chunk = anlam.rsplit("; ", 1)[-1].strip()
+        if syns_chunk:
+            for piece in syns_chunk.split(","):
+                cand = re.sub(r"\s*\([IVX]+\)\s*", "", piece).strip()
+                if cand and len(cand.split()) <= 3 and "." not in cand:
+                    before = len(aliases)
+                    _append_alias(seen_keys, aliases, cand, canonical_folded)
+                    if len(aliases) > before:
+                        found = True
+    if (found or def_hint) and "TDK Sözlük" not in sources:
+        sources.append("TDK Sözlük")
+    return def_hint
+
+
+def _lookup_english_online(term: str, aliases: list[str], seen_keys: set[str],
+                           sources: list[str], canonical_folded: str) -> str:
+    """Query Datamuse rel_syn and Free Dictionary API for English terms."""
+    q = urllib.parse.quote(term.strip().lower())
+    def_hint = ""
+    found = False
+    try:
+        dm = _http_get_json(f"https://api.datamuse.com/words?rel_syn={q}&max=6", timeout=1.5)
+        if isinstance(dm, list):
+            for item in dm:
+                w = item.get("word", "")
+                before = len(aliases)
+                _append_alias(seen_keys, aliases, w, canonical_folded)
+                if len(aliases) > before:
+                    found = True
+    except Exception:
+        pass
+    try:
+        fd = _http_get_json(f"https://api.dictionaryapi.dev/api/v2/entries/en/{q}", timeout=1.5)
+        if isinstance(fd, list) and fd:
+            for meaning in fd[0].get("meanings", [])[:3]:
+                for syn in meaning.get("synonyms", [])[:5]:
+                    before = len(aliases)
+                    _append_alias(seen_keys, aliases, syn, canonical_folded)
+                    if len(aliases) > before:
+                        found = True
+                for df in meaning.get("definitions", [])[:2]:
+                    if not def_hint and df.get("definition"):
+                        def_hint = df["definition"].strip()
+                    for syn in df.get("synonyms", [])[:4]:
+                        before = len(aliases)
+                        _append_alias(seen_keys, aliases, syn, canonical_folded)
+                        if len(aliases) > before:
+                            found = True
+    except Exception:
+        pass
+    if (found or def_hint) and "İngilizce Sözlük" not in sources:
+        sources.append("İngilizce Sözlük")
+    return def_hint
+
+
+def _lookup_wikipedia_online(term: str, lang: str, aliases: list[str], seen_keys: set[str],
+                             sources: list[str], canonical_folded: str) -> None:
+    """Fetch bilingual cross-language title and clean redirects from Wikipedia."""
+    wiki_lang = "en" if lang == "en" else "tr"
+    other_lang = "tr" if wiki_lang == "en" else "en"
+    q = urllib.parse.quote(term.strip())
+    url = (
+        f"https://{wiki_lang}.wikipedia.org/w/api.php?"
+        f"action=query&titles={q}&redirects=1&prop=langlinks|redirects&lllang={other_lang}&format=json"
+    )
+    try:
+        data = _http_get_json(url, timeout=1.5)
+    except Exception:
+        return
+    pages = (data or {}).get("query", {}).get("pages", {})
+    found = False
+    for page in pages.values():
+        if not isinstance(page, dict) or page.get("missing") is not None:
+            continue
+        title = page.get("title", "")
+        if "(" not in title:
+            before = len(aliases)
+            _append_alias(seen_keys, aliases, title, canonical_folded)
+            found = found or len(aliases) > before
+        for ll in page.get("langlinks", []) or []:
+            cross = ll.get("*", "")
+            if cross and "(" not in cross:
+                before = len(aliases)
+                _append_alias(seen_keys, aliases, cross, canonical_folded)
+                found = found or len(aliases) > before
+        for rd in (page.get("redirects") or [])[:5]:
+            rt = rd.get("title", "")
+            if rt and "(" not in rt and len(rt.split()) <= 4:
+                before = len(aliases)
+                _append_alias(seen_keys, aliases, rt, canonical_folded)
+                found = found or len(aliases) > before
+    if found and "Wikipedia" not in sources:
+        sources.append("Wikipedia")
+
+
+def lookup_term_synonyms(term: str, lang: str = "tr", use_online: bool = True) -> dict:
+    """Collect deduplicated synonyms/aliases and a definition hint for an annotation term."""
+    clean_term = re.sub(r"\s+", " ", (term or "").strip())
+    canonical_folded = _fold_key(clean_term)
+    if not clean_term or not canonical_folded or len(clean_term) < 2:
+        return {"term": clean_term, "aliases": [], "sources": [], "definition_hint": ""}
+
+    cache_key = (canonical_folded, (lang or "tr").lower(), bool(use_online))
+    with _SYNONYM_LOCK:
+        cached = _SYNONYM_CACHE.get(cache_key)
+        if cached is not None:
+            return cached
+
+    aliases: list[str] = []
+    seen_keys: set[str] = set()
+    sources: list[str] = []
+
+    # Parse inline parenthetical acronyms/phrases, e.g., "Kişisel Verileri Koruma Kurulu (KVKK)"
+    m_par = re.match(r"^(.+?)\s*\(([^()]{2,40})\)\s*$", clean_term)
+    if m_par:
+        _append_alias(seen_keys, aliases, m_par.group(1), canonical_folded)
+        _append_alias(seen_keys, aliases, m_par.group(2), canonical_folded)
+
+    def_hint = _collect_local_synonyms(clean_term, aliases, seen_keys, sources, canonical_folded)
+
+    if use_online:
+        is_tr = (lang or "tr").lower().startswith("tr")
+        if is_tr:
+            tdk_def = _lookup_tdk_online(clean_term, aliases, seen_keys, sources, canonical_folded)
+            if not def_hint and tdk_def:
+                def_hint = tdk_def
+        else:
+            en_def = _lookup_english_online(clean_term, aliases, seen_keys, sources, canonical_folded)
+            if not def_hint and en_def:
+                def_hint = en_def
+        if len(aliases) < 5:
+            _lookup_wikipedia_online(clean_term, "en" if not is_tr else "tr", aliases, seen_keys, sources, canonical_folded)
+
+    result = {
+        "term": clean_term,
+        "aliases": aliases[:12],
+        "sources": sources,
+        "definition_hint": def_hint,
+    }
+    with _SYNONYM_LOCK:
+        _SYNONYM_CACHE[cache_key] = result
+    return result
 
 
 HTML_TEMPLATE = """<!DOCTYPE html>
@@ -722,11 +1003,15 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           <div class="term-box">
             <div class="form-group">
               <label>Teknik Terim Adı (Canonical Name)</label>
-              <input type="text" class="input-text" id="termCanonical" placeholder="Örn: Özdeğerler, DNA Replikasyonu...">
+              <input type="text" class="input-text" id="termCanonical" placeholder="Örn: Özdeğerler, DNA Replikasyonu..." oninput="onCanonicalInput()">
             </div>
             <div class="form-group">
-              <label>Eş Anlamlılar / Kısaltmalar (Virgülle ayırın)</label>
-              <input type="text" class="input-text" id="termAliases" placeholder="Örn: eigenvalues, özvektör, char equation">
+              <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px; margin-bottom: 4px;">
+                <label style="margin: 0;">Eş Anlamlılar / Kısaltmalar (Otomatik çekilir)</label>
+                <button type="button" onclick="fetchSynonymsForCanonical(true)" style="background: rgba(56,189,248,0.12); color: var(--accent); border: 1px solid rgba(56,189,248,0.3); border-radius: 6px; padding: 2px 8px; font-size: 11px; font-weight: 600; cursor: pointer;">🔄 Sözlükten Çek</button>
+              </div>
+              <input type="text" class="input-text" id="termAliases" placeholder="Terimi yazınca sözlükten otomatik doldurulur..." oninput="onAliasesManualInput()">
+              <div id="synStatus" style="font-size: 11px; color: var(--text-muted); margin-top: 3px; min-height: 15px;"></div>
             </div>
             <div class="form-group">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
@@ -737,6 +1022,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                 <button type="button" class="cefr-tab-btn active" data-level="B1" onclick="selectCefrLevel('B1')">🌱 B1 (Sade / Lisans 1)</button>
                 <button type="button" class="cefr-tab-btn" data-level="B2" onclick="selectCefrLevel('B2')">⚙️ B2 (Teknik / Lisans 3-4)</button>
                 <button type="button" class="cefr-tab-btn" data-level="C1" onclick="selectCefrLevel('C1')">🔬 C1 (Uzman / Y.Lisans)</button>
+              </div>
+              <div id="defHintBar" style="display: none; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; padding: 6px 8px; border-radius: 6px; background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.28); font-size: 11.5px; color: #e2e8f0;">
+                <span id="defHintText" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"></span>
+                <button type="button" onclick="applyDefHint()" style="flex-shrink: 0; background: rgba(168,85,247,0.22); color: #e9d5ff; border: 1px solid rgba(168,85,247,0.4); border-radius: 5px; padding: 2px 8px; font-size: 11px; font-weight: 600; cursor: pointer;">Taslağa Aktar</button>
               </div>
               <textarea class="input-textarea" id="termDef" placeholder="Teknik jargona boğmadan, sade açıklama..." oninput="updateAtesmanPreview()"></textarea>
               <div class="atesman-bar">
@@ -811,6 +1100,94 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     let currentTerms = [];
     let currentBloom = 'Anlama';
     let currentCefr = 'B1';
+    let synTimer = null;
+    let aliasesManuallyEdited = false;
+    let lastLookupTerm = '';
+    let currentDefHint = '';
+
+    function onAliasesManualInput() {
+      aliasesManuallyEdited = document.getElementById('termAliases').value.trim().length > 0;
+    }
+
+    function onCanonicalInput() {
+      const val = document.getElementById('termCanonical').value.trim();
+      if (!val) {
+        aliasesManuallyEdited = false;
+        document.getElementById('termAliases').value = '';
+        document.getElementById('synStatus').innerText = '';
+        document.getElementById('defHintBar').style.display = 'none';
+        currentDefHint = '';
+        lastLookupTerm = '';
+        return;
+      }
+      if (!aliasesManuallyEdited) {
+        document.getElementById('synStatus').innerText = '🔎 Sözlük taranıyor...';
+        document.getElementById('synStatus').style.color = 'var(--text-muted)';
+      }
+      if (synTimer) clearTimeout(synTimer);
+      synTimer = setTimeout(() => fetchSynonymsForCanonical(false), 420);
+    }
+
+    async function fetchSynonymsForCanonical(force) {
+      const canon = document.getElementById('termCanonical').value.trim();
+      const statusEl = document.getElementById('synStatus');
+      const hintBar = document.getElementById('defHintBar');
+      const hintText = document.getElementById('defHintText');
+      if (!canon || canon.length < 2) {
+        statusEl.innerText = '';
+        hintBar.style.display = 'none';
+        return;
+      }
+      if (!force && canon === lastLookupTerm && document.getElementById('termAliases').value.trim()) {
+        return;
+      }
+      lastLookupTerm = canon;
+      const lang = (currentClip && currentClip.lang) ? currentClip.lang : 'tr';
+      statusEl.innerText = '⏳ Sözlükten eş anlamlılar getiriliyor...';
+      statusEl.style.color = 'var(--accent)';
+      try {
+        const res = await fetch(`/api/synonyms?term=${encodeURIComponent(canon)}&lang=${encodeURIComponent(lang)}`);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        // Ignore stale response if input changed while waiting
+        if (document.getElementById('termCanonical').value.trim() !== canon) return;
+
+        const aliases = data.aliases || [];
+        const sources = data.sources || [];
+        if (force || !aliasesManuallyEdited) {
+          document.getElementById('termAliases').value = aliases.join(', ');
+          aliasesManuallyEdited = false;
+        }
+        if (aliases.length > 0) {
+          statusEl.innerText = `✨ ${aliases.length} eş anlamlı çekildi (${sources.join(', ') || 'Sözlük'})`;
+          statusEl.style.color = 'var(--accent-green)';
+        } else {
+          statusEl.innerText = sources.length
+            ? `ℹ️ Eş anlamlı bulunamadı (${sources.join(', ')})`
+            : 'ℹ️ Sözlükte ek eş anlamlı bulunamadı (alt formda yine küçük harfli hali eklenir)';
+          statusEl.style.color = 'var(--text-muted)';
+        }
+
+        currentDefHint = (data.definition_hint || '').trim();
+        if (currentDefHint && !document.getElementById('termDef').value.trim()) {
+          hintText.innerText = `💡 ${currentDefHint}`;
+          hintText.title = currentDefHint;
+          hintBar.style.display = 'flex';
+        } else {
+          hintBar.style.display = 'none';
+        }
+      } catch (err) {
+        statusEl.innerText = '⚠️ Sözlük sorgusu başarısız oldu';
+        statusEl.style.color = '#fbbf24';
+      }
+    }
+
+    function applyDefHint() {
+      if (!currentDefHint) return;
+      document.getElementById('termDef').value = currentDefHint;
+      document.getElementById('defHintBar').style.display = 'none';
+      updateAtesmanPreview();
+    }
 
     // CEFR Seçimi
     function selectCefrLevel(level) {
@@ -926,8 +1303,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       const sel = document.getElementById('selectedWord').innerText;
       if (sel) {
         document.getElementById('termCanonical').value = sel;
-        document.getElementById('termDef').focus();
+        aliasesManuallyEdited = false;
         document.getElementById('selectionHint').style.display = 'none';
+        fetchSynonymsForCanonical(true);
+        document.getElementById('termDef').focus();
       }
     }
 
@@ -991,14 +1370,27 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     }
 
     // 6. Terim Ekleme & Silme
-    function addTermToList() {
+    async function addTermToList() {
       const canon = document.getElementById('termCanonical').value.trim();
-      const aliasesRaw = document.getElementById('termAliases').value.trim();
+      let aliasesRaw = document.getElementById('termAliases').value.trim();
       const def = document.getElementById('termDef').value.trim();
 
       if (!canon) {
         alert('Lütfen bir terim adı girin!');
         return;
+      }
+
+      if (!aliasesRaw && !aliasesManuallyEdited) {
+        try {
+          const lang = (currentClip && currentClip.lang) ? currentClip.lang : 'tr';
+          const res = await fetch(`/api/synonyms?term=${encodeURIComponent(canon)}&lang=${encodeURIComponent(lang)}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data.aliases) && data.aliases.length > 0) {
+              aliasesRaw = data.aliases.join(', ');
+            }
+          }
+        } catch (_) {}
       }
 
       const aliases = aliasesRaw ? aliasesRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
@@ -1028,6 +1420,11 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       document.getElementById('termCanonical').value = '';
       document.getElementById('termAliases').value = '';
       document.getElementById('termDef').value = '';
+      document.getElementById('synStatus').innerText = '';
+      document.getElementById('defHintBar').style.display = 'none';
+      aliasesManuallyEdited = false;
+      lastLookupTerm = '';
+      currentDefHint = '';
       selectCefrLevel('B1');
 
       renderTermList();
@@ -1141,6 +1538,17 @@ class AnnotationHandler(http.server.BaseHTTPRequestHandler):
             self.send_header("Content-Type", "application/json; charset=utf-8")
             self.end_headers()
             self.wfile.write(json.dumps(annot, ensure_ascii=False).encode("utf-8"))
+            return
+
+        elif path == "/api/synonyms":
+            qs = urllib.parse.parse_qs(parsed.query)
+            term = qs.get("term", [""])[0]
+            lang = qs.get("lang", ["tr"])[0]
+            result = lookup_term_synonyms(term, lang=lang)
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.end_headers()
+            self.wfile.write(json.dumps(result, ensure_ascii=False).encode("utf-8"))
             return
 
         self.send_response(404)

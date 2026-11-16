@@ -178,28 +178,46 @@ def main() -> int:
         per_model = {}
         for res in srm.get("results", []):
             rtfs = {p["id"]: p["rtf"] for p in res.get("per_clip", []) if p.get("rtf")}
+            toks = {p["id"]: p.get("generated_tokens") for p in res.get("per_clip", []) if p.get("generated_tokens") is not None}
             per_model[res["key"]] = {
                 "model": res["model"],
                 "params_m": res.get("params_m"),
                 "mean_rtf_stored_unweighted_per_clip": res.get("mean_rtf"),
                 "pooled_wall_over_audio": (round(res["wall_seconds"] / res["audio_seconds"], 4)
                                            if res.get("wall_seconds") and res.get("audio_seconds") else None),
+                "total_generated_tokens": res.get("total_generated_tokens"),
+                "mean_generated_tokens": res.get("mean_generated_tokens"),
+                "mean_tokens_per_s": res.get("mean_tokens_per_s"),
                 "clips": rtfs,
+                "clip_generated_tokens": toks,
             }
         inv = None
         if "tiny" in per_model and "small" in per_model:
             t, s = per_model["tiny"]["clips"], per_model["small"]["clips"]
             shared = sorted(set(t) & set(s))
+            tiny_slower = sum(1 for c in shared if t[c] > s[c])
+            t_tok = per_model["tiny"].get("total_generated_tokens")
+            s_tok = per_model["small"].get("total_generated_tokens")
+            reading = (
+                f"With generated_tokens measured cleanly: tiny ({per_model['tiny']['total_generated_tokens']} tokens, "
+                f"{per_model['tiny']['mean_tokens_per_s']} tok/s) vs small ({per_model['small']['total_generated_tokens']} "
+                f"tokens, {per_model['small']['mean_tokens_per_s']} tok/s); tiny is slower on {tiny_slower}/{len(shared)} "
+                f"clips (mean RTF {per_model['tiny']['mean_rtf_stored_unweighted_per_clip']} vs "
+                f"{per_model['small']['mean_rtf_stored_unweighted_per_clip']})."
+                if t_tok is not None and s_tok is not None
+                else "Generated token counts were not logged."
+            )
             inv = {
                 "clip_ids": shared,
-                "tiny_slower_on": sum(1 for c in shared if t[c] > s[c]),
+                "tiny_slower_on": tiny_slower,
                 "of": len(shared),
                 "tiny_mean": per_model["tiny"]["mean_rtf_stored_unweighted_per_clip"],
                 "small_mean": per_model["small"]["mean_rtf_stored_unweighted_per_clip"],
-                "reading": "39M tiny vs 244M small: RTF is not monotone in parameter count at "
-                           "n=6 clips. Generated token counts were not logged, so the cause "
-                           "(repetition/hallucination loops fill the 440-token budget) is "
-                           "unverified; these rows are not a speed ranking.",
+                "tiny_total_generated_tokens": t_tok,
+                "small_total_generated_tokens": s_tok,
+                "tiny_mean_tokens_per_s": per_model["tiny"].get("mean_tokens_per_s"),
+                "small_mean_tokens_per_s": per_model["small"].get("mean_tokens_per_s"),
+                "reading": reading,
             }
         srm_block = {
             "path": "benchmark_srm_asr_local.py -> outputs/srm_asr_measured.json (report catalog Section 8.x)",

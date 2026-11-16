@@ -81,6 +81,7 @@ _WHISPER_CACHE: dict[str, tuple[object, object]] = {}
 _QWEN_CACHE: dict[str, tuple[object, object]] = {}
 _NEMO_CACHE: dict[str, tuple[object, object]] = {}
 _SB_CACHE: dict[str, object] = {}
+_LAST_GEN_TOKENS: int | None = None
 NEMOTRON_CHUNK_S = 60.0
 
 
@@ -185,12 +186,14 @@ def transcribe_whisper(model_id: str, audio_path: str, lang: str | None, args, c
         gen_kwargs["language"] = lang
 
     # VAD Long-form handling: segment audio on silence boundaries to prevent looping/hallucinations
+    global _LAST_GEN_TOKENS
     if getattr(args, "use_vad", False):
         from vad_chunker import segment_audio_vad
 
         intervals = segment_audio_vad(audio, sr=sr, min_chunk_s=12.0, max_chunk_s=28.0)
         print(f"    [VAD Enabled]: segmented {len(audio)/sr:.1f}s audio into {len(intervals)} speech chunks ...", flush=True)
         parts = []
+        tok_total = 0
         for i, (st, en) in enumerate(intervals):
             st_idx = int(st * sr)
             en_idx = min(len(audio), int(en * sr))
@@ -210,9 +213,11 @@ def transcribe_whisper(model_id: str, audio_path: str, lang: str | None, args, c
                 inputs["input_features"] = inputs["input_features"].to(dtype=dtype)
             with torch.inference_mode():
                 ids = model.generate(**inputs, **gen_kwargs)
+            tok_total += int(ids.shape[-1])
             txt = processor.batch_decode(ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)[0].strip()
             if txt:
                 parts.append(txt)
+        _LAST_GEN_TOKENS = tok_total
         return " ".join(parts).strip()
 
     # Standard sequential generate
@@ -231,6 +236,7 @@ def transcribe_whisper(model_id: str, audio_path: str, lang: str | None, args, c
 
     with torch.inference_mode():
         ids = model.generate(**inputs, **gen_kwargs)
+    _LAST_GEN_TOKENS = int(ids.shape[-1])
     return processor.batch_decode(ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)[0].strip()
 
 
@@ -297,6 +303,8 @@ def transcribe_qwen3(model_id: str, audio_path: str, lang: str | None, args=None
     chunk = int(30.0 * sr)
     parts: list[str] = []
     n_chunks = max(1, (len(audio) + chunk - 1) // chunk)
+    global _LAST_GEN_TOKENS
+    tok_total = 0
 
     for i, start in enumerate(range(0, len(audio), chunk)):
         piece = audio[start : start + chunk]
@@ -319,12 +327,14 @@ def transcribe_qwen3(model_id: str, audio_path: str, lang: str | None, args=None
         with torch.inference_mode():
             out = model.generate(**inputs, max_new_tokens=440)
         gen_ids = out[:, inputs["input_ids"].shape[1] :]
+        tok_total += int(gen_ids.shape[-1])
         decoded = processor.batch_decode(gen_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)[0].strip()
         if "<asr_text>" in decoded:
             decoded = decoded.split("<asr_text>", 1)[-1].strip()
         if decoded:
             parts.append(decoded)
 
+    _LAST_GEN_TOKENS = tok_total
     return " ".join(parts).strip()
 
 
@@ -428,6 +438,8 @@ def run_one(model: dict, row: dict, args) -> dict:
         audio = str((ROOT / audio).resolve())
     lang = row.get("lang")
     print(f"  {row.get('id')} start ({row.get('duration_s')}s) ...", flush=True)
+    global _LAST_GEN_TOKENS
+    _LAST_GEN_TOKENS = None
     t0 = time.perf_counter()
     backend = model["backend"]
     if backend == "whisper":
@@ -451,6 +463,8 @@ def run_one(model: dict, row: dict, args) -> dict:
         "revision": model.get("revision"),
         "hypothesis": hyp,
         "latency_s": elapsed,
+        "generated_tokens": _LAST_GEN_TOKENS,
+        "tokens_per_s": round(_LAST_GEN_TOKENS / elapsed, 2) if (_LAST_GEN_TOKENS is not None and elapsed > 0) else None,
         "audio_duration_s": row.get("duration_s"),
         "decoding": decoding_config(args),
         "confirmed": bool(row.get("confirmed")),

@@ -79,6 +79,8 @@ def main() -> int:
 
         ok = [r for r in records if r.get("wer_norm") is not None]
         dur = sum(r.get("audio_duration_s") or 0 for r in ok)
+        gen_toks = [r["generated_tokens"] for r in ok if r.get("generated_tokens") is not None]
+        wall_s = round(time.time() - t0, 1)
         row_out = {
             "key": key,
             "model": entry["id"],
@@ -89,11 +91,17 @@ def main() -> int:
             "mean_wer_norm": round(sum(r["wer_norm"] for r in ok) / len(ok), 4) if ok else None,
             "mean_cer_norm": round(sum(r["cer_norm"] for r in ok) / len(ok), 4) if ok else None,
             "mean_rtf": round(sum(r["rtf"] for r in ok) / len(ok), 4) if ok else None,
+            "total_generated_tokens": sum(gen_toks) if gen_toks else None,
+            "mean_generated_tokens": round(sum(gen_toks) / len(gen_toks), 1) if gen_toks else None,
+            "mean_tokens_per_s": round(sum(gen_toks) / wall_s, 1) if (gen_toks and wall_s > 0) else None,
             "peak_vram_gb": round(torch.cuda.max_memory_allocated() / 1024 ** 3, 2),
-            "wall_seconds": round(time.time() - t0, 1),
+            "wall_seconds": wall_s,
             "audio_seconds": round(dur, 1),
             "decoding": R.decoding_config(dec),
-            "per_clip": [{k: r.get(k) for k in ("id", "lang", "wer_norm", "cer_norm", "rtf", "error")} for r in records],
+            "per_clip": [
+                {k: r.get(k) for k in ("id", "lang", "wer_norm", "cer_norm", "rtf", "latency_s", "generated_tokens", "tokens_per_s", "error")}
+                for r in records
+            ],
         }
         report["results"] = [r for r in report["results"] if r.get("model") != entry["id"]] + [row_out]
         args.out.parent.mkdir(parents=True, exist_ok=True)

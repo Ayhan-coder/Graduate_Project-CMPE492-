@@ -569,6 +569,17 @@ def update_inventory():
         "qa_passed_total": qa_passed_total,
     }
 
+    closed_gold_32 = sum(1 for r in data["records"] if r.get("annotation", {}).get("closed_gold_count", 0) >= 32)
+    dual_iaa = sum(1 for r in data["records"] if r.get("annotation", {}).get("dual_annotator_pairs", 0) > 0)
+    template_only = sum(1 for r in data["records"] if r.get("annotation", {}).get("dual_annotator_pairs", 0) == 0)
+    total_template_terms = sum(r.get("annotation", {}).get("template_candidate_count", 4) for r in data["records"])
+    data["annotation_summary"] = {
+        "closed_gold_benchmark_32": closed_gold_32,
+        "dual_annotated_iaa": dual_iaa,
+        "template_starter_only": template_only,
+        "total_template_terms": total_template_terms,
+    }
+
     with open(INVENTORY_JSON, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 

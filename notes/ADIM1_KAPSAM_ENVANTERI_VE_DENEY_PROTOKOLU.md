@@ -41,7 +41,7 @@ Her veri öğesi için aşağıdaki 4 durum ekseni ayrı ayrı izlenir:
    - `CURATED_DRAFT_CAPTION`: Altyazı veya sentetik ders metni taslağı; henüz tam insan düzeltmesi yapılmamış.
 4. **Anotasyon / Terim Etiketi Durumu (`annotation_status`):**
    - `CLOSED_GOLD_BENCHMARK`: $N=32$ terimlik kapalı altın terminoloji listesi hazırlanmış (TR-01 ve EN-01).
-   - `DUAL_ANNOTATED_SAMPLE`: İki bağımsız değerlendirici tarafından $R$ ve $D$ metrikleriyle etiketlenmiş ve $\kappa$ hesaplanmış örneklem (115 terim çifti, TR-01..03 ve EN-01..04).
+   - `SINGLE_ANNOTATOR_A1_POOL`: Tek insan değerlendirici (`A1`) tarafından $R$ ve $D$ boyutlarında etiketlenmiş pilot küme ($N=233$) ve kurtarılan aday kümesi ($180/235$ madde: $59$ doğrudan CSV indirmesi + $121$ tarayıcı durumu kurtarması, $55$ EN beklemede). Bağımsız ikinci insan kolu üzerinden çift-kör IAA iddia edilmez.
    - `TEMPLATE_STARTER_ONLY`: Şablon dosyada (`annotation_template_30plus.jsonl`) 4 aday terim ile açılmış, hakem anotasyonu bekleyen kayıtlar.
 
 ---
@@ -60,7 +60,7 @@ Her veri öğesi için aşağıdaki 4 durum ekseni ayrı ayrı izlenir:
 | **Tam ASR Transkripti (QA Onaylı)** | 4 (`TR-17..20`) | 4 (`EN-17..20`) | **0** | **8 (%20.0)** | Whisper Turbo ile uzun form ASR transkripti |
 | **Kürate Edilmiş Taslak Transkript** | 13 | 12 | **25 (%78.1)** | **25 (%62.5)** | Konu özetleri ve taslak altyazılar (düşük WPM) |
 | **Kapalı Altın Sözlük ($N=32$)** | 1 (`TR-01`) | 1 (`EN-01`) | **2 (%6.3)** | **2 (%5.0)** | 32 kanonik terim + alternatif eşanlamlılar |
-| **Çift Etiketli IAA Örneklemi** | 3 | 4 | **7 (%21.9)** | **7 (%17.5)** | 115 madde-bazlı $R/D$ çift etiket |
+| **Tek İnsan Değerlendirici (A1) Kuyruğu** | 3 | 4 | **7 (pilot)** | **413 (`A1`)** | 233 pilot + 180 aday (59 CSV indirme + 121 tarayıcı kurtarması); 55 EN beklemede |
 | **Aday Şablon Terimleri (N=4)** | 16 $\to$ 20 | 16 $\to$ 20 | **32 (%100)** | **40 (%100)** | 160 aday terim şablonu hazırlandı |
 
 ---
@@ -147,23 +147,22 @@ Modelin ürettiği aday terim $t_{hyp}$ ile referans altın sözlükteki $t_{ref
 
 ---
 
-### 3.3 Değerlendiriciler Arası Uyum: Cohen's Kappa ($\kappa$)
+### 3.3 Tek İnsan Değerlendirici (`A1`) ve Hakem Uyum Ölçütü
 
-İki bağımsız etiketleyicinin ($A_1$ ve $A_2$) terimler üzerindeki ikili kararları `experiments/iaa.py` protokolüne göre değerlendirilir:
+Tek değerlendirici ($A_1$) ile otomatik hakem kolları ($J$) arasındaki uyum `experiments/panel_agreement.py` ve `recompute_cross_family_clean.py` üzerinden değerlendirilir:
 
 $$\kappa = \frac{P_o - P_e}{1 - P_e}$$
 
 Burada:
 - $P_o$: Gözlenen göreli uyum oranı ($P_o = \frac{\sum \text{Uyum}}{N}$).
-- $P_e$: Şans eseri beklenen rastgele uyum oranı ($P_e = \sum_{k \in \{0, 1\}} P(A_1 = k) \cdot P(A_2 = k)$).
+- $P_e$: Şans eseri beklenen rastgele uyum oranı ($P_e = \sum_{k \in \{0, 1\}} P(A_1 = k) \cdot P(J = k)$).
 
 **Etiketleme Boyutları:**
 - **$R$ (Relevance - Bağlamsal İlgililik):** Çıkarılan terim, transkript bağlamında gerçekten alana özgü teknik bir kavram mıdır? ($R1=1$, $R0=0$).
 - **$D$ (Definition - Tanım Doğruluğu):** Üretilen açıklama TDK (Türkçe) veya Oxford English Dictionary (İngilizce) sözlüklerine göre doğru mudur? ($D1=1$, $D0=0$).
 
-**Sabitlenmiş Sayısal Doğrulama (115 Çift Etiketli Veri):**
-- $R$ metriği: $P_o = 0.965$, $\kappa_R = \mathbf{0.782}$ (Yüksek ayrıştırıcı güvenilirlik, Landis & Koch "Önemli Düzeyde Uyum").
-- $D$ metriği: $P_o = 1.000$, $\kappa_D = \mathbf{1.000}$ ($112$ pozitif, $3$ negatif etiket; yüksek sınıf dengesizliği nedeniyle $P_e \approx 0.95$ düzeyindedir. Bu nedenle $\kappa_D$ tek başına model kalitesinin kanıtı sayılmaz; daima $P_o$ ve $\kappa_R$ ile birlikte sunulmalıdır).
+**Önemli Metodolojik Not (Çift-Kör İnsan IAA İddiası Kaldırılmıştır):**
+Diskte doğrulanmış ikinci insan değerlendirici (`A2`) kolu bulunmadığından `labels_a2.csv` ($115$ satırlık taslak) üzerinden çift-kör insan IAA skoru raporlanmamaktadır. Bunun yerine `A1` (`233` pilot + `180` aday; `59` doğrudan CSV indirmesi + `121` kurtarma) üzerinde $TN$ sayımı ve çapraz-menşe (`Qwen2.5-7B` temiz `N=184` vs `Mistral-7B-v0.3` `N=454`) modeli uyumu kullanılır.
 
 ---
 
@@ -212,10 +211,10 @@ Küçük örneklem boyutuna bağlı belirsizliği şeffafça belgelemek amacıyl
 
 ## 4. Sınırlılık Listesi (Limitations & Guardrails)
 
-Gelecekteki araştırma adımlarında hatalı veya abartılı iddiaların kurulmasını engellemek üzere aşağıdaki sınırlılıklar kesin olarak belirlenmiştir:
+Gelecekteki araştırma adımlarında hatalı veya abartılı iddiaların kurulmasını engellemek üzere aşağıdaki sınırlılıklar belirlenmiştir:
 
 1. **Örneklem Kapsamı Sınırlılığı:**
-   32 kliplik çekirdek liste bir **aday korpus (candidate corpus)** aşamasındadır. Disk taraması (30 Ekim 2026, `experiments/data/build_machine_manifest_32.py`) 32 klipten **26'sında yerel ses** bulunduğunu, **6'sında ses olmadığını** göstermiştir (TR-05, TR-06, TR-07, TR-14, TR-15, EN-10). Sesi olan 26 klip tam uzunlukta yeniden yazılmış (**13,92 saat, 110.510 kelime**) ve `Qwen3.5-4B` `extract-v2` ile **235 terim adayı** çıkarılmıştır; her kayıt `gold_how=machine_only` olarak işaretlidir. Bu, **çift etiketli bir altın küme değildir**: makine transkripti ve makine etiket adayı insan anotasyonunun yerine geçmez. İnsan etiketi iki ayrı kapsamda bulunmaktadır: 7 pilot klipte iki değerlendiriciyle ($R$ ve $D$ çift etiketli 115 madde) ve 32 klip aday havuzunda **tek değerlendiriciyle (a1) 180/235 madde** (30 Ekim 2026 ölçümü; TR 91/91 tamamlanmış, 55 İngilizce madde bekliyor). İkinci bir insan kolü olmayan aday satırları için IAA hesaplanamaz; bu satırlar `gold_how=machine_only` statüsünde kalır. Ayrıca 18 klipte ölçülen ses süresi ilan edilen süreyle uyuşmuyor (EN-06: 760 s ilan, 21.283 s ses), yani manifestteki `duration` alanı güvenilir değildir ve kapsam hesaplarında ölçülen süre kullanılmalıdır.
+   32 kliplik çekirdek liste bir **aday korpus (candidate corpus)** aşamasındadır. Disk taraması (30 Ekim 2026, `experiments/data/build_machine_manifest_32.py`) 32 klipten **26'sında yerel ses** bulunduğunu, **6'sında ses olmadığını** göstermiştir (TR-05, TR-06, TR-07, TR-14, TR-15, EN-10). Sesi olan 26 klip tam uzunlukta yeniden yazılmış (**13,92 saat, 110.510 kelime**) ve `Qwen3.5-4B` `extract-v2` ile **235 terim adayı** çıkarılmıştır; her kayıt `gold_how=machine_only` olarak işaretlidir. Bu, **çift etiketli bir altın küme değildir**: makine transkripti ve makine etiket adayı insan anotasyonunun yerine geçmez. İnsan etiketi **tek değerlendirici (`A1`)** ile pilot ($N=233$) ve aday havuzunda ($180/235$ madde: $59$ doğrudan CSV indirmesi + $121$ tarayıcı kurtarması, $0$ çelişki; TR 91/91 tamamlanmış, $55$ İngilizce madde bekliyor) kapsamında tutulmaktadır; bağımsız ikinci insan kolu (`A2`) olmadığından çift-kör insan IAA hesaplanmaz ve aday satırlar `gold_how=machine_only` statüsünde kalır. Ayrıca 18 klipte ölçülen ses süresi ilan edilen süreyle uyuşmuyor (EN-06: 760 s ilan, 21.283 s ses), yani manifestteki `duration` alanı güvenilir değildir ve kapsam hesaplarında ölçülen süre kullanılmalıdır.
 2. **Dil Karşılaştırması Kısıtı ("Türkçe Daha Zordur" İddiasından Kaçınma):**
    $n=3$ Türkçe ve $n=4$ İngilizce klip üzerinden alınan sonuçlarda güven aralıkları geniştir ve formel bir hipotez/anlamlılık testi (significance test) uygulanmamıştır. Türkçe modellerdeki yüksek hata payı, incelenen spesifik videolardaki konuşma temposu, stüdyo/sınıf akustiği ve jargon yoğunluğundan kaynaklanıyor olabilir; bu durum "Türkçe ASR mimarileri için genel olarak İngilizceden daha zordur" şeklinde evrensel bir iddiaya dönüştürülemez.
 3. **Anotasyon ve Hakem LLM Sınırlılığı (Leniency Riski):**
@@ -245,7 +244,7 @@ Gelecekteki araştırma adımlarında hatalı veya abartılı iddiaların kurulm
 | **RTF Ölçüm Yolu Denetimi (ölçülmüş)** | `experiments/outputs/rtf_path_audit.json` | Rapordaki üç RTF ailesi ayrı ayrı yollarıyla: tam-ses Turbo **durağan RTF 0,0178** (uyarlama: gecikme $=7{,}43 + 0{,}0178\times$ ses sn, $R^2=0{,}907$, 125 kayıt / 48,70 saat), 600 sn+ 104 klipte havuzlanmış 0,0226 (TR 0,0276 / EN 0,0190; üç soğuk-başlangıç kaydı bandın dışında); altın-küme ortalaması 0,025–0,044 (ilk klip soğuk başlangıç; TR havuzlanmış 0,0433 → 0,0334); SRM katalog 0,112 / 0,156 / 0,054 / 0,168 — Tiny (39M) Small (244M)'dan 6 klipin 5'inde yavaş, **hız sıralaması taşımaz** (üretilen belirteç sayıları kaydedilmedi). Ayrıca `srm_asr_measured.json`'daki `chunk_length_s=30.0` uygulanmış bir ayar değil betimleyici üstveri | `python experiments/analyze_rtf_paths.py` |
 | **Doğrulanmış 7 Altın + 8 Kurumsal Transkript**| `experiments/data/gold/*.txt` + `outputs/transcripts/.../*.json` | 7 insan onaylı altın (13.467 kelime) + 8 tam ASR transkripti (QA onaylı) | `experiments/data/DATASET_CARD.md` |
 | **Kapalı Altın Sözlük** | `experiments/data/gold_terms.json` | TR-1 ve EN-1 için 32'şer doğrulanmış kanonik terim | `experiments/eval_gold_terms.py` |
-| **Çift Etiketli Anotasyonlar**| `experiments/annotation/labels_a1.csv`, `labels_a2.csv` | `labels_a1.csv` 413 satır = 233 pilot + 180 aday; `labels_a2.csv` 115 satır. **Çift etiketli küme 115 madde** ($\kappa_R=0{,}782$, $\kappa_D=1{,}000$; 30.10.2026'da yeniden koşuldu, değişmedi) | `python experiments/iaa.py --a1 ... --a2 ...` |
+| **Tek İnsan Etiketleri (`A1`)** | `experiments/annotation/labels_a1.csv` | `labels_a1.csv` 413 satır = 233 pilot + 180 kurtarılan aday (59 doğrudan CSV indirmesi + 121 tarayıcı kurtarması); **çift-kör ikinci insan kolu iddia edilmez** | `experiments/outputs/annotation_provenance_180.json` |
 | **Pilot Bağlam Kurtarma Seti** | `experiments/annotation/labels_pilot_ctx.csv` + `outputs/pilot_ctx_sheet.json` | 233 pilot maddeden **219**'u altın transkriptten birebir ($197$) / en-uzun-token ($22$) eşleşmeyle bağlam penceresi aldı; 14 madde elendi; insan $R$/$D$ etiketleri **aynen** taşındı (yeni etiket yok) | `python experiments/data/build_pilot_ctx_sheet.py` |
 | **Hakem Panel Girdisi** | `experiments/annotation/labels_panel_input.csv` | 454 madde = 235 `machine_only` aday + 219 pilot; `gold_how` ve `row_source` sütunlarıyla menşe izlenebilir | `python experiments/data/build_panel_sheet.py` |
 | **Hakem Yetenek Denetimi (ölçülmüş)** | `experiments/annotation/_audit_*.csv` + `outputs/judge_capability_audit.json` + `logs/judge_capability.log` | 40 madde/kol: Llama-3.2-1B **0/40**, SmolLM2-1.7B **7/40** (7'si de biçim yankısı), Qwen3.5-4B **39/40** (extractörün kendisi → self-grading; adaylarda $R1\%$ 97,44 / $D1\%$ 92,31) | `python experiments/llm_judge_protocol.py --model ... --limit 40` |

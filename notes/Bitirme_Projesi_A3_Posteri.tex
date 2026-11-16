@@ -111,8 +111,8 @@
 
   \begin{block}{40 VİDEOLUK EĞİTİM KORPUS ENVANTERİ}
     \begin{itemize}
-      \item \textbf{12 Disiplinlik Envanter:} Mühendislik, Tıp, Fizik, Matematik, Sosyal Bilimler ve kurumsal eğitimler (KVKK, İSG). 10.1 sa kaynak üstverisi (diskte doğrulanmış 16/40 klipte 4.6 sa); ASR başarım ölçümleri 7 derslik doğrulanmış test kümesindedir.
-      \item \textbf{Çift Değerlendirici:} İki bağımsız araştırmacı ile $N=115$ terim altın etiketlenmiştir ($\kappa_R = 0.782$ ilgililik, $\kappa_D = 1.000$ tanım doğruluğu).
+      \item \textbf{12 Disiplinlik Envanter:} Mühendislik, Tıp, Fizik, Matematik, Sosyal Bilimler ve kurumsal eğitimler (KVKK, İSG). 10.1 sa kaynak üstverisi; 125 kliplik (26+99) makine transkripti havuzu + 133 kliplik HPC toplu analizi (İş ID \texttt{34124}).
+      \item \textbf{Tek İnsan Değerlendirici (\texttt{A1}):} $233$ pilot + $180$ aday terim (59 doğrudan CSV indirmesi + 121 tarayıcı kurtarması, 0 çelişki; 55 EN beklemede). Çapraz-menşe hakem denetiminde Qwen2.5-7B (184 temiz karar; 270 fallback ayıklandı) vs.\ Mistral-7B-v0.3 (454/454 geçerli) kıyaslanmıştır.
     \end{itemize}
 
     \vskip0.2ex
@@ -145,7 +145,7 @@
       \textbf{EVREN Qwen 3.8F} & \textbf{6.11 s} & \textbf{4.23 s} & Millî Bulut (H200) \\
       \textbf{Boğaziçi HPC (A40)} & \textbf{15.28 s} & \textbf{12.45 s} & 7B LoRA (48GB A40) \\
       \textbf{EVREN DeepSeek} & 27.68 s & 24.12 s & Yüksek Hacim \\
-      \textbf{Qwen 3.5-4B (Local)} & 39.80 s & 34.20 s & RTX 5060 (4-bit) \\
+      \textbf{Qwen 3.5-4B (Local)} & 39.55 s & 34.20 s & RTX 5060 (4-bit) \\
       \textbf{Qwen 3.5-9B (Local)} & 513.19 s & 322.29 s & CPU Offload \\
       \bottomrule
     \end{tabularx}
@@ -162,9 +162,9 @@
 
   \begin{block}{HPC MODEL ÖLÇEKLEME (SCALING LAW) VE EDUTERM-7B-TR SFT}
     \begin{itemize}
-      \item \textbf{Ampirik Scaling Law (0.5B $\to$ 1.5B $\to$ 7B $\to$ 14B):} A40 üzerinde 5 model ölçeği 8 dikey alanda kıyaslanmıştır (İş ID \texttt{33611}): 0.5B \%41.7 recall (0.95GB), 1.5B \%68.8 recall (2.90GB, uç cihaz dengesi), 14B \%85.4 recall (27.74GB, 7.11s).
-      \item \textbf{Dikey SFT Üstünlüğü (EduTerm-7B-TR):} 2.296 dikey örnekle eğitilen modelimiz 14B'den daha yüksek doğruluğa (\textbf{\%95.7 Recall, \%95.8 Precision}) yarı VRAM'de (14.39 GB) ve \textbf{4.2 kat daha hızlı (1.68 sn)} ulaşmıştır.
-      \item \textbf{Pedagojik B1 Uyumu:} 14B fazla karmaşıklaşırken (38.7 Ateşman), EduTerm-7B-TR hedef \textbf{CEFR B1 (66.4 Ateşman)} bandına tam oturmuştur.
+      \item \textbf{Ampirik Scaling Law (0.5B $\to$ 1.5B $\to$ 7B $\to$ 14B):} A40 üzerinde 5 model ölçeği 8 dikey alanda kıyaslanmıştır (İş ID \texttt{33611}): 0.5B \%14.6 recall (0.95GB), 1.5B \%20.8 recall (2.90GB), 7B Base \%10.4 recall (14.28GB), 14B \%85.4 recall / \%75.2 $F_1$ (27.74GB, 7.11s).
+      \item \textbf{7B SFT Bulgusu ve 14B Geçişi:} İlk 7B LoRA SFT kontrol noktası (İş ID \texttt{33602}, 2.296 örnek) katı JSON şemasında \%0.0 uyum verip 71.0 Ateşman üretmiş; katı JSON ve CEFR B1/B2/C1 başarımı 14B QLoRA ve Türkçe DPO aşamalarıyla sağlanmıştır.
+      \item \textbf{Pedagojik DPO Hizalaması:} 7B DPO (İş ID \texttt{33750}, 650 üçlü) doğrulamada \%100 tercih ayrımı ve $+6.60$ ödül marjı elde etmiştir.
     \end{itemize}
 
     \vskip0.2ex
@@ -232,7 +232,7 @@
       \textbf{ASR Terim Çıkarımı} & \textbf{Tam Otomatik} & Yok (Elle Altyazı) & Sınırlı \\
       \textbf{Kanonik RAG} & \textbf{Evet} & Hayır & Hayır \\
       \textbf{Önkoşul DAG} & \textbf{Evet (NetworkX)} & Statik Müfredat & Ağaç Bazlı \\
-      \textbf{Uçta / Web GPU} & \textbf{Evet (WebGPU)} & Yalnızca Bulut & İstemci/API \\
+      \textbf{Yerel GPU Çıkarımı} & \textbf{Evet (RTX 5060)} & Yalnızca Bulut & İstemci/API \\
       \textbf{CEFR B1 Sadeleştirme} & \textbf{Evet (Ateşman)} & Yok & A1--B2 Sabit \\
       \bottomrule
     \end{tabularx}

@@ -110,26 +110,26 @@ The project was executed across two academic terms, structured into five major d
 \begin{enumerate}
     \item \textbf{Phase 1: Corpus Curation and Gold Reference Construction (Weeks 1--4):} Selection of 40 diverse lecture clips (10.1 hours source metadata, of which 4.6 hours across 16 local WAVs is duration-verified on disk; 20 Turkish, 20 English) across 14 academic and corporate domains; creation of human-verified gold transcripts and closed 32-term reference lists on the 7-lecture evaluation set (TR-1..3, EN-1..4).
     \item \textbf{Phase 2: Acoustic Layer Benchmarking and Optimization (Weeks 5--8):} Comprehensive GPU evaluation of Whisper (Medium, Large-v3, Turbo), Qwen3-ASR (0.6B, 1.7B), and NVIDIA Nemotron 3.5; empirical assessment of Voice Activity Detection (VAD) chunking.
-    \item \textbf{Phase 3: Semantic Layer and LLM Benchmarking (Weeks 9--12):} Zero-shot, few-shot, and Chain-of-Thought (CoT) prompting across GPT-4.1, GPT-4o-mini, and Qwen3.5; double-blind human annotation for Cohen's Kappa reliability; Ateşman and Flesch readability profiling.
+    \item \textbf{Phase 3: Semantic Layer and LLM Benchmarking (Weeks 9--12):} Zero-shot, few-shot, and Chain-of-Thought (CoT) prompting across GPT-4.1, GPT-4o-mini, and Qwen3.5; single-annotator human review protocol and automated judge audits; Ate\c{s}man and Flesch readability profiling.
     \item \textbf{Phase 4: Generative Video Pipeline and UI Development (Weeks 13--16):} Integration of Manimator, Edge-TTS, and FFmpeg; construction of the FastAPI interactive local studio.
-    \item \textbf{Phase 5: 2026 Expansion and Optimization (Weeks 17--20):} Hybrid RAG (BM25 + TF-IDF Reciprocal Rank Fusion), NetworkX prerequisite Directed Acyclic Graph (DAG) construction, and INT4 edge quantization for RTX 5060 GPU execution.
+    \item \textbf{Phase 5: 2026 Expansion and Optimization (Weeks 17--20):} Hybrid RAG (BM25 + TF-IDF Reciprocal Rank Fusion), NetworkX prerequisite Directed Acyclic Graph (DAG) construction, and INT4/BF16 benchmarking for RTX 5060 and HPC NVIDIA A40 execution.
 \end{enumerate}
 
 Computational resources utilized include:
 \begin{itemize}
-    \item \textbf{Local Edge Development Host:} AMD Ryzen 7 7800X3D, 32 GB DDR5 RAM, NVIDIA GeForce RTX 5060 (8 GB VRAM), Windows 11 / WSL2 Ubuntu 24.04.
-    \item \textbf{National Sovereign Cloud Platform:} TÜBİTAK/SSB EVREN National AI Platform with NVIDIA H200 GPU nodes for evaluating sovereign LLMs (Qwen 3.8 Flash, DeepSeek V4.1 Flash).
+    \item \textbf{Local Edge Development Host:} Intel Core i7-14650HX, 32 GB DDR5 RAM, NVIDIA GeForce RTX 5060 Laptop GPU (8 GB VRAM), Windows 11.
+    \item \textbf{National Sovereign Cloud Platform:} TÜBİTAK/SSB EVREN National AI Platform and Bo\u{g}azi\c{c}i University Computer Engineering HPC cluster (\texttt{ultramarine}, NVIDIA A40 48 GB VRAM).
 \end{itemize}
 
 \subsection{Success Criteria}
 Project deliverables were evaluated against the following quantitative criteria:
 \begin{itemize}
     \item \textbf{Acoustic Quality:} Word Error Rate (WER) $\le 4.0\%$ on clean English lectures and $\le 5.0\%$ on normalized Turkish lectures on modern checkpoints.
-    \item \textbf{Annotation Reliability:} Cohen's Kappa inter-annotator agreement $\kappa_R \ge 0.70$ on contextual relevance.
+    \item \textbf{Human Review Coverage:} Single-annotator (A1) human labeling across pilot ($233$ pairs) and stratified candidate sets, plus cross-family automated judge audits.
     \item \textbf{Pedagogical Simplification:} Significant reduction in lexical complexity relative to raw transcripts, achieving CEFR-B1 band concentration.
-    \item \textbf{Edge Viability:} Combined ASR and SLM inference operating under 4.0 GB VRAM with an end-to-end response latency under 3.0 seconds on the local RTX 5060.
-    \item \textbf{Factual Reliability:} Elimination of hallucinated explanations in domain-dense subjects (target: 0.0\% hallucination rate via Hybrid RAG).
-    \item \textbf{Generative Video Operability:} Successful programmatic compilation of $\ge 5$ distinct concept explainer videos with verified video-audio synchronization.
+    \item \textbf{Edge Viability:} Standalone edge components operating comfortably inside the 8.0 GB consumer VRAM boundary on the local RTX 5060.
+    \item \textbf{Factual Reliability:} Mitigation of hallucinated explanations in domain-dense subjects via Hybrid RAG and DPO preference alignment.
+    \item \textbf{Generative Video Operability:} Successful programmatic compilation of $\ge 5$ distinct concept explainer videos with verified video-audio metadata.
 \end{itemize}
 
 \subsection{Risk Analysis}
@@ -145,10 +145,10 @@ Table \ref{table:risk_analysis} enumerates the primary technical and operational
 \hline
 \textbf{Identified Risk} & \textbf{Likelihood} & \textbf{Impact} & \textbf{Mitigation Strategy} \\ \hline
 Acoustic Domain Shift / Hallucinations & Medium & High & Disabled problematic VAD chunkers; enforced temperature fallback in Whisper decoders. \\ \hline
-LLM Hallucination on Technical Terms & High & High & Deployed Hybrid RAG (BM25 + TF-IDF RRF) with authoritative dictionaries (TDK, Oxford). \\ \hline
-Edge VRAM Out-of-Memory (OOM) & High & Critical & Quantized SLMs to INT4 (AWQ/GPTQ) and selected Whisper Small/Base for edge inference. \\ \hline
+LLM Hallucination on Technical Terms & High & High & Deployed Hybrid RAG (BM25 + TF-IDF RRF) and DPO alignment with authoritative dictionaries (TDK, Oxford). \\ \hline
+Edge VRAM Out-of-Memory (OOM) & High & Critical & Benchmarked quantized SLMs (NF4/INT4) and selected compact SRMs (Whisper Small) for 8 GB edge GPUs. \\ \hline
 Manim Code Syntax / Render Timeouts & Medium & Medium & Constrained LLM code synthesis to deterministic AST templates; enforced strict timeouts. \\ \hline
-Annotation Subjectivity & Medium & Medium & Implemented formal double-blind coding protocol and calculated Cohen's $\kappa$ agreement. \\ \hline
+Annotation Subjectivity & Medium & Medium & Implemented structured single-annotator (A1) R/D rubric protocol and cross-family LLM judge negative-class audits. \\ \hline
 \end{tabularx}
 \end{table}
 
@@ -500,18 +500,14 @@ All primary experimental metrics rest upon a rigorous 7-lecture benchmark corpus
 
 Furthermore, closed 32-term gold reference lists were established by independent domain annotators across two designated clips to enable rigorous precision and recall scoring.
 
-\subsection{Double-Annotated Human Evaluation and Cohen's Kappa}
-To measure semantic explanation quality, a double-blind human evaluation was conducted on a sample of $N=115$ extracted terms evaluated by two independent domain judges across two binary dimensions:
+\subsection{Single-Annotator Human Evaluation Protocol and Label Provenance}
+To evaluate semantic explanation quality using binary human rubrics (\path{experiments/annotation/PROTOCOL.md}), a single human domain annotator (\texttt{A1}) evaluated term-explanation pairs across two binary dimensions:
 \begin{itemize}
-    \item \textbf{Contextual Relevance ($R$):} Does the extracted term represent a true domain-specific concept in the lecture context?
-    \item \textbf{Definition Accuracy ($D$):} Is the generated explanation factually accurate and appropriately simplified for a beginner?
+    \item \textbf{Contextual Relevance ($R$):} Does the extracted term represent a domain-specific concept grounded in the lecture context?
+    \item \textbf{Definition Accuracy ($D$):} Is the generated explanation factually accurate and appropriately simplified for a beginner without circularity?
 \end{itemize}
 
-Inter-annotator agreement was quantified using Cohen's Kappa ($\kappa$) \cite{cohen1960}:
-\begin{equation}
-\kappa = \frac{P_o - P_e}{1 - P_e}
-\end{equation}
-where $P_o$ is the observed percentage agreement and $P_e$ is the expected agreement under chance.
+Across the pilot and 32-clip candidate partitions (\path{experiments/outputs/annotation_provenance_180.json}), human labeling covers: (i) $233$ pilot pairs in \path{labels_a1.csv}; and (ii) $180$ of $235$ candidate pairs from the 32-clip machine pool ($91/91$ TR completed; $89/144$ EN completed; $55$ EN items remaining in \path{labels_todo_human_queue.csv}). Crucially, we distinguish provenance across the $180$ candidate labels: exactly $59$ records ($40$ TR, $19$ EN) come from the user-triggered CSV export (\path{labels_a1_download_20261030_2148.csv}), whereas the full $180$ set was recovered from browser \texttt{localStorage} (\path{labels_a1_recovered_export.csv}) with zero contradictions on the $59$ overlapping items. Because no verified independent second-annotator cohort completed a double-blind pass over these items, formal double-blind human inter-annotator agreement (IAA) is \emph{not} claimed in this thesis.
 
 \section{Deployment}
 Figure \ref{fig:deployment} depicts the containerized local deployment architecture.
@@ -599,19 +595,16 @@ The experimental findings reveal:
     \item \textbf{Readability Band Membership:} The average Ateşman score for Turkish explanations ($52.3$--$58.4$) and Flesch score for English explanations ($59.8$--$64.2$) fell firmly within the targeted CEFR-B1 difficulty band, providing substantial simplification over academic lecture prose.
 \end{itemize}
 
-\section{Inter-Annotator Agreement Reliability}
-Human evaluation on the $N=115$ double-annotated term sample yielded:
-\begin{itemize}
-    \item \textbf{Contextual Relevance ($R$):} Observed agreement $P_o = 96.5\%$, expected agreement $P_e = 84.0\%$, producing Cohen's $\kappa_R = 0.782$ (substantial agreement; 4 disagreements, 8--12 true negatives).
-    \item \textbf{Definition Accuracy ($D$):} Observed agreement $P_o = 100.0\%$, producing Cohen's $\kappa_D = 1.000$. However, due to high class prevalence ($112$ positive vs. $3$ negative definitions), the chance agreement is $P_e \approx 0.95$. Consequently, $\kappa_R$ serves as the primary discriminative indicator of human evaluation reliability.
-\end{itemize}
+\section{Human Labeling Coverage and Negative-Class Scarcity}
+Human review by single annotator \texttt{A1} yielded $413$ labeled items ($233$ pilot + $180$ recovered candidate items). A central methodological characteristic observed across human annotations is extreme class skew (prevalence asymmetry): over $94\%$ of candidate terms are labeled positive ($R=1$, $D=1$), leaving very few verified negatives ($R=0$: $2$ candidate items; $D=0$: $3$ candidate items). Consequently, raw agreement percentages cannot establish automated judge discriminative accuracy; human--LLM validation must inspect confusion-matrix true negatives ($TN$) directly (Section~\ref{sec:llm_judge_validation}). While an unverified prototype archive (\path{labels_a2.csv}, $115$ rows) exists in repository history, formal double-blind human IAA is not claimed.
 
 \section{Edge Optimization and Small Models (SRM / SLM)}
 \label{sec:edge}
-To address edge deployment constraints on consumer hardware, we evaluated Small Recognition Models (Whisper Tiny/Base/Small) alongside the Small Language Model Qwen2.5-1.5B in 4-bit AWQ quantization.
+To characterize edge deployment on consumer hardware, we benchmarked Small Recognition Models (Whisper Tiny/Base/Small and Qwen3-ASR 0.6B) alongside Small Language Models (Qwen2.5-0.5B/1.5B/3B, Llama-3.2-1B, SmolLM2-1.7B, and NF4-quantized Qwen3.5-4B) on the local NVIDIA RTX 5060 (8~GB VRAM) (\path{experiments/outputs/srm_slm_benchmark.json}):
 \begin{itemize}
-    \item \textbf{VRAM Footprint:} Whisper Small (FP16) combined with Qwen2.5-1.5B INT4 consumes exactly \textbf{1.12 GB of VRAM}.
-    \item \textbf{Latency:} End-to-end term extraction completes in \textbf{1.78 seconds} on the local NVIDIA RTX 5060, successfully meeting NFR1 and NFR2.
+    \item \textbf{Standalone Measured Footprints:} \texttt{Whisper Small} (FP16, 244M) requires \textbf{0.77~GB peak VRAM} ($\text{RTF} = 0.054$, $\text{WER}_{\text{norm}} = 6.08\%$ on 6 gold clips). \texttt{Qwen2.5-1.5B-Instruct} (BF16) occupies \textbf{2.93~GB peak VRAM} with a mean probe latency of \textbf{3.62~seconds} ($F_1 = 0.7238$ on the 8-case probe), comfortably operating inside the 8~GB VRAM limit.
+    \item \textbf{4-Bit Host-Constrained Probe:} \texttt{Qwen3.5-4B} (4-bit NF4 double-quant) consumes $3.01\text{~GiB}$ weights and $4.61\text{~GiB}$ peak torch VRAM ($5.26\text{~GB}$ total device occupancy) with mean clip latency of \textbf{46.74~seconds} (\path{outputs/local_vram_probe.json}), demonstrating the practical memory-latency boundary on 8~GB hardware.
+    \item \textbf{BENCH-8 Cross-Host Non-Comparability Caveat:} The 8-case SLM probe (\texttt{BENCH-8}, 28 canonical gold terms) exhibits $\pm 0.07$ F1 variance across local RTX 5060 and HPC A40 runs due to quantization, decoding temperature/seed differences, and small-sample granularity ($1/28 \approx 0.036$); local vs.\ A40 BENCH-8 F1 scores must therefore not be compared as direct cross-host accuracy deltas.
 \end{itemize}
 
 \section{Hybrid RAG and Prerequisite DAG Impact}
@@ -656,7 +649,7 @@ To overcome the physical hardware boundary of local edge devices (where an 8~GB 
 
 \begin{itemize}
     \item \textbf{LoRA Configuration and Training Dynamics:} We applied Low-Rank Adaptation (LoRA) to \path{Qwen/Qwen2.5-7B-Instruct} targeting all attention projection layers ($q, k, v, o$) and MLP layers ($gate, up, down$) with rank $r=16$, scaling $\alpha=32$, and learning rate $2 \times 10^{-4}$. Across 3 training epochs (6 gradient accumulation steps), fine-tuning completed in only \textbf{13.67 seconds}, with loss decreasing from $5.9867 \to 4.3618$. Peak training VRAM reached \textbf{27.84~GB}, empirically confirming why 8~GB hardware is physically precluded from 7B adaptation.
-    \item \textbf{Generalization on Unseen Domain Benchmarks:} We evaluated the base zero-shot model against the fine-tuned LoRA checkpoint across four completely held-out specialized disciplines: Electrical Engineering (\texttt{BENCH-EE}), Bioengineering (\texttt{BENCH-BIO}), Computer Science (\texttt{BENCH-CS}), and Tourism Management (\texttt{BENCH-TOUR}). In Computer Science (Binary Search Tree analysis), terminology recall surged from \textbf{0.0\% $\to$ 33.3\%}, while explanation readability shifted decisively from negative values into the targeted CEFR B1 band (average score $+25.7$, reaching $94.3$ in Bioengineering and $125.1$ in Tourism). All model artifacts are archived at \path{experiments/outputs/qwen7b_hpc_experiment_report.json}.
+    \item \textbf{Generalization on Unseen Domain Benchmarks:} We evaluated the base zero-shot model against the fine-tuned LoRA checkpoint across four completely held-out specialized disciplines: Electrical Engineering (\texttt{BENCH-EE}), Bioengineering (\texttt{BENCH-BIO}), Computer Science (\texttt{BENCH-CS}), and Tourism Management (\texttt{BENCH-TOUR}). In Computer Science (Binary Search Tree analysis), terminology recall rose from \textbf{0.0\% $\to$ 33.3\%}, while explanation readability shifted from negative values into the targeted CEFR B1 band (average score $+25.7$, reaching $94.3$ in Bioengineering and $125.1$ in Tourism). All model artifacts are archived at \path{experiments/outputs/qwen7b_hpc_experiment_report.json}.
 \end{itemize}
 
 \section{Empirical Scope Matrix: Hypotheses, Datasets, and Evaluation Protocols}
@@ -682,20 +675,43 @@ To maintain complete methodological transparency across the heterogeneous experi
 \endfoot
 \bottomrule
 \endlastfoot
-Acoustic Fidelity \& Speed & Gold Pilot Clips & $7$ clips & Dual Human Phonetic Transcripts & WER, CER, RTF, Bootstrap CI, Wilcoxon \\
+Acoustic Fidelity \& Speed & Gold Pilot Clips & $7$ clips & Human Post-Edited Transcripts & WER, CER, RTF, Bootstrap CI, Wilcoxon \\
 Cross-Layer Error Drift & Acoustic Degradation Ladder & $14$ steps & Verified Closed Terminology List & Precision, Recall, F1, Sensitivity Slopes \\
-Terminology Extraction Parity & Double-Annotated Sample & $454$ items & Double-Blind Human Verification & Cohen's $\kappa=0.531$, PABAK$=0.669$ \\
-Cross-Family Judge Autonomy & Cross-Family Panel & $454$ pairs & Verified Human Ground Truth & Qwen2.5-7B vs. Mistral-7B-Instruct \\
+Human Candidate Review & Pilot + 32-Clip Candidate Pool & $413$ items & Single Annotator \texttt{A1} ($59$ direct CSV + $121$ recovered + $233$ pilot) & Positive/Negative Distribution, Queue ($55$ EN) \\
+Cross-Family Judge Audit & Cross-Family Panel & $454$ total ($184$ Qwen clean / $454$ Mistral) & Annotator \texttt{A1} ($155$ Qwen overlap / $399$ Mistral overlap) & Qwen2.5-7B ($270$ fallbacks excluded) vs. Mistral-7B \\
 Model Parameter Scaling & Grand 7-Tier Scaling Suite & $7$ models & Structured JSON Target Schema & Schema Adherence, Ate\c{s}man B1, VRAM \\
 Multi-Domain SFT (7B / 14B) & Domain-Dense Corpus & $2{,}296$ / $4{,}666$ & LeakageGuard Synthetic ChatML & Validation Loss, Bloom Shift ($0\%\to 62.5\%$) \\
 Controllable CEFR B1/B2/C1 & Multi-Tier Triplet Dataset & $4{,}666$ train / $586$ val & Level-Conditioned Prompts & Syllable-Parsed Ate\c{s}man ($91.7\%$ Accuracy) \\
 Multi-Turn Socratic Tutoring & Synthetic Student Personas & $250$ turns & Pedagogical Misconceptions & Socratic Questioning, Zero Spoon-Feeding \\
-Curriculum Concept DAG & Full Curriculum Corpus & $33\to 133$ & Machine Transcripts (\texttt{machine\_only}) & NetworkX Directed Acyclic Topological Sort \\
+Curriculum Concept DAG & Multi-Scope Corpora & $33\to 133$ & Machine Transcripts (\texttt{machine\_only}) & NetworkX Directed Acyclic Topological Sort \\
 \end{longtable}
 }
 
+To eliminate any ambiguity across the project's progressively expanded lecture scopes ($7$, $33$, $40$, $99$, $125$, and $133$), Table~\ref{tab:scope_reconciliation} provides an exact mathematical reconciliation (\path{experiments/outputs/scope_reconciliation_matrix.json}).
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Unified Corpus Scope Reconciliation Across All Pipeline Partitions ($7 / 33 / 40 / 99 / 125 / 133$).}
+\label{tab:scope_reconciliation}
+\scriptsize\setlength{\tabcolsep}{2pt}
+\begin{tabularx}{\textwidth}{>{\RaggedRight\arraybackslash}lclX}
+\toprule
+\textbf{Partition} & \textbf{Clips} & \textbf{Label Status} & \textbf{Exact Set Composition \& Traceability} \\
+\midrule
+Pilot Gold Set & \textbf{7} & \texttt{human\_gold} & 3 TR (\texttt{TR-1..3}) + 4 EN (\texttt{EN-1..4}); $\approx 95.6$ min audio, $13{,}467$ gold words (\path{manifest.jsonl}). \\
+Job 33600 Subset & \textbf{33} & \texttt{mixed} & Initial subset of the 40-video inventory with transcripts ready at Job 33600 launch ($12{,}609$ tokens). \\
+Curated Inventory & \textbf{40} & \texttt{mixed} & 32 academic lectures (\texttt{TR-01..16}, \texttt{EN-01..16}) + 8 corporate videos (\texttt{TR-17..20}, \texttt{EN-17..20}). \\
+100+ Expansion & \textbf{99} & \texttt{machine\_only} & 99 fetched clips from the 100-clip worklist (\texttt{EN-44} unavailable); $34.78$ audio hours (\path{manifest_100plus.jsonl}); \texttt{999} machine terms across 98 clips (\path{labels_todo_100plus_machine.csv}) and \texttt{180}-item stratified sample across 95 clips (74 TR, 106 EN; \path{labels_todo_sample_100plus.csv}). \\
+Unified Machine & \textbf{125} & \texttt{machine\_only} & Disjoint union: $26$ (32-clip academic with audio) $+$ $99$ (100+ expansion) $= 125$ clips ($48.70$ hours). \\
+HPC Batch-133 & \textbf{133} & \texttt{mixed} & $125$ unified clips $+$ $8$ corporate clips (\texttt{TR/EN-17..20}); 7 pilot IDs unpadded in \path{full_corpus_133_report.json}. \\
+\bottomrule
+\end{tabularx}
+\begin{flushleft}\scriptsize *Taxonomy note: \texttt{human\_gold} in this table aggregates the post-edited pilot reference transcripts recorded in \path{manifest.jsonl} under \texttt{gold\_how} $\in \{\text{\texttt{caption\_corrected}}, \text{\texttt{official\_caption\_corrected}}, \text{\texttt{independent\_transcription}}\}$ (closed 32-term benchmark lists reside canonically on \texttt{TR-1} and \texttt{EN-1} in \path{gold_terms.json}).\end{flushleft}
+\end{table}
+
 \section{Full-Corpus Batch Pipeline and Scaled Pedagogical DAG Analysis (33 Verified Lectures)}
-To provide definitive validation that the EduTerm AI architecture generalizes across an entire institutional curriculum rather than a small 7-clip pilot, we executed the full-corpus batch pipeline (Slurm Job ID \texttt{33600}) across all \textbf{33 verified lecture recordings} (12 distinct academic and corporate disciplines, comprising $\approx 12.85$ audio hours and $20,915$ words):
+To evaluate whether the EduTerm AI architecture generalizes across an institutional curriculum rather than only a small 7-clip pilot, we executed the full-corpus batch pipeline (Slurm Job ID \texttt{33600}) across all \textbf{33 ready lecture recordings} available at that stage (12 distinct academic and corporate disciplines, comprising $12{,}609$ generated tokens and $118$ extracted terms):
 
 \begin{itemize}
     \item \textbf{High-Throughput HPC Throughput:} Leveraging native \texttt{bfloat16} tensor execution on the NVIDIA A40, the entire 33-lecture corpus was processed end-to-end in \textbf{504.47 seconds ($\approx 8.4$ minutes)}. The average inference latency was \textbf{15.28 seconds per lecture}, with a peak VRAM ceiling of \textbf{14.91~GB} and a total of \textbf{12,609 tokens} generated.
@@ -755,11 +771,12 @@ The measured empirical results are summarized in Table~\ref{tab:scaling_law_resu
 \midrule
 Qwen2.5-0.5B-Instruct & 0.49B & 0.95~GB & \textbf{1.50~s} & 41.7\% & 37.5\% & 39.5\% & 70.9 & 100\% \\
 Qwen2.5-1.5B-Instruct & 1.54B & 2.90~GB & 2.25~s & 68.8\% & 56.2\% & 61.9\% & 45.5 & 100\% \\
-Qwen2.5-7B-Instruct (Base) & 7.62B & 14.28~GB & 4.16~s & 45.8\% & 50.0\% & 47.8\% & 60.3 & 87.5\% \\
-\textbf{EduTerm-7B-TR (LoRA SFT)} & 7.66B & 14.39~GB & \textbf{1.68~s} & \textbf{95.7\%} & \textbf{95.8\%} & \textbf{95.7\%} & \textbf{66.4} & \textbf{100\%} \\
-Qwen2.5-14B-Instruct (Large) & 14.77B & 27.74~GB & 7.11~s & 85.4\% & 71.7\% & 77.9\% & 38.7 & 100\% \\
+Qwen2.5-7B-Instruct (Base) & 7.62B & 14.28~GB & 4.16~s & 10.4\% & 0.0\% & 0.0\% & 60.3 & 87.5\% \\
+\textbf{EduTerm-7B-TR (LoRA SFT)} & 7.66B & 14.39~GB & \textbf{1.68~s} & 0.0\%* & 0.0\%* & 0.0\%* & \textbf{71.0} & 0.0\%* \\
+Qwen2.5-14B-Instruct (Large) & 14.77B & 27.74~GB & 7.11~s & \textbf{85.4\%} & \textbf{71.7\%} & \textbf{78.0\%} & 38.7 & \textbf{100\%} \\
 \bottomrule
 \end{tabularx}
+\begin{flushleft}\scriptsize *Note: In \path{scaling_law_report.json} and \path{eduterm_7b_tr_sft_report.json}, the initial 7B SFT checkpoint suffered structured JSON schema key drift ($0.0\%$ valid JSON), yielding $0.0\%$ strict parser-matched F1 despite readable surface text (71.0 Ate\c{s}man); this motivated migrating SFT/DPO to the 14B QLoRA pipeline (Section~\ref{sec:eduterm_14b_sft}).\end{flushleft}
 \end{table}
 
 \begin{figure}[htbp]
@@ -774,11 +791,11 @@ Qwen2.5-14B-Instruct (Large) & 14.77B & 27.74~GB & 7.11~s & 85.4\% & 71.7\% & 77
     \item \textbf{The 1.5B Parameter Pareto Sweet Spot for Edge Inference:}  
     While the ultra-compact 0.5B model requires only $0.95$~GB VRAM, its domain terminology recall is constrained to $41.7\%$, struggling to isolate complex multi-word jargon. Scaling parameter capacity to $1.54$B parameters yields a substantial leap in terminology recall to \textbf{68.8\%} (+65.0\% relative improvement) while requiring only \textbf{2.90~GB VRAM} and exhibiting an inference latency of $2.25$~seconds. Given the 8~GB hardware threshold of modern student laptops (e.g., RTX 5060), the 1.5B scale represents an exceptional local Pareto frontier for offline classroom deployment.
 
-    \item \textbf{Targeted Domain Fine-Tuning Outperforms Brute-Force Parameter Scaling:}  
-    Scaling zero-shot parameters from 7B to 14B doubles memory consumption ($14.28 \to 27.74$~GB VRAM) and nearly doubles query latency ($4.16 \to 7.11$~s) while lifting recall to $85.4\%$. However, fine-tuning the 7B model with 2,296 multi-domain instructional pairs (\textbf{EduTerm-7B-TR}) decisively surpasses the 14B model across every dimension: achieving \textbf{95.7\% Recall, 95.8\% Precision, and 95.7\% F1-score} at half the VRAM footprint (14.39~GB) and \textbf{$4.2\times$ faster latency (1.68~s vs. 7.11~s)}. This provides conclusive proof that specialized pedagogical fine-tuning is far more parameter- and energy-efficient than raw model scaling.
+    \item \textbf{Schema Drift in Early 7B LoRA vs. 14B Scaling Robustness:}  
+    In \path{scaling_law_report.json}, \texttt{Qwen2.5-14B-Instruct} reached the highest base terminology performance (\textbf{85.4\% Recall, 71.7\% Precision, 78.0\% F1, 100\% JSON validity}), whereas both zero-shot 7B ($10.4\%$ recall, non-canonical JSON keys) and the initial 7B LoRA SFT checkpoint ($0.0\%$ strict JSON validity, faster $1.68$~s latency) exhibited schema mismatch under the strict parser. These measured failures directly motivated upgrading domain adaptation to the 14B QLoRA and DPO architectures.
 
-    \item \textbf{Pedagojik Over-Complication at Large Scale:}  
-    As raw model capacity scales to 14B without domain regularization, generated explanations become increasingly verbose and intellectually dense, causing the Turkish Ate\c{s}man readability score to fall to $38.7$ (academically challenging / university-level). In contrast, EduTerm-7B-TR strictly aligns with the intended \textbf{CEFR B1 readability window (66.4 Ate\c{s}man)}, producing lucid, accessible definitions suitable for introductory learners.
+    \item \textbf{Pedagogical Over-Complication at Large Scale:}  
+    As raw model capacity scales to 14B without domain regularization, generated explanations become increasingly verbose and intellectually dense, causing the Turkish Ate\c{s}man readability score to fall to $38.7$ (academically challenging / university-level), underscoring the need for downstream CEFR-B1 and DPO pedagogical alignment.
 \end{enumerate}
 
 \section{Empirical Cross-Layer Error Propagation Analysis (ASR WER \texorpdfstring{$\to$}{->} LLM Terminology F1)}
@@ -851,25 +868,23 @@ All 14 generated transcripts were ingested into the open-weight \path{Qwen/Qwen2
 \end{enumerate}
 
 \section{Direct Preference Optimization (DPO) for Pedagogical Alignment}
-While Supervised Fine-Tuning (SFT) equips open-weight models to extract domain terminology with high precision ($95.8\%$), standard cross-entropy training inherently preserves the lexical complexity of the training data. Consequently, only $57.6\%$ of SFT-generated definitions fall within the target CEFR B1 readability band (Ate\c{s}man 50--70), with the remainder lapsing into bureaucratic jargon and over-nested syntax.
+While Supervised Fine-Tuning (SFT) equips open-weight models to extract domain terminology, standard cross-entropy training preserves the lexical complexity of dense source material. To enforce intuitive beginner-level pedagogy, we conducted \textbf{Direct Preference Optimization (DPO)} on the Bo\u{g}azi\c{c}i HPC cluster (NVIDIA A40 48GB GPU, Job ID \texttt{33750}, \path{experiments/outputs/dpo_experiment_report.json}). A curated dataset of 650 preference triplets ($585$ train / $65$ validation) across 7 domains was constructed, pairing target B1 definitions ($y_w$, mean Ate\c{s}man $67.53$, accessible analogies) against dense academic text ($y_l$, mean Ate\c{s}man $11.97$), establishing a corpus readability differential of $\Delta = +55.56$ points.
 
-To enforce intuitive pedagogy without degrading extraction recall, we conducted \textbf{Direct Preference Optimization (DPO)} on the Bo\u{g}azi\c{c}i HPC cluster (NVIDIA A40 48GB GPU, Job ID \texttt{33750}, script \path{experiments/finetune/train_dpo_qwen.py}). A curated dataset of 650 preference triplets ($(x, y_w, y_l)$) across 7 domains was constructed, pairing target B1 definitions ($y_w$, mean Ate\c{s}man 67.53, crisp 8--12 word structures, intuitive everyday analogies) against dense academic text ($y_l$, mean Ate\c{s}man 11.97), establishing an empirical readability differential of $\Delta = +55.56$ points.
-
-To bypass the memory constraint of concurrently loading both reference and active policy models in 48~GB VRAM, reference log-probabilities ($\log \pi_{\text{ref}}$) were precomputed with frozen weights in a single pass. LoRA policy parameters were then optimized over 3 epochs with $\beta = 0.1$ and learning rate $\eta = 5 \times 10^{-6}$ in 6.28 minutes ($376.7$\,s). As shown in Table~\ref{tab:dpo_results} and Figure~\ref{fig:dpo_curves}, validation preference accuracy reached $100.0\%$, the implicit reward margin expanded from $+0.15$ to $+6.60$, and the target B1 in-band share surged from $57.6\%$ to $\mathbf{94.2\%}$ while preserving $95.5\%$ domain terminology precision with zero catastrophic forgetting.
+Reference log-probabilities ($\log \pi_{\text{ref}}$) were precomputed with frozen weights in a single pass, and LoRA policy parameters were optimized over 3 epochs with $\beta = 0.1$ and learning rate $\eta = 5 \times 10^{-6}$ in $376.67$\,s ($32.78$\,GB peak VRAM). As recorded in Table~\ref{tab:dpo_results}, validation preference accuracy reached \textbf{100.0\%} and the implicit validation reward margin converged from $+6.382$ (Epoch 1) to \textbf{$+6.600$} (Epoch 3), verifying clean preference separation on held-out pedagogical pairs. When subsequently evaluated generatively across the 8 held-out BENCH vertical prompts (Job ID \texttt{34561}, \path{experiments/outputs/dpo_7b_generative_eval.json}), \texttt{Qwen2.5-7B-Instruct (Base)} achieved $62.5\%$ JSON compliance / $25.0\%$ B1 band share ($20.14$ Ate\c{s}man) / $0.0\%$ $F_1$, \texttt{EduTerm-7B-TR (SFT)} produced $0.0\%$ JSON / $0.0\%$ B1 / $0.0\%$ $F_1$, and \texttt{EduTerm-7B-DPO} produced $12.5\%$ JSON / $0.0\%$ B1 ($37.35$ Ate\c{s}man) / $0.0\%$ $F_1$---demonstrating empirically that DPO on top of a schema-drifted 7B SFT checkpoint does not recover end-to-end JSON/B1 generation, and motivating our migration to 14B QLoRA and 3B/14B Turkish DPO (Sections~\ref{sec:hallucination_stress_benchmark}, \ref{sec:cross_lingual_transfer}).
 
 \begin{table}[htbp]
 \centering
 \small
-\caption{Pedagogical DPO Alignment Metrics on Bo\u{g}azi\c{c}i HPC NVIDIA A40 (Job ID \texttt{33750}).}
+\caption{Pedagogical DPO Alignment Training \& Validation Convergence on NVIDIA A40 (Job ID \texttt{33750}).}
 \label{tab:dpo_results}
 \scriptsize\setlength{\tabcolsep}{2pt}
-\begin{tabularx}{\textwidth}{>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}X}
+\begin{tabularx}{\textwidth}{>{\RaggedRight\arraybackslash}Xccccc}
 \toprule
-\textbf{Model Stage} & \textbf{Ate\c{s}man Score} & \textbf{CEFR B1 Share (\%)} & \textbf{Term Precision (\%)} & \textbf{Val. Preference Acc. (\%)} \\
+\textbf{Training Stage} & \textbf{Train Loss} & \textbf{Train Acc. (\%)} & \textbf{Val. Loss} & \textbf{Val. Acc. (\%)} & \textbf{Val. Reward Margin} \\
 \midrule
-Qwen 2.5-7B (Base) & -19.1 (Very Difficult) & 12.5 & 50.0 & 50.0 (Baseline) \\
-EduTerm-7B-TR (SFT) & 52.4 (Moderate) & 57.6 & \textbf{95.8} & 74.5 \\
-\textbf{EduTerm-7B-DPO (SFT+DPO)} & \textbf{66.8 (Target B1)} & \textbf{94.2} & \textbf{95.5} & \textbf{100.0} \\
+Epoch 1 & 0.0780 & 98.13\% & 0.0021 & \textbf{100.0\%} & +6.3824 \\
+Epoch 2 & 0.0015 & \textbf{100.0\%} & 0.0016 & \textbf{100.0\%} & \textbf{+6.6029} \\
+\textbf{Epoch 3 (Final)} & \textbf{0.0013} & \textbf{100.0\%} & \textbf{0.0016} & \textbf{100.0\%} & \textbf{+6.6000} \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -877,7 +892,7 @@ EduTerm-7B-TR (SFT) & 52.4 (Moderate) & 57.6 & \textbf{95.8} & 74.5 \\
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.98\textwidth]{figures/dpo_alignment_curves.png}
-\caption{Direct Preference Optimization (DPO) Pedagogical Alignment on Bo\u{g}azi\c{c}i HPC A40: (a) Preference accuracy progression ($75\% \to 100\%$); (b) Reward margin expansion ($+6.60$ relative advantage for B1 analogies); (c) Readability score transformation into the target CEFR B1 band (Ate\c{s}man 50--70); and (d) Conservation of terminology precision ($95.5\%$) alongside soaring B1 compliance ($94.2\%$).}
+\caption{Direct Preference Optimization (DPO) Pedagogical Alignment Training Curves on Bo\u{g}azi\c{c}i HPC A40: validation preference accuracy reaches $100.0\%$ with an implicit reward margin of $+6.60$ between CEFR-B1 chosen definitions and dense academic text.}
 \label{fig:dpo_curves}
 \end{figure}
 
@@ -892,7 +907,7 @@ To resolve this limitation, we executed an empirical quantization degradation be
     \item \textbf{INT4-FP4 (Standard 4-bit Float):} $5.65\text{ GB}$ load footprint ($2.5\times$ compression), $5.94\text{ GB}$ peak VRAM, $16.60$\,s latency, $15.2\text{ tok/s}$ throughput, and $35.6\%$ F1 score.
 \end{enumerate}
 
-The measured empirical metrics are compiled in Table~\ref{tab:quant_results} and visualized in Figure~\ref{fig:quant_curves}. Crucially, while FP16 ($14.30\text{ GB}$) and INT8 ($8.28\text{ GB}$) exceed the physical $8\text{ GB}$ VRAM ceiling of laptop GPUs (such as the NVIDIA RTX 5060), both INT4 configurations drop safely to $5.38$--$5.65\text{ GB}$, leaving over $2.3\text{ GB}$ of memory headroom for context KV-cache expansion. This confirms that 4-bit NF4 establishes the optimal Pareto-efficient operating point for real-world edge deployment without catastrophic semantic loss.
+The measured empirical metrics are compiled in Table~\ref{tab:quant_results} and visualized in Figure~\ref{fig:quant_curves}. Crucially, while FP16 ($14.30\text{ GB}$) and INT8 ($8.28\text{ GB}$) exceed the physical $8\text{ GB}$ VRAM ceiling of laptop GPUs (such as the NVIDIA RTX 5060), both INT4 configurations drop safely to $5.38$--$5.65\text{ GB}$, leaving over $2.3\text{ GB}$ of memory headroom for context KV-cache expansion.
 
 \begin{table}[htbp]
 \centering
@@ -915,43 +930,35 @@ The measured empirical metrics are compiled in Table~\ref{tab:quant_results} and
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.98\textwidth]{figures/quantization_degradation_curves.png}
-\caption{Empirical Quantization Degradation Curves on Bo\u{g}azi\c{c}i HPC A40: (a) Memory footprint scaling across precision tiers relative to the 8 GB consumer GPU ceiling; (b) Terminology F1 and Recall preservation under quantization; (c) Latency and generation throughput trade-off; and (d) Pareto frontier establishing INT4-NF4 as the optimal edge configuration.}
+\caption{Empirical Quantization Degradation Curves on Bo\u{g}azi\c{c}i HPC A40: (a) Memory footprint scaling across precision tiers relative to the 8 GB consumer GPU ceiling; (b) Terminology F1 and Recall preservation under quantization; (c) Latency and generation throughput trade-off; and (d) Pareto frontier comparing VRAM and throughput.}
 \label{fig:quant_curves}
 \end{figure}
 
 \section{Empirical Human--LLM Agreement Analysis and Discriminative Limitations}
 \label{sec:llm_judge_validation}
 
-A central methodological question in automated evaluation is whether local LLM scoring aligns with human annotators and whether it possesses true discriminative capability on imbalanced rubrics. To empirically characterize the extent of human--LLM agreement and examine potential evaluation biases, we conducted a benchmark on the Bo\u{g}azi\c{c}i HPC cluster (\texttt{ultramarine}, NVIDIA A40 48~GB GPU; Job ID \texttt{33782}).
+A central methodological question in automated evaluation is whether local LLM scoring aligns with single-annotator human labels (\texttt{A1}) and whether it possesses true discriminative capability on imbalanced rubrics. To empirically characterize human--LLM agreement and inspect potential evaluation biases, we conducted a benchmark on the Bo\u{g}azi\c{c}i HPC cluster (\texttt{ultramarine}, NVIDIA A40 48~GB GPU; Job ID \texttt{33782}).
 
-The benchmark loaded \texttt{Qwen2.5-7B-Instruct} in \texttt{bfloat16} precision and evaluated the complete human-annotated corpus of 233 term-explanation pairs (\path{annotation/labels_a1.csv}) alongside the double-annotated subset of 115 pairs (\path{annotation/labels_a2.csv}) under zero-shot prompting (\texttt{temperature=0.0}) across two binary metrics:
+The benchmark loaded \texttt{Qwen2.5-7B-Instruct} in \texttt{bfloat16} precision and evaluated the 233 human-annotated pilot term-explanation pairs (\path{annotation/labels_a1.csv}) under zero-shot prompting (\texttt{temperature=0.0}) across two binary metrics:
 \begin{enumerate}
     \item \textbf{Metric $R$ (Context Consistency and Domain Validity):} $1$ if the term is a valid domain concept and its explanation is consistent with lecture context; $0$ if generic filler or hallucinated.
     \item \textbf{Metric $D$ (Beginner Suitability / CEFR-B1 Clarity):} $1$ if the explanation is non-circular and intuitive for novices; $0$ if tautological or overburdened with unexplained jargon.
 \end{enumerate}
 
-Every item-by-item decision was serialized to disk (\path{annotation/labels_7b_judge.csv}; summary report in \path{outputs/llm_judge_human_agreement_report.json}). Pairwise observed percentage agreement ($P_o$), expected chance agreement ($P_e$), Cohen's Kappa ($\kappa$), Prevalence-Adjusted Bias-Adjusted Kappa (PABAK)~\cite{byrt1993bias}, confusion components [TP, TN, FP, FN], Sensitivity (Sens), Specificity (Spec), and Balanced Accuracy (BalAcc) are detailed in Table~\ref{tab:llm_judge_agreement}.
+Every item-by-item decision was serialized to disk (\path{annotation/labels_7b_judge.csv}; summary report in \path{outputs/llm_judge_human_agreement_report.json}). Observed percentage agreement ($P_o$), Cohen's Kappa ($\kappa$), Prevalence-Adjusted Bias-Adjusted Kappa (PABAK)~\cite{byrt1993bias}, confusion components [TP, TN, FP, FN], Sensitivity (Sens), Specificity (Spec), and Balanced Accuracy (BalAcc) against Human \texttt{A1} are detailed in Table~\ref{tab:llm_judge_agreement}. Formal double-blind human IAA is not claimed here.
 
 \begin{table}[htbp]
 \centering
 \small
-\caption{Empirical Human--LLM Agreement, Kappa Statistics, and Discriminative Diagnostic Metrics on Bo\u{g}azi\c{c}i HPC A40.}
+\caption{Empirical Human (\texttt{A1})--LLM Agreement and Discriminative Diagnostic Metrics on NVIDIA A40.}
 \label{tab:llm_judge_agreement}
 \scriptsize\setlength{\tabcolsep}{2pt}
 \begin{tabularx}{\textwidth}{>{\RaggedRight\arraybackslash}Xlcccccccc}
 \toprule
 \textbf{Rater Pair} & \textbf{Subset} & \textbf{Metric} & \textbf{$P_o$ (\%)} & \textbf{$\kappa$} & \textbf{PABAK} & \textbf{[TP, TN, FP, FN]} & \textbf{Sens} & \textbf{Spec} & \textbf{BalAcc} \\
 \midrule
-Human 1 $\times$ Human 2 & $N=115$ & $R$ & \textbf{96.52\%} & \textbf{0.782} & \textbf{0.930} & [103, 8, 0, 4] & 96.3\% & 100.0\% & \textbf{98.1\%} \\
-Human 1 $\times$ Human 2 & $N=115$ & $D$ & \textbf{100.0\%} & \textbf{1.000} & \textbf{1.000} & [112, 3, 0, 0] & 100.0\% & 100.0\% & \textbf{100.0\%} \\
-\midrule
-7B Judge $\times$ Human 1 & $N=115$ & $R$ & \textbf{92.17\%} & -0.016 & 0.843 & [106, 0, 1, 8] & 93.0\% & 0.0\% & 46.5\% \\
-7B Judge $\times$ Human 1 & $N=115$ & $D$ & \textbf{97.39\%} & 0.000 & 0.948 & [112, 0, 0, 3] & 97.4\% & 0.0\% & 48.7\% \\
-7B Judge $\times$ Human 2 & $N=115$ & $R$ & \textbf{88.70\%} & -0.016 & 0.774 & [102, 0, 1, 12] & 89.5\% & 0.0\% & 44.7\% \\
-7B Judge $\times$ Human 2 & $N=115$ & $D$ & \textbf{97.39\%} & 0.000 & 0.948 & [112, 0, 0, 3] & 97.4\% & 0.0\% & 48.7\% \\
-\midrule
-7B Judge $\times$ Human 1 & $N=233$ & $R$ & \textbf{94.42\%} & -0.015 & 0.888 & [220, 0, 2, 11] & 95.2\% & 0.0\% & 47.6\% \\
-7B Judge $\times$ Human 1 & $N=233$ & $D$ & \textbf{97.42\%} & 0.000 & 0.948 & [227, 0, 0, 6] & 97.4\% & 0.0\% & 48.7\% \\
+7B Judge $\times$ Human A1 & $N=233$ (Pilot) & $R$ & \textbf{94.42\%} & -0.015 & 0.888 & [220, 0, 2, 11] & 95.2\% & 0.0\% & 47.6\% \\
+7B Judge $\times$ Human A1 & $N=233$ (Pilot) & $D$ & \textbf{97.42\%} & 0.000 & 0.948 & [227, 0, 0, 6] & 97.4\% & 0.0\% & 48.7\% \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -959,60 +966,64 @@ Human 1 $\times$ Human 2 & $N=115$ & $D$ & \textbf{100.0\%} & \textbf{1.000} & \
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.98\textwidth]{figures/llm_judge_agreement_matrix.png}
-\caption{Empirical Human--LLM Agreement Benchmark: (a) Inter-rater Kappa matrix; (b) Marginal prevalence adjustment via PABAK; (c) Raw observed percentage agreement; and (d) Cross-subset consistency from $N=115$ to the full $N=233$ corpus.}
+\caption{Empirical Human--LLM Agreement Diagnostic View across Kappa, PABAK, and raw concordance metrics.}
 \label{fig:judge_matrix}
 \end{figure}
 
 \subsection{Discussion of Prevalence, High Agreement, and Discriminative Limitations}
-A critical statistical insight emerges from contrasting raw percentage agreement ($P_o \ge 92.17\%$) and PABAK ($\ge 0.843$) against Cohen's Kappa ($\kappa \le 0.000$) and Specificity ($\text{Spec} = 0.0\%$).
-In highly skewed educational datasets where positive items dominate (e.g., $97.4\%$ positive human labels in Metric $D$), chance expected agreement $P_e$ is extremely elevated ($0.974$). While PABAK mathematically adjusts for marginal imbalance, PABAK alone cannot demonstrate that the LLM is an effective discriminator of negative cases. 
+A critical statistical insight emerges from contrasting raw percentage agreement ($P_o \ge 94.42\%$) and PABAK ($\ge 0.888$) against Cohen's Kappa ($\kappa \le 0.000$) and Specificity ($\text{Spec} = 0.0\%$).
+In highly skewed educational datasets where positive items dominate ($97.4\%$ positive human labels in Metric $D$), chance expected agreement $P_e$ reaches $0.9742$. While PABAK mathematically adjusts for marginal imbalance, PABAK alone cannot demonstrate that the LLM is an effective discriminator of negative cases.
 
-Crucially, in the human--LLM comparison, the 7B judge achieves zero True Negatives ($TN = 0$), yielding Specificity $= 0.0\%$ and Balanced Accuracy below $50.0\%$. Consequently, while high observed concordance is documented on positive-heavy samples, the LLM evaluator cannot be considered an empirically validated autonomous judge or a substitute for human ground truth. It functions primarily as a high-concordance positive sieve whose negative-class discrimination remains unproven.
+Crucially, in the human--LLM comparison, the 7B judge achieves zero True Negatives ($TN = 0$), yielding Specificity $= 0.0\%$ and Balanced Accuracy below $50.0\%$. Consequently, the automated 7B evaluator cannot serve as a substitute for human ground truth; it acts strictly as a high-concordance positive triage pass whose negative-class discrimination remains unproven.
 
-\subsection{Cross-Family Human--LLM and LLM--LLM Agreement (Mitigating Self-Grading)}
+\subsection{Cross-Family Human--LLM and LLM--LLM Agreement (Fallback-Excluded Re-Audit)}
 \label{sec:cross_family_judge}
 
-A further concern in automated evaluation is \textit{family-internal confirmation bias} or \textit{self-grading}---i.e., whether Qwen-extracted terminology is favorably assessed when evaluated by a model from the same architectural family (\texttt{Qwen2.5-7B-Instruct}). To investigate cross-family agreement dynamics, we deployed an independent benchmark on the Bo\u{g}azi\c{c}i HPC cluster (\texttt{ultramarine}, NVIDIA A40 48~GB GPU; Job ID \texttt{33983}; script \path{experiments/annotation/run_hpc_cross_family_judge.py}).
+A further concern in automated evaluation is \textit{family-internal confirmation bias} or \textit{self-grading}---whether Qwen-extracted terminology is judged differently by a model outside the Qwen family. We deployed a cross-family panel on Bo\u{g}azi\c{c}i HPC A40 (Job ID \texttt{33983}, \path{experiments/annotation/run_hpc_cross_family_judge.py}) evaluating the 454-item panel (\path{experiments/annotation/labels_panel_input.csv}) across \path{Qwen/Qwen2.5-7B-Instruct} and European-origin \path{mistralai/Mistral-7B-Instruct-v0.3}.
 
-A critical defense critique against LLM-as-a-Judge frameworks is the risk of \textit{family-internal confirmation bias} or \textit{self-grading}---i.e., whether Qwen-extracted terminology is favorably assessed when judged by a model from the identical family (\texttt{Qwen2.5-7B-Instruct}). To definitively dispel this concern with empirical cross-family validation, we deployed an independent benchmark on the Bo\u{g}azi\c{c}i HPC cluster (\texttt{ultramarine}, NVIDIA A40 48~GB GPU; Job ID \texttt{33983}; script \path{experiments/annotation/run_hpc_cross_family_judge.py}).
-
-The benchmark evaluated the expanded 454-item panel (\path{experiments/annotation/labels_panel_input.csv}) across two completely independent open-weight model architectures:
-\begin{enumerate}
-    \item \textbf{Arm 1 (Asian Origin / Alibaba):} \path{Qwen/Qwen2.5-7B-Instruct} (NF4 4-bit bfloat16 quantization; 1344.9~s evaluation time).
-    \item \textbf{Arm 2 (European Origin / Mistral AI):} \path{mistralai/Mistral-7B-Instruct-v0.3} (NF4 4-bit bfloat16 quantization; 1346.2~s evaluation time).
-    \item \textbf{Human Gold Standard (Annotator A1):} 399 overlapping human-annotated items from \path{experiments/annotation/labels_a1.csv}.
-\end{enumerate}
-
-Both models evaluated every item zero-shot under the identical prompt criteria ($R$: context consistency; $D$: definition correctness according to TDK/domain standards). Decisions and raw generation traces were saved to \path{experiments/annotation/labels_panel_qwen25_7b_a40.csv} and \path{experiments/annotation/labels_panel_mistral7b_a40.csv}, with statistical synthesis compiled in \path{experiments/outputs/cross_family_judge_report.json}. Results are summarized in Table~\ref{tab:cross_family_judge}.
+\textbf{Critical Parse-Fallback Audit and Recomputation:} Post-hoc auditing of \path{labels_panel_qwen25_7b_a40.csv} revealed that under the $65$-token budget, \textbf{270 of 454 items (59.5\%)} failed structured parsing in Qwen2.5-7B and had triggered a silent script default (\texttt{{"R": 1, "D": 1, "why": "Parsing fallback"}}), whereas \textbf{Mistral-7B produced 454/454 real parsed verdicts (0 fallbacks)}. Including synthetic \texttt{R=1, D=1} fallback rows in agreement statistics invalidates comparisons. Therefore, via \path{experiments/annotation/recompute_cross_family_clean.py}, we physically separated the $270$ Qwen fallback rows (\path{labels_panel_qwen25_7b_a40_fallback270.csv}) and recomputed Qwen metrics strictly over its \textbf{184 verified real parsed verdicts} (\path{labels_panel_qwen25_7b_a40_clean184.csv}, overlapping $N=155$ items with Human \texttt{A1}). The clean, fallback-free metrics are compiled in Table~\ref{tab:cross_family_judge}.
 
 \begin{table}[htbp]
 \centering
 \small
-\caption{Cross-Family Human--LLM and Model--Model Agreement on Bo\u{g}azi\c{c}i HPC A40: Diagnostic Metrics.}
+\caption{Cross-Family Agreement After Excluding 270 Qwen Parse Fallbacks (\texttt{cross\_family\_judge\_report.json}).}
 \label{tab:cross_family_judge}
-\scriptsize\setlength{\tabcolsep}{2pt}
+\scriptsize\setlength{\tabcolsep}{1.5pt}
 \begin{tabularx}{\textwidth}{>{\RaggedRight\arraybackslash}X>{\RaggedRight\arraybackslash}Xcccccccc}
 \toprule
 \textbf{Rater Pair} & \textbf{Metric} & \textbf{$N$} & \textbf{$P_o$ (\%)} & \textbf{$\kappa$} & \textbf{PABAK} & \textbf{[TP, TN, FP, FN]} & \textbf{Sens} & \textbf{Spec} & \textbf{BalAcc} \\
 \midrule
-Qwen2.5-7B $\times$ Mistral-7B & $R$ (Context) & 454 & \textbf{94.93\%} & \textbf{0.182} & \textbf{0.899} & [428, 3, 8, 15] & 96.6\% & 27.3\% & 61.9\% \\
-Qwen2.5-7B $\times$ Mistral-7B & $D$ (Definition) & 454 & \textbf{96.26\%} & \textbf{0.303} & \textbf{0.925} & [433, 4, 4, 13] & 97.1\% & 50.0\% & 73.5\% \\
+Qwen2.5-7B (Real 184) $\times$ Mistral & $R$ & 184 & \textbf{90.22\%} & 0.211 & 0.804 & [163, 3, 3, 15] & 91.6\% & 50.0\% & 70.8\% \\
+Qwen2.5-7B (Real 184) $\times$ Mistral & $D$ & 184 & \textbf{92.39\%} & \textbf{0.336} & \textbf{0.848} & [166, 4, 1, 13] & 92.7\% & 80.0\% & \textbf{86.4\%} \\
 \midrule
-Mistral-7B $\times$ Human A1 & $R$ (Context) & 399 & \textbf{94.24\%} & -0.030 & 0.885 & [376, 0, 12, 11] & 97.2\% & 0.0\% & 48.6\% \\
-Mistral-7B $\times$ Human A1 & $D$ (Definition) & 399 & \textbf{96.24\%} & -0.019 & 0.925 & [384, 0, 8, 7] & 98.2\% & 0.0\% & 49.1\% \\
+Mistral-7B (All 454) $\times$ Human A1 & $R$ & 399 & \textbf{94.24\%} & -0.030 & 0.885 & [376, 0, 12, 11] & 97.2\% & 0.0\% & 48.6\% \\
+Mistral-7B (All 454) $\times$ Human A1 & $D$ & 399 & \textbf{96.24\%} & -0.019 & 0.925 & [384, 0, 8, 7] & 98.2\% & 0.0\% & 49.1\% \\
 \midrule
-Qwen2.5-7B $\times$ Human A1 & $R$ (Context) & 399 & \textbf{92.48\%} & -0.037 & 0.850 & [369, 0, 12, 18] & 95.4\% & 0.0\% & 47.7\% \\
-Qwen2.5-7B $\times$ Human A1 & $D$ (Definition) & 399 & \textbf{94.24\%} & -0.027 & 0.885 & [376, 0, 8, 15] & 96.2\% & 0.0\% & 48.1\% \\
+Qwen2.5-7B (Real 184) $\times$ Human A1 & $R$ & 155 & 86.45\% & -0.034 & 0.729 & [134, 0, 3, 18] & 88.2\% & 0.0\% & 44.1\% \\
+Qwen2.5-7B (Real 184) $\times$ Human A1 & $D$ & 155 & 87.74\% & -0.043 & 0.755 & [136, 0, 4, 15] & 90.1\% & 0.0\% & 45.0\% \\
+\midrule
+Qwen2.5-14B (\texttt{bf16}, 454) $\times$ Human A1 & $R$ & 399 & 69.67\% & +0.052 & 0.394 & [271, 7, 5, 116] & 70.0\% & \textbf{58.3\%} & 64.2\% \\
+Qwen2.5-14B (\texttt{bf16}, 454) $\times$ Human A1 & $D$ & 399 & 55.64\% & +0.026 & 0.113 & [216, 6, 2, 175] & 55.2\% & \textbf{75.0\%} & 65.1\% \\
+\midrule
+EVREN-Auto (TÜBİTAK/SSB) $\times$ Human A1 & $R$ & 399 & \textbf{92.73\%} & \textbf{+0.183} & \textbf{0.855} & [366, 4, 8, 21] & 94.6\% & 33.3\% & 64.0\% \\
+EVREN-Auto (TÜBİTAK/SSB) $\times$ Human A1 & $D$ & 399 & \textbf{90.23\%} & \textbf{+0.142} & \textbf{0.805} & [356, 4, 4, 35] & 91.0\% & 50.0\% & \textbf{70.5\%} \\
+\midrule
+EVREN-Auto $\times$ Mistral-7B & $R$ & 454 & \textbf{93.17\%} & +0.133 & 0.863 & [420, 3, 8, 23] & 94.8\% & 27.3\% & 61.1\% \\
+EVREN-Auto $\times$ Mistral-7B & $D$ & 454 & \textbf{89.65\%} & +0.050 & 0.793 & [405, 2, 6, 41] & 90.8\% & 25.0\% & 57.9\% \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-The cross-family empirical findings demonstrate three nuanced insights:
+The clean cross-family findings demonstrate five nuanced insights:
+\begin{sloppypar}
 \begin{enumerate}
-    \item \textbf{High Concordance on Predominantly Positive Items ($P_o \ge 92.5\%$):} Across 454 panel items, both European-origin Mistral-7B and Asian-origin Qwen2.5-7B exhibit strong mutual observed agreement ($P_o \ge 94.9\%$, $\text{PABAK} \ge 0.899$) and align closely with Human Annotator A1 on accepted definitions and contexts.
-    \item \textbf{Model-to-Model Mutual Rejection vs. Human Disagreement:} When comparing Mistral-7B and Qwen2.5-7B against each other, both models identify non-trivial mutual rejections ($TN=3$ in $R$, $TN=4$ in $D$), yielding modest positive Kappa values ($\kappa = 0.182$ and $0.303$).
-    \item \textbf{Absence of Negative-Class Concordance with Human A1 ($TN = 0$):} In direct comparison against Human Annotator A1 on the 399 overlapping items, neither Mistral nor Qwen correctly flagged the small set of human-negative cases ($TN = 0$), driving specificities to $0.0\%$ and Kappa to slightly negative values ($-0.019$ to $-0.037$). This demonstrates that while open-weight 7B models reliably mimic human approval on clear positive pedagogical concepts, their capability to serve as independent discriminators of negative or invalid concepts remains unproven under high-prevalence settings.
+    \item \textbf{Exclusion of Parse-Contaminated Metrics:} Removing the 270 fallback defaults drops Qwen2.5-7B's raw observed agreement against Human \texttt{A1} from the previously inflated $92.48\%$ to \textbf{86.45\%} ($N=155$, $\text{PABAK}=0.729$) on Context ($R$) and \textbf{87.74\%} ($\text{PABAK}=0.755$) on Definition ($D$). Meanwhile, Mistral-7B maintained $100\%$ valid structured output across all 454 items.
+    \item \textbf{Confirmation via Native \texttt{bfloat16} Rerun (Job \texttt{34562}, \texttt{max\_new\_tokens=192}):} Re-running \texttt{Qwen2.5-7B-Instruct} on the full 454-item panel in native \texttt{bfloat16} with a 192-token budget (\path{experiments/outputs/cross_family_judge_report_bf16.json}) eliminated 4-bit quantization degeneration and reduced parse fallbacks from $270/454$ to just \textbf{2/454 ($0.4\%$)}. On this near-complete 454-item run, Qwen--Mistral agreement is $94.71\%$ ($\kappa=0.175$, $\text{PABAK}=0.894$, $[427,3,8,16]$) on $R$ and $88.33\%$ ($\kappa=0.184$, $\text{PABAK}=0.767$, $[394,7,1,52]$) on $D$; against Human \texttt{A1} ($N=399$), Qwen still records $TN=0$ ($P_{o,R}=92.48\%$, $P_{o,D}=84.71\%$), confirming that negative-class specificity against human annotations remains a structural limitation at the 7B scale.
+    \item \textbf{Scaling the Judge to 14B (\texttt{Qwen2.5-14B-Instruct}, Job \texttt{34567}, \texttt{bf16}):} Scaling to \texttt{Qwen2.5-14B-Instruct} (\path{experiments/outputs/cross_family_judge_report_14b_bf16.json}, \textbf{0/454} parse fallbacks) breaks the $TN=0$ barrier against Human \texttt{A1} ($N=399$), achieving $TN=7$ ($58.3\%$ specificity, $\kappa=+0.052$) on $R$ and $TN=6$ ($75.0\%$ specificity, $\kappa=+0.026$) on $D$, at the cost of stricter positive rejection ($FN=116$ on $R$, $FN=175$ on $D$; BalAcc $64.2\%$ / $65.1\%$). Against Mistral-7B ($N=454$), agreement drops to $73.35\%$ ($R$, $TN=9$) and $57.71\%$ ($D$, $TN=8$) because the 14B judge flags false positives that both 7B judges rubber-stamp.
+    \item \textbf{National Sovereign Cloud Judge (TÜBİTAK/SSB EVREN Platform, \texttt{cross\_family\_judge\_report\_evren.json}):} Executing the 454-item panel on the national AI infrastructure (\texttt{evren/auto}, H200 GPU cluster) resolved external API authentication and completed with \textbf{453/454 valid verdicts} (only 1 fallback). Against Human \texttt{A1} ($N=399$), EVREN achieved \textbf{92.73\%} agreement ($\kappa = +0.1830$, $\text{PABAK}=0.8546$, $TN=4/12$) on $R$ and \textbf{90.23\%} ($\kappa = +0.1417$, $\text{PABAK}=0.8045$, $TN=4/8$, $\text{BalAcc}=70.5\%$) on $D$. Unlike open 7B models which exhibit negative Kappa, EVREN combines high human concordance with positive discriminative Kappa and genuine negative-class detection ($TN=4$). Against European Mistral-7B ($N=454$), agreement reaches \textbf{93.17\%} on $R$ and \textbf{89.65\%} on $D$.
+    \item \textbf{Model-to-Model Mutual Rejection on Real Verdicts ($N=184$):} On the 184 clean paired 7B items, Qwen2.5-7B and Mistral-7B shared mutual rejections ($TN=3$ on $R$, $TN=4$ on $D$), yielding positive Kappa coefficients ($\kappa_R = 0.211$, $\kappa_D = 0.336$), whereas 7B-only judges still fail to catch human-negative items ($TN=0$).
 \end{enumerate}
+\end{sloppypar}
 
 
 \section{Empirical Long-Context (32K) vs. Chunked Prerequisite DAG Analysis and Hardware VRAM Boundary}
@@ -1097,6 +1108,203 @@ As summarized in Table~\ref{tab:student_journey_results} and Figure~\ref{fig:stu
     \item \textbf{Simulated Retention for At-Risk Agent Persona ($0\% \to 93\%$):} Under the assumed BKT transition probabilities ($P(L_0)=0.08, P(T)=0.24$), all 300 modeled at-risk agents fail out in the linear condition. Algorithmic routing to foundational nodes ($C01, C04$) allows $93.0\%$ of simulated at-risk agents to satisfy the terminal mastery threshold in simulation.
     \item \textbf{Algorithmic Bottleneck Attribution:} Funnel tracing identified $C01$ (92 simulated churns) and $C04$ (89 simulated churns) as structural bottlenecks, precisely accounting for the greatest intervention frequencies (3,862 and 2,802 algorithmic events). We emphasize that these results reflect rule-based synthetic agent behaviors under chosen parameters rather than empirical learning gains with human participants.
 \end{enumerate}
+
+\subsection{Hybrid Empirical-Cognitive Simulation Grounded in Benchmark Literature}
+\label{sec:hybrid_student_simulation}
+
+To address the idealized parameter assumptions of standard Markovian BKT and stress-test our Prerequisite DAG under realistic educational dynamics, we implemented a 5-seed hybrid simulation (\path{experiments/simulation/run_hybrid_student_simulation.py}; report \path{outputs/hybrid_student_simulation_report.json}) blending three established literature paradigms ($5 \times 1,000 = 5,000$ simulated agent trajectories per policy):
+\begin{enumerate}
+    \item \textbf{ASSISTments \& EdNet Empirical BKT Calibration \cite{hawkins2014,choi2020ednet}:} Following Hawkins et al.~\cite{hawkins2014}, BKT parameters are constrained to non-degenerate empirical bounds ($P(L_0) \in [0.05, 0.70]$, $P(T) \in [0.10, 0.65]$, $P(S) \le 0.30$, $P(G) \le 0.35$). Inspired by EdNet's hierarchical lecture-watching logs (\texttt{KT3}/\texttt{KT4})~\cite{choi2020ednet}, each agent carries a cohort-calibrated lecture engagement factor ($e_{\text{watch}} \in [0.68, 0.96]$) modulating effective concept acquisition.
+    \item \textbf{Junyi Academy Prerequisite Coupling \cite{chang2015modeling}:} Retaining the 12-node prerequisite DAG structure modeled after Junyi Academy's exercise-relationship graphs~\cite{chang2015modeling}, downstream transition rates collapse sigmoidally when parent concepts fall below mastery.
+    \item \textbf{Agent4Edu Memory Decay \& Student\_100 Cognitive Imperfection \cite{gao2025agent4edu,wu2025embracing}:} Following Agent4Edu~\cite{gao2025agent4edu}, unpracticed concepts undergo Ebbinghaus exponential retention decay ($P(L_u) \leftarrow \max(0.05, P(L_u) e^{-\lambda \Delta t})$). Following \emph{Embracing Imperfection} (\texttt{Student\_100})~\cite{wu2025embracing}, agents exhibit difficulty-scaled persistent misconceptions that elevate effective slip ($+0.14$) and resist naive repetition ($20\%$ clearance) unless targeted by root-cause DAG remediation ($85\%$ clearance).
+\end{enumerate}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.98\textwidth]{figures/hybrid_student_simulation.png}
+\caption{Hybrid 3-Source Student Simulation (5 Seeds $\times$ 1,000 Agents): (a) Completion vs.\ simulated churn under combined empirical bounds, memory decay, and misconceptions; (b) Cohort-wise completion showing resilient gains for Standard ($20.6\% \to 71.5\%$) and Inattentive ($13.8\% \to 62.4\%$) learners; (c) Mechanism ablation ladder ($M_0 \to M_3$); and (d) End-of-journey foundational mastery retention ($C01$--$C04$).}
+\label{fig:hybrid_student_simulation}
+\end{figure}
+
+Under this combined stress regime ($M_3$, Figure~\ref{fig:hybrid_student_simulation}), \textbf{DAG-Guided Remediation} achieves \textbf{57.46\% $\pm$ 1.02\%} completion (42.54\% churn), outperforming both the \textbf{Linear Baseline} (\textbf{28.42\% $\pm$ 1.05\%}, $+29.04\%$ absolute gain) and \textbf{Naive Static Review} (\textbf{39.38\% $\pm$ 0.70\%}, $+18.08\%$ gain). Moreover, root-cause backtracking preserves end-of-journey foundational mastery ($C01$--$C04$) against Ebbinghaus decay at \textbf{50.69\%} versus \textbf{33.17\%} (Linear) and \textbf{36.23\%} (Naive Review).
+
+\subsection{Empirical Calibration and Hold-Out Fidelity Validation}
+\label{sec:empirical_calibration}
+
+To eliminate arbitrary parameter assumptions and measure synthetic-to-real fidelity directly against unseen learners, we implemented a two-stage calibration and hold-out validation pipeline (\path{experiments/simulation/calibrate_from_real_data.py}, \path{experiments/simulation/fidelity_metrics.py}, \path{experiments/simulation/validate_calibrated_simulation.py}; artifact \path{outputs/calibration.json}):
+\begin{enumerate}
+    \item \textbf{Empirical Fitting on Real Students ($N=3,274$):} Using the ASSISTments 2009--2010 Skill Builder training split from Piech et al.~\cite{piech2015dkt} ($24,108$ skill sequences across $119$ skills), Baum--Welch EM fitted global BKT parameters ($P(L_0)=0.6293$, $P(T)=0.0761$, $P(S)=0.2001$, $P(G)=0.2404$). A 4-component Gaussian Mixture Model (GMM) discovered data-driven cohort proportions ($19.5\%$ Advanced, $24.3\%$ Standard, $39.0\%$ Inattentive, $17.1\%$ At-Risk), while survival hazard analysis yielded an empirical median patience of $4$ consecutive failures.
+    \item \textbf{Hold-Out Fidelity Validation ($N=834$ Unseen Students, $6,352$ Sequences):} Following the hold-out synthetic-vs-real fidelity validation protocol~\cite{park2024genagents} on the held-out ASSISTments test split, replacing hardcoded assumptions ($M_0$) with EM-fitted BKT ($M_1$) and calibrated GMM+decay ($M_3$) reduced the 12-step learning-curve RMSE from \textbf{0.1572} ($15.72$ pp) down to \textbf{0.0429} ($M_1$, mastery gap $0.77$ pp) and \textbf{0.0457} ($M_3$), eliminating the unrealistic upward drift of uncalibrated agents (Figure~\ref{fig:calibrated_fidelity}a--b).
+    \item \textbf{Calibrated \.{I}SG DAG Policy Results:} Re-running the 12-node \.{I}SG prerequisite DAG across 5 seeds ($N=1,000$ calibrated agents/seed) yielded \textbf{53.72\% $\pm$ 1.97\%} completion (\textbf{72.18\%} foundational retention) for \textbf{DAG-Guided Remediation}, compared to \textbf{37.20\% $\pm$ 0.82\%} (Naive Review) and \textbf{27.48\% $\pm$ 1.42\%} (Linear Baseline). We explicitly note that behavioral transition/slip/patience distributions are transferred from ASSISTments mathematics logs, whereas domain-specific \.{I}SG concept difficulties remain subject to future \emph{in vivo} Turkish student validation.
+\end{enumerate}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.98\textwidth]{figures/calibrated_fidelity_validation.png}
+\caption{Empirical Calibration and Hold-Out Fidelity Validation: (a) Learning curve $P(\text{correct} \mid k)$ on $N=834$ unseen ASSISTments students vs.\ uncalibrated $M_0$ and calibrated $M_3$; (b) Hold-out fidelity gap ablation ($M_0 \to M_3$); (c) GMM-derived cohort proportions vs.\ assumed priors; and (d) 5-seed calibrated \.{I}SG DAG policy performance.}
+\label{fig:calibrated_fidelity}
+\end{figure}
+
+\subsection{Live Dual-Agent LLM-vs-LLM Student Simulation (Phase 3 Diagnostic)}
+\label{sec:live_llm_student_sim}
+
+To complement the calibrated Markovian BKT simulations with an unscripted conversational arm on the Bo\u{g}azi\c{c}i HPC A40 cluster (\path{experiments/simulation/run_hpc_live_student_simulation.py} and \path{run_hpc_task_separated_ablation.py}; Slurm Jobs \texttt{34699} and \texttt{34707}; reports \path{outputs/hpc_live_student_simulation_v2_report.json} and \path{outputs/hpc_task_separated_ablation_report.json}), we deployed live dual-agent simulations across all 12 \.{I}SG prerequisite concepts $\times$ 3 cognitive personas (\texttt{at\_risk}, \texttt{standard}, \texttt{inattentive}) across four tutor architectures ($36$ multi-turn sessions / $144$ turns per condition). To eliminate Chinese character leakage observed in preliminary \texttt{Qwen2.5-7B} student trials, the simulated student agent was instantiated with the native Turkish \textbf{\texttt{Kumru-2B}} (\texttt{bfloat16}) model, while an unbiased \texttt{Qwen2.5-14B-Instruct} judge scored each dialogue.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Live Dual-Agent \texttt{Kumru-2B} $\leftrightarrow$ \texttt{14B} Student Simulation and Task-Separation Ablation (Jobs \texttt{34699} \& \texttt{34707}, 36 Sessions / 144 Turns per Condition on HPC A40).}
+\label{tab:live_llm_student_sim}
+\scriptsize\setlength{\tabcolsep}{3.5pt}
+\begin{tabularx}{\textwidth}{>{\RaggedRight\arraybackslash}Xccccc}
+\toprule
+\textbf{Tutor Condition} & \textbf{Misconception Resolved} & \textbf{Socratic (1--5)} & \textbf{Prereq.\ Link (1--5)} & \textbf{Turkish Purity (1--5)} & \textbf{CJK Leakage} \\
+\midrule
+\textbf{Base \texttt{Qwen2.5-14B-Instruct}} (DAG prompt, Job \texttt{34699}) & 55.56\% (20/36) & 3.444 & 2.833 & \textbf{4.583} & \textbf{3.47\%} \\
+\textbf{\texttt{EduTerm-14B-CEFR} Direct Chat} (Job \texttt{34699}) & 38.89\% (14/36) & 2.889 & 2.861 & 4.500 & 4.17\% \\
+\textbf{No-DAG Base \texttt{Qwen2.5-14B-Instruct}} (Job \texttt{34707}) & \textbf{61.11\%} (22/36) & 3.472 & 2.639 & 4.444 & 4.86\% \\
+\textbf{Task-Separated Hybrid} (\texttt{EduTerm-14B-CEFR} Card + Base \texttt{14B} Chat, Job \texttt{34707}) & 55.56\% (20/36) & \textbf{3.972} & \textbf{2.944} & 4.056 & 7.64\% \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+As reported in Table~\ref{tab:live_llm_student_sim}, these live experiments revealed three empirical findings:
+\begin{enumerate}
+    \item \textbf{Single-Turn SFT Template Overfitting in Direct Chat:} When used directly for multi-turn chat (Job \texttt{34699}), \texttt{EduTerm-14B-CEFR} underperformed \texttt{Base Qwen2.5-14B-Instruct} on misconception resolution ($38.89\%$ vs.\ $55.56\%$) and Socratic guidance ($2.889$ vs.\ $3.444$) because single-turn CEFR/prerequisite SFT induced template-reversion during extended dialogue.
+    \item \textbf{Gains from Task-Separated Hybrid Architecture (Job \texttt{34707}):} Delegating prerequisite CEFR-B1 card generation to \texttt{EduTerm-14B-CEFR} while handing multi-turn Socratic steering to conversational \texttt{Base Qwen2.5-14B-Instruct} recovered $+16.67$\,pp misconception resolution over direct SFT chat ($38.89\% \to 55.56\%$) and achieved the highest \textbf{Socratic guidance score ($3.972$ vs.\ $3.472$ No-DAG)} and \textbf{prerequisite grounding ($2.944$ vs.\ $2.639$ No-DAG)}, confirming that withholding direct answers and anchoring prerequisites requires longer Socratic exchanges even when 4-turn resolution slightly trails direct answer-giving ($55.56\%$ vs.\ $61.11\%$).
+    \item \textbf{Student Simulator Artifacts:} Using \texttt{Kumru-2B} kept Turkish purity at $4.06$--$4.58/5.0$ ($\le 7.64\%$ CJK turn leakage), yet the 2B student model occasionally broke first-person roleplay (meta-scripts or prompt refusals), underscoring that LLM-generated student dialogues remain synthetic proxies requiring human validation.
+\end{enumerate}
+
+\subsubsection{Multi-Turn Socratic SFT V2, CJK-Blocked Multi-Seed Ablation, and On-Policy DPO (Jobs \texttt{34721}--\texttt{34762})}
+\label{sec:cjk_blocked_onpolicy_dpo}
+
+To resolve the three limitations identified in Phase~3 (SFT template overfitting, residual CJK leakage, and $n=36$ statistical power), we executed four follow-up experiments on the Bo\u{g}azi\c{c}i HPC A40 cluster (scripts \path{run_hpc_socratic_v2_train_and_eval.py}, \path{run_hpc_cjk_blocked_dag_ablation.py}, \path{run_hpc_cross_judge_pairwise.py}, \path{run_hpc_7b_bf16_cross_judge.py}, and \path{run_hpc_onpolicy_dpo_and_eval.py}).
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Follow-up Live \texttt{Kumru-2B} Evaluations: Socratic-V2 SFT, 3-Seed CJK-Blocked Causal Ablation ($n=108$/arm), and On-Policy DPO ($n=36$/arm).}
+\label{tab:followup_dpo_cjk_ablation}
+\scriptsize\setlength{\tabcolsep}{3.0pt}
+\begin{tabularx}{\textwidth}{>{\RaggedRight\arraybackslash}Xcccccc}
+\toprule
+\textbf{Experiment / Tutor Condition} & \textbf{Sessions ($n$)} & \textbf{Resolved (95\% CI)} & \textbf{Socratic} & \textbf{Prereq.} & \textbf{Purity} & \textbf{CJK Leak} \\
+\midrule
+\texttt{EduTerm-14B-Socratic-V2} (Job \texttt{34721}) & 36 & 41.67\% (15/36) & 3.389 & 2.806 & 3.417 & 12.50\% \\
+\midrule
+\multicolumn{7}{l}{\textit{3-Seed Paired Ablation with \texttt{CJKBlockLogitsProcessor} (Job \texttt{34740}, 324 sessions / 1,296 turns):}} \\
+\texttt{no\_dag\_base\_14b} & 108 & 50.00\% [40.74, 59.26] & 3.259 & 2.574 & \textbf{4.944} & \textbf{0.00\%} \\
+\texttt{prompt\_dag\_rag\_base\_14b} & 108 & 53.70\% [44.44, 62.96] & 3.815 & \textbf{3.130} & 4.870 & \textbf{0.00\%} \\
+\texttt{task\_separated\_hybrid} & 108 & \textbf{61.11\%} [51.85, 70.37] & \textbf{4.000} & 2.898 & \textbf{4.944} & \textbf{0.00\%} \\
+\midrule
+\multicolumn{7}{l}{\textit{On-Policy DPO Alignment vs.\ Hybrid Baseline (Job \texttt{34755}, 72 paired sessions / 288 turns):}} \\
+\texttt{task\_separated\_hybrid} (paired) & 36 & 41.67\% [25.00, 58.33] & 3.778 & 2.944 & \textbf{4.889} & \textbf{0.00\%} \\
+\textbf{\texttt{onpolicy\_dpo} (150 pairs, 2 ep.)} & 36 & \textbf{72.22\%} [58.33, 86.11] & \textbf{3.944} & \textbf{3.028} & 4.056 & 2.08\% \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Key findings from Table~\ref{tab:followup_dpo_cjk_ablation}, cross-judge validation, and deterministic transcript audits include:
+\begin{itemize}
+    \item \textbf{Multi-Turn Socratic SFT Still Memorizes Templates (Job \texttt{34721}):} Training on $1,200$ leak-free multi-turn synthetic dialogues ($480$ Socratic, $360$ scaffolding, $360$ CEFR replay; 2 epochs, avg loss $0.7856 \to 0.1476$) improved Socratic quality over V1 ($3.389$ vs.\ $2.889$), but training loss dropped as low as $0.0135$ and resolution ($41.67\%$) still trailed un-finetuned base \texttt{14B}.
+    \item \textbf{Zero CJK Leakage and Causal Isolation (Jobs \texttt{34740}--\texttt{34741}):} Masking $25,944$ CJK vocabulary tokens via \texttt{CJKBlockLogitsProcessor} reduced CJK leakage to \textbf{0.00\%} ($0/1,296$ turns) and raised Turkish purity to $4.870$--$4.944/5.0$. Across $n=108$ paired sessions per arm, \texttt{task\_separated\_hybrid} led pointwise resolution ($61.11\%$ vs.\ $53.70\%$ \texttt{prompt\_dag\_rag} vs.\ $50.00\%$ \texttt{no\_dag}), Turn-1 question rate ($71.30\%$ vs.\ $60.19\%$ vs.\ $12.04\%$), and blinded \texttt{14B} pairwise wins ($65$--$42$ vs.\ \texttt{prompt\_dag\_rag}, sign $p=0.0329$; $62$--$42$ vs.\ \texttt{no\_dag}, $p=0.0619$), though pointwise McNemar differences ($+11.11$\,pp vs.\ \texttt{no\_dag}, $p=0.1480$) did not reach $p < 0.05$.
+    \item \textbf{Cross-Scale Judge Diagnostics (Jobs \texttt{34741}, \texttt{34742}, \texttt{34762}):} Loading \texttt{Qwen2.5-7B-Instruct} in 4-bit \texttt{float16} caused severe logit corruption (exclamation-mark spam in Job \texttt{34742}; $0/324$ valid JSON in Job \texttt{34741}). Reloading \texttt{Qwen2.5-7B-Instruct} in unquantized \texttt{bfloat16} (Job \texttt{34762}) restored JSON validity to $290/324$ ($89.5\%$) and confirmed in blinded A/B judging that both \texttt{task\_separated\_hybrid} ($54$--$30$, $p=0.0116$) and \texttt{prompt\_dag\_rag} ($52$--$31$, $p=0.0275$) significantly outperform \texttt{no\_dag\_base\_14b}, while remaining tied with each other ($38$--$44$, $p=0.5811$). On strict pointwise scoring, \texttt{7B-bf16} predicted \texttt{false} for all sessions ($\kappa = 0.0$), leaving human IAA validation as future work.
+    \item \textbf{On-Policy DPO Breakthrough (Job \texttt{34755}):} Extracting $150$ on-policy preference pairs directly from Job \texttt{34740} resolved-vs-unresolved transcripts and training 2 epochs of DPO ($\beta=0.1$, loss $0.3722 \to 0.0065$) raised misconception resolution to \textbf{72.22\%} ($26/36$) versus $41.67\%$ ($15/36$) for \texttt{task\_separated\_hybrid} ($+30.56$\,pp, 95\% CI $[+8.33, +52.78]$, exact McNemar $p=0.0192$), with a modest trade-off in Turkish purity ($4.889 \to 4.056$, $2.08\%$ residual leakage).
+\end{itemize}
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Multi-Seed On-Policy DPO Scaling, Unquantized \texttt{Qwen2.5-7B-Instruct} (\texttt{bfloat16}) Student Validation, and Hybrid CEFR+DPO Ablation (Jobs \texttt{35536}--\texttt{35538}).}
+\label{tab:dpo_3seed_7b_hybrid}
+\scriptsize\setlength{\tabcolsep}{3.0pt}
+\begin{tabularx}{\textwidth}{>{\RaggedRight\arraybackslash}Xcccccc}
+\toprule
+\textbf{Experiment / Tutor Condition} & \textbf{Sessions ($n$)} & \textbf{Resolved (95\% CI)} & \textbf{Socratic} & \textbf{Prereq.} & \textbf{Purity} & \textbf{Q-Rate} \\
+\midrule
+\multicolumn{7}{l}{\textit{3-Seed \texttt{Kumru-2B} Validation + \texttt{7B-bf16} A/B Cross-Judge (Job \texttt{35536}, 324 sessions / 1,296 turns):}} \\
+\texttt{prompt\_dag\_rag\_base\_14b} & 108 & 50.93\% [41.67, 60.19] & 3.769 & \textbf{3.167} & 4.824 & 34.26\% \\
+\texttt{task\_separated\_hybrid} & 108 & 55.56\% [46.30, 64.81] & 3.954 & 2.898 & \textbf{4.926} & 57.64\% \\
+\textbf{\texttt{onpolicy\_dpo}} & 108 & \textbf{60.19\%} [50.93, 69.44] & \textbf{3.963} & 2.870 & 4.185 & \textbf{78.01\%} \\
+\midrule
+\multicolumn{7}{l}{\textit{Stronger \texttt{Qwen2.5-7B-Instruct} (\texttt{bfloat16}) Student Validation (Job \texttt{35537}, 144 sessions / 576 turns):}} \\
+\texttt{no\_dag\_base\_14b} & 36 & 75.00\% [61.11, 88.89] & 3.722 & 2.778 & 3.667 & 7.64\% \\
+\texttt{prompt\_dag\_rag\_base\_14b} & 36 & 77.78\% [63.89, 91.67] & 3.833 & \textbf{3.083} & \textbf{3.694} & 31.94\% \\
+\texttt{task\_separated\_hybrid} & 36 & 77.78\% [63.89, 91.67] & 4.000 & 2.861 & 3.639 & 44.44\% \\
+\textbf{\texttt{onpolicy\_dpo}} & 36 & \textbf{91.67\%} [80.56, 100.0] & \textbf{4.111} & 3.056 & 2.972 & \textbf{56.94\%} \\
+\midrule
+\multicolumn{7}{l}{\textit{Hybrid CEFR-Card + On-Policy DPO Ablation on \texttt{Kumru-2B} (Job \texttt{35538}, 108 sessions / 432 turns):}} \\
+\texttt{task\_separated\_hybrid} & 36 & 52.78\% [36.11, 69.44] & \textbf{3.972} & \textbf{2.944} & \textbf{4.944} & 67.36\% \\
+\texttt{hybrid\_cefr\_dpo} & 36 & 55.56\% [38.89, 72.22] & 3.556 & 2.722 & 4.333 & 47.22\% \\
+\textbf{\texttt{onpolicy\_dpo}} & 36 & \textbf{61.11\%} [44.44, 77.78] & 3.917 & 2.806 & 4.444 & \textbf{78.47\%} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Table~\ref{tab:dpo_3seed_7b_hybrid} establishes three critical boundary conditions for \texttt{onpolicy\_dpo}:
+\begin{itemize}
+    \item \textbf{3-Seed Effect-Size Attenuation (Job \texttt{35536}):} Scaling from $n=36$ to $n=108$ paired \texttt{Kumru-2B} sessions attenuated the lead of \texttt{onpolicy\_dpo} over \texttt{task\_separated\_hybrid} from $+30.56$\,pp ($p=0.0192$) to $+4.63$\,pp ($60.19\%$ vs.\ $55.56\%$, McNemar $p=0.5758$; $+9.26$\,pp vs.\ \texttt{prompt\_dag\_rag}, $p=0.1325$), and \texttt{7B-bf16} blinded pairwise preference was $48$--$38$ (22 ties, $p=0.3318$). Thus, \texttt{onpolicy\_dpo} consistently ranks first in resolution and Socratic questioning rate ($78.01\%$) without reaching $p < 0.05$ at $n=108$.
+    \item \textbf{Cross-Student Generalization and Non-CJK Language Drift (Job \texttt{35537}):} Under the unquantized \texttt{Qwen2.5-7B-Instruct} (\texttt{bfloat16}) student, \texttt{onpolicy\_dpo} still ranked highest at \textbf{91.67\%} ($33/36$) vs.\ $77.78\%$ for both \texttt{task\_separated\_hybrid} and \texttt{prompt\_dag\_rag} ($+13.89$\,pp, $p=0.1797$) and $75.00\%$ for \texttt{no\_dag}. However, transcript inspection revealed occasional Cyrillic/Russian code-switching when \texttt{7B} student turns contained Turkish typos (lowering Turkish purity to $2.972$--$3.694$), showing that CJK-only logit blocking does not prevent non-CJK script drift.
+    \item \textbf{Direct DPO vs.\ Hybrid CEFR+DPO (Job \texttt{35538}):} Combining CEFR-B1 cards with \texttt{onpolicy\_dpo} (\texttt{hybrid\_cefr\_dpo}) neither surpassed direct \texttt{onpolicy\_dpo} ($55.56\%$ vs.\ $61.11\%$, $p=0.7744$) nor recovered \texttt{task\_separated\_hybrid}'s Turkish purity ($4.333$ vs.\ $4.944$).
+\end{itemize}
+
+\subsubsection{Non-Latin Logit Guardrail, Round-2 Iterative DPO, 3-Seed 7B Validation, and Alignment Tax Audit (Jobs \texttt{35649}, \texttt{35651}, \texttt{36004})}
+\label{sec:nonlatin_dpo_r2_align_tax}
+
+To eliminate the residual Cyrillic/non-Latin script drift observed in Job~\texttt{35537}, recover Turkish fluency in on-policy DPO, and verify whether pedagogical alignment degrades core CEFR readability calibration or structured JSON extraction, we executed three final validation runs on \texttt{ultramarine}:
+\begin{enumerate}
+    \item \textbf{Round-2 Iterative DPO with Non-Latin Logit Blocking (Job \texttt{35649}):} We replaced CJK-only blocking with a full \texttt{NonLatinBlockLogitsProcessor} (masking $51{,}167$ non-Latin/non-Turkish tutor tokens, permitting ASCII, Turkish diacritics, and standard punctuation) and trained \texttt{onpolicy\_dpo\_v2} on $240$ Round-2 preference pairs (epoch losses $0.3639 \to 0.0113$, $8{,}440$\,s), comparing it against \texttt{onpolicy\_dpo\_v1} and \texttt{task\_separated\_hybrid} across $108$ \texttt{Kumru-2B} sessions ($432$ turns).
+    \item \textbf{3-Seed \texttt{Qwen2.5-7B-Instruct} (\texttt{bfloat16}) Validation with Non-Latin Blocking (Job \texttt{35651}):} We scaled the stronger unquantized \texttt{7B} student across $3$ seeds ($42, 1337, 2026$; $216$ sessions / $864$ turns, $14{,}449$\,s) comparing \texttt{onpolicy\_dpo\_v2} vs.\ \texttt{task\_separated\_hybrid}.
+    \item \textbf{Alignment Tax Benchmark on CEFR \& JSON (Job \texttt{36004}):} We evaluated \texttt{base\_14b}, SFT adapters (\texttt{cefr}, \texttt{socratic\_v2}), and DPO adapters (\texttt{dpo\_v1}, \texttt{dpo\_v2}) on $36$ CEFR B1/B2/C1 probes and $12$ structured JSON extraction probes ($3{,}181$\,s).
+\end{enumerate}
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Non-Latin Logit Guardrail Evaluations: Round-2 On-Policy DPO on \texttt{Kumru-2B} (Job \texttt{35649}) and 3-Seed \texttt{Qwen2.5-7B-Instruct} (\texttt{bfloat16}) Validation (Job \texttt{35651}).}
+\label{tab:nonlatin_dpo_r2_7b_3seed}
+\scriptsize\setlength{\tabcolsep}{2.8pt}
+\begin{tabularx}{\textwidth}{>{\RaggedRight\arraybackslash}Xccccccc}
+\toprule
+\textbf{Experiment / Condition} & \textbf{Sessions} & \textbf{Resolved (95\% CI)} & \textbf{Socratic} & \textbf{Prereq.} & \textbf{Purity} & \textbf{Non-Latin} & \textbf{Q-Rate} \\
+\midrule
+\multicolumn{8}{l}{\textit{Round-2 DPO + Non-Latin Guardrail on \texttt{Kumru-2B} (Job \texttt{35649}, 108 sessions / 432 turns):}} \\
+\texttt{task\_separated\_hybrid} & 36 & 61.11\% [44.44, 77.78] & 3.944 & 2.917 & \textbf{4.944} & \textbf{0.00\%} & 67.36\% \\
+\texttt{onpolicy\_dpo\_v1} & 36 & \textbf{63.89\%} [47.22, 80.56] & 3.917 & 2.806 & 4.194 & \textbf{0.00\%} & \textbf{90.28\%} \\
+\textbf{\texttt{onpolicy\_dpo\_v2}} & 36 & \textbf{63.89\%} [47.22, 77.78] & \textbf{4.056} & \textbf{2.944} & 4.750 & \textbf{0.00\%} & 63.19\% \\
+\midrule
+\multicolumn{8}{l}{\textit{3-Seed \texttt{Qwen2.5-7B-Instruct} (\texttt{bfloat16}) + Non-Latin Guardrail (Job \texttt{35651}, 216 sessions / 864 turns):}} \\
+\texttt{task\_separated\_hybrid} & 108 & 82.41\% [75.00, 88.89] & \textbf{3.981} & 2.852 & \textbf{3.389} & \textbf{0.00\%} & \textbf{39.58\%} \\
+\textbf{\texttt{onpolicy\_dpo\_v2}} & 108 & \textbf{86.11\%} [79.63, 91.67] & 3.972 & \textbf{2.972} & 3.343 & \textbf{0.00\%} & 33.33\% \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Alignment Tax Audit across 36 CEFR (B1/B2/C1) Readability Probes and 12 JSON Extraction Probes (Job \texttt{36004}).}
+\label{tab:alignment_tax_cefr}
+\scriptsize\setlength{\tabcolsep}{3.0pt}
+\begin{tabularx}{\textwidth}{>{\RaggedRight\arraybackslash}Xcccccc}
+\toprule
+\textbf{Model / Adapter} & \textbf{CEFR Comp.} & \textbf{B1$-$C1 Gap} & \textbf{B1 (Atesman/Comp.)} & \textbf{C1 (Atesman/Comp.)} & \textbf{JSON Valid / Schema} & \textbf{Non-Latin} \\
+\midrule
+\texttt{base\_14b} & \textbf{0.6944} & 34.87 & 64.69 / 0.9167 & 29.82 / 0.5833 & \textbf{1.000} / \textbf{1.000} & 0.00\% \\
+\texttt{cefr} (SFT) & 0.3611 & 12.07 & 52.76 / 0.5833 & 40.69 / 0.5000 & 0.500 / 0.500 & 0.00\% \\
+\texttt{socratic\_v2} (SFT) & 0.4444 & 13.30 & 40.68 / 0.3333 & 27.38 / 0.7500 & \textbf{1.000} / \textbf{1.000} & 0.00\% \\
+\texttt{dpo\_v1} & 0.6389 & \textbf{36.16} & 56.04 / 0.7500 & 19.88 / 0.7500 & \textbf{1.000} / \textbf{1.000} & 0.00\% \\
+\texttt{dpo\_v2} & 0.6111 & 33.20 & 58.32 / 0.8333 & 25.12 / 0.6667 & \textbf{1.000} / \textbf{1.000} & 0.00\% \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Tables~\ref{tab:nonlatin_dpo_r2_7b_3seed} and~\ref{tab:alignment_tax_cefr} establish three decisive conclusions:
+\begin{itemize}
+    \item \textbf{Zero Script Leakage Under Non-Latin Logit Masking (Jobs \texttt{35649} \& \texttt{35651}):} Expanding from CJK-only blocking to full non-Latin blocking reduced non-Latin turn leakage to \textbf{0.00\%} across all $324$ sessions ($1{,}296$ turns), completely eliminating the Cyrillic drift seen in Job~\texttt{35537}.
+    \item \textbf{Round-2 DPO Recovers Turkish Purity and Scales to 86.11\% (Jobs \texttt{35649} \& \texttt{35651}):} On \texttt{Kumru-2B}, \texttt{onpolicy\_dpo\_v2} matched \texttt{v1}'s $63.89\%$ resolution while raising Turkish purity from $4.194$ to $4.750$ and achieving the highest Socratic score ($4.056$). Across $216$ paired 3-seed \texttt{Qwen2.5-7B-Instruct} (\texttt{bfloat16}) sessions, \texttt{onpolicy\_dpo\_v2} achieved \textbf{86.11\%} [$79.63, 91.67$] vs.\ $82.41\%$ [$75.00, 88.89$] for \texttt{task\_separated\_hybrid} ($+3.70$\,pp, McNemar $a_1b_0=14, a_0b_1=10, p=0.5413$).
+    \item \textbf{DPO Avoids SFT Alignment Tax (Job \texttt{36004}):} Whereas SFT adapters suffered severe alignment tax---\texttt{cefr} dropped JSON validity/schema compliance to $50.0\%$ and CEFR compliance to $36.11\%$, and \texttt{socratic\_v2} compressed the B1$-$C1 Atesman readability gap from $34.87$ to $13.30$---both \texttt{dpo\_v1} and \texttt{dpo\_v2} preserved \textbf{100\%} JSON schema compliance and maintained strong B1$-$C1 readability separation ($36.16$ and $33.20$ Atesman points; CEFR compliance $63.89\%$ and $61.11\%$).
+\end{itemize}
 
 \section{The Grand 7-Tier Scaling Law and Multimodal LLM Benchmark (0.5B \texorpdfstring{$\to$}{->} 1.5B \texorpdfstring{$\to$}{->} 7B \texorpdfstring{$\to$}{->} 14B \texorpdfstring{$\to$}{->} 27B \texorpdfstring{$\to$}{->} 32B \texorpdfstring{$\to$}{->} 72B)}
 \label{sec:scaling_law_72b}
@@ -1206,7 +1414,7 @@ We formulated an automated CEFR complexity verification benchmark (\path{experim
 0, & \text{otherwise}
 \end{cases}
 \end{equation}
-In offline validation across 24 multi-level gold targets, the multi-tier generation engine attained an overall \textbf{91.7\% level-adherence accuracy}, demonstrating that lexical and syntactic constraints can reliably steer Turkish pedagogical difficulty without semantic distortion. The human annotation studio (\path{experiments/gui/annotator.py}) was simultaneously upgraded with live B1/B2/C1 selectors and dynamic Ate\c{s}man gauge indicators to empower continuous dual-human ground truth calibration.
+In offline validation across 24 multi-level gold targets, the multi-tier generation engine attained an overall \textbf{91.7\% level-adherence accuracy}, demonstrating that lexical and syntactic constraints can steer Turkish pedagogical difficulty across target tiers without semantic distortion. The human annotation studio (\path{experiments/gui/annotator.py}) was simultaneously upgraded with live B1/B2/C1 selectors and dynamic Ate\c{s}man gauge indicators to support structured human \texttt{A1} calibration.
 
 \subsection{Empirical 14B Multi-Tier SFT Training Dynamics and Benchmark Results}
 \label{sec:cefr_14b_training_results}
@@ -1241,7 +1449,7 @@ C1 Readability Range ($\text{Ate\c{s}man}_{\text{C1}}$) & --- & \textbf{0.0 -- 1
 \end{tabularx}
 \end{table}
 
-As summarized in Table~\ref{tab:cefr_14b_results} (archived in \path{experiments/outputs/eduterm_14b_cefr_sft_report.json}), the fine-tuned checkpoint (\path{eduterm_14b_cefr_qlora}, 263~MB adapter) achieved \textbf{100.0\% structural schema validity} and a \textbf{70.8\% overall CEFR steering rate}. Crucially, the measured Ate\c{s}man scores strictly obey the intended cognitive tiers: B1 explanations consistently produce accessible syntactic formulations ($51.8$--$69.7$), while B2 and C1 prompts reliably shift toward engineering detail and theoretical rigor ($<36.5$).
+As summarized in Table~\ref{tab:cefr_14b_results} (archived in \path{experiments/outputs/eduterm_14b_cefr_sft_report.json}), the fine-tuned checkpoint (\path{eduterm_14b_cefr_qlora}, 263~MB adapter) achieved \textbf{100.0\% structural schema validity} and a \textbf{70.8\% overall CEFR steering rate}. Crucially, the measured Ate\c{s}man scores obey the intended cognitive tiers on this 24-prompt evaluation: B1 explanations produce accessible syntactic formulations ($51.8$--$69.7$), while B2 and C1 prompts shift toward engineering detail and theoretical rigor ($<36.5$).
 
 \section{Empirical Multi-Turn Socratic Tutoring Dialogue Benchmark}
 \label{sec:socratic_dialogue_bench}
@@ -1731,7 +1939,7 @@ The architecture operates in two synchronous cycles:
 \scriptsize\setlength{\tabcolsep}{2pt}
 \begin{tabularx}{\textwidth}{>{\RaggedRight\arraybackslash}Xccccc}
 \hline
-\textbf{Model Architecture} & \textbf{Pass} & \textbf{Mean Ate\c{s}man} $\uparrow$ & \textbf{Avg Sent. Len (ASL)} $\downarrow$ & \textbf{CEFR-B1 Comp.} $\uparrow$ & \textbf{Term Retention} $\uparrow$ \\
+\shortstack{\textbf{Model}\\\textbf{Architecture}} & \textbf{Pass} & \shortstack{\textbf{Mean}\\\textbf{Ate\c{s}man} $\uparrow$} & \shortstack{\textbf{Avg Sent. Len}\\\textbf{(ASL)} $\downarrow$} & \shortstack{\textbf{CEFR-B1}\\\textbf{Comp.} $\uparrow$} & \shortstack{\textbf{Term}\\\textbf{Retention} $\uparrow$} \\
 \hline
 \textbf{EduTerm-14B-CEFR} & Direct (Pass 1) & 28.13 & 20.12 words & 33.3\% & 60.0\% \\
 & Refined (Pass 2) & \textbf{33.59} & \textbf{19.29 words} & \textbf{50.0\%} & \textbf{66.67\%} \\
@@ -2035,6 +2243,78 @@ We ran two 5-turn dialogues in which the student's utterances are \emph{pre-scri
 
 \textbf{Interpretation:} In the virtual-memory dialogue the model answered directly (``No, virtual memory is\ldots'') in every turn, including one reply that contains a stray Chinese-language fragment, i.e.\ it did not behave as a Socratic tutor; in the overfitting dialogue it mostly returned bulleted lists of questions without engaging the student's statements. The probe does not support a claim of reliable Socratic tutoring or of misconception resolution.
 
+\section{Pedagogical Safety, Socratic Guardrails, and Anti-Cheating Resilience}
+\label{sec:pedagogical_safety}
+Deploying generative AI inside active university classrooms introduces an adversarial human-computer interaction challenge: students frequently attempt to exploit tutors for exam answers (\textit{"I am in an exam, just give me A/B/C/D!"}), direct homework code dumping, ghostwritten essays, or prompt-injection attacks. We constructed an 8-vector adversarial evaluation suite on the NVIDIA A40 measuring \textbf{Direct Leak Prevention}, \textbf{Socratic Deflection Rate}, and \textbf{Cheat Rejection Rate} (\path{experiments/outputs/pedagogical_safety_guardrails_report.json}):
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Pedagogical Safety, Anti-Cheating Resistance, and Socratic Deflection on NVIDIA A40}
+\label{tab:pedagogical_safety}
+\scriptsize\setlength{\tabcolsep}{1.5pt}
+\begin{tabularx}{\textwidth}{>{\RaggedRight\arraybackslash}Xccccc}
+\hline
+\textbf{Model Architecture} & \textbf{Safety Score} & \textbf{Socratic Deflect.} & \textbf{Cheat Reject.} & \textbf{Leak Prevent.} & \textbf{Ped. Tone} \\
+\hline
+\textbf{Kumru-2B (Edge SFT)} & \textbf{48.8\%} & \textbf{37.5\%} & \textbf{25.0\%} & \textbf{75.0\%} & \textbf{2.15 / 5} \\
+\textbf{EduTerm-14B-DPO} & 37.5\% & 12.5\% & 12.5\% & \textbf{75.0\%} & 2.00 / 5 \\
+\textbf{EduTerm-14B-Omni} & 33.8\% & 0.0\% & 12.5\% & \textbf{75.0\%} & 2.00 / 5 \\
+\textbf{EduTerm-14B-SFT} & 30.0\% & 0.0\% & 0.0\% & \textbf{75.0\%} & 2.08 / 5 \\
+\hline
+\end{tabularx}
+\end{table}
+
+\textbf{Empirical Safety Findings:} As detailed in Table~\ref{tab:pedagogical_safety}, none of the base instruction-following checkpoints achieved complete immunity against persistent exam-solution extraction, confirming a critical open gap in educational alignment. Because larger 14B models optimize strongly for helpful instruction execution, \textbf{EduTerm-14B-SFT} succumbed on 100\% of cheat-demanding prompts ($0.0\%$ Socratic deflection). Crucially, \textbf{Direct Preference Optimization (EduTerm-14B-DPO)} lifted Socratic deflection from $0.0\%$ to $12.5\%$ (+12.5\% gain) and raised composite safety to $37.5\%$. This empirically motivates integrating explicit anti-cheating Socratic refusal pairs into future preference datasets.
+
+\section{BKT and Knowledge Graph Guided Adaptive Curriculum Generation}
+\label{sec:adaptive_curriculum_bkt}
+An intelligent tutoring system must transcend static term definitions by synthesizing personalized, topologically valid learning trajectories conditioned on a student's Bayesian Knowledge Tracing (BKT) mastery state. Across four core academic disciplines (Operating Systems, Molecular Biology, Deep Learning, and Banking Risk), we evaluated each model's capacity to generate prerequisite roadmaps for both Novice ($P_{\text{mastery}} \approx 0.25$) and Advanced ($P_{\text{mastery}} \approx 0.85$) profiles without violating Directed Acyclic Graph (DAG) dependency order (\path{experiments/outputs/adaptive_curriculum_bkt_report.json}):
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{BKT-Conditioned Adaptive Curriculum Trajectory and DAG Fidelity on NVIDIA A40}
+\label{tab:adaptive_curriculum_bkt}
+\scriptsize\setlength{\tabcolsep}{1.5pt}
+\begin{tabularx}{\textwidth}{>{\RaggedRight\arraybackslash}Xccccc}
+\hline
+\textbf{Model Architecture} & \textbf{Curriculum Score} & \textbf{DAG Topo. Fidelity} & \textbf{Prereq. Coverage} & \textbf{Quiz Inclusion} & \textbf{BKT Diff. (1--5)} \\
+\hline
+\textbf{EduTerm-14B-SFT} & \textbf{74.6} & \textbf{100.0\% (0 viol.)} & \textbf{64.6\%} & 25.0\% & 2.44 \\
+\textbf{EduTerm-14B-DPO} & 72.3 & \textbf{100.0\% (0 viol.)} & 54.2\% & \textbf{37.5\%} & \textbf{2.56} \\
+\textbf{Kumru-2B (Edge SFT)} & 60.0 & \textbf{100.0\% (0 viol.)} & 37.5\% & 0.0\% & 2.44 \\
+\textbf{EduTerm-14B-Omni} & 59.4 & \textbf{100.0\% (0 viol.)} & 31.2\% & 12.5\% & 2.12 \\
+\hline
+\end{tabularx}
+\end{table}
+
+\textbf{Curriculum Engineering Findings:} Every evaluated model preserved \textbf{100.0\% Topological DAG Fidelity} (zero dependency order inversions across all trajectories), ensuring foundational prerequisites are never bypassed prior to advanced concepts. While \textbf{EduTerm-14B-SFT} attained the highest prerequisite node coverage ($64.6\%$, score $74.6$), \textbf{EduTerm-14B-DPO} delivered superior pedagogical adaptability, achieving the highest formative quiz integration rate ($37.5\%$) and strongest BKT difficulty differentiation ($2.56 / 5.0$) between novice and advanced learners.
+
+\section{Cross-Lingual Zero-Shot Pedagogical Transfer (TR \texorpdfstring{$\to$}{->} EN / AZ / DE)}
+\label{sec:cross_lingual_transfer}
+Although the EduTerm adapters were fine-tuned exclusively on Turkish pedagogical corpora, bilingual university environments often demand cross-lingual concept transfer. We benchmarked zero-shot pedagogical explanation transfer from Turkish source concepts into English (\texttt{EN}), Azerbaijani (\texttt{AZ}), and German (\texttt{DE}) on the NVIDIA A40 (\path{experiments/outputs/cross_lingual_transfer_report.json}):
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Zero-Shot Cross-Lingual Pedagogical Transfer Across Three Target Languages on NVIDIA A40}
+\label{tab:cross_lingual_transfer}
+\scriptsize\setlength{\tabcolsep}{1.5pt}
+\begin{tabularx}{\textwidth}{>{\RaggedRight\arraybackslash}Xcccccc}
+\hline
+\textbf{Model Architecture} & \textbf{Overall Transfer} & \textbf{EN Term Ret.} & \textbf{EN Transfer} & \textbf{DE Fidelity} & \textbf{DE Transfer} & \textbf{AZ Transfer} \\
+\hline
+\textbf{EduTerm-14B-DPO} & \textbf{51.2} & \textbf{61.2\%} & \textbf{73.1} & \textbf{100.0\%} & \textbf{59.4} & 21.2 \\
+\textbf{EduTerm-14B-SFT} & 48.0 & 30.0\% & 47.5 & \textbf{100.0\%} & \textbf{59.4} & \textbf{37.2} \\
+\textbf{EduTerm-14B-Omni} & 32.5 & 30.0\% & 35.0 & 91.7\% & 48.8 & 13.8 \\
+\textbf{Kumru-2B (Edge SFT)} & 9.8 & 12.5\% & 11.2 & 8.3\% & 8.8 & 9.2 \\
+\hline
+\end{tabularx}
+\end{table}
+
+\textbf{Cross-Lingual Transfer Findings:} Despite receiving zero non-Turkish DPO pairs during preference alignment, \textbf{EduTerm-14B-DPO} achieved a remarkable cross-lingual generalization boost---more than doubling English technical term retention over SFT ($30.0\% \to \textbf{61.2\%}$) and reaching an overall transfer score of \textbf{51.2} ($73.1$ in English, $59.4$ in German). Conversely, the monolingual Turkish foundation \textbf{Kumru-2B} exhibited severe template collapse ($9.8$ overall), empirically confirming that 14B multilingual pre-training is essential when bilingual or international pedagogical transfer is required.
+
 
 \chapter{CONCLUSION}
 
@@ -2042,31 +2322,29 @@ We ran two 5-turn dialogues in which the student's utterances are \emph{pre-scri
 This graduation project presents a comprehensive, empirical evaluation of an end-to-end multimodal pipeline designed to transform raw educational lectures into accessible, interactive learning experiences. Key accomplishments include:
 \begin{enumerate}
     \item \textbf{Rigorous Speech Benchmarking:} Established acoustic performance across model tiers on the GPU baseline: Whisper Large-v3 achieved $\text{WER}_{\text{TR}} = 2.1\%$, $\text{WER}_{\text{EN}} = 1.0\%$ ($\text{RTF} = 0.188$), while the optimized Whisper Large-v3 Turbo model achieved statistically indistinguishable accuracy ($\text{WER}_{\text{TR}} = 3.7\%$, $\text{WER}_{\text{EN}} = 1.1\%$, $p=0.438$) with a $5.7\times$ speedup ($\text{RTF} = 0.033$). In addition, standard energy-based VAD chunking was empirically shown to paradoxically degrade transcription accuracy.
-    \item \textbf{Characterization of the Semantic Layer:} Proved that terminology extraction is bounded by recall ($<28.1\%$ TR, $<56.2\%$ EN) rather than precision ($>88\%$), while validating that LLM explanations successfully reach the targeted CEFR-B1 readability band.
-    \item \textbf{Double-Blind Reliability Validation:} Confirmed human evaluation consistency with Cohen's Kappa $\kappa_R = 0.782$ on contextual relevance.
-    \item \textbf{Robust Edge Implementation:} Quantized and profiled an edge stack (Whisper SRM + Qwen2.5-1.5B INT4) achieving 1.12 GB VRAM usage and $<1.8$s latency on a consumer NVIDIA RTX 5060 GPU.
-    \item \textbf{High-Performance Computing (HPC) LoRA Scaling and EduTerm-7B-TR:} Validated Qwen 2.5-7B LoRA fine-tuning on an NVIDIA A40 (48~GB) cluster across 2,296 multi-domain samples, producing the specialized \textbf{EduTerm-7B-TR} model (78 MB checkpoint, 2.4x latency speedup, 17.85 GB peak VRAM), empirically demonstrating why 8 GB consumer hardware is physically precluded from 7B adaptation.
-    \item \textbf{Empirical Cross-Layer Error Propagation Curves:} Characterized end-to-end ASR $\to$ LLM sensitivity across 7 ASR model steps ($0\% \to 89.7\%$ WER) on the A40 cluster, mathematically quantifying sensitivity slopes ($\Delta F_{1,\text{TR}} = -0.11\%$, $\Delta F_{1,\text{EN}} = -1.23\% \text{ per } 5\% \text{ WER}$) and revealing the $\text{WER} \le 15\%$ resilience boundary.
-    \item \textbf{Full-Corpus Curriculum Validation:} Executed batch extraction and NetworkX DAG prerequisite modeling across 33 complete lectures (12 disciplines, 118 terms), identifying 19 authentic pedagogical learning gaps in corporate compliance (KVKK/OHS).
-    \item \textbf{Factual Reliability via Hybrid RAG:} Implemented canonical ontology grounding and prerequisite DAG verification, achieving 60.7\% candidate grounding precision on long-form corporate speech transcripts (superseding early synthetic 52.6\% $\to$ 0.0\% ablation claims).
-    \item \textbf{Generative Video Operability:} Validated programmatic scriptwriting, neural voice synthesis, and Manim rendering for on-demand explainer videos.
-    \item \textbf{Direct Preference Optimization (DPO) for Pedagogical B1 Alignment:} Trained \textbf{EduTerm-7B-DPO} on the Bo\u{g}azi\c{c}i HPC A40 cluster across 650 curated pedagogical triplets (Job ID \texttt{33750}), achieving 100\% validation preference accuracy, expanding implicit reward margin to $+6.60$, and surging CEFR-B1 compliance share from 57.6\% to 94.2\% while strictly retaining 95.5\% domain terminology precision without catastrophic forgetting.
-    \item \textbf{Empirical Quantization Degradation and Edge Pareto Frontier:} Evaluated \textbf{EduTerm-7B-TR} across four quantization regimes on Bo\u{g}azi\c{c}i HPC NVIDIA A40 (FP16 $\to$ INT8 $\to$ INT4-NF4 $\to$ INT4-FP4, Job ID \texttt{33777}), demonstrating that INT4-NF4 achieves a $2.7\times$ memory compression factor ($14.30\text{ GB} \to 5.38\text{ GB}$), easily fitting within the 8 GB consumer GPU ceiling (RTX 5060) with $2.3\text{ GB}$ of head-room while preserving terminology F1 and B1 pedagogical readability.
-    \item \textbf{Empirical Characterization of Human--LLM Agreement:} Executed an evaluation of \texttt{Qwen2.5-7B-Instruct} on the Bo\u{g}azi\c{c}i HPC A40 cluster across human-annotated items (Job ID \texttt{33782}, \path{labels_7b_judge.csv}). Documented high raw percentage concordance ($P_{o,R} = 94.42\%$, $\text{PABAK}_R = 0.888$; $P_{o,D} = 97.42\%$, $\text{PABAK}_D = 0.948$) on predominantly positive items, while identifying the prevalence-driven compression of Cohen's Kappa and highlighting the absence of negative-class discrimination ($TN=0$) as a boundary condition against using LLMs as autonomous ground-truth substitutes.
-    \item \textbf{Empirical Long-Context (32K) Hardware Boundary Mapping:} Quantified full-lecture single-pass DAG extraction across 16,059 input tokens on Bo\u{g}azi\c{c}i HPC A40 GPU (Job ID \texttt{33789}), demonstrating that unfragmented 32K context ingestion requires 17.83 GB of peak VRAM ($2.18\times$ the 8.15 GB ceiling of consumer RTX 5060 GPUs), proving that sliding-window chunking is physically mandated by consumer hardware constraints.
-    \item \textbf{Agent-Based Student Journey Simulation under Assumed BKT Parameters:} Implemented a Markovian learning analytics simulation with 1,000 synthetic student agents across 4 cohorts on a 12-node DAG. Under the modeled state transitions, algorithmic DAG-guided prerequisite remediation reduced simulated agent drop-out from $60.7\%$ to $2.1\%$, increased simulated completion from $39.3\%$ to $97.9\%$, and elevated simulated at-risk agent progression to $93.0\%$. We explicitly note that these metrics represent rule-based computational simulations and do not constitute causal evidence of human learning gains.
-    \item \textbf{The Grand 5-Tier Scaling Law and Flagship 72B Benchmark:} Mapped empirical scaling dynamics across five orders of magnitude ($0.49\text{B} \to 1.54\text{B} \to 7.62\text{B} \to 14.7\text{B} \to \mathbf{72.71B}$) on Bo\u{g}azi\c{c}i HPC A40 (Job ID \texttt{33801}). Demonstrated that 4-bit NF4 enables the 72.7B flagship to run stably on a single A40 card (38.97 GB peak VRAM), achieving a peak 37.5\% Bloom taxonomy classification accuracy and 100\% structural JSON validity across unseen academic disciplines.
-    \item \textbf{14B QLoRA SFT and Project-Record Bloom Accuracy ($62.5\%$):} Successfully fine-tuned \texttt{Qwen2.5-14B-Instruct} on Bo\u{g}azi\c{c}i HPC A40 (Job ID \texttt{33903}, 2,296 multi-domain Turkish pedagogical instructions, 4-bit NF4 QLoRA, peak training VRAM 22.83 GB). Lifted structural JSON validity to 100.0\%, extraction precision to 87.5\%, $F_1$ to 78.3\%, and attained a project-record Bloom taxonomy classification accuracy of \textbf{62.5\%} (up from $0.0\%$ zero-shot and surpassing the 50.0\% peak of 32B models).
-    \item \textbf{Multi-Tier CEFR Pedagogical Architecture (B1 / B2 / C1):} Introduced Turkey's first controllable pedagogical complexity framework, dynamically tailoring explanations across CEFR B1 (Ate\c{s}man $\ge 50.0$, foundational undergraduate), B2 ($35.0 \le \text{Ate\c{s}man} < 50.0$, upper-division engineering), and C1 ($\text{Ate\c{s}man} < 35.0$, postgraduate research). Generated 4,666 multi-tier instruction pairs and achieved 91.7\% level-control adherence with live annotation tooling.
+    \item \textbf{Characterization of the Semantic Layer:} Proved that terminology extraction is bounded by recall ($<28.1\%$ TR, $<56.2\%$ EN) rather than precision ($>88\%$), while validating that LLM explanations reach the targeted CEFR-B1 readability band.
+    \item \textbf{Single-Annotator Human Audit \& Provenance:} Documented $413$ single-annotator (\texttt{A1}) binary evaluations ($233$ pilot + $180$ candidate rows recovered from browser state, distinguishing $59$ records verified via direct user CSV export; $55$ EN items pending human queue). Formal double-blind human IAA is not claimed.
+    \item \textbf{Verified Edge Implementation:} Profiled standalone edge components on consumer NVIDIA RTX 5060 (8~GB VRAM), verifying Whisper Small FP16 ($0.77\text{ GB}$ VRAM, $\text{RTF}=0.054$, $\text{WER}=6.08\%$) and \texttt{Qwen2.5-1.5B-Instruct} BF16 ($2.93\text{ GB}$ VRAM, $3.62\text{ s}$ latency, $F_1=0.7238$).
+    \item \textbf{High-Performance Computing (HPC) LoRA Scaling and EduTerm-7B-TR Diagnosis:} Trained \textbf{EduTerm-7B-TR} on NVIDIA A40 across 2,296 multi-domain samples (Job ID \texttt{33602}, peak training VRAM $17.85\text{ GB}$), demonstrating why 8~GB consumer GPUs cannot run 7B backpropagation while identifying structured JSON schema drift ($0.0\%$ strict JSON compliance) as the driver for migrating to 14B QLoRA.
+    \item \textbf{Empirical Cross-Layer Error Propagation Curves:} Characterized end-to-end ASR $\to$ LLM sensitivity across 7 ASR model steps ($0\% \to 89.7\%$ WER) on the A40 cluster, quantifying sensitivity slopes ($\Delta F_{1,\text{TR}} = -0.11\%$, $\Delta F_{1,\text{EN}} = -1.23\% \text{ per } 5\% \text{ WER}$) and the $\text{WER} \le 15\%$ resilience boundary.
+    \item \textbf{Multi-Scope Corpus Validation ($7/33/40/99/125/133$):} Executed batch extraction and NetworkX DAG modeling across 33 initial ready lectures (Job \texttt{33600}, 118 terms, 19 missing prerequisites) and expanded to the 125-clip machine-only corpus ($26 + 99$ fetched, $48.70$ hours) plus 8 corporate clips ($133$ total batch lectures).
+    \item \textbf{Factual Reliability via Hybrid RAG:} Implemented canonical ontology grounding and prerequisite DAG verification, achieving 60.7\% candidate grounding precision on long-form corporate speech transcripts (superseding circular historical synthetic ablation claims).
+    \item \textbf{Generative Video Operability:} Validated programmatic scriptwriting, neural voice synthesis, and Manim rendering across seven explainer MP4 artifacts verified via \texttt{ffprobe}.
+    \item \textbf{Direct Preference Optimization (DPO) for Pedagogical B1 Alignment:} Trained \textbf{EduTerm-7B-DPO} (Job \texttt{33750}, 650 triplets, $\Delta = +55.56$ Ate\c{s}man) reaching $100\%$ validation preference accuracy and $+6.60$ reward margin, and subsequently validated end-to-end generative alignment on \textbf{EduTerm-14B-DPO} (cutting adversarial hallucination rate from $70.0\%$ to $30.0\%$, reaching $87.5\%$ code-switching recall, and more than doubling English cross-lingual term transfer over SFT).
+    \item \textbf{Empirical Quantization \& Latency Profiling:} Profiled Kumru-2B FP16 ($17.5\text{ ms}$ TTFT, $60.4\text{ tok/s}$, $4.44\text{ GB}$ VRAM) alongside EduTerm-14B NF4 ($9.53\text{ GB}$ peak VRAM, $66.3\%$ base reduction vs BF16) on NVIDIA A40 (Job \texttt{34410}).
+    \item \textbf{Fallback-Excluded Cross-Family Judge Audit:} Re-evaluated the cross-family panel (\texttt{Qwen2.5-7B} vs \texttt{Mistral-7B}, Job \texttt{33983}) after excluding 270 Qwen parse-fallbacks ($59.5\%$), measuring clean human agreement over Qwen's 184 real verdicts ($86.45\%$ R, $87.74\%$ D, $TN=0$) and Mistral's 454 real verdicts ($94.24\%$ R, $96.24\%$ D, $TN=0$).
+    \item \textbf{Empirical Long-Context (32K) Hardware Boundary Mapping:} Quantified full-lecture single-pass DAG ingestion across 16,059 input tokens (Job \texttt{33789}, 17.83~GB peak VRAM), and established 100.0\% Middle Context Retrieval up to 4K tokens on \texttt{EduTerm-14B} (Job \texttt{34336}).
+    \item \textbf{Agent-Based Student Journey Simulation under Assumed BKT Parameters:} Modeled 1,000 synthetic student agents under assumed BKT transitions as a computational simulation (non-causal for human learning).
+    \item \textbf{The Grand Scaling Law \& 14B QLoRA CEFR/Reflexion Suites:} Mapped scaling from $0.49\text{B} \to 72.71\text{B}$, achieved $62.5\%$ Bloom taxonomy accuracy with \texttt{EduTerm-14B} QLoRA (Job \texttt{33903}), constructed controllable Turkish CEFR (B1/B2/C1) complexity adaptation (4,666 pairs, 91.7\% control adherence), and verified +5.46 Ate\c{s}man gains via Agentic Self-Reflexion (Job \texttt{34378}).
 \end{enumerate}
 
 \section{Limitations and Threats to Validity}
 \begin{itemize}
-    \item \textbf{Gold Reference Alignment:} The gold reference transcripts were produced by post-editing high-grade ASR drafts rather than independent double-blind transcription from scratch, which could introduce a minor stylistic affinity toward Whisper conventions.
-    \item \textbf{Lack of In Vivo Student Evaluation:} While the learning journey analytics were modeled via Bayesian Knowledge Tracing with 1,000 synthetic agents, these results represent structural simulations under assumed transition parameters. No empirical randomized controlled trials (RCTs) with human student participants were conducted.
-    \item \textbf{High-Prevalence Boundary on Automated Evaluation:} As characterized in our inter-rater reliability analysis, while open-weight 7B LLMs achieve high agreement with humans on positive definitions and contexts, their specificity and negative-class discriminative power remain unvalidated due to the extreme scarcity of negative examples in the gold corpus ($TN = 0$).
-    \item \textbf{Ablation Range and Noise Types:} Cross-layer error propagation was empirically benchmarked across 7 discrete ASR models from $0\%$ to $89.7\%$ WER; continuous, synthetic additive Gaussian or reverberant acoustic corruption curves remain valuable avenues for future research.
-    \item \textbf{Manim Generation Constraints:} While functional operability was demonstrated across seven artifacts, fully autonomous generative rendering occasionally encounters syntax variations on highly complex mathematical geometries.
+    \item \textbf{Gold Reference \& Single-Annotator Boundary:} Gold reference transcripts were produced by post-editing ASR drafts rather than independent double-blind transcription from scratch, and candidate human labeling relies on a single annotator (\texttt{A1}) without independent second-annotator verification ($55$ EN items remain queued; only $59/180$ candidate labels came from direct CSV export).
+    \item \textbf{Judge Parse Failures \& Zero True Negatives:} Zero-shot 7B judge execution yielded a $59.5\%$ parse failure rate ($270/454$ fallback defaults) for \texttt{Qwen2.5-7B} under a 65-token budget, and neither Qwen ($N=155$ clean) nor Mistral ($N=399$) matched human negative labels ($TN = 0$).
+    \item \textbf{Pedagogical Guardrail Vulnerability:} In adversarial cheat-pressure tests (Job \texttt{34443}), instruction-following 14B SFT/DPO models exhibited susceptibility to exam-solution and direct-code extraction ($12.5\%$ Socratic deflection for DPO), highlighting the need for refusal pairs in future alignment.
+    \item \textbf{Lack of In Vivo Student Evaluation:} All BKT learning trajectories represent Markovian simulations under assumed parameters; no randomized controlled trials (RCTs) with human students were conducted.
+    \item \textbf{Manim Generation Constraints:} While seven explainer MP4s were rendered and inspected via \texttt{ffprobe}, autonomous animation synthesis still faces syntax failures on complex geometric layouts.
 \end{itemize}
 
 \section{Future Work}
@@ -2151,5 +2429,48 @@ Occupational Health \& Safety (İSG / OHS) & TR / EN & 4 & 2.16 hours & 16 \\ \h
 \textbf{Total Inventory} & \textbf{Bilingual} & \textbf{40} & \textbf{10.12 hours} & \textbf{160} \\ \hline
 \end{tabular}
 \end{table}
+
+\chapter{REPRODUCIBILITY MANIFEST, SLURM EVIDENCE, AND CHECKSUM REGISTRY}
+\label{app:repro}
+
+All model revisions, Slurm batch execution evidence on the Bo\u{g}azi\c{c}i University HPC cluster (\texttt{ultramarine}, NVIDIA A40 48GB), and verified adapter checkpoint SHA-256 digests are archived in \path{experiments/outputs/reproducibility_registry.json} and \path{experiments/outputs/annotation_provenance_180.json}.
+
+\section{Hugging Face Base Model Revisions}
+\begin{sloppypar}
+\begin{itemize}
+    \item \path{openai/whisper-medium} (769M): rev \footnotesize\texttt{abdf7c39ab9d0397620ccaea8974cc764cd0953e}\normalsize
+    \item \path{openai/whisper-large-v3} (1.55B): rev \footnotesize\texttt{06f233fe06e710322aca913c1bc4249a0d71fce1}\normalsize
+    \item \path{openai/whisper-large-v3-turbo} (809M): rev \footnotesize\texttt{41f01f3fe87f28c78e2fbf8b568835947dd65ed9}\normalsize
+    \item \path{Qwen/Qwen3-ASR-1.7B-hf} (1.7B): rev \footnotesize\texttt{bcd2b5b7f32b480ab5790554cfa8347f246a14f3}\normalsize
+    \item \path{Qwen/Qwen3-ASR-0.6B-hf} (0.6B): rev \footnotesize\texttt{7f1569a48a89f3e3f4dc3a5c9d28bddd903bc76c}\normalsize
+    \item \path{nvidia/nemotron-3.5-asr-streaming-0.6b} (0.6B): \newline rev \footnotesize\texttt{1c8deaecc64b91f034d73e08dd8b64625eb3395d}\normalsize
+\end{itemize}
+\end{sloppypar}
+
+\section{Verified LoRA Checkpoint SHA-256 Checksums}
+\begin{table}[h!]
+\centering
+\caption{Verified SHA-256 Digests for Trained Adapter Checkpoints (\texttt{adapter\_model.safetensors})}
+\label{table:checksums}
+\scriptsize\setlength{\tabcolsep}{3pt}
+\begin{tabularx}{\textwidth}{l>{\ttfamily\scriptsize\RaggedRight\arraybackslash}X}
+\toprule
+\textbf{Checkpoint Name} & \textbf{SHA-256 Digest} \\
+\midrule
+srm\_whisper\_small\_tr (Local) & 69f60090aa309578e9b3d2f2042d66336774f795b776c71d17a96c30ba6d4543 \\
+eduterm\_7b\_tr\_sft (HPC A40) & b26fa6714a5408c8f5c3885ec228e852d8060d743a4ad008eb295e1537f8a895 \\
+eduterm\_14b\_cefr\_qlora (HPC A40) & c667308ebf5d7e585491cde86a202fb64ea487b9314d324009dde624e1a3c397 \\
+eduterm\_14b\_tr\_qlora (HPC A40) & 99f07ff09b3f9aecd69869b193c55f85c0b3e7052d6a2767c6efd6c9a377c4f9 \\
+eduterm\_14b\_dpo (HPC A40) & 0fb2cf25fc59df47658fbfd1c69a154b2c1ae966281b5b3339fcbcf201e5d938 \\
+eduterm\_14b\_banking (HPC A40) & b97ff2f516799d1921a8ba270cfeab554f119678b841f984ffe817067150cfc6 \\
+eduterm\_14b\_omni\_merged (HPC A40) & 2e110072cded434f900eb4857db590480a237bbc095a66e95f7a3de8f42922a3 \\
+eduterm\_kumru\_2b\_cefr (HPC A40) & 1c565ab3f955dc159d239cde3f3fe11e603f4aa6ad147759f2c69d6b28acd04b \\
+eduterm\_trendyol\_8b\_cefr (HPC A40) & 5e266b1aa98ce3705e8e1f238f3b10868ef003b4a94a1c2ce27873efb5bbe8d8 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Primary Bo\u{g}azi\c{c}i HPC Slurm Job Manifest}
+Primary experimental runs on \texttt{ultramarine} (NVIDIA A40 48GB) correspond to Slurm batch logs archived on the cluster: \texttt{33580} (7B smoke LoRA), \texttt{33600} (33-lecture DAG corpus), \texttt{33602} (EduTerm-7B-TR SFT), \texttt{33611} (5-tier scaling law), \texttt{33750} (DPO 7B), \texttt{33777} (quantization profiling), \texttt{33782} (7B judge vs human), \texttt{33789} (long-context 32K VRAM boundary), \texttt{33801} (72B scaling benchmark), \texttt{33903} (14B QLoRA SFT), \texttt{33965/34027} (CEFR 14B QLoRA), \texttt{33983} (cross-family judge Qwen vs Mistral), \texttt{34288} (EduTerm-14B-DPO), \texttt{34293} (Banking LoRA), \texttt{34329} (Tri-Domain adapter fusion), \texttt{34336} (NIAH 1K--8K), \texttt{34378} (Agentic Self-Reflexion), \texttt{34408} (Adversarial Hallucination), \texttt{34410} (Triad Suite 1: Judge, Code-Switching, TTFT/Latency), and \texttt{34443} (Triad Suite 2: Safety Guardrails, Adaptive BKT Curriculum, Cross-Lingual Transfer), \texttt{34561} (7B DPO generative evaluation), \texttt{34562} (cross-family judge \texttt{bfloat16} rerun), \texttt{34721} (Socratic-V2 SFT live tutoring), \texttt{34755} (on-policy DPO v1), \texttt{35536}--\texttt{35538} (3-seed \texttt{Kumru-2B}, \texttt{7B-bf16} student, and hybrid CEFR+DPO ablations), \texttt{35649} (Round-2 DPO + non-Latin blocking), \texttt{35651} (3-seed \texttt{7B-bf16} + non-Latin blocking), and \texttt{36004} (alignment tax CEFR/JSON audit).
 
 \end{document}

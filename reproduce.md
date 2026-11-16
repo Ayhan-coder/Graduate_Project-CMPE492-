@@ -40,11 +40,57 @@ Generated inventory files:
 - `experiments/data/data_inventory.json`
 - `experiments/data/data_inventory.csv`
 
+### Scope Reconciliation, Provenance & Reproducibility Registries (`P1` / `P2`)
+
+Reconcile all six evaluation scopes (`7 / 33 / 40 / 99 / 125 / 133`), audit `180` candidate human `A1` labels (`59` direct CSV exports vs. `121` browser-state recovered records; `55` pending EN items), and regenerate Slurm job / Hugging Face revision / checkpoint SHA-256 manifests:
+
+```powershell
+python experiments/data/build_audit_registries.py
+```
+
+Outputs:
+- `experiments/outputs/scope_reconciliation_matrix.json`
+- `experiments/outputs/annotation_provenance_180.json`
+- `experiments/outputs/reproducibility_registry.json`
+
+### 100+ Machine Corpus Extraction, Stratified Sampling & Human Queue Forms (`P1`)
+
+Resume machine term extraction over the 99 fetched lectures (`manifest_100plus.jsonl`), build the deterministic ~180 stratified evaluation sample, and generate the single-annotator (`A1`) HTML forms:
+
+```powershell
+# 1. Resume/complete machine term candidates from experiments/outputs/machine_terms_cache_100plus.json
+python -u experiments/data/build_item_sheet_32_machine.py `
+  --manifest experiments/data/manifest_100plus.jsonl `
+  --out experiments/annotation/labels_todo_100plus_machine.csv `
+  --cache experiments/outputs/machine_terms_cache_100plus.json `
+  --summary experiments/outputs/machine_labels_100plus_summary.json
+
+# 2. Construct deterministic stratified ~180 sample & offline A1 HTML annotation form
+python experiments/data/build_sample_100plus.py
+python experiments/annotation/make_annotation_form.py --annotator a1 --items 100plus-sample
+
+# 3. Render HTML form for the remaining 55 EN human-queue items from the 32-clip pool
+python experiments/annotation/make_annotation_form.py --annotator a1 --items experiments/annotation/labels_todo_human_queue.csv
+```
+
+### Cross-Family Judge Audit (`P0.2`)
+
+Strictly separate the `184` verified non-fallback `Qwen/Qwen2.5-7B-Instruct` judge verdicts from the `270` `"Parsing fallback"` (`R=1, D=1`) defaults under `max_new_tokens=65`, and recompute agreement against `mistralai/Mistral-7B-Instruct-v0.3` (`0/454` fallbacks) and single human annotator `A1`:
+
+```powershell
+python experiments/annotation/recompute_cross_family_clean.py
+```
+
+Outputs:
+- `experiments/annotation/labels_panel_qwen25_7b_a40_clean184.csv`
+- `experiments/annotation/labels_panel_qwen25_7b_a40_fallback270.csv`
+- `experiments/outputs/cross_family_judge_report.json`
+
 ---
 
 ## 3. Acoustic ASR & SLM Benchmarking
 
-### 3.1 Speech Recognition Evaluation (7 Gold Lectures)
+### 3.1 Speech Recognition Evaluation (7 Gold Lectures & SRM Generated-Token Audit)
 
 Benchmark Whisper (Medium, Large-v3, Turbo) and evaluate WER/CER across the 7 verified test lectures:
 
@@ -54,9 +100,13 @@ python experiments/run_asr.py --manifest experiments/data/manifest.jsonl --all-s
 
 # 2. Aggregate language-level tables & 10,000-resample bootstrap 95% confidence intervals:
 python experiments/report.py --asr experiments/outputs/asr.jsonl
+
+# 3. Measure SRM generated token counts (tiny / base / small / qwen3asr) on local RTX 5060:
+python -u experiments/benchmark_srm_asr_local.py --models tiny base small qwen3asr
+python experiments/analyze_rtf_paths.py
 ```
 
-Emitted artifact: `experiments/outputs/asr_by_lang.json` (contains language-level unweighted means, per-clip breakdown, and bootstrap `wer_ci`).
+Emitted artifacts: `experiments/outputs/asr_by_lang.json`, `experiments/outputs/srm_asr_measured.json`, `experiments/outputs/rtf_path_audit.json`.
 
 *(Note: To benchmark edge-device SRM and SLM inference latency and VRAM footprint separately, run `python experiments/benchmark_srm_slm.py`.)*
 
@@ -92,41 +142,47 @@ Artifact emitted: `experiments/outputs/rag_corporate_results.json` (`status: ENG
 
 ---
 
-## 5. Recompiling Posters and Academic Reports
+## 5. Recompiling Posters, IEEE Paper, and Thesis Reports
 
-### 5.1 Recompiling Presentation Posters (A3 & A0)
+### 5.1 Recompiling Presentation Posters (A3 & A0 TR/EN)
 
 ```powershell
 cd notes
 xelatex -interaction=nonstopmode Bitirme_Projesi_A3_Posteri.tex
 xelatex -interaction=nonstopmode Bitirme_Projesi_A0_Posteri.tex
+xelatex -interaction=nonstopmode Bitirme_Projesi_A0_Posteri_EN.tex
 pdftoppm -png -r 150 Bitirme_Projesi_A3_Posteri.pdf Bitirme_Projesi_A3_Posteri_Final
 pdftoppm -png -r 150 Bitirme_Projesi_A0_Posteri.pdf Bitirme_Projesi_A0_Posteri_Final
 cd ..
 ```
 
-Output PDFs:
-- `notes/Bitirme_Projesi_A3_Posteri.pdf`
-- `notes/Bitirme_Projesi_A0_Posteri.pdf`
-
-### 5.2 Recompiling Graduation Project Reports
-
-The authoritative graduation thesis report is generated from `notes/Bitirme_Projesi_Raporu.md` via `md2tex.py` and compiled with LaTeX (`pdflatex` or `xelatex`):
+### 5.2 Recompiling CMPE 492 Final Report (ENG), Comprehensive Report (TR), & IEEE Paper
 
 ```powershell
 cd notes
+pdflatex -interaction=nonstopmode Boğaziçi_CMPE492_Final_Report.tex
+pdflatex -interaction=nonstopmode Boğaziçi_CMPE492_Final_Report.tex
 python md2tex.py
 pdflatex -interaction=nonstopmode Bitirme_Projesi_Raporu.tex
 pdflatex -interaction=nonstopmode Bitirme_Projesi_Raporu.tex
-python generate_revision_report.py
+cd ..\paper
+xelatex -interaction=nonstopmode main.tex
+xelatex -interaction=nonstopmode main.tex
 cd ..
 ```
 
-*(Note: `python notes/generate_final_report_pdf.py` renders a legacy side-by-side ReportLab document to `Bitirme_Projesi_Raporu.legacy-reportlab.pdf` and will not overwrite the authoritative thesis deliverable unless `--allow-overwrite-report` is explicitly provided.)*
+### 5.3 Running Core Unit Tests
 
-Output PDFs:
-- `notes/Bitirme_Projesi_Raporu.pdf` (Authoritative thesis deliverable)
-- `notes/What_Added_What_Improved.pdf` (Revision & expansion report)
+```powershell
+python -m unittest experiments/tests/test_eval_kit.py experiments/tests/test_benchmark_srm_slm.py experiments/tests/test_domain_rag.py
+```
+
+Output PDFs (mirrored into `GUNCEL_TESLIM_PDFLERI/`):
+- `notes/Boğaziçi_CMPE492_Final_Report.pdf` (`1_Bogazici_CMPE492_Final_Report_ENG.pdf`)
+- `notes/Bitirme_Projesi_Raporu.pdf` (`2_Bitirme_Projesi_Kapsamli_Rapor_TR.pdf`)
+- `notes/Bitirme_Projesi_A0_Posteri.pdf` (`3_Bitirme_Projesi_A0_Sunum_Posteri.pdf`)
+- `notes/Bitirme_Projesi_A3_Posteri.pdf` (`4_Bitirme_Projesi_A3_Masaustu_Posteri.pdf`)
+- `paper/main.pdf` (`5_Akademik_Bildiri_IEEE_Paper.pdf`)
 
 ---
 

@@ -532,349 +532,332 @@
       }
     ]
   },
-  "EN-01": {
-    "domain": "Software Engineering & Project Management",
-    "target_level": "CEFR B1",
-    "lecture_title": "Introduction to Agile Methodologies and Scrum Framework",
+  "EN-02": {
+    "domain": "Tourism & Sustainable Hospitality",
+    "target_level": "CEFR Multi-Level (B1/B2/C1)",
+    "lecture_title": "What Is Sustainable Tourism? Principles and Ecotourism Practice",
     "bloom_level": "Anlama",
     "terms": [
       {
-        "canonical": "Agile",
+        "canonical": "sustainability",
         "aliases": [
-          "agile",
-          "agile methodology",
-          "agile framework",
-          "agile methods"
+          "sustainability"
         ],
+        "primary_level": "B1",
         "definition_b1": "",
+        "definition_b2": "",
+        "definition_c1": "",
+        "atesman_b1": null,
+        "atesman_b2": null,
+        "atesman_c1": null,
         "atesman_score": 60.0
       },
       {
-        "canonical": "Scrum",
+        "canonical": "greenwashing",
         "aliases": [
-          "scrum",
-          "scrum methodology",
-          "scrum framework"
+          "greenwashing"
         ],
+        "primary_level": "B2",
         "definition_b1": "",
+        "definition_b2": "",
+        "definition_c1": "",
+        "atesman_b1": null,
+        "atesman_b2": null,
+        "atesman_c1": null,
+        "atesman_score": 42.0
+      },
+      {
+        "canonical": "proclaimed",
+        "aliases": [
+          "proclaimed"
+        ],
+        "primary_level": "B2",
+        "definition_b1": "",
+        "definition_b2": "",
+        "definition_c1": "",
+        "atesman_b1": null,
+        "atesman_b2": null,
+        "atesman_c1": null,
+        "atesman_score": 42.0
+      },
+      {
+        "canonical": "Sustainable tourism",
+        "aliases": [
+          "sustainable tourism"
+        ],
+        "primary_level": "B1",
+        "definition_b1": "",
+        "definition_b2": "",
+        "definition_c1": "",
+        "atesman_b1": null,
+        "atesman_b2": null,
+        "atesman_c1": null,
         "atesman_score": 60.0
       },
       {
-        "canonical": "Scrum Master",
+        "canonical": "PR (Public Relations)",
         "aliases": [
-          "scrum master",
-          "the scrum master"
+          "pr (public relations)"
         ],
+        "primary_level": "B1",
         "definition_b1": "",
+        "definition_b2": "",
+        "definition_c1": "",
+        "atesman_b1": null,
+        "atesman_b2": null,
+        "atesman_c1": null,
         "atesman_score": 60.0
       },
       {
-        "canonical": "Product Owner",
+        "canonical": "Brundtland Report",
         "aliases": [
-          "product owner",
-          "the product owner"
+          "brundtland report"
         ],
+        "primary_level": "B2",
         "definition_b1": "",
+        "definition_b2": "",
+        "definition_c1": "",
+        "atesman_b1": null,
+        "atesman_b2": null,
+        "atesman_c1": null,
+        "atesman_score": 42.0
+      },
+      {
+        "canonical": "Economic leakage",
+        "aliases": [
+          "economic leakage"
+        ],
+        "primary_level": "B1",
+        "definition_b1": "",
+        "definition_b2": "",
+        "definition_c1": "",
+        "atesman_b1": null,
+        "atesman_b2": null,
+        "atesman_c1": null,
         "atesman_score": 60.0
       },
       {
-        "canonical": "Development Team",
+        "canonical": "United Nations World Tourism Organization (UNWTO)",
         "aliases": [
-          "development team",
-          "the development team",
-          "scrum team"
+          "united nations world tourism organization (unwto)"
         ],
+        "primary_level": "B1",
         "definition_b1": "",
+        "definition_b2": "",
+        "definition_c1": "",
+        "atesman_b1": null,
+        "atesman_b2": null,
+        "atesman_c1": null,
         "atesman_score": 60.0
       },
       {
-        "canonical": "Sprint",
+        "canonical": "Three pillars of sustainability",
         "aliases": [
-          "sprint",
-          "the sprint",
-          "sprints"
+          "three pillars of sustainability"
         ],
+        "primary_level": "B1",
         "definition_b1": "",
+        "definition_b2": "",
+        "definition_c1": "",
+        "atesman_b1": null,
+        "atesman_b2": null,
+        "atesman_c1": null,
         "atesman_score": 60.0
       },
       {
-        "canonical": "Backlog",
+        "canonical": "Mitigate / Mitigation",
         "aliases": [
-          "backlog",
-          "the backlog",
-          "product backlog",
-          "sprint backlog"
+          "mitigate / mitigation"
         ],
+        "primary_level": "B1",
         "definition_b1": "",
+        "definition_b2": "",
+        "definition_c1": "",
+        "atesman_b1": null,
+        "atesman_b2": null,
+        "atesman_c1": null,
         "atesman_score": 60.0
       },
       {
-        "canonical": "Daily Scrum",
+        "canonical": "Ecological processes",
         "aliases": [
-          "daily scrum",
-          "stand-up",
-          "the daily scrum",
-          "daily standup"
+          "ecological processes"
         ],
+        "primary_level": "B1",
         "definition_b1": "",
+        "definition_b2": "",
+        "definition_c1": "",
+        "atesman_b1": null,
+        "atesman_b2": null,
+        "atesman_c1": null,
         "atesman_score": 60.0
       },
       {
-        "canonical": "Timebox",
+        "canonical": "Natural heritage",
         "aliases": [
-          "timebox",
-          "timebox period",
-          "timeboxing"
+          "natural heritage"
         ],
+        "primary_level": "B1",
         "definition_b1": "",
+        "definition_b2": "",
+        "definition_c1": "",
+        "atesman_b1": null,
+        "atesman_b2": null,
+        "atesman_c1": null,
         "atesman_score": 60.0
       },
       {
-        "canonical": "Deliverable",
+        "canonical": "Biodiversity",
         "aliases": [
-          "deliverable",
-          "deliverables"
+          "biodiversity"
         ],
+        "primary_level": "B1",
         "definition_b1": "",
+        "definition_b2": "",
+        "definition_c1": "",
+        "atesman_b1": null,
+        "atesman_b2": null,
+        "atesman_c1": null,
         "atesman_score": 60.0
       },
       {
-        "canonical": "Iteration",
+        "canonical": "Socio-cultural authenticity",
         "aliases": [
-          "iteration",
-          "iterations"
+          "socio-cultural authenticity"
         ],
+        "primary_level": "B2",
         "definition_b1": "",
+        "definition_b2": "",
+        "definition_c1": "",
+        "atesman_b1": null,
+        "atesman_b2": null,
+        "atesman_c1": null,
+        "atesman_score": 42.0
+      },
+      {
+        "canonical": "Cultural heritage",
+        "aliases": [
+          "cultural heritage"
+        ],
+        "primary_level": "B1",
+        "definition_b1": "",
+        "definition_b2": "",
+        "definition_c1": "",
+        "atesman_b1": null,
+        "atesman_b2": null,
+        "atesman_c1": null,
         "atesman_score": 60.0
       },
       {
-        "canonical": "Cross-Functional Team",
+        "canonical": "Stakeholders",
         "aliases": [
-          "cross-functional",
-          "cross-functional team",
-          "pizza-sized team"
+          "stakeholders"
         ],
+        "primary_level": "B1",
         "definition_b1": "",
+        "definition_b2": "",
+        "definition_c1": "",
+        "atesman_b1": null,
+        "atesman_b2": null,
+        "atesman_c1": null,
         "atesman_score": 60.0
       },
       {
-        "canonical": "Kanban",
+        "canonical": "Poverty alleviation",
         "aliases": [
-          "kanban",
-          "kanban method"
+          "poverty alleviation"
         ],
+        "primary_level": "B2",
         "definition_b1": "",
+        "definition_b2": "",
+        "definition_c1": "",
+        "atesman_b1": null,
+        "atesman_b2": null,
+        "atesman_c1": null,
+        "atesman_score": 42.0
+      },
+      {
+        "canonical": "Over-consumption",
+        "aliases": [
+          "over-consumption"
+        ],
+        "primary_level": "B1",
+        "definition_b1": "",
+        "definition_b2": "",
+        "definition_c1": "",
+        "atesman_b1": null,
+        "atesman_b2": null,
+        "atesman_c1": null,
         "atesman_score": 60.0
       },
       {
-        "canonical": "Kanban Board",
+        "canonical": "Environmental impact assessments (EIA)",
         "aliases": [
-          "kanban board",
-          "kanban chart",
-          "kanban boards"
+          "environmental impact assessments (eia)"
         ],
+        "primary_level": "B1",
         "definition_b1": "",
+        "definition_b2": "",
+        "definition_c1": "",
+        "atesman_b1": null,
+        "atesman_b2": null,
+        "atesman_c1": null,
         "atesman_score": 60.0
       },
       {
-        "canonical": "Work In Progress",
+        "canonical": "Host communities",
         "aliases": [
-          "work in progress",
-          "wip",
-          "in-progress work"
+          "host communities"
         ],
+        "primary_level": "B1",
         "definition_b1": "",
+        "definition_b2": "",
+        "definition_c1": "",
+        "atesman_b1": null,
+        "atesman_b2": null,
+        "atesman_c1": null,
         "atesman_score": 60.0
       },
       {
-        "canonical": "WIP Limit",
+        "canonical": "Tourism development strategies",
         "aliases": [
-          "wip limit",
-          "work in progress limit",
-          "work-in-progress limit"
+          "tourism development strategies"
         ],
+        "primary_level": "B1",
         "definition_b1": "",
+        "definition_b2": "",
+        "definition_c1": "",
+        "atesman_b1": null,
+        "atesman_b2": null,
+        "atesman_c1": null,
         "atesman_score": 60.0
       },
       {
-        "canonical": "Flow",
+        "canonical": "Destination areas",
         "aliases": [
-          "flow",
-          "create flow"
+          "destination areas"
         ],
+        "primary_level": "B1",
         "definition_b1": "",
+        "definition_b2": "",
+        "definition_c1": "",
+        "atesman_b1": null,
+        "atesman_b2": null,
+        "atesman_c1": null,
         "atesman_score": 60.0
       },
       {
-        "canonical": "Extreme Programming",
+        "canonical": "Data collection and analysis",
         "aliases": [
-          "extreme programming",
-          "xp"
+          "data collection and analysis"
         ],
+        "primary_level": "B1",
         "definition_b1": "",
-        "atesman_score": 60.0
-      },
-      {
-        "canonical": "Test-First Development",
-        "aliases": [
-          "test-first development",
-          "test-driven development",
-          "tdd"
-        ],
-        "definition_b1": "",
-        "atesman_score": 60.0
-      },
-      {
-        "canonical": "Pair Programming",
-        "aliases": [
-          "pair programming"
-        ],
-        "definition_b1": "",
-        "atesman_score": 60.0
-      },
-      {
-        "canonical": "Continuous Integration",
-        "aliases": [
-          "continuous integration",
-          "ci"
-        ],
-        "definition_b1": "",
-        "atesman_score": 60.0
-      },
-      {
-        "canonical": "Continuous Refactoring",
-        "aliases": [
-          "continuous refactoring",
-          "refactoring"
-        ],
-        "definition_b1": "",
-        "atesman_score": 60.0
-      },
-      {
-        "canonical": "Simple Design",
-        "aliases": [
-          "simple design",
-          "avoid big design up front",
-          "simplicity"
-        ],
-        "definition_b1": "",
-        "atesman_score": 60.0
-      },
-      {
-        "canonical": "Sustainable Pace",
-        "aliases": [
-          "sustainable pace"
-        ],
-        "definition_b1": "",
-        "atesman_score": 60.0
-      },
-      {
-        "canonical": "Self-Organizing Team",
-        "aliases": [
-          "self-organizing",
-          "self-organizing team",
-          "empowered team"
-        ],
-        "definition_b1": "",
-        "atesman_score": 60.0
-      },
-      {
-        "canonical": "Artifact",
-        "aliases": [
-          "artifact",
-          "scrum artifact",
-          "central artifact"
-        ],
-        "definition_b1": "",
-        "atesman_score": 60.0
-      },
-      {
-        "canonical": "Design Document",
-        "aliases": [
-          "design document",
-          "designing"
-        ],
-        "definition_b1": "",
-        "atesman_score": 60.0
-      },
-      {
-        "canonical": "Customer Requirements",
-        "aliases": [
-          "customer requirements",
-          "customer needs",
-          "listening to the customer"
-        ],
-        "definition_b1": "",
-        "atesman_score": 60.0
-      },
-      {
-        "canonical": "Lean",
-        "aliases": [
-          "lean",
-          "lean methodology",
-          "lean six sigma"
-        ],
-        "definition_b1": "",
-        "atesman_score": 60.0
-      },
-      {
-        "canonical": "Value Stream",
-        "aliases": [
-          "value stream",
-          "map value stream"
-        ],
-        "definition_b1": "",
-        "atesman_score": 60.0
-      },
-      {
-        "canonical": "Establish Pull",
-        "aliases": [
-          "establish pull",
-          "pull system",
-          "pull"
-        ],
-        "definition_b1": "",
-        "atesman_score": 60.0
-      },
-      {
-        "canonical": "Continuous Improvement",
-        "aliases": [
-          "pursue perfection",
-          "continuous improvement",
-          "continuous learning"
-        ],
-        "definition_b1": "",
-        "atesman_score": 60.0
-      },
-      {
-        "canonical": "hybrid",
-        "aliases": [
-          "hybrid",
-          "compound",
-          "amalgam",
-          "combination"
-        ],
-        "definition_b1": "",
-        "atesman_score": 60.0
-      },
-      {
-        "canonical": "backlog",
-        "aliases": [
-          "backlog",
-          "inventory",
-          "stockpile"
-        ],
-        "definition_b1": "",
-        "atesman_score": 60.0
-      },
-      {
-        "canonical": "rugby",
-        "aliases": [
-          "rugby",
-          "soccer",
-          "football"
-        ],
-        "definition_b1": "",
+        "definition_b2": "",
+        "definition_c1": "",
+        "atesman_b1": null,
+        "atesman_b2": null,
+        "atesman_c1": null,
         "atesman_score": 60.0
       }
     ]

@@ -111,8 +111,8 @@
 
   \begin{block}{40 VİDEOLUK EĞİTİM KORPUS ENVANTERİ}
     \begin{itemize}
-      \item \textbf{12 Disiplinlik Envanter:} Mühendislik, Tıp, Fizik, Matematik, Sosyal Bilimler ve kurumsal eğitimler (KVKK, İSG). 10.1 sa kaynak üstverisi (diskte doğrulanmış 16/40 klipte 4.6 sa); ASR başarım ölçümleri 7 derslik doğrulanmış test kümesindedir.
-      \item \textbf{Çift Değerlendirici:} İki bağımsız araştırmacı ile $N=115$ terim altın etiketlenmiştir ($\kappa_R = 0.782$ ilgililik, $\kappa_D = 1.000$ tanım doğruluğu).
+      \item \textbf{12 Disiplinlik Envanter:} Mühendislik, Tıp, Fizik, Matematik, Sosyal Bilimler ve kurumsal eğitimler (KVKK, İSG). 10.1 sa kaynak üstverisi; 125 kliplik (26+99) makine transkripti havuzu + 133 kliplik HPC toplu analizi (İş ID \texttt{34124}).
+      \item \textbf{Tek İnsan Değerlendirici (\texttt{A1}):} $233$ pilot + $180$ aday terim (59 doğrudan CSV indirmesi + 121 tarayıcı kurtarması, 0 çelişki; 55 EN beklemede). Çapraz-menşe hakem denetiminde Qwen2.5-7B (184 temiz karar; 270 fallback ayıklandı) vs.\ Mistral-7B-v0.3 (454/454 geçerli) kıyaslanmıştır.
     \end{itemize}
 
     \vskip0.2ex
@@ -145,7 +145,7 @@
       \textbf{EVREN Qwen 3.8F} & \textbf{6.11 s} & \textbf{4.23 s} & Millî Bulut (H200) \\
       \textbf{Boğaziçi HPC (A40)} & \textbf{15.28 s} & \textbf{12.45 s} & 7B LoRA (48GB A40) \\
       \textbf{EVREN DeepSeek} & 27.68 s & 24.12 s & Yüksek Hacim \\
-      \textbf{Qwen 3.5-4B (Local)} & 39.80 s & 34.20 s & RTX 5060 (4-bit) \\
+      \textbf{Qwen 3.5-4B (Local)} & 39.55 s & 34.20 s & RTX 5060 (4-bit) \\
       \textbf{Qwen 3.5-9B (Local)} & 513.19 s & 322.29 s & CPU Offload \\
       \bottomrule
     \end{tabularx}
@@ -232,7 +232,7 @@
       \textbf{ASR Terim Çıkarımı} & \textbf{Tam Otomatik} & Yok (Elle Altyazı) & Sınırlı \\
       \textbf{Kanonik RAG} & \textbf{Evet} & Hayır & Hayır \\
       \textbf{Önkoşul DAG} & \textbf{Evet (NetworkX)} & Statik Müfredat & Ağaç Bazlı \\
-      \textbf{Uçta / Web GPU} & \textbf{Evet (WebGPU)} & Yalnızca Bulut & İstemci/API \\
+      \textbf{Yerel GPU Çıkarımı} & \textbf{Evet (RTX 5060)} & Yalnızca Bulut & İstemci/API \\
       \textbf{CEFR B1 Sadeleştirme} & \textbf{Evet (Ateşman)} & Yok & A1--B2 Sabit \\
       \bottomrule
     \end{tabularx}

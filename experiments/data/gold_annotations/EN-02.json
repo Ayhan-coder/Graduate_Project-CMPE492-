@@ -1,0 +1,331 @@
+{
+  "id": "EN-02",
+  "title": "What Is Sustainable Tourism? Principles and Ecotourism Practice",
+  "domain": "Tourism & Sustainable Hospitality",
+  "bloom_level": "Anlama",
+  "terms": [
+    {
+      "canonical": "sustainability",
+      "aliases": [
+        "sustainability"
+      ],
+      "primary_level": "B1",
+      "definition_b1": "",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 60.0,
+      "atesman_b1": null,
+      "atesman_b2": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "greenwashing",
+      "aliases": [
+        "greenwashing"
+      ],
+      "primary_level": "B2",
+      "definition_b1": "",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 42.0,
+      "atesman_b2": null,
+      "atesman_b1": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "proclaimed",
+      "aliases": [
+        "proclaimed"
+      ],
+      "primary_level": "B2",
+      "definition_b1": "",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 42.0,
+      "atesman_b2": null,
+      "atesman_b1": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "Sustainable tourism",
+      "aliases": [
+        "sustainable tourism"
+      ],
+      "primary_level": "B1",
+      "definition_b1": "",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 60.0,
+      "atesman_b1": null,
+      "atesman_b2": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "PR (Public Relations)",
+      "aliases": [
+        "pr (public relations)"
+      ],
+      "primary_level": "B1",
+      "definition_b1": "",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 60.0,
+      "atesman_b1": null,
+      "atesman_b2": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "Brundtland Report",
+      "aliases": [
+        "brundtland report"
+      ],
+      "primary_level": "B2",
+      "definition_b1": "",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 42.0,
+      "atesman_b2": null,
+      "atesman_b1": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "Economic leakage",
+      "aliases": [
+        "economic leakage"
+      ],
+      "primary_level": "B1",
+      "definition_b1": "",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 60.0,
+      "atesman_b1": null,
+      "atesman_b2": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "United Nations World Tourism Organization (UNWTO)",
+      "aliases": [
+        "united nations world tourism organization (unwto)"
+      ],
+      "primary_level": "B1",
+      "definition_b1": "",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 60.0,
+      "atesman_b1": null,
+      "atesman_b2": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "Three pillars of sustainability",
+      "aliases": [
+        "three pillars of sustainability"
+      ],
+      "primary_level": "B1",
+      "definition_b1": "",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 60.0,
+      "atesman_b1": null,
+      "atesman_b2": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "Mitigate / Mitigation",
+      "aliases": [
+        "mitigate / mitigation"
+      ],
+      "primary_level": "B1",
+      "definition_b1": "",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 60.0,
+      "atesman_b1": null,
+      "atesman_b2": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "Ecological processes",
+      "aliases": [
+        "ecological processes"
+      ],
+      "primary_level": "B1",
+      "definition_b1": "",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 60.0,
+      "atesman_b1": null,
+      "atesman_b2": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "Natural heritage",
+      "aliases": [
+        "natural heritage"
+      ],
+      "primary_level": "B1",
+      "definition_b1": "",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 60.0,
+      "atesman_b1": null,
+      "atesman_b2": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "Biodiversity",
+      "aliases": [
+        "biodiversity"
+      ],
+      "primary_level": "B1",
+      "definition_b1": "",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 60.0,
+      "atesman_b1": null,
+      "atesman_b2": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "Socio-cultural authenticity",
+      "aliases": [
+        "socio-cultural authenticity"
+      ],
+      "primary_level": "B2",
+      "definition_b1": "",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 42.0,
+      "atesman_b2": null,
+      "atesman_b1": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "Cultural heritage",
+      "aliases": [
+        "cultural heritage"
+      ],
+      "primary_level": "B1",
+      "definition_b1": "",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 60.0,
+      "atesman_b1": null,
+      "atesman_b2": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "Stakeholders",
+      "aliases": [
+        "stakeholders"
+      ],
+      "primary_level": "B1",
+      "definition_b1": "",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 60.0,
+      "atesman_b1": null,
+      "atesman_b2": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "Poverty alleviation",
+      "aliases": [
+        "poverty alleviation"
+      ],
+      "primary_level": "B2",
+      "definition_b1": "",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 42.0,
+      "atesman_b2": null,
+      "atesman_b1": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "Over-consumption",
+      "aliases": [
+        "over-consumption"
+      ],
+      "primary_level": "B1",
+      "definition_b1": "",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 60.0,
+      "atesman_b1": null,
+      "atesman_b2": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "Environmental impact assessments (EIA)",
+      "aliases": [
+        "environmental impact assessments (eia)"
+      ],
+      "primary_level": "B1",
+      "definition_b1": "",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 60.0,
+      "atesman_b1": null,
+      "atesman_b2": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "Host communities",
+      "aliases": [
+        "host communities"
+      ],
+      "primary_level": "B1",
+      "definition_b1": "",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 60.0,
+      "atesman_b1": null,
+      "atesman_b2": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "Tourism development strategies",
+      "aliases": [
+        "tourism development strategies"
+      ],
+      "primary_level": "B1",
+      "definition_b1": "",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 60.0,
+      "atesman_b1": null,
+      "atesman_b2": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "Destination areas",
+      "aliases": [
+        "destination areas"
+      ],
+      "primary_level": "B1",
+      "definition_b1": "",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 60.0,
+      "atesman_b1": null,
+      "atesman_b2": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "Data collection and analysis",
+      "aliases": [
+        "data collection and analysis"
+      ],
+      "primary_level": "B1",
+      "definition_b1": "",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 60.0,
+      "atesman_b1": null,
+      "atesman_b2": null,
+      "atesman_c1": null
+    }
+  ],
+  "updated_at": "2026-11-11 23:31:19"
+}

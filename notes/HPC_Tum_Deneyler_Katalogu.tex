@@ -1,0 +1,126 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=1.8cm]{geometry}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+
+\definecolor{bounnavy}{RGB}{0,45,98}
+\definecolor{darkgray}{RGB}{60,60,60}
+\definecolor{lightgray}{RGB}{245,247,250}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=bounnavy,
+    urlcolor=bounnavy,
+    pdftitle={EduTerm AI - Boğaziçi HPC Deney Kataloğu},
+    pdfauthor={Ali Günder}
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\footnotesize\textcolor{darkgray}{Boğaziçi Üniversitesi Bilgisayar Mühendisliği -- CMPE 492}}
+\lhead{\footnotesize\textcolor{bounnavy}{\textbf{EduTerm AI: HPC Deneyleri Kataloğu}}}
+\rfoot{\footnotesize Sayfa \thepage}
+
+\titleformat{\section}{\large\bfseries\color{bounnavy}}{}{0em}{}[\titlerule]
+\titleformat{\subsection}{\normalsize\bfseries\color{bounnavy}}{}{0em}{}
+
+\begin{document}
+
+\begin{center}
+    {\LARGE\bfseries\color{bounnavy} EduTerm AI: Boğaziçi Üniversitesi HPC Kümesi}\\[0.2cm]
+    {\Large\bfseries Tam Deney Kataloğu ve Slurm İş Manifestosu}\\[0.2cm]
+    {\normalsize\textbf{Yürütücü:} Ali Günder \quad|\quad \textbf{Donanım:} \texttt{ultramarine} (NVIDIA A40 48~GB GDDR6 ECC) \quad|\quad \textbf{Tarih:} 12 Kasım 2026}
+\end{center}
+
+\vspace{0.3cm}
+
+\section{Genel Bakış ve HPC Altyapı Özeti}
+Bu belge, \textbf{EduTerm AI} lisans bitirme projesi kapsamında Boğaziçi Üniversitesi Bilgisayar Mühendisliği Bölümü Yüksek Başarımlı Hesaplama (HPC) kümesinde (\texttt{ultramarine} düğümü, 1x NVIDIA A40 48~GB GPU, Slurm iş yöneticisi) yürütülen \textbf{22 büyük ölçekli deney ve model eğitimi işini} kronolojik ve tematik olarak listeler. Tüm deneyler Slurm iş kimlikleri (\texttt{Job ID}), hedef betikleri, giriş-çıkış yapılandırmaları ve elde edilen somut bilimsel metrikleriyle kayıt altına alınmıştır.
+
+\vspace{0.2cm}
+
+\section{Tematik Deney Grupları Özeti}
+\begin{enumerate}
+    \item \textbf{Büyük Ölçekli Model İnce Ayar (SFT \& DPO):} 7B ve 14B QLoRA SFT/DPO eğitimleri, CEFR B1/B2/C1 çok düzeyli okunabilirlik kontrolü ve bankacılık dikey alan adaptasyonu (\texttt{33602, 33750, 34027, 34288, 34293}).
+    \item \textbf{Geniş Ölçekli Korpus Terim \& DAG Çıkarımı:} 33 ve 133 derslik küresel transkript toplu işleme hatları (\texttt{33600, 34006}).
+    \item \textbf{Donanım, Ölçekleme ve Uzun Bağlam Sınırları:} 0.5B--14B Scaling Law, 4-bit nicemleme profillemesi, 32K uzun bağlam OOM/bölümleme sınırı ve Needle-in-a-Haystack (\texttt{33611, 33777, 33789, 34336}).
+    \item \textbf{Çapraz-Aile Hakem ve Değerlendirme Deneyleri:} 454 maddelik çoklu model paneli (Qwen2.5-7B, Mistral-7B, Qwen2.5-14B ve 14B Calibrated) (\texttt{33782, 33983, 34561, 34562, 34567, 34568}).
+    \item \textbf{İleri Düzey Otonom Agent \& Triad Test Paketleri:} Sokratik yanılgı giderme, adaptör füzyonu (DARE-TIES), adversariyel halüsinasyon, BKT pedagojik müfredat ve kod değiştirme (code-switching) analizleri (\texttt{34329, 34378, 34408, 34410, 34443}).
+\end{enumerate}
+
+\vspace{0.2cm}
+
+\section{Tam Slurm Deney Manifestosu (Kronolojik)}
+
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabularx}{\textwidth}{lp{2.8cm}p{3.4cm}p{3.2cm}X}
+\toprule
+\textbf{Job ID} & \textbf{Deney Adı / Görev} & \textbf{Yürütülen Betik / Kod} & \textbf{Kullanılan Model \& Yöntem} & \textbf{Temel Çıktı ve Elde Edilen Metrik} \\
+\midrule
+\texttt{33580} & Duman Testi \& Çevre Doğrulama & \texttt{test\_gpu.sbatch} & Qwen2.5-7B / LoRA smoke & A40 PyTorch 2.1 ortamı ve CUDA belleği doğrulandı. \\
+\addlinespace
+\texttt{33600} & 33 Derslik Toplu DAG Analizi & \texttt{run\_hpc\_full\_corpus.py} & Qwen2.5-7B LoRA (bf16) & \textbf{504.5 sn}, 12,609 token, 118 terim, 19 önkoşul açığı (\texttt{full\_corpus\_40\_report.json}). \\
+\addlinespace
+\texttt{33602} & EduTerm-7B-TR SFT Eğitimi & \texttt{train\_sft\_7b.py} & 2,296 örnek, 4-bit LoRA & Eğitim tamamlandı, 0.0\% JSON şema kayması teşhis edildi (\texttt{eduterm\_7b\_tr\_sft\_report.json}). \\
+\addlinespace
+\texttt{33611} & 5 Kademeli Scaling Law & \texttt{run\_scaling\_law\_bench.py} & 0.5B, 1.5B, 3B, 7B, 14B & Parametre büyüklüğü ile F1 ve JSON şema uyumu arasındaki ampirik ilişki (\texttt{scaling\_law\_report.json}). \\
+\addlinespace
+\texttt{33660} & Cross-Layer Hata Yayılımı & \texttt{run\_cross\_layer\_curve.py} & 7 ASR $\times$ 2 Dil $\times$ LLM & ASR WER bozulmasının terim F1'e aktarım katsayısı ($\Delta F_1$) (\texttt{cross\_layer\_report.json}). \\
+\addlinespace
+\texttt{33750} & EduTerm-7B-DPO Hizalama & \texttt{train\_dpo\_7b.py} & 432 çift, DPO ($\beta=0.1$) & B1 okunabilirlik stili hizalandı (Ateşman 37.4, JSON \%12.5) (\texttt{dpo\_7b\_training\_report.json}). \\
+\addlinespace
+\texttt{33777} & Donanım Nicemleme Profili & \texttt{run\_quant\_profile.py} & FP16, BF16, INT8, NF4 & 4-bit nicemlemenin terim doğruluğu üzerindeki bellek/başarım ödünleşimi (\texttt{quant\_report.json}). \\
+\addlinespace
+\texttt{33782} & Sıfır-Atış LLM Hakem Testi & \texttt{run\_judge\_eval.py} & Qwen2.5-7B zero-shot & 233 pilot maddede insan uyumu tarandı ($P_o=94.42\%$, $TN=0$) (\texttt{judge\_report.json}). \\
+\addlinespace
+\texttt{33789} & 32K Uzun Bağlam DAG Sınırı & \texttt{run\_hpc\_long\_context\_dag.py} & Qwen2.5-7B (bf16, 32K) & TR-19 (16,059 tok) ve TR-20 (14,374 tok); 8~GB GPU'da OOM, A40'ta tek parça çizge (\texttt{long\_context\_dag\_report.json}). \\
+\addlinespace
+\texttt{34006} & 133 Klip Tam Korpus Batch & \texttt{run\_hpc\_corpus\_133.py} & Qwen2.5-7B LoRA (bf16) & \textbf{2,079.1 sn} ($\approx 34.7$ dk), \textbf{54,385 token}, 143 terim, \textbf{\%78.9 B1 uyumu} (\texttt{full\_corpus\_133\_report.json}). \\
+\addlinespace
+\texttt{34027} & EduTerm-14B-CEFR SFT & \texttt{train\_cefr\_14b.py} & Qwen2.5-14B, 4,666 örnek & \textbf{\%100 JSON}, \textbf{\%87.5 kesinlik}, \textbf{\%70.8 CEFR kontrolü}, \%47.2 F1 (\texttt{eduterm\_14b\_cefr\_sft\_report.json}). \\
+\addlinespace
+\texttt{33983} & Çapraz-Aile Hakem (İlk Koşu) & \texttt{run\_hpc\_cross\_family\_judge.py} & Qwen2.5-7B vs Mistral-7B & 454 madde; Mistral 0 fallback, Qwen 270 fallback ayrıştırılarak 184 temiz verdict üretildi (\texttt{cross\_family\_judge\_report.json}). \\
+\addlinespace
+\texttt{34288} & EduTerm-14B-DPO Eğitimi & \texttt{train\_dpo\_14b\_qwen.py} & Qwen2.5-14B DPO çiftleri & 14B tercih hizalaması tamamlandı; adaptör ağırlıkları SHA-256 ile mühürlendi. \\
+\addlinespace
+\texttt{34292} & 14B Çoklu Görev \& Arena & \texttt{submit\_pipeline\_3jobs.sbatch} & Arena / TTC / Sokratik & \textbf{\%62.5 DPO vs SFT win-rate}, \%87.5 analoji, \textbf{\%100 yanılgı giderimi} (\texttt{arena\_winrate\_report.json}). \\
+\addlinespace
+\texttt{34293} & Bankacılık Alanı LoRA & \texttt{train\_banking\_lora.py} & Finans/Bankacılık terimleri & FinTech mevzuat ve bankacılık terim adaptörü eğitildi (\texttt{banking\_adaptation\_report.json}). \\
+\addlinespace
+\texttt{34329} & Çok Alanlı Füzyon (DARE-TIES) & \texttt{run\_tri\_domain\_merge.py} & 3 LoRA adaptör birleşimi & Lineer ağırlıklı ortalama vs DARE-TIES adaptör füzyonu kıyaslandı (\texttt{tri\_domain\_merge\_14b\_report.json}). \\
+\addlinespace
+\texttt{34336} & Samanlıkta İğne (NIAH 1K-8K) & \texttt{run\_haystack\_bench.py} & Uzun bağlam bilgi geri çağırma & 1K'dan 8K'ya geri çağırma doğruluğu \%100 korundu (\texttt{long\_context\_haystack\_report.json}). \\
+\addlinespace
+\texttt{34378} & Otonom Öz-Yansıma (Reflexion) & \texttt{run\_self\_reflexion.py} & İki aşamalı eleştirmen döngüsü & Yanlış açıklamaların otonom revizyon ile düzeltilme oranı (\texttt{self\_reflexion\_benchmark\_report.json}). \\
+\addlinespace
+\texttt{34408} & Halüsinasyon \& Sadakat Testi & \texttt{run\_hallucination\_bench.py} & Karşıt (adversarial) transkript & Hibrit RAG'in uydurma terim engelleme başarısı (\texttt{hallucination\_faithfulness\_report.json}). \\
+\addlinespace
+\texttt{34410} & Triad Paket 1 (Hakem/Dinamik) & \texttt{run\_triad\_suite\_1.py} & Rubrik / Kod Değişimi / TTFT & Türkçe-İngilizce teknik kod değişimi ve ilk belirteç gecikmesi (\texttt{inference\_latency\_profiling\_report.json}). \\
+\addlinespace
+\texttt{34443} & Triad Paket 2 (BKT / Güvenlik) & \texttt{run\_triad\_suite\_2.py} & Bayesian Knowledge Tracing & Öğrenci bilgi izleme modeli ve pedagojik güvenlik kuralları (\texttt{adaptive\_curriculum\_bkt\_report.json}). \\
+\addlinespace
+\texttt{34561} & 7B DPO Üretken Doğrulama & \texttt{eval\_hpc\_7b\_dpo\_generative.py} & Base, SFT, DPO 7B üretimi & Base \%62.5 JSON, SFT \%0.0, DPO \%12.5 JSON; 14B göçünün ampirik kanıtı (\texttt{dpo\_7b\_generative\_eval.json}). \\
+\addlinespace
+\texttt{34562} & 7B Hakem Doğal \texttt{bfloat16} & \texttt{run\_hpc\_cross\_family\_judge.py} & Qwen2.5-7B (bf16, 192 tok) & Fallback 270'ten \textbf{2/454'e (\%0.4)} düştü; Qwen $\times$ Mistral \%94.71 uyum, $TN=0$ (\texttt{cross\_family\_judge\_report\_bf16.json}). \\
+\addlinespace
+\texttt{34567} & 14B Hakem Ölçeklemesi & \texttt{run\_hpc\_cross\_family\_judge.py} & Qwen2.5-14B (bf16, 192 tok) & \textbf{0/454 fallback}; İnsan A1 karşısında \textbf{$TN_R=7/12$ (\%58.3)}, \textbf{$TN_D=6/8$ (\%75.0)} ile $TN=0$ engeli aşıldı (\texttt{cross\_family\_judge\_report\_14b\_bf16.json}). \\
+\addlinespace
+\texttt{34568} & 14B Kalibre Hakem (2-Shot) & \texttt{run\_hpc\_cross\_family\_judge.py} & Qwen2.5-14B + 2-shot CEFR & 14B'nin yüksek yanlış negatif ($FN$) oranını düşürmek için kalibre 2-shot hakem istemi kuyrukta. \\
+\bottomrule
+\end{tabularx}
+
+\vspace{0.4cm}
+
+\section{HPC Çıktılarının Yeniden Üretilebilirlik Kaydı}
+\small
+Tüm Slurm işlerinin çıktı JSON raporları \path{experiments/outputs/} dizininde, üretilen model adaptör kontrol noktaları ise Boğaziçi HPC \texttt{ali.gunder@79.123.177.160} üzerindeki \path{/users/ali.gunder/models/} ve \path{/users/ali.gunder/eduterm-finetune/checkpoints/} dizinlerinde saklanmaktadır. Her adaptörün kriptografik \textbf{SHA-256} özetleri tezin Appendix C bölümünde ve \path{experiments/outputs/reproducibility_registry.json} dosyasında bağımsız doğrulamaya açık olarak kayıtlıdır.
+
+\end{document}

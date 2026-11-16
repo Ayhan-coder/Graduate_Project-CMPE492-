@@ -23,7 +23,7 @@ Bu klasör, bitirme projesi kapsamında derlenmiş en güncel ve resmi teslim PD
 ### 3. Bitirme Projesi Resmi Sunum Posteri (A0 Boyutu)
 * **Dosya:** [`3_Bitirme_Projesi_A0_Sunum_Posteri.pdf`](file:///c:/Users/Slayer/Desktop/Bitirme%20Projesi/GUNCEL_TESLIM_PDFLERI/3_Bitirme_Projesi_A0_Sunum_Posteri.pdf)
 * **Önizleme:** [`notes/Bitirme_Projesi_A0_Posteri_Final-1.png`](file:///c:/Users/Slayer/Desktop/Bitirme%20Projesi/notes/Bitirme_Projesi_A0_Posteri_Final-1.png)
-* **Boyut:** A0 Dikey (841 x 1189 mm) - Profesyonel Konferans / Jüri Sunum Posteri
+* **Boyut:** A0 Yatay (1189 x 841 mm) - Profesyonel Konferans / Jüri Sunum Posteri
 * **Format:** Beamerposter (LaTeX) - Yüksek çözünürlüklü vektörel şemalar ve renk paleti.
 
 ---
@@ -31,7 +31,7 @@ Bu klasör, bitirme projesi kapsamında derlenmiş en güncel ve resmi teslim PD
 ### 4. Bitirme Projesi Masaüstü / El Posteri (A3 Boyutu)
 * **Dosya:** [`4_Bitirme_Projesi_A3_Masaustu_Posteri.pdf`](file:///c:/Users/Slayer/Desktop/Bitirme%20Projesi/GUNCEL_TESLIM_PDFLERI/4_Bitirme_Projesi_A3_Masaustu_Posteri.pdf)
 * **Önizleme:** [`notes/Bitirme_Projesi_A3_Posteri-1.png`](file:///c:/Users/Slayer/Desktop/Bitirme%20Projesi/notes/Bitirme_Projesi_A3_Posteri-1.png)
-* **Boyut:** A3 Yatay (297 x 420 mm) - Masaüstü, jüri el dağıtımı ve hızlı inceleme için optimize edilmiş 3 kolonlu düzen.
+* **Boyut:** A3 Yatay (420 x 297 mm) - Masaüstü, jüri el dağıtımı ve hızlı inceleme için optimize edilmiş 4 kolonlu düzen.
 
 ---
 
