@@ -1,0 +1,16 @@
+field_name,type,allowed_values_or_coding,missing_value_rule,description
+participant_id,string,"Randomly assigned post-hoc ID (P-001, P-002, ...); no PII",never_missing,Anonymous participant identifier
+form_version,string,"V1 | V2 (V2 flips A/B positions relative to V1)",never_missing,Counterbalanced form version
+scenario_id,string,"SOC_01..SOC_03 | SAFE_01..SAFE_03 | EXP_01..EXP_04 | CEFR_01",never_missing,Unique stimulus scenario identifier
+domain,string,"ISG | KVKK | CS | Finance",never_missing,Academic domain of the scenario
+model_pair_id,string,"task_separated_hybrid__vs__onpolicy_dpo_v2 | base_14b__vs__dpo_v4_guardrail_sysguard | ...",never_missing,Exact model comparison pair (never pooled across different pairs)
+display_position,string,"A | B",never_missing,Blinded UI label shown to participant
+model_checkpoint,string,"Exact unblinded checkpoint/condition name from human_eval_manifest.json",never_missing,True underlying model identifier
+response_source,string,"Path + Job ID from human_eval_manifest.json",never_missing,Verbatim output provenance
+rating_dimension,string,"clarity | pedagogical_tone | socratic_encouragement | logical_links | misconception_handling | guidance_utility | academic_integrity | pedagogical_utility | alternative_help | self_solution_support | respectful_tone",never_missing,Evaluated rubric dimension
+rating_value,float,"1..5 (parsed from '1 - Çok düşük'..'5 - Çok yüksek'); 'Değerlendiremiyorum' -> NA","NA (excluded from numeric mean/median, counted in unratable_n)",Numeric Likert rating
+mental_effort,float,"1..9 (1=Çok az zihinsel çaba, 9=Çok yüksek zihinsel çaba)",NA,Perceived mental effort rating
+preference,string,"model_A | model_B | tie | neither | undecided (unblinded to winning checkpoint or tie/neither/undecided)",NA,Pairwise preference outcome
+comprehension_correct,int,"1=correct | 0=incorrect | -1=unsure ('Emin değilim')",NA,Objective application question result (not attributed to A or B when both read)
+prior_knowledge,string,"Hiç bilgim yok | Başlangıç | Orta | İleri | Uzman (ordered 1..5 for subgroup/correlation)",NA,Domain-specific self-reported prior knowledge
+completion_timestamp,string,"ISO-8601 timestamp from Google Forms export",NA,Response submission timestamp

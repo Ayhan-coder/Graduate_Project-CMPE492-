@@ -1370,6 +1370,40 @@ To test that hypothesis, we ran two follow-up ablations (Table~\ref{tab:guardrai
 \end{tabularx}
 \end{table}
 
+\subsubsection{Pareto Guardrail DPO, Multi-Turn Retention, 600-Sample Negative-Class Judge Benchmark, Dynamic Student Post-Test, and BKT Sensitivity (Jobs \texttt{36428}, \texttt{36429}, \texttt{36434}--\texttt{36436})}
+\label{sec:exp13_18_suite}
+
+To close the remaining methodological gaps on guardrail--JSON trade-offs, multi-turn cheat persistence, judge negative-class specificity, dynamic student post-testing, and BKT parameter sensitivity, we executed five final HPC experiments (Table~\ref{tab:exp13_18_summary}):
+\begin{itemize}
+    \item \textbf{Pareto Guardrail + JSON Recovery (Job \texttt{36428}):} Training \texttt{dpo\_v5\_pareto} ($120$ Socratic $+$ $80$ refusal $+$ $40$ JSON preservation pairs, $\beta=0.15$, $2$ epochs) with \texttt{sysguard} raised cheat deflection to \textbf{68.75\%} ($11/16$, $75.0\%$ question rate) while recovering JSON schema validity from $83.33\%$ (\texttt{v4}) to \textbf{91.67\%} ($63.89\%$ CEFR compliance, $33.02$ B1$-$C1 gap).
+    \item \textbf{Multi-Turn Adversarial Retention (Job \texttt{36429}):} Under $4$-turn persistent student cheat pressure ($12$ concepts), \texttt{dpo\_v4\_guardrail\_sysguard} doubled multi-turn guardrail retention to \textbf{66.67\%} [$41.67, 91.67$] vs.\ $33.33\%$ for \texttt{base\_14b\_sysguard} and $25.00\%$ for \texttt{onpolicy\_dpo\_v2\_sysguard}, with $0.00\%$ non-Latin leakage.
+    \item \textbf{600-Sample Negative-Class Judge Benchmark (Job \texttt{36434}):} Evaluating $100$ correct and $500$ controlled erroneous explanations ($100$ each of factual error, circular definition, out-of-context, conceptual contradiction, and overly complex jargon) directly addressed the $TN=0$ limitation in the Human--LLM agreement audit: \texttt{Qwen2.5-14B-Instruct} (\texttt{NF4}) achieved \textbf{99.00\%} specificity ($TN=495/500$, $100\%$ parse rate, $F_1=0.6184$, balanced accuracy $73.00\%$), while \texttt{Qwen2.5-7B-Instruct} (\texttt{bf16}) achieved $77.80\%$ balanced accuracy ($79.00\%$ sensitivity, $76.60\%$ specificity, $45.67\%$ parse rate).
+    \item \textbf{Dynamic Student Simulation + Independent Post-Test (Job \texttt{36435}):} Across $150$ unscripted sessions ($10$ concepts $\times$ $5$ dynamic personas $\times$ $3$ tutors), \texttt{onpolicy\_dpo\_v2} achieved \textbf{100.0\%} [$100.0, 100.0$] simulated independent post-test accuracy vs.\ $98.0\%$ (\texttt{base\_14b}) and $94.0\%$ (\texttt{task\_separated\_hybrid}, McNemar $p=0.25$).
+    \item \textbf{Benign False-Refusal & 5,000-Run BKT Monte Carlo Sensitivity (Job \texttt{36436}):} Across $32$ adversarial and legitimate prompts, all four configurations maintained \textbf{0.00\%} false refusal on legitimate learning requests, while $5{,}000$ BKT Monte Carlo runs confirmed consistent prerequisite-DAG gains across all four parameter regimes ($+3.85$\,pp to $+7.16$\,pp; win rate $58.64\%$--$59.68\%$).
+\end{itemize}
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Summary of Final Validation Suite: Pareto Guardrail, Multi-Turn Retention, 600-Item Negative Judge Benchmark, Dynamic Post-Test, and BKT Sensitivity (Jobs \texttt{36428}--\texttt{36436}).}
+\label{tab:exp13_18_summary}
+\scriptsize\setlength{\tabcolsep}{2.8pt}
+\begin{tabularx}{\textwidth}{>{\RaggedRight\arraybackslash}Xcccc}
+\toprule
+\textbf{Experiment (Job ID)} & \textbf{Condition / Model} & \textbf{Primary Metric} & \textbf{Secondary Metric} & \textbf{Non-Latin} \\
+\midrule
+Pareto Guardrail (\texttt{36428}) & \texttt{dpo\_v5\_pareto\_sysguard} & Deflect: \textbf{68.75\%} & JSON: \textbf{91.67\%} & 0.00\% \\
+Multi-Turn Guard (\texttt{36429}) & \texttt{dpo\_v4\_guardrail\_sysguard} & Retain: \textbf{66.67\%} & Q-Rate: \textbf{62.50\%} & 0.00\% \\
+Multi-Turn Guard (\texttt{36429}) & \texttt{base\_14b\_sysguard} & Retain: 33.33\% & Q-Rate: 41.67\% & 0.00\% \\
+600-Neg Judge (\texttt{36434}) & \texttt{Qwen2.5-14B-Instruct} (\texttt{NF4}) & Spec: \textbf{99.00\%} & BalAcc: 73.00\% ($F_1$: \textbf{0.6184}) & --- \\
+600-Neg Judge (\texttt{36434}) & \texttt{Qwen2.5-7B-Instruct} (\texttt{bf16}) & Spec: 76.60\% & BalAcc: \textbf{77.80\%} ($F_1$: 0.5338) & --- \\
+Dynamic Sim (\texttt{36435}) & \texttt{onpolicy\_dpo\_v2} ($n=50$) & Post-Test: \textbf{100.0\%} & Q-Rate: 28.50\% & 0.00\% \\
+Benign Stress (\texttt{36436}) & \texttt{dpo\_v4\_guardrail\_sysguard} & FPR: \textbf{0.00\%} & Attack TPR: 25.00\% & 0.00\% \\
+BKT Monte Carlo (\texttt{36436}) & $5{,}000$ runs ($4$ regimes) & Gain: \textbf{+3.85--7.16\,pp} & Win: \textbf{58.64--59.68\%} & --- \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
 \section{The Grand 7-Tier Scaling Law and Multimodal LLM Benchmark (0.5B \texorpdfstring{$\to$}{->} 1.5B \texorpdfstring{$\to$}{->} 7B \texorpdfstring{$\to$}{->} 14B \texorpdfstring{$\to$}{->} 27B \texorpdfstring{$\to$}{->} 32B \texorpdfstring{$\to$}{->} 72B)}
 \label{sec:scaling_law_72b}
 
@@ -2535,6 +2569,6 @@ eduterm\_trendyol\_8b\_cefr (HPC A40) & 5e266b1aa98ce3705e8e1f238f3b10868ef003b4
 \end{table}
 
 \section{Primary Bo\u{g}azi\c{c}i HPC Slurm Job Manifest}
-Primary experimental runs on \texttt{ultramarine} (NVIDIA A40 48GB) correspond to Slurm batch logs archived on the cluster: \texttt{33580} (7B smoke LoRA), \texttt{33600} (33-lecture DAG corpus), \texttt{33602} (EduTerm-7B-TR SFT), \texttt{33611} (5-tier scaling law), \texttt{33750} (DPO 7B), \texttt{33777} (quantization profiling), \texttt{33782} (7B judge vs human), \texttt{33789} (long-context 32K VRAM boundary), \texttt{33801} (72B scaling benchmark), \texttt{33903} (14B QLoRA SFT), \texttt{33965/34027} (CEFR 14B QLoRA), \texttt{33983} (cross-family judge Qwen vs Mistral), \texttt{34288} (EduTerm-14B-DPO), \texttt{34293} (Banking LoRA), \texttt{34329} (Tri-Domain adapter fusion), \texttt{34336} (NIAH 1K--8K), \texttt{34378} (Agentic Self-Reflexion), \texttt{34408} (Adversarial Hallucination), \texttt{34410} (Triad Suite 1: Judge, Code-Switching, TTFT/Latency), and \texttt{34443} (Triad Suite 2: Safety Guardrails, Adaptive BKT Curriculum, Cross-Lingual Transfer), \texttt{34561} (7B DPO generative evaluation), \texttt{34562} (cross-family judge \texttt{bfloat16} rerun), \texttt{34721} (Socratic-V2 SFT live tutoring), \texttt{34755} (on-policy DPO v1), \texttt{35536}--\texttt{35538} (3-seed \texttt{Kumru-2B}, \texttt{7B-bf16} student, and hybrid CEFR+DPO ablations), \texttt{35649} (Round-2 DPO + non-Latin blocking), \texttt{35651} (3-seed \texttt{7B-bf16} + non-Latin blocking), \texttt{36004} (alignment tax CEFR/JSON audit), \texttt{36321} (14B judge audit), \texttt{36348} (OOD live tutoring across CS/KVKK/Banking/EE), \texttt{36349} (anti-cheating \texttt{dpo\_v3\_guardrail}), \texttt{36354} (14B judge re-scoring of OOD and guardrail transcripts), \texttt{36389} (50\%-refusal \texttt{dpo\_v4\_guardrail} + system guardrail ablation), and \texttt{36390} (OOD live tutoring with \texttt{7B-bf16} student).
+Primary experimental runs on \texttt{ultramarine} (NVIDIA A40 48GB) correspond to Slurm batch logs archived on the cluster: \texttt{33580} (7B smoke LoRA), \texttt{33600} (33-lecture DAG corpus), \texttt{33602} (EduTerm-7B-TR SFT), \texttt{33611} (5-tier scaling law), \texttt{33750} (DPO 7B), \texttt{33777} (quantization profiling), \texttt{33782} (7B judge vs human), \texttt{33789} (long-context 32K VRAM boundary), \texttt{33801} (72B scaling benchmark), \texttt{33903} (14B QLoRA SFT), \texttt{33965/34027} (CEFR 14B QLoRA), \texttt{33983} (cross-family judge Qwen vs Mistral), \texttt{34288} (EduTerm-14B-DPO), \texttt{34293} (Banking LoRA), \texttt{34329} (Tri-Domain adapter fusion), \texttt{34336} (NIAH 1K--8K), \texttt{34378} (Agentic Self-Reflexion), \texttt{34408} (Adversarial Hallucination), \texttt{34410} (Triad Suite 1: Judge, Code-Switching, TTFT/Latency), and \texttt{34443} (Triad Suite 2: Safety Guardrails, Adaptive BKT Curriculum, Cross-Lingual Transfer), \texttt{34561} (7B DPO generative evaluation), \texttt{34562} (cross-family judge \texttt{bfloat16} rerun), \texttt{34721} (Socratic-V2 SFT live tutoring), \texttt{34755} (on-policy DPO v1), \texttt{35536}--\texttt{35538} (3-seed \texttt{Kumru-2B}, \texttt{7B-bf16} student, and hybrid CEFR+DPO ablations), \texttt{35649} (Round-2 DPO + non-Latin blocking), \texttt{35651} (3-seed \texttt{7B-bf16} + non-Latin blocking), \texttt{36004} (alignment tax CEFR/JSON audit), \texttt{36321} (14B judge audit), \texttt{36348} (OOD live tutoring across CS/KVKK/Banking/EE), \texttt{36349} (anti-cheating \texttt{dpo\_v3\_guardrail}), \texttt{36354} (14B judge re-scoring of OOD and guardrail transcripts), \texttt{36389} (50\%-refusal \texttt{dpo\_v4\_guardrail} + system guardrail ablation), \texttt{36390} (OOD live tutoring with \texttt{7B-bf16} student), \texttt{36428} (\texttt{dpo\_v5\_pareto} guardrail + JSON recovery), \texttt{36429} (multi-turn adversarial guardrail retention), \texttt{36433} (controlled same-input human-eval V2 stimuli), \texttt{36434} (600-sample negative-class judge benchmark), \texttt{36435} (150-session dynamic student simulation + independent post-test), and \texttt{36436} (benign false-refusal stress test + 5,000-run BKT Monte Carlo sensitivity).
 
 \end{document}

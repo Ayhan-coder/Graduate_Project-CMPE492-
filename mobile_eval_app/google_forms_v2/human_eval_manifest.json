@@ -1,0 +1,318 @@
+{
+  "protocol_version": "2.1",
+  "scientific_rules": {
+    "outputs_unedited": true,
+    "mock_outputs_excluded": true,
+    "all_pairs_same_input_controlled": true
+  },
+  "modules": {
+    "section_2_explanation_comparison": {
+      "status": "VERIFIED_REAL_OUTPUT",
+      "scenarios": [
+        {
+          "scenario_id": "EXP_01",
+          "domain": "ISG",
+          "concept": "Tehlike Kavramı",
+          "model_pair_id": "base_14b__vs__onpolicy_dpo_v2",
+          "same_input_controlled": true,
+          "v1_A_model": "base_14b",
+          "v1_B_model": "onpolicy_dpo_v2",
+          "checkpoints": {
+            "base_14b": "/users/ali.gunder/models/Qwen2.5-14B-Instruct",
+            "onpolicy_dpo_v2": "checkpoints/eduterm_14b_onpolicy_dpo_v2/dpo_v2"
+          },
+          "response_source": "experiments/outputs/hpc_human_eval_v2_stimuli.json (Job 36433)",
+          "generation_params": {
+            "temperature": 0.0,
+            "do_sample": false,
+            "seed": 42,
+            "nonlatin_blocked": true
+          },
+          "atesman": {
+            "base_14b": 53.2,
+            "onpolicy_dpo_v2": 34.9
+          },
+          "quiz_gold_index": 0
+        },
+        {
+          "scenario_id": "EXP_02",
+          "domain": "KVKK",
+          "concept": "Açık Rıza ve Hukuki Sebepler",
+          "model_pair_id": "base_14b__vs__onpolicy_dpo_v2",
+          "same_input_controlled": true,
+          "v1_A_model": "base_14b",
+          "v1_B_model": "onpolicy_dpo_v2",
+          "checkpoints": {
+            "base_14b": "/users/ali.gunder/models/Qwen2.5-14B-Instruct",
+            "onpolicy_dpo_v2": "checkpoints/eduterm_14b_onpolicy_dpo_v2/dpo_v2"
+          },
+          "response_source": "experiments/outputs/hpc_human_eval_v2_stimuli.json (Job 36433)",
+          "generation_params": {
+            "temperature": 0.0,
+            "do_sample": false,
+            "seed": 42,
+            "nonlatin_blocked": true
+          },
+          "atesman": {
+            "base_14b": 50.4,
+            "onpolicy_dpo_v2": 49.2
+          },
+          "quiz_gold_index": 1
+        },
+        {
+          "scenario_id": "EXP_03",
+          "domain": "CS",
+          "concept": "Dinamik Programlama ve Örtüşen Alt Problemler",
+          "model_pair_id": "base_14b__vs__onpolicy_dpo_v2",
+          "same_input_controlled": true,
+          "v1_A_model": "base_14b",
+          "v1_B_model": "onpolicy_dpo_v2",
+          "checkpoints": {
+            "base_14b": "/users/ali.gunder/models/Qwen2.5-14B-Instruct",
+            "onpolicy_dpo_v2": "checkpoints/eduterm_14b_onpolicy_dpo_v2/dpo_v2"
+          },
+          "response_source": "experiments/outputs/hpc_human_eval_v2_stimuli.json (Job 36433)",
+          "generation_params": {
+            "temperature": 0.0,
+            "do_sample": false,
+            "seed": 42,
+            "nonlatin_blocked": true
+          },
+          "atesman": {
+            "base_14b": 51.7,
+            "onpolicy_dpo_v2": 29.5
+          },
+          "quiz_gold_index": 2
+        },
+        {
+          "scenario_id": "EXP_04",
+          "domain": "Finance",
+          "concept": "Nominal Faiz ve Enflasyon Etkisi",
+          "model_pair_id": "base_14b__vs__onpolicy_dpo_v2",
+          "same_input_controlled": true,
+          "v1_A_model": "base_14b",
+          "v1_B_model": "onpolicy_dpo_v2",
+          "checkpoints": {
+            "base_14b": "/users/ali.gunder/models/Qwen2.5-14B-Instruct",
+            "onpolicy_dpo_v2": "checkpoints/eduterm_14b_onpolicy_dpo_v2/dpo_v2"
+          },
+          "response_source": "experiments/outputs/hpc_human_eval_v2_stimuli.json (Job 36433)",
+          "generation_params": {
+            "temperature": 0.0,
+            "do_sample": false,
+            "seed": 42,
+            "nonlatin_blocked": true
+          },
+          "atesman": {
+            "base_14b": 75.1,
+            "onpolicy_dpo_v2": 56.1
+          },
+          "quiz_gold_index": 0
+        }
+      ]
+    },
+    "section_4_cefr_b1_b2_c1": {
+      "status": "VERIFIED_REAL_OUTPUT",
+      "concept": "Tehlike ve Risk Kavramı",
+      "model": "onpolicy_dpo_v2",
+      "response_source": "experiments/outputs/hpc_human_eval_v2_stimuli.json (Job 36433)",
+      "atesman_by_level": {
+        "B1": 73.1,
+        "B2": 10.6,
+        "C1": 23.0
+      }
+    },
+    "section_5_socratic_tutoring": {
+      "status": "VERIFIED_REAL_OUTPUT",
+      "scenarios": [
+        {
+          "scenario_id": "SOC_01",
+          "domain": "ISG",
+          "concept": "Tehlike Kavramı",
+          "model_pair_id": "task_separated_hybrid__vs__onpolicy_dpo_v2",
+          "same_input_controlled": true,
+          "v1_A_model": "task_separated_hybrid",
+          "v1_B_model": "onpolicy_dpo_v2",
+          "checkpoints": {
+            "task_separated_hybrid": "/users/ali.gunder/models/Qwen2.5-14B-Instruct + /users/ali.gunder/eduterm-finetune/checkpoints/eduterm_14b_cefr_qlora",
+            "onpolicy_dpo_v2": "checkpoints/eduterm_14b_onpolicy_dpo_v2/dpo_v2"
+          },
+          "response_source": "experiments/outputs/hpc_human_eval_v2_stimuli.json (Job 36433)",
+          "generation_params": {
+            "temperature": 0.0,
+            "do_sample": false,
+            "seed": 42,
+            "nonlatin_blocked": true
+          }
+        },
+        {
+          "scenario_id": "SOC_02",
+          "domain": "ISG",
+          "concept": "Ramak Kala Olayı",
+          "model_pair_id": "task_separated_hybrid__vs__onpolicy_dpo_v2",
+          "same_input_controlled": true,
+          "v1_A_model": "task_separated_hybrid",
+          "v1_B_model": "onpolicy_dpo_v2",
+          "checkpoints": {
+            "task_separated_hybrid": "/users/ali.gunder/models/Qwen2.5-14B-Instruct + /users/ali.gunder/eduterm-finetune/checkpoints/eduterm_14b_cefr_qlora",
+            "onpolicy_dpo_v2": "checkpoints/eduterm_14b_onpolicy_dpo_v2/dpo_v2"
+          },
+          "response_source": "experiments/outputs/hpc_human_eval_v2_stimuli.json (Job 36433)",
+          "generation_params": {
+            "temperature": 0.0,
+            "do_sample": false,
+            "seed": 42,
+            "nonlatin_blocked": true
+          }
+        },
+        {
+          "scenario_id": "SOC_03",
+          "domain": "KVKK",
+          "concept": "Anonimleştirme ve Pseudonimizasyon",
+          "model_pair_id": "task_separated_hybrid__vs__onpolicy_dpo_v2",
+          "same_input_controlled": true,
+          "v1_A_model": "task_separated_hybrid",
+          "v1_B_model": "onpolicy_dpo_v2",
+          "checkpoints": {
+            "task_separated_hybrid": "/users/ali.gunder/models/Qwen2.5-14B-Instruct + /users/ali.gunder/eduterm-finetune/checkpoints/eduterm_14b_cefr_qlora",
+            "onpolicy_dpo_v2": "checkpoints/eduterm_14b_onpolicy_dpo_v2/dpo_v2"
+          },
+          "response_source": "experiments/outputs/hpc_human_eval_v2_stimuli.json (Job 36433)",
+          "generation_params": {
+            "temperature": 0.0,
+            "do_sample": false,
+            "seed": 42,
+            "nonlatin_blocked": true
+          }
+        },
+        {
+          "scenario_id": "SOC_04",
+          "domain": "CS",
+          "concept": "Dinamik Programlama ve Örtüşen Alt Problemler",
+          "model_pair_id": "task_separated_hybrid__vs__onpolicy_dpo_v2",
+          "same_input_controlled": true,
+          "v1_A_model": "task_separated_hybrid",
+          "v1_B_model": "onpolicy_dpo_v2",
+          "checkpoints": {
+            "task_separated_hybrid": "/users/ali.gunder/models/Qwen2.5-14B-Instruct + /users/ali.gunder/eduterm-finetune/checkpoints/eduterm_14b_cefr_qlora",
+            "onpolicy_dpo_v2": "checkpoints/eduterm_14b_onpolicy_dpo_v2/dpo_v2"
+          },
+          "response_source": "experiments/outputs/hpc_human_eval_v2_stimuli.json (Job 36433)",
+          "generation_params": {
+            "temperature": 0.0,
+            "do_sample": false,
+            "seed": 42,
+            "nonlatin_blocked": true
+          }
+        }
+      ]
+    },
+    "section_6_ood_generalization": {
+      "status": "VERIFIED_REAL_OUTPUT",
+      "scenarios": [
+        {
+          "scenario_id": "OOD_01",
+          "domain": "Maritime Law (Zero-Overlap OOD)",
+          "concept": "Müşterek Avarya (General Average)",
+          "model_pair_id": "prompt_dag_rag_base_14b__vs__onpolicy_dpo_v2",
+          "same_input_controlled": true,
+          "v1_A_model": "prompt_dag_rag_base_14b",
+          "v1_B_model": "onpolicy_dpo_v2",
+          "checkpoints": {
+            "prompt_dag_rag_base_14b": "/users/ali.gunder/models/Qwen2.5-14B-Instruct",
+            "onpolicy_dpo_v2": "checkpoints/eduterm_14b_onpolicy_dpo_v2/dpo_v2"
+          },
+          "response_source": "experiments/outputs/hpc_human_eval_v2_stimuli.json (Job 36433)",
+          "generation_params": {
+            "temperature": 0.0,
+            "do_sample": false,
+            "seed": 42,
+            "nonlatin_blocked": true
+          }
+        },
+        {
+          "scenario_id": "OOD_02",
+          "domain": "Quantum Cryptography (Zero-Overlap OOD)",
+          "concept": "BB84 Kuantum Anahtar Dağıtımı ve Gözlemci Etkisi",
+          "model_pair_id": "prompt_dag_rag_base_14b__vs__onpolicy_dpo_v2",
+          "same_input_controlled": true,
+          "v1_A_model": "prompt_dag_rag_base_14b",
+          "v1_B_model": "onpolicy_dpo_v2",
+          "checkpoints": {
+            "prompt_dag_rag_base_14b": "/users/ali.gunder/models/Qwen2.5-14B-Instruct",
+            "onpolicy_dpo_v2": "checkpoints/eduterm_14b_onpolicy_dpo_v2/dpo_v2"
+          },
+          "response_source": "experiments/outputs/hpc_human_eval_v2_stimuli.json (Job 36433)",
+          "generation_params": {
+            "temperature": 0.0,
+            "do_sample": false,
+            "seed": 42,
+            "nonlatin_blocked": true
+          }
+        }
+      ]
+    },
+    "section_7_pedagogical_safety": {
+      "status": "VERIFIED_REAL_OUTPUT",
+      "scenarios": [
+        {
+          "scenario_id": "SAFE_01",
+          "domain": "Sınav Baskısı: KKD Risk Kontrol Sırası",
+          "model_pair_id": "base_14b__vs__dpo_v4_guardrail_sysguard",
+          "same_input_controlled": true,
+          "v1_A_model": "base_14b",
+          "v1_B_model": "dpo_v4_guardrail_sysguard",
+          "checkpoints": {
+            "base_14b": "/users/ali.gunder/models/Qwen2.5-14B-Instruct",
+            "dpo_v4_guardrail_sysguard": "checkpoints/eduterm_14b_dpo_v4_guardrail/dpo_v4_guardrail"
+          },
+          "response_source": "experiments/outputs/hpc_guardrail_v4_ablation_report.json (Job 36389)",
+          "generation_params": {
+            "temperature": 0.2,
+            "max_new_tokens": 160,
+            "nonlatin_blocked": true,
+            "seed": 42
+          }
+        },
+        {
+          "scenario_id": "SAFE_02",
+          "domain": "Ödev Kodu İsteme: Özyinelemeli Faktöriyel",
+          "model_pair_id": "base_14b__vs__dpo_v4_guardrail_sysguard",
+          "same_input_controlled": true,
+          "v1_A_model": "base_14b",
+          "v1_B_model": "dpo_v4_guardrail_sysguard",
+          "checkpoints": {
+            "base_14b": "/users/ali.gunder/models/Qwen2.5-14B-Instruct",
+            "dpo_v4_guardrail_sysguard": "checkpoints/eduterm_14b_dpo_v4_guardrail/dpo_v4_guardrail"
+          },
+          "response_source": "experiments/outputs/hpc_guardrail_v4_ablation_report.json (Job 36389)",
+          "generation_params": {
+            "temperature": 0.2,
+            "max_new_tokens": 160,
+            "nonlatin_blocked": true,
+            "seed": 42
+          }
+        },
+        {
+          "scenario_id": "SAFE_03",
+          "domain": "Kural İhlali Baskısı: KVKK Test Sorusu",
+          "model_pair_id": "base_14b__vs__dpo_v4_guardrail_sysguard",
+          "same_input_controlled": true,
+          "v1_A_model": "base_14b",
+          "v1_B_model": "dpo_v4_guardrail_sysguard",
+          "checkpoints": {
+            "base_14b": "/users/ali.gunder/models/Qwen2.5-14B-Instruct",
+            "dpo_v4_guardrail_sysguard": "checkpoints/eduterm_14b_dpo_v4_guardrail/dpo_v4_guardrail"
+          },
+          "response_source": "experiments/outputs/hpc_guardrail_v4_ablation_report.json (Job 36389)",
+          "generation_params": {
+            "temperature": 0.2,
+            "max_new_tokens": 160,
+            "nonlatin_blocked": true,
+            "seed": 42
+          }
+        }
+      ]
+    }
+  }
+}
