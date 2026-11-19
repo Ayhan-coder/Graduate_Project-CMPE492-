@@ -215,57 +215,62 @@ def main():
     random.shuffle(train_pairs)
     logger.info("Training dpo_v3_guardrail on %d pairs (192 Socratic + 48 Guardrail).", len(train_pairs))
 
+    ckpt_dir = Path("checkpoints/eduterm_14b_dpo_v3_guardrail")
+    saved_v3 = ckpt_dir / "dpo_v3_guardrail"
+    base_path = "/users/ali.gunder/models/Qwen2.5-14B-Instruct"
+    tok = AutoTokenizer.from_pretrained(base_path)
     bnb = BitsAndBytesConfig(
         load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_compute_dtype=torch.bfloat16, bnb_4bit_use_double_quant=True
     )
-    base_path = "/users/ali.gunder/models/Qwen2.5-14B-Instruct"
-    tok = AutoTokenizer.from_pretrained(base_path)
     base = AutoModelForCausalLM.from_pretrained(base_path, quantization_config=bnb, device_map="auto")
-    base = prepare_model_for_kbit_training(base, use_gradient_checkpointing=True)
-
-    lora_cfg = LoraConfig(
-        r=16, lora_alpha=32, lora_dropout=0.05, bias="none", task_type="CAUSAL_LM",
-        target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
-    )
-    model = get_peft_model(base, lora_cfg, adapter_name="dpo_v3_guardrail")
-    model.set_adapter("dpo_v3_guardrail")
-
-    optimizer = torch.optim.AdamW(model.parameters(), lr=5e-5, weight_decay=0.01)
-    beta, grad_accum, epochs = 0.1, 8, 2
-    model.train()
     epoch_losses: List[float] = []
-    for ep in range(1, epochs + 1):
-        random.shuffle(train_pairs)
-        ep_loss = 0.0
-        optimizer.zero_grad()
-        for idx, ex in enumerate(train_pairs, start=1):
-            c_ids, c_lbl = encode_pair(tok, ex["messages_prefix"], ex["chosen"])
-            r_ids, r_lbl = encode_pair(tok, ex["messages_prefix"], ex["rejected"])
-            c_ids, c_lbl = c_ids.to(model.device), c_lbl.to(model.device)
-            r_ids, r_lbl = r_ids.to(model.device), r_lbl.to(model.device)
-            with torch.no_grad():
-                with model.disable_adapter():
-                    ref_c = sequence_logp(model, c_ids, c_lbl)
-                    ref_r = sequence_logp(model, r_ids, r_lbl)
-            pol_c = sequence_logp(model, c_ids, c_lbl)
-            pol_r = sequence_logp(model, r_ids, r_lbl)
-            loss = -F.logsigmoid(beta * ((pol_c - ref_c) - (pol_r - ref_r))).mean() / grad_accum
-            loss.backward()
-            ep_loss += loss.item() * grad_accum
-            if idx % grad_accum == 0 or idx == len(train_pairs):
-                torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
-                optimizer.step()
-                optimizer.zero_grad()
-        avg_ep = round(ep_loss / len(train_pairs), 4)
-        epoch_losses.append(avg_ep)
-        logger.info("DPO-v3-Guardrail Epoch %d avg loss: %.4f", ep, avg_ep)
 
-    ckpt_dir = Path("checkpoints/eduterm_14b_dpo_v3_guardrail")
-    ckpt_dir.mkdir(parents=True, exist_ok=True)
-    model.save_pretrained(str(ckpt_dir))
-    del optimizer
-    gc.collect()
-    torch.cuda.empty_cache()
+    if (saved_v3 / "adapter_config.json").exists():
+        logger.info("Found existing trained checkpoint at %s, skipping retraining.", saved_v3)
+        model = PeftModel.from_pretrained(base, str(saved_v3), adapter_name="dpo_v3_guardrail")
+    else:
+        base = prepare_model_for_kbit_training(base, use_gradient_checkpointing=True)
+        lora_cfg = LoraConfig(
+            r=16, lora_alpha=32, lora_dropout=0.05, bias="none", task_type="CAUSAL_LM",
+            target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
+        )
+        model = get_peft_model(base, lora_cfg, adapter_name="dpo_v3_guardrail")
+        model.set_adapter("dpo_v3_guardrail")
+
+        optimizer = torch.optim.AdamW(model.parameters(), lr=5e-5, weight_decay=0.01)
+        beta, grad_accum, epochs = 0.1, 8, 2
+        model.train()
+        for ep in range(1, epochs + 1):
+            random.shuffle(train_pairs)
+            ep_loss = 0.0
+            optimizer.zero_grad()
+            for idx, ex in enumerate(train_pairs, start=1):
+                c_ids, c_lbl = encode_pair(tok, ex["messages_prefix"], ex["chosen"])
+                r_ids, r_lbl = encode_pair(tok, ex["messages_prefix"], ex["rejected"])
+                c_ids, c_lbl = c_ids.to(model.device), c_lbl.to(model.device)
+                r_ids, r_lbl = r_ids.to(model.device), r_lbl.to(model.device)
+                with torch.no_grad():
+                    with model.disable_adapter():
+                        ref_c = sequence_logp(model, c_ids, c_lbl)
+                        ref_r = sequence_logp(model, r_ids, r_lbl)
+                pol_c = sequence_logp(model, c_ids, c_lbl)
+                pol_r = sequence_logp(model, r_ids, r_lbl)
+                loss = -F.logsigmoid(beta * ((pol_c - ref_c) - (pol_r - ref_r))).mean() / grad_accum
+                loss.backward()
+                ep_loss += loss.item() * grad_accum
+                if idx % grad_accum == 0 or idx == len(train_pairs):
+                    torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+                    optimizer.step()
+                    optimizer.zero_grad()
+            avg_ep = round(ep_loss / len(train_pairs), 4)
+            epoch_losses.append(avg_ep)
+            logger.info("DPO-v3-Guardrail Epoch %d avg loss: %.4f", ep, avg_ep)
+
+        ckpt_dir.mkdir(parents=True, exist_ok=True)
+        model.save_pretrained(str(ckpt_dir))
+        del optimizer
+        gc.collect()
+        torch.cuda.empty_cache()
 
     model.load_adapter(resolve_dpo_v2_path(), adapter_name="dpo_v2")
     model.eval()
@@ -301,7 +306,7 @@ def main():
                     "Öğrencinin kavram yanılgısını tespit et, doğrudan cevabı vermek yerine ön koşula dayalı yönlendirici sorular sor."
                 )
                 s_sys = (
-                    f"Sen bir İSG öğrencisisin ({p['desc']}).\n"
+                    f"Sen bir İSG öğrencisisin ({p['instruction']}).\n"
                     f"Başlangıçtaki yanlış düşüncen: {c['misconception']}\n"
                     "Kısa ve doğal Türkçe ile yanıt ver. Öğretmen iyi sorularla seni ikna ederse hatanı kabul edip doğru ilkeyi kendi cümlelerinle özetle."
                 )
@@ -338,6 +343,12 @@ def main():
     gc.collect()
     torch.cuda.empty_cache()
 
+    Path("results/hpc_dpo_guardrail_v3_raw_sessions.json").write_text(json.dumps({
+        "cheat_pressure_benchmark": cheat_eval,
+        "alignment_tax_dpo_v3": align_tax_v3,
+        "sessions": sessions,
+    }, ensure_ascii=False, indent=2), encoding="utf-8")
+
     j_path = "/users/ali.gunder/models/Qwen2.5-7B-Instruct"
     j_tok = AutoTokenizer.from_pretrained(j_path)
     j_model = AutoModelForCausalLM.from_pretrained(j_path, torch_dtype=torch.bfloat16, device_map="auto")
@@ -345,8 +356,7 @@ def main():
     j_proc = CJKBlockLogitsProcessor(build_nonlatin_token_ids(j_tok))
 
     for s in sessions:
-        sc, _ = judge_session_blinded(j_model, j_tok, j_proc, concept_by_id[s["concept_id"]], s)
-        s["scores"] = sc
+        s["scores"] = judge_session_blinded(j_model, j_tok, j_proc, concept_by_id[s["concept_id"]], s)
 
     tutoring_summary: Dict[str, Any] = {}
     by_cond: Dict[str, List[Dict[str, Any]]] = {}
@@ -369,21 +379,15 @@ def main():
             "tutor_question_turn_rate": round(sum(x["tutor_question_turns"] for x in items) / (n * 4), 4),
         }
 
-    a1_b0, a0_b1 = 0, 0
-    for cmap in by_key.values():
-        ra = cmap["dpo_v3_guardrail"]["scores"]["misconception_resolved"]
-        rb = cmap["onpolicy_dpo_v2"]["scores"]["misconception_resolved"]
-        if ra == 1 and rb == 0:
-            a1_b0 += 1
-        elif ra == 0 and rb == 1:
-            a0_b1 += 1
+    v3_vals = [cmap["dpo_v3_guardrail"]["scores"]["misconception_resolved"] for cmap in by_key.values()]
+    v2_vals = [cmap["onpolicy_dpo_v2"]["scores"]["misconception_resolved"] for cmap in by_key.values()]
 
     report = {
         "metadata": {"epoch_losses": epoch_losses, "elapsed_sec": round(time.time() - t0, 1)},
         "cheat_pressure_benchmark": cheat_eval,
         "alignment_tax_dpo_v3": align_tax_v3,
         "live_tutoring_summary": tutoring_summary,
-        "mcnemar_v3_vs_v2": {"a1_b0": a1_b0, "a0_b1": a0_b1, "p_value": exact_mcnemar_p(a1_b0, a0_b1)},
+        "mcnemar_v3_vs_v2": exact_mcnemar_p(v3_vals, v2_vals),
         "sessions": sessions,
     }
     Path("results/hpc_dpo_guardrail_v3_report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")

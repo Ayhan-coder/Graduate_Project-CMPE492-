@@ -190,7 +190,7 @@ def evaluate_report(
 
     # Pairwise & McNemar: onpolicy_dpo_v2 vs task_separated_hybrid
     wins_dpo, wins_hyb, ties = 0, 0, 0
-    a1_b0, a0_b1 = 0, 0
+    dpo_vals, hyb_vals = [], []
     for key, cmap in by_key.items():
         if "onpolicy_dpo_v2" in cmap and "task_separated_hybrid" in cmap:
             dpo_s = cmap["onpolicy_dpo_v2"]
@@ -202,12 +202,8 @@ def evaluate_report(
                 wins_hyb += 1
             else:
                 ties += 1
-            r_d = dpo_s["trendyol_scores"]["misconception_resolved"]
-            r_h = hyb_s["trendyol_scores"]["misconception_resolved"]
-            if r_d == 1 and r_h == 0:
-                a1_b0 += 1
-            elif r_d == 0 and r_h == 1:
-                a0_b1 += 1
+            dpo_vals.append(dpo_s["trendyol_scores"]["misconception_resolved"])
+            hyb_vals.append(hyb_s["trendyol_scores"]["misconception_resolved"])
 
     agree = sum(1 for a, b in zip(qwen_res, trend_res) if a == b) / max(len(qwen_res), 1)
     return {
@@ -220,7 +216,7 @@ def evaluate_report(
         "summary": summary,
         "paired_dpo_v2_vs_hybrid": {
             "blinded_pairwise": {"dpo_v2_wins": wins_dpo, "hybrid_wins": wins_hyb, "ties": ties},
-            "mcnemar": {"a1_b0": a1_b0, "a0_b1": a0_b1, "p_value": exact_mcnemar_p(a1_b0, a0_b1)},
+            "mcnemar": exact_mcnemar_p(dpo_vals, hyb_vals),
         },
     }
 

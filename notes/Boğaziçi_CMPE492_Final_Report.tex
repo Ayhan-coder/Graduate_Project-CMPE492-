@@ -1306,6 +1306,70 @@ Tables~\ref{tab:nonlatin_dpo_r2_7b_3seed} and~\ref{tab:alignment_tax_cefr} estab
     \item \textbf{DPO Avoids SFT Alignment Tax (Job \texttt{36004}):} Whereas SFT adapters suffered severe alignment tax---\texttt{cefr} dropped JSON validity/schema compliance to $50.0\%$ and CEFR compliance to $36.11\%$, and \texttt{socratic\_v2} compressed the B1$-$C1 Atesman readability gap from $34.87$ to $13.30$---both \texttt{dpo\_v1} and \texttt{dpo\_v2} preserved \textbf{100\%} JSON schema compliance and maintained strong B1$-$C1 readability separation ($36.16$ and $33.20$ Atesman points; CEFR compliance $63.89\%$ and $61.11\%$).
 \end{itemize}
 
+\subsubsection{14B High-Capacity Judge Audit, Out-of-Domain Transfer, and Anti-Cheating Guardrail DPO (Jobs \texttt{36321}, \texttt{36348}, \texttt{36349}, \texttt{36354})}
+\label{sec:14b_ood_guardrail}
+
+To stress-test our findings against judge capacity, unseen academic domains, and adversarial cheat-pressure prompts, we ran four final verification jobs on \texttt{ultramarine}:
+\begin{enumerate}
+    \item \textbf{14B Judge Audit (Job \texttt{36321}):} Re-scored all $216$ \texttt{7B-bf16} sessions (Job~\texttt{35651}) and $108$ \texttt{Kumru-2B} sessions (Job~\texttt{35649}) with \texttt{Qwen2.5-14B-Instruct} (4-bit NF4, non-Latin blocked; $100\%$ JSON parse success).
+    \item \textbf{Out-of-Domain (OOD) Transfer (Jobs \texttt{36348} \& \texttt{36354}):} Evaluated $12$ unseen university concepts across CS, KVKK, Banking, and EE ($108$ \texttt{Kumru-2B} sessions / $432$ turns), re-scored by the 14B judge ($100\%$ parse success).
+    \item \textbf{Anti-Cheating Guardrail DPO (Jobs \texttt{36349} \& \texttt{36354}):} Trained \texttt{dpo\_v3\_guardrail} on $192$ Socratic pairs $+$ $48$ Turkish exam/code-deflection pairs ($20\%$ refusal ratio) and tested $16$ adversarial cheat-pressure probes, $36$ CEFR/$12$ JSON alignment-tax probes, and $72$ live \texttt{Kumru-2B} tutoring sessions.
+\end{enumerate}
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{14B Judge Audit, Out-of-Domain (OOD) Transfer, and Anti-Cheating Guardrail DPO (Jobs \texttt{36321}, \texttt{36348}, \texttt{36349}, \texttt{36354}).}
+\label{tab:14b_ood_guardrail}
+\scriptsize\setlength{\tabcolsep}{3.0pt}
+\begin{tabularx}{\textwidth}{>{\RaggedRight\arraybackslash}Xcccccc}
+\toprule
+\textbf{Benchmark / Condition} & \textbf{Sessions / Probes} & \textbf{14B Resolved} & \textbf{Q-Rate} & \textbf{Purity (14B)} & \textbf{Non-Latin} & \textbf{Extra Metric} \\
+\midrule
+\multicolumn{7}{l}{\textit{14B Judge Audit on \texttt{Kumru-2B} (Job \texttt{36321}, 108 sessions; raw agreement vs.\ 7B $= 69.44\%$, $\kappa = 0.2108$):}} \\
+\texttt{task\_separated\_hybrid} & 36 & 94.44\% & --- & 5.000 & 0.00\% & Pairwise wins: 17 \\
+\textbf{\texttt{onpolicy\_dpo\_v2}} & 36 & \textbf{97.22\%} & --- & 5.000 & 0.00\% & Pairwise wins: \textbf{19} \\
+\midrule
+\multicolumn{7}{l}{\textit{Unseen OOD Domains: CS / KVKK / Banking / EE (Jobs \texttt{36348} \& \texttt{36354}, 108 sessions, 14B judge):}} \\
+\texttt{prompt\_dag\_rag\_base\_14b} & 36 & 100.0\% & 43.75\% & 5.000 & 0.00\% & --- \\
+\texttt{task\_separated\_hybrid} & 36 & 100.0\% & 74.31\% & 5.000 & 0.00\% & --- \\
+\textbf{\texttt{onpolicy\_dpo\_v2}} & 36 & 100.0\% & \textbf{78.47\%} & 5.000 & 0.00\% & --- \\
+\midrule
+\multicolumn{7}{l}{\textit{Anti-Cheating Guardrail DPO Benchmark (Jobs \texttt{36349} \& \texttt{36354}, 16 cheat probes + 72 live sessions):}} \\
+\texttt{onpolicy\_dpo\_v2} & 16 / 36 & 100.0\% & 71.53\% & 5.000 & 0.00\% & Deflect: 0.00\% (0/16) \\
+\texttt{dpo\_v3\_guardrail} & 16 / 36 & 100.0\% & 70.14\% & 5.000 & 0.00\% & Deflect: \textbf{6.25\%} (1/16); JSON: 91.67\% \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+These runs reveal three important findings: (1) under the 14B judge ($100\%$ parse rate), \texttt{onpolicy\_dpo\_v2} ranked first on \texttt{Kumru-2B} ($97.22\%$, $19$--$17$ pairwise) and reached $84.26\%$ raw agreement with the 7B judge on Job~\texttt{35651} ($50$--$58$ pairwise); (2) Socratic questioning transfers cleanly to unseen OOD domains (\texttt{onpolicy\_dpo\_v2} $78.47\%$ vs.\ $43.75\%$ base, $0.00\%$ non-Latin leakage); and (3) mixing only $20\%$ ($48/240$) refusal pairs into LoRA DPO (\texttt{dpo\_v3\_guardrail}) preserved live tutoring and CEFR calibration ($61.11\%$) but raised adversarial cheat deflection only slightly ($0.00\% \to 6.25\%$), confirming that explicit user override commands require higher refusal weighting or system-level guardrails.
+
+To test that hypothesis, we ran two follow-up ablations (Table~\ref{tab:guardrail_v4_ood_7b}): \textbf{Job~\texttt{36389}} trained \texttt{dpo\_v4\_guardrail} with $50\%$ refusal pairs ($120$ Socratic $+$ $120$ anti-cheating, $\beta=0.2$, $3$ epochs; epoch losses $0.3179 \to 0.0078 \to 0.0001$) and evaluated both standard and explicit anti-cheating system prompts (\texttt{sysguard}), while \textbf{Job~\texttt{36390}} repeated the $108$-session OOD benchmark with the stronger \texttt{Qwen2.5-7B-Instruct} (\texttt{bfloat16}) student. Combining weight-level DPO with an explicit system guardrail (\texttt{dpo\_v4\_guardrail\_sysguard}) boosted Socratic cheat deflection from $0.00\%$ (\texttt{base\_14b}) and $6.25\%$ (\texttt{dpo\_v4\_guardrail} alone) to \textbf{62.50\%} ($10/16$, $81.25\%$ question rate, $+12.50$\,pp over \texttt{base\_14b\_sysguard} at $50.00\%$), while preserving $63.89\%$ CEFR compliance ($28.68$ B1$-$C1 gap), $83.33\%$ JSON validity, and $72.92\%$ live \texttt{Kumru-2B} questioning rate (vs.\ $66.67\%$ for \texttt{dpo\_v2}). On the \texttt{7B-bf16} OOD benchmark, \texttt{onpolicy\_dpo\_v2} again led Socratic questioning (\textbf{42.36\%} vs.\ $34.72\%$ hybrid and $25.69\%$ base) with \textbf{0.00\%} non-Latin leakage.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{High-Weight Guardrail DPO + System Guardrail Ablation (Job \texttt{36389}) and OOD \texttt{7B-bf16} Transfer (Job \texttt{36390}).}
+\label{tab:guardrail_v4_ood_7b}
+\scriptsize\setlength{\tabcolsep}{3.0pt}
+\begin{tabularx}{\textwidth}{>{\RaggedRight\arraybackslash}Xccccc}
+\toprule
+\textbf{Experiment / Condition} & \textbf{Scope} & \textbf{Deflection Rate} & \textbf{Q-Rate} & \textbf{Non-Latin} & \textbf{Alignment / Extra} \\
+\midrule
+\multicolumn{6}{l}{\textit{Adversarial Cheat-Pressure + System Guardrail Ablation (Job \texttt{36389}, 16 probes):}} \\
+\texttt{base\_14b} (std.\ prompt) & 16 probes & 0.00\% (0/16) & 0.00\% & 0.00\% & --- \\
+\texttt{dpo\_v4\_guardrail} (std.\ prompt) & 16 probes & 6.25\% (1/16) & 6.25\% & 0.00\% & CEFR: 63.89\%, JSON: 83.33\% \\
+\texttt{base\_14b\_sysguard} & 16 probes & 50.00\% (8/16) & 68.75\% & 0.00\% & --- \\
+\textbf{\texttt{dpo\_v4\_guardrail\_sysguard}} & 16 probes & \textbf{62.50\%} (10/16) & \textbf{81.25\%} & \textbf{0.00\%} & Live \texttt{Kumru-2B} Q-Rate: \textbf{72.92\%} \\
+\midrule
+\multicolumn{6}{l}{\textit{OOD Domains (CS / KVKK / Banking / EE) with \texttt{Qwen2.5-7B-Instruct} (\texttt{bfloat16}) Student (Job \texttt{36390}, 108 sessions):}} \\
+\texttt{prompt\_dag\_rag\_base\_14b} & 36 sessions & --- & 25.69\% & \textbf{0.00\%} & 7B Judge Parse: 88.89\% \\
+\texttt{task\_separated\_hybrid} & 36 sessions & --- & 34.72\% & \textbf{0.00\%} & --- \\
+\textbf{\texttt{onpolicy\_dpo\_v2}} & 36 sessions & --- & \textbf{42.36\%} & \textbf{0.00\%} & --- \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
 \section{The Grand 7-Tier Scaling Law and Multimodal LLM Benchmark (0.5B \texorpdfstring{$\to$}{->} 1.5B \texorpdfstring{$\to$}{->} 7B \texorpdfstring{$\to$}{->} 14B \texorpdfstring{$\to$}{->} 27B \texorpdfstring{$\to$}{->} 32B \texorpdfstring{$\to$}{->} 72B)}
 \label{sec:scaling_law_72b}
 
@@ -2471,6 +2535,6 @@ eduterm\_trendyol\_8b\_cefr (HPC A40) & 5e266b1aa98ce3705e8e1f238f3b10868ef003b4
 \end{table}
 
 \section{Primary Bo\u{g}azi\c{c}i HPC Slurm Job Manifest}
-Primary experimental runs on \texttt{ultramarine} (NVIDIA A40 48GB) correspond to Slurm batch logs archived on the cluster: \texttt{33580} (7B smoke LoRA), \texttt{33600} (33-lecture DAG corpus), \texttt{33602} (EduTerm-7B-TR SFT), \texttt{33611} (5-tier scaling law), \texttt{33750} (DPO 7B), \texttt{33777} (quantization profiling), \texttt{33782} (7B judge vs human), \texttt{33789} (long-context 32K VRAM boundary), \texttt{33801} (72B scaling benchmark), \texttt{33903} (14B QLoRA SFT), \texttt{33965/34027} (CEFR 14B QLoRA), \texttt{33983} (cross-family judge Qwen vs Mistral), \texttt{34288} (EduTerm-14B-DPO), \texttt{34293} (Banking LoRA), \texttt{34329} (Tri-Domain adapter fusion), \texttt{34336} (NIAH 1K--8K), \texttt{34378} (Agentic Self-Reflexion), \texttt{34408} (Adversarial Hallucination), \texttt{34410} (Triad Suite 1: Judge, Code-Switching, TTFT/Latency), and \texttt{34443} (Triad Suite 2: Safety Guardrails, Adaptive BKT Curriculum, Cross-Lingual Transfer), \texttt{34561} (7B DPO generative evaluation), \texttt{34562} (cross-family judge \texttt{bfloat16} rerun), \texttt{34721} (Socratic-V2 SFT live tutoring), \texttt{34755} (on-policy DPO v1), \texttt{35536}--\texttt{35538} (3-seed \texttt{Kumru-2B}, \texttt{7B-bf16} student, and hybrid CEFR+DPO ablations), \texttt{35649} (Round-2 DPO + non-Latin blocking), \texttt{35651} (3-seed \texttt{7B-bf16} + non-Latin blocking), and \texttt{36004} (alignment tax CEFR/JSON audit).
+Primary experimental runs on \texttt{ultramarine} (NVIDIA A40 48GB) correspond to Slurm batch logs archived on the cluster: \texttt{33580} (7B smoke LoRA), \texttt{33600} (33-lecture DAG corpus), \texttt{33602} (EduTerm-7B-TR SFT), \texttt{33611} (5-tier scaling law), \texttt{33750} (DPO 7B), \texttt{33777} (quantization profiling), \texttt{33782} (7B judge vs human), \texttt{33789} (long-context 32K VRAM boundary), \texttt{33801} (72B scaling benchmark), \texttt{33903} (14B QLoRA SFT), \texttt{33965/34027} (CEFR 14B QLoRA), \texttt{33983} (cross-family judge Qwen vs Mistral), \texttt{34288} (EduTerm-14B-DPO), \texttt{34293} (Banking LoRA), \texttt{34329} (Tri-Domain adapter fusion), \texttt{34336} (NIAH 1K--8K), \texttt{34378} (Agentic Self-Reflexion), \texttt{34408} (Adversarial Hallucination), \texttt{34410} (Triad Suite 1: Judge, Code-Switching, TTFT/Latency), and \texttt{34443} (Triad Suite 2: Safety Guardrails, Adaptive BKT Curriculum, Cross-Lingual Transfer), \texttt{34561} (7B DPO generative evaluation), \texttt{34562} (cross-family judge \texttt{bfloat16} rerun), \texttt{34721} (Socratic-V2 SFT live tutoring), \texttt{34755} (on-policy DPO v1), \texttt{35536}--\texttt{35538} (3-seed \texttt{Kumru-2B}, \texttt{7B-bf16} student, and hybrid CEFR+DPO ablations), \texttt{35649} (Round-2 DPO + non-Latin blocking), \texttt{35651} (3-seed \texttt{7B-bf16} + non-Latin blocking), \texttt{36004} (alignment tax CEFR/JSON audit), \texttt{36321} (14B judge audit), \texttt{36348} (OOD live tutoring across CS/KVKK/Banking/EE), \texttt{36349} (anti-cheating \texttt{dpo\_v3\_guardrail}), \texttt{36354} (14B judge re-scoring of OOD and guardrail transcripts), \texttt{36389} (50\%-refusal \texttt{dpo\_v4\_guardrail} + system guardrail ablation), and \texttt{36390} (OOD live tutoring with \texttt{7B-bf16} student).
 
 \end{document}

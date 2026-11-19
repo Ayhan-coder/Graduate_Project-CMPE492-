@@ -173,7 +173,7 @@ def run_ood_session(
         )
 
     student_sys = (
-        f"Sen bir üniversite öğrencisisin ({persona['desc']}).\n"
+        f"Sen bir üniversite öğrencisisin ({persona['instruction']}).\n"
         f"Başlangıçtaki yanlış düşüncen: {concept['misconception']}\n"
         "Kısa ve doğal Türkçe ile yanıt ver. Öğretmen iyi sorularla seni ikna ederse hatanı kabul edip doğru ilkeyi kendi cümlelerinle özetle."
     )
@@ -259,6 +259,8 @@ def main():
     gc.collect()
     torch.cuda.empty_cache()
 
+    Path("results/hpc_ood_tutoring_raw_sessions.json").write_text(json.dumps(sessions, ensure_ascii=False, indent=2), encoding="utf-8")
+
     j_path = "/users/ali.gunder/models/Qwen2.5-7B-Instruct"
     j_tok = AutoTokenizer.from_pretrained(j_path)
     j_model = AutoModelForCausalLM.from_pretrained(j_path, torch_dtype=torch.bfloat16, device_map="auto")
@@ -267,8 +269,7 @@ def main():
 
     concept_by_id = {c["id"]: c for c in OOD_CONCEPTS}
     for s in sessions:
-        sc, _ = judge_session_blinded(j_model, j_tok, j_proc, concept_by_id[s["concept_id"]], s)
-        s["scores"] = sc
+        s["scores"] = judge_session_blinded(j_model, j_tok, j_proc, concept_by_id[s["concept_id"]], s)
 
     summary: Dict[str, Any] = {}
     by_cond: Dict[str, List[Dict[str, Any]]] = {}
@@ -294,19 +295,9 @@ def main():
 
     paired: Dict[str, Any] = {}
     for a, b in [("onpolicy_dpo_v2", "task_separated_hybrid"), ("onpolicy_dpo_v2", "prompt_dag_rag_base_14b")]:
-        a1_b0, a0_b1 = 0, 0
-        for cmap in by_key.values():
-            ra = cmap[a]["scores"]["misconception_resolved"]
-            rb = cmap[b]["scores"]["misconception_resolved"]
-            if ra == 1 and rb == 0:
-                a1_b0 += 1
-            elif ra == 0 and rb == 1:
-                a0_b1 += 1
-        paired[f"{a}__vs__{b}"] = {
-            "a1_b0": a1_b0,
-            "a0_b1": a0_b1,
-            "p_value": exact_mcnemar_p(a1_b0, a0_b1),
-        }
+        a_vals = [cmap[a]["scores"]["misconception_resolved"] for cmap in by_key.values()]
+        b_vals = [cmap[b]["scores"]["misconception_resolved"] for cmap in by_key.values()]
+        paired[f"{a}__vs__{b}"] = exact_mcnemar_p(a_vals, b_vals)
 
     report = {
         "metadata": {"domains": ["CS", "KVKK", "Banking", "EE"], "elapsed_sec": round(time.time() - t0, 1)},

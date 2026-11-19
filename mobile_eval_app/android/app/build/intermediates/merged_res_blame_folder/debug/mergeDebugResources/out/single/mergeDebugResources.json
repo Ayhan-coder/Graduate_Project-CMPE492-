@@ -1,0 +1,6 @@
+[
+    {
+        "merged": "edu.boun.cmpe492.edutermeval.app-debug-23:/xml_network_security_config.xml.flat",
+        "source": "edu.boun.cmpe492.edutermeval.app-main-25:/xml/network_security_config.xml"
+    }
+]
