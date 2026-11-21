@@ -153,6 +153,7 @@ def judge_explanation(model, tok, proc, item: Dict[str, Any]) -> Tuple[int, bool
     ]
     text = tok.apply_chat_template(msgs, tokenize=False, add_generation_prompt=True)
     enc = tok(text, return_tensors="pt").to(model.device)
+    enc.pop("token_type_ids", None)
     with torch.no_grad():
         out = model.generate(
             **enc,

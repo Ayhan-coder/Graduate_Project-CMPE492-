@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Optional
 
 logger = logging.getLogger(__name__)
+ROOT = Path(__file__).resolve().parent.parent
 
 DEFAULT_EVREN_BASE_URL = "https://evren-llmapi.ssyz.org.tr/v1"
 # EVREN qwen3.8-flash-next is a reasoning model and bills thinking tokens against
@@ -230,13 +231,15 @@ def generate_evren(
     messages.append({"role": "user", "content": prompt})
 
     def _create(effort_value: str):
-        return client.chat.completions.create(
+        kwargs = dict(
             model=target_model,
             messages=messages,
             temperature=temperature,
             max_tokens=max_tokens,
-            reasoning_effort=effort_value,
         )
+        if effort_value and "gemma" not in target_model.lower():
+            kwargs["reasoning_effort"] = effort_value
+        return client.chat.completions.create(**kwargs)
 
     def _attempt(effort_value: str):
         try:
