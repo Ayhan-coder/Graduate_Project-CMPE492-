@@ -1414,11 +1414,34 @@ Yalnızca Türkçe eğitim içerikleriyle ince ayar yapılmış modellerin öğr
 
 **Çapraz-Dilli Çıkarım:** Hiçbir yabancı dil DPO çifti görmemesine rağmen `EduTerm-14B-DPO`, İngilizce teknik terim korunumunu SFT'ye kıyasla iki katından fazla artırarak **%30.0'dan %61.2'ye** çıkarmıştır (73.1 Transfer Skoru). Buna karşın yalnızca Türkçe odaklı eğitilmiş 2B modeli Kumru-2B yabancı dillerde şablon çökmesi yaşamış (9.8), çok dilli eğitim ortamları için 14B tabanın gerekliliğini kanıtlamıştır.
 
+---
+
+## 8.45 Genişletilmiş HPC Doğrulaması: Çok Dilli Transfer, UTF-8 Logit Maskesi Keşfi, Anlamsal Güvenlik ve RAG/ASR Dayanıklılığı (`İş ID: 36506–36524`)
+
+İlk doğrulama döngüsünün ardından ortaya çıkan genelleme, güvenlik ve kod-çözme (decoding) sorularını yanıtlamak üzere Boğaziçi HPC A40 kümesinde 12 takip deneyi çalıştırılmıştır:
+
+| Deney (Slurm ID) | Koşul / Model | Birincil Metrik | İkincil Metrik / İstatistik | Non-Latin Sızıntı |
+| :--- | :--- | :--- | :--- | :---: |
+| Sıfır-Atış EN Transferi (`36506`) | `onpolicy_dpo_v2` / `dpo_v5_DiD` (`n=30`) | EN Son-Test: **%100.0** | EN Guardrail BalAcc: **%75.0** (base %50.0) | %0.00 |
+| Öğrenci Ölçekleme (`36510`) | `Kumru-2B` / `Qwen-1.5B` (`dpo_v2`) | Son-Test: **%100.0** / **%58.33** | 7B-bf16 ikili çöküş (%0.0) | %0.00 |
+| 300 Oturum 14B Hakem (`36508`) | `dpo_v2` / `hybrid` / `base` (`n=100`) | 14B Çözünürlük: **%100.0** | Sokratik `4.0`, Saflık `4.98–5.00` | — |
+| `omni_merged` vs Pareto (`36515`) | `dpo_v5_pareto` vs `omni_merged` | OOD Son-Test: **%90.0** vs %70.0 | Guardrail: **%72.22** vs %50.0 (hakem %0.0) | %0.00 |
+| Çok Turlu Code-Switch (`36516`) | `dpo_v5_pareto_DiD` (`72` tur) | T2/T3 TPR: **%81.25** ($p=0.0$) | BalAcc: **%82.29** (FPR **%0.00**, T1 %31.25) | %0.00 |
+| Örtük Saldırı Anlamsal DiD (`36519`) | `dpo_v5_semantic_did` (`n=40`) | Örtük TPR: **%75.0** ($p=0.0063$) | BalAcc: **%81.25** (FPR **%12.5**) | %0.00 |
+| UTF-8 `U+FFFD` Maske Düzeltmesi (`36522`) | `utf8_safe` vs `naive_mask` (7B, `n=36`) | Açık-Uçlu: **%66.67** vs %50.0 | Kurtarılan `U+FFFD`: **1,457** (`Kumru`: 178) | %0.69–%1.39 |
+| Ölçeklenmiş Zor OOD (`36524`, `n=30`) | `base_14b` vs `dpo_v5_pareto` | OOD Son-Test: **%73.33** vs %50.0 | 7B Çözünürlük: **%93.33** ($p=0.1185$) | %0.00–%0.83 |
+| Çekişmeli RAG Sadakati (`36518`) | `dpo_v5_pareto` vs `cefr_qlora` (`n=48`) | Genel RAG: **%91.67** vs %64.58 | Çekinme: **%100.0**, Çeldirici: **%81.25** | %0.00 |
+| ASR Gürültü Dayanıklılığı (`36523`) | `dpo_v5_pareto` vs `tr_qlora` (`n=36`) | Orta ASR Kurtarma: **%75.0** vs %16.67 | Ağır ASR Sokratik: **%75.0** vs %25.0 | %0.00 |
+
+- **UTF-8 Bayt-Parça Maskesi Keşfi (`36517`, `36522`):** `Qwen2.5-7B-bf16` öğrencisinin `36510` ve `36517`'de ikili `"DOĞRU/YANLIŞ"` testinde yapay olarak `%0.0–%5.56` bandında kalmasına karşın `14B` hakemli açık-uçlu kavramsal testte **%41.67–%50.0** alması ($p=0.000402$), çıktı örneklerindeki `"DOGUur"`, `"DOGUR"`, `"DOGUU"` yazım bozulmalarından incelenmiştir. Tokenizer denetimi, naif `non-Latin` regex maskesinin `Qwen2.5-14B/7B` içindeki tüm `1,457` (ve `Kumru-2B`'deki `178`) `\ufffd` (`U+FFFD`) yarım UTF-8 devam baytı tokenını hatalı bloke ederek Türkçe `ğ/ş/ı` üretimini bozduğunu kanıtlamıştır. Bu baytları koruyan `utf8_safe_script_mask` açık-uçlu başarıyı `%50.0 -> %66.67` düzeyine çıkarmıştır.
+- **Örtük Saldırılara Karşı Anlamsal Niyet Filtresi (`36516`, `36519`):** Çok turlu `TR-EN` code-switched saldırılarda regex tabanlı Defense-in-Depth Turn-2/Turn-3 saptırmasını `%81.25`'e çıkarırken Turn-1 dolaylı istekleri kaçırmış (`%31.25`); sıfır-atış `14B` anlamsal niyet sınıflandırıcısı eklenince açık regex tetikleyicisi olmayan rol yapma/leetspeak saldırılarında saptırma TPR'ı `%33.33`'ten **%75.0**'a ($p=0.006348$), dengeli güvenlik doğruluğu **%81.25**'e yükselmiştir.
+- **SFT Hizalama Vergisi ve OOD Sınırı (`36515`, `36518`, `36523`, `36524`):** `cefr_qlora`, `tr_qlora` ve `omni_merged` kontrol noktaları RAG sadakatinde (`%64.58`), ASR gürültüsünde (`%0.0–%25.0`) ve OOD Sokratik hakemde (`%0.0`) ciddi hizalama vergisi sergilerken **`dpo_v5_pareto`** RAG sadakatini **%91.67**'ye, orta ASR kurtarma oranını **%75.0**'a geri taşımıştır. Buna karşın `n=30` zor OOD ölçeğinde (`36524`) taban `base_14b` (`%73.33`) İSG odaklı DPO adaptörlerinin (`%50.0`) önünde kalarak alan dışı genelleme sınırını ortaya koymuştur.
+
 ### 8.15 Tekrarlanabilirlik Sicili: Run Manifestleri, Slurm İşleri, Model Revizyonları ve SHA-256 Özetleri (`P2`)
 
 Tüm ana deney çıktıları, Hugging Face model revizyonları (`experiments/models.json`), Boğaziçi HPC (`ultramarine`) Slurm iş kimlikleri ve disk/HPC ağırlık SHA-256 özetleri `experiments/outputs/reproducibility_registry.json` dosyasında (`experiments/data/build_audit_registries.py` ile otomatik oluşturularak) kayıt altına alınmıştır:
 
-- **Önemli Slurm İşleri (`ultramarine`, NVIDIA A40 48 GB):** `33600` (33 QA-geçerli ders toplu DAG/terim çıkarımı), `33602` (`EduTerm-7B-TR` SFT), `33611` (Scaling Law benchmark), `33660` (Cross-Layer ASR→LLM eğrisi), `33750` (`EduTerm-7B-DPO`), `33777` (Quantization eğrisi), `33789` (Long-Context 32K DAG), `33983` (Cross-Family Judge: Qwen2.5-7B vs.\ Mistral-7B-v0.3), `34027` (`EduTerm-14B-CEFR`), `34124` (133 klip toplu korpus), `34561` (7B DPO üretken değerlendirme), `34562` (çapraz-menşe `bfloat16` 7B hakem doğrulaması), `34567` (`Qwen2.5-14B-Instruct` `bfloat16` hakem ölçekleme testi).
+- **Önemli Slurm İşleri (`ultramarine`, NVIDIA A40 48 GB):** `33600` (33 QA-geçerli ders toplu DAG/terim çıkarımı), `33602` (`EduTerm-7B-TR` SFT), `33611` (Scaling Law benchmark), `33660` (Cross-Layer ASR→LLM eğrisi), `33750` (`EduTerm-7B-DPO`), `33777` (Quantization eğrisi), `33789` (Long-Context 32K DAG), `33983` (Cross-Family Judge: Qwen2.5-7B vs.\ Mistral-7B-v0.3), `34027` (`EduTerm-14B-CEFR`), `34124` (133 klip toplu korpus), `34561` (7B DPO üretken değerlendirme), `34562` (çapraz-menşe `bfloat16` 7B hakem doğrulaması), `34567` (`Qwen2.5-14B-Instruct` `bfloat16` hakem ölçekleme testi), `36428`–`36479` (Pareto guardrail `dpo_v5`, 600-negatif EVREN/yerel hakem kıyaslaması, 2-katmanlı Defense-in-Depth ve 5-tohum stokastik kararlılık), `36506`–`36510` (sıfır-atış EN transferi, 300 oturum 14B rubrik puanlama, 1.5B/2B/7B öğrenci ölçekleme), `36514`–`36519` (`omni_merged` Pareto testi, çok turlu TR-EN jailbreak, 36-çift 7B tanı, 48-soruluk çekişmeli RAG sadakati, anlamsal niyet filtreli stealth savunması) ve `36522`–`36524` (`U+FFFD` UTF-8 maske düzeltmesi, ASR gürültü dayanıklılığı ve `n=30` zor OOD ölçekleme).
 - **Kilit Kontrol Noktası SHA-256 Özetleri:** Yerel `srm_whisper_small_tr/adapter_model.safetensors` (`69f60090aa309578e9b3d2f2042d66336774f795b776c71d17a96c30ba6d4543`); HPC `eduterm_7b_tr_sft` (`b26fa6714a5408c8f5c3885ec228e852d8060d743a4ad008eb295e1537f8a895`), `eduterm_14b_cefr_qlora` (`c667308ebf5d7e585491cde86a202fb64ea487b9314d324009dde624e1a3c397`) ve `eduterm_14b_dpo` (`0fb2cf25fc59df47658fbfd1c69a154b2c1ae966281b5b3339fcbcf201e5d938`) ile tüm kontrol noktalarının tam SHA-256 değerleri `experiments/outputs/reproducibility_registry.json` ve `Boğaziçi_CMPE492_Final_Report.tex` Ek C'de yer almaktadır.
 
 ---
