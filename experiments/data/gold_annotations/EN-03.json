@@ -1,0 +1,385 @@
+{
+  "id": "EN-03",
+  "title": "Generative AI in a Nutshell: How LLMs and Diffusion Models Work",
+  "domain": "Artificial Intelligence & Machine Learning",
+  "bloom_level": "Anlama",
+  "terms": [
+    {
+      "canonical": "Generative AI",
+      "aliases": [
+        "generative ai"
+      ],
+      "primary_level": "B1",
+      "definition_b1": "artificial intelligence designed to produce output.",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 49.2,
+      "atesman_b1": 49.2,
+      "atesman_b2": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "Prompt Engineering",
+      "aliases": [
+        "prompt engineering"
+      ],
+      "primary_level": "B1",
+      "definition_b1": "the occupation or activity of writing instructions for an artificial intelligence program or tool to determine or influence the content that it creates.",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 48.0,
+      "atesman_b1": 48.0,
+      "atesman_b2": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "Traditional AI",
+      "aliases": [
+        "traditional ai"
+      ],
+      "primary_level": "B1",
+      "definition_b1": "",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 60.0,
+      "atesman_b1": null,
+      "atesman_b2": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "Large Language Models",
+      "aliases": [
+        "large language models",
+        "LLM"
+      ],
+      "primary_level": "B1",
+      "definition_b1": "",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 60.0,
+      "atesman_b1": null,
+      "atesman_b2": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "ChatGPT",
+      "aliases": [
+        "chatgpt"
+      ],
+      "primary_level": "B1",
+      "definition_b1": "LLM model produced by openAI.",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 100.0,
+      "atesman_b1": 100.0,
+      "atesman_b2": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "Transformer Architecture",
+      "aliases": [
+        "transformer architecture"
+      ],
+      "primary_level": "B2",
+      "definition_b1": "",
+      "definition_b2": "a type of neural network architecture that transforms or changes an input sequence into an output sequence. They do this by learning context and tracking relationships between sequence components.",
+      "definition_c1": "",
+      "atesman_score": 75.1,
+      "atesman_b2": 75.1,
+      "atesman_b1": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "Artificial Neural Network",
+      "aliases": [
+        "artificial neural network",
+        "yapay sinir ağları",
+        "neural net",
+        "neural nets",
+        "massive neural network",
+        "neuralnets",
+        "neuralnet"
+      ],
+      "primary_level": "B1",
+      "definition_b1": "The structure of a large language model, consisting of interconnected numbers (parameters) similar to how neurons connect in a human brain.",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 57.9,
+      "atesman_b1": 57.9,
+      "atesman_b2": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "Parameters",
+      "aliases": [
+        "parameters",
+        "distinguishing",
+        "feature",
+        "argument",
+        "parameter",
+        "parametre",
+        "parametrically",
+        "parametric operator",
+        "model parameter"
+      ],
+      "primary_level": "B1",
+      "definition_b1": "something that decides or limits the way in which something can be done",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 100.0,
+      "atesman_b1": 100.0,
+      "atesman_b2": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "Training",
+      "aliases": [
+        "training",
+        "preparation",
+        "grooming",
+        "education",
+        "breeding",
+        "antrenman",
+        "trainable",
+        "trained",
+        "practical skills",
+        "training provider"
+      ],
+      "primary_level": "B1",
+      "definition_b1": "the process of learning the skills that you need to do a job",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 100.0,
+      "atesman_b1": 100.0,
+      "atesman_b2": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "Backpropagation",
+      "aliases": [
+        "backpropagation",
+        "back-propagation",
+        "backprop",
+        "backpropogation",
+        "error back-propagation"
+      ],
+      "primary_level": "B1",
+      "definition_b1": "is an elegant method to calculate how changes to any of the weights or biases of a neural network will affect the accuracy of model predictions.",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 59.9,
+      "atesman_b1": 59.9,
+      "atesman_b2": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "Reinforcement Learning with Human Feedback",
+      "aliases": [
+        "reinforcement learning with human feedback",
+        "RLHF"
+      ],
+      "primary_level": "B1",
+      "definition_b1": "A process where humans spend thousands of hours testing the model and giving feedback to reinforce good, safe behavior (e.g., teaching it not to help commit crimes).",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 100.0,
+      "atesman_b1": 100.0,
+      "atesman_b2": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "Fine-Tuning",
+      "aliases": [
+        "fine-tuning"
+      ],
+      "primary_level": "B1",
+      "definition_b1": "Adjustments made to the model after the initial massive pre-training phase.",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 83.8,
+      "atesman_b1": 83.8,
+      "atesman_b2": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "Pre-trained",
+      "aliases": [
+        "pre-trained"
+      ],
+      "primary_level": "B1",
+      "definition_b1": "The \"P\" in GPT, indicating the model has already completed its primary training phase and is mostly \"frozen.\"",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 100.0,
+      "atesman_b1": 100.0,
+      "atesman_b2": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "Text-to-Text Models",
+      "aliases": [
+        "text-to-text models"
+      ],
+      "primary_level": "B1",
+      "definition_b1": "Models like GPT-4 that take text as input and generate text (natural language, code, HTML) as output.",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 84.9,
+      "atesman_b1": 84.9,
+      "atesman_b2": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "Text-to-Image Models",
+      "aliases": [
+        "text-to-image models"
+      ],
+      "primary_level": "B1",
+      "definition_b1": "Models that generate visual images based on a written description.",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 80.3,
+      "atesman_b1": 80.3,
+      "atesman_b2": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "Image-to-Image Models",
+      "aliases": [
+        "image-to-image models"
+      ],
+      "primary_level": "B1",
+      "definition_b1": "Models that transform or combine existing images",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 94.5,
+      "atesman_b1": 94.5,
+      "atesman_b2": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "Speech-to-Text Models",
+      "aliases": [
+        "speech-to-text models"
+      ],
+      "primary_level": "B1",
+      "definition_b1": "Models that create voice transcriptions (e.g., meeting notes).",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 100.0,
+      "atesman_b1": 100.0,
+      "atesman_b2": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "Image-to-Text Models",
+      "aliases": [
+        "image-to-text models"
+      ],
+      "primary_level": "B1",
+      "definition_b1": "Models that analyze and describe the contents of an image.",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 100.0,
+      "atesman_b1": 100.0,
+      "atesman_b2": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "Text-to-Audio / Text-to-Video Models",
+      "aliases": [
+        "text-to-audio / text-to-video models"
+      ],
+      "primary_level": "B1",
+      "definition_b1": "Models that generate sounds, music, or video clips from a written prompt.",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 97.2,
+      "atesman_b1": 97.2,
+      "atesman_b2": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "Multimodal AI",
+      "aliases": [
+        "multimodal ai",
+        "multimodal learning",
+        "multimodal machine learning",
+        "multimodal deep learning",
+        "multimodal neural network"
+      ],
+      "primary_level": "B1",
+      "definition_b1": "refers to machine learning models capable of processing and integrating information from multiple modalities or types of data. These modalities can include text, images, audio, video and other forms of sensory input.",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 65.4,
+      "atesman_b1": 65.4,
+      "atesman_b2": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "Emergent Capabilities",
+      "aliases": [
+        "emergent capabilities"
+      ],
+      "primary_level": "B1",
+      "definition_b1": "Unexpected skills—like writing code, playing roles, or understanding high-level concepts like physics—that models develop as they grow larger and see more data.",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 59.7,
+      "atesman_b1": 59.7,
+      "atesman_b2": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "Hallucination",
+      "aliases": [
+        "hallucination",
+        "halüsinasyon",
+        "hallucinations",
+        "hallucinating",
+        "hallucinate",
+        "hallucinoses",
+        "hallucinatory state"
+      ],
+      "primary_level": "B1",
+      "definition_b1": "A sensory perception of something that does not exist, often arising from disorder of the nervous system, as in delirium tremens; a delusion.",
+      "definition_b2": "",
+      "definition_c1": "",
+      "atesman_score": 60.2,
+      "atesman_b1": 60.2,
+      "atesman_b2": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "Application Programming Interfaces",
+      "aliases": [
+        "application programming interfaces",
+        "API"
+      ],
+      "primary_level": "B2",
+      "definition_b1": "",
+      "definition_b2": "A set of routines, protocols, and tools for building software applications, which makes it possible for software components to interact with one another, leading to the ability to share data over a network.",
+      "definition_c1": "",
+      "atesman_score": 31.1,
+      "atesman_b2": 31.1,
+      "atesman_b1": null,
+      "atesman_c1": null
+    },
+    {
+      "canonical": "Autonomous Agents with Tools",
+      "aliases": [
+        "autonomous agents with tools"
+      ],
+      "primary_level": "B2",
+      "definition_b1": "",
+      "definition_b2": "AI-powered software entities that run on their own to accomplish high-level missions without constant micro-management, utilizing tools like internet access or messaging.",
+      "definition_c1": "",
+      "atesman_score": 43.6,
+      "atesman_b2": 43.6,
+      "atesman_b1": null,
+      "atesman_c1": null
+    }
+  ],
+  "updated_at": "2026-11-25 23:25:38"
+}
